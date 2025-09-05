@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import static io.openbas.database.model.CollectExecutionStatus.COLLECTING;
 import static io.openbas.database.specification.InjectSpecification.VALID_TESTABLE_TYPES;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
@@ -176,6 +177,13 @@ public class Inject implements Base, Injection {
   @Queryable(filterable = true, sortable = true)
   private InjectStatus status;
 
+  @Column(name = "inject_collect_status", nullable = false)
+  @Enumerated(EnumType.STRING)
+  @JsonProperty("inject_collect_status")
+  @NotNull
+  @Getter
+  private CollectExecutionStatus collectExecutionStatus = COLLECTING;
+
   // UpdatedAt now used to sync with linked object
   public void setStatus(InjectStatus status) {
     this.updatedAt = now();
@@ -324,6 +332,7 @@ public class Inject implements Base, Injection {
     this.communications.clear();
     this.expectations.clear();
     this.findings.clear();
+    this.setCollectExecutionStatus(COLLECTING);
   }
 
   @JsonProperty("inject_users_number")

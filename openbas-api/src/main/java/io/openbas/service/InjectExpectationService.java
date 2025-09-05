@@ -6,21 +6,25 @@ import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.*;
 import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_END_DATE;
 import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_START_DATE;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.service.InjectExpectationUtils.*;
-import static io.openbas.utils.ExpectationUtils.*;
+import static io.openbas.service.InjectExpectationUtils.computeScore;
+import static io.openbas.service.InjectExpectationUtils.expectationConverter;
+import static io.openbas.utils.ExpectationUtils.HUMAN_EXPECTATION;
+import static io.openbas.utils.inject_expectation_result.InjectExpectationResultUtils.*;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
-import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.specification.InjectExpectationSpecification;
 import io.openbas.execution.ExecutableInject;
+import io.openbas.expectation.ExpectationPropertiesConfig;
+import io.openbas.expectation.ExpectationType;
 import io.openbas.model.Expectation;
+import io.openbas.rest.collector.service.CollectorService;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
+import io.openbas.utils.ExpectationUtils;
 import io.openbas.utils.TargetType;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
@@ -48,10 +52,10 @@ public class InjectExpectationService {
   public static final String PENDING = "Pending";
   public static final String COLLECTOR = "collector";
   private final InjectExpectationRepository injectExpectationRepository;
-  private final InjectRepository injectRepository;
   private final AssetGroupService assetGroupService;
   private final EndpointService endpointService;
-  private final CollectorRepository collectorRepository;
+  private final CollectorService collectorService;
+  @Resource private ExpectationPropertiesConfig expectationPropertiesConfig;
 
   @Resource protected ObjectMapper mapper;
 
@@ -68,49 +72,38 @@ public class InjectExpectationService {
       @NotBlank final String expectationId, @NotNull final ExpectationUpdateInput input) {
     InjectExpectation injectExpectation =
         this.injectExpectationRepository.findById(expectationId).orElseThrow();
-    Optional<InjectExpectationResult> exists =
-        injectExpectation.getResults().stream()
-            .filter(r -> input.getSourceId().equals(r.getSourceId()))
-            .findAny();
+    InjectExpectationResult injectExpectationResult =
+        findResultBySourceId(injectExpectation.getResults(), input.getSourceId());
 
     String result;
     if (HUMAN_EXPECTATION.contains(injectExpectation.getType())) {
       result = input.getScore() >= injectExpectation.getExpectedScore() ? SUCCESS : FAILED;
       injectExpectation.getResults().clear();
-      exists = Optional.empty();
     } else if (DETECTION.equals(injectExpectation.getType())) {
       if (input.getScore() >= injectExpectation.getExpectedScore()) {
-        result = "Detected";
+        result = ExpectationType.DETECTION.successLabel;
       } else if (input.getScore() > 0) {
-        result = "Partially Detected";
+        result = ExpectationType.DETECTION.partialLabel;
       } else {
-        result = "Not Detected";
+        result = ExpectationType.DETECTION.failureLabel;
       }
     } else if (PREVENTION.equals(injectExpectation.getType())) {
       if (input.getScore() >= injectExpectation.getExpectedScore()) {
-        result = "Prevented";
+        result = ExpectationType.PREVENTION.successLabel;
       } else if (input.getScore() > 0) {
-        result = "Partially Prevented";
+        result = ExpectationType.PREVENTION.partialLabel;
       } else {
-        result = "Not Prevented";
+        result = ExpectationType.PREVENTION.failureLabel;
       }
     } else {
       result = "";
     }
-    if (exists.isPresent()) {
-      exists.get().setResult(result);
-      exists.get().setScore(input.getScore());
-      exists.get().setDate(now().toString());
+    if (injectExpectationResult != null) {
+      injectExpectationResult.setResult(result);
+      injectExpectationResult.setScore(input.getScore());
+      injectExpectationResult.setDate(now().toString());
     } else {
-      injectExpectation
-          .getResults()
-          .add(
-              buildInjectExpectationResult(
-                  input.getSourceId(),
-                  input.getSourceType(),
-                  input.getSourceName(),
-                  result,
-                  input.getScore()));
+      injectExpectation.getResults().add(build(input, result));
     }
     if (injectExpectation.getScore() == null) {
       injectExpectation.setScore(input.getScore());
@@ -162,15 +155,7 @@ public class InjectExpectationService {
 
     expectations.forEach(
         expectation -> {
-          expectation
-              .getResults()
-              .add(
-                  buildInjectExpectationResult(
-                      input.getSourceId(),
-                      input.getSourceType(),
-                      input.getSourceName(),
-                      result,
-                      input.getScore()));
+          expectation.getResults().add(build(input, result));
           expectation.setScore(updated.getScore());
           expectation.setUpdatedAt(updated.getUpdatedAt());
           if (isAsset) {
@@ -197,11 +182,8 @@ public class InjectExpectationService {
       @NotBlank final String expectationId, @NotBlank final String sourceId) {
     InjectExpectation injectExpectation =
         this.injectExpectationRepository.findById(expectationId).orElseThrow();
-    Optional<InjectExpectationResult> exists =
-        injectExpectation.getResults().stream()
-            .filter(r -> sourceId.equals(r.getSourceId()))
-            .findAny();
-    if (exists.isPresent()) {
+    InjectExpectationResult result = findResultBySourceId(injectExpectation.getResults(), sourceId);
+    if (result != null) {
       injectExpectation.setResults(
           injectExpectation.getResults().stream()
               .filter(r -> !sourceId.equals(r.getSourceId()))
@@ -345,13 +327,7 @@ public class InjectExpectationService {
       parentExpectation.getResults().clear();
       parentExpectation
           .getResults()
-          .add(
-              buildInjectExpectationResult(
-                  "player-manual-validation",
-                  "player-manual-validation",
-                  "Player Manual Validation",
-                  result,
-                  parentExpectation.getScore()));
+          .add(buildForPlayerManualValidation(result, parentExpectation.getScore()));
       injectExpectationRepository.save(parentExpectation);
 
     } else {
@@ -365,31 +341,11 @@ public class InjectExpectationService {
         expectation.setUpdatedAt(Instant.now());
         expectation.getResults().clear();
         if (result != null) {
-          expectation
-              .getResults()
-              .add(
-                  buildInjectExpectationResult(
-                      "team-manual-validation",
-                      "team-manual-validation",
-                      "Team Manual Validation",
-                      result,
-                      updated.getScore()));
+          expectation.getResults().add(buildForTeamManualValidation(result, updated.getScore()));
         }
         injectExpectationRepository.save(expectation);
       }
     }
-  }
-
-  private InjectExpectationResult buildInjectExpectationResult(
-      String id, String type, String name, String resultStatus, Double score) {
-    return InjectExpectationResult.builder()
-        .sourceId(id)
-        .sourceType(type)
-        .sourceName(name)
-        .result(resultStatus)
-        .date(now().toString())
-        .score(score)
-        .build();
   }
 
   // -- UPDATE FROM EXTERNAL SOURCE : COLLECTORS --
@@ -398,29 +354,11 @@ public class InjectExpectationService {
       @NotBlank String expectationId, @Valid @NotNull InjectExpectationUpdateInput input) {
     InjectExpectation injectExpectation =
         this.findInjectExpectation(expectationId).orElseThrow(ElementNotFoundException::new);
-    Collector collector =
-        this.collectorRepository
-            .findById(input.getCollectorId())
-            .orElseThrow(ElementNotFoundException::new);
+    Collector collector = this.collectorService.collector(input.getCollectorId());
 
-    // Update inject expectation at agent level
-    injectExpectation =
-        this.computeExpectation(
-            injectExpectation,
-            collector.getId(),
-            COLLECTOR,
-            collector.getName(),
-            input.getResult(),
-            input.getIsSuccess(),
-            input.getMetadata());
-
-    Inject inject = injectExpectation.getInject();
-    // Compute potential expectations for asset
-    propagateUpdateToAssets(injectExpectation, inject, collector);
-    // Compute potential expectations for asset groups
-    propagateUpdateToAssetGroups(inject, collector);
-
-    // end of computing
+    List<InjectExpectation> updated =
+        computeExpectationCascading(injectExpectation, collector, input);
+    this.updateAll(updated);
 
     return injectExpectation;
   }
@@ -437,13 +375,11 @@ public class InjectExpectationService {
         injectExpectations.stream().collect(Collectors.toMap(InjectExpectation::getId, e -> e));
 
     Collector collector =
-        this.collectorRepository
-            .findById(
-                inputs.values().stream()
-                    .findFirst()
-                    .orElseThrow(ElementNotFoundException::new)
-                    .getCollectorId())
-            .orElseThrow(ElementNotFoundException::new);
+        this.collectorService.collector(
+            inputs.values().stream()
+                .findFirst()
+                .orElseThrow(ElementNotFoundException::new)
+                .getCollectorId());
 
     // Update inject expectation at agent level
     for (Map.Entry<String, InjectExpectationUpdateInput> entry : inputs.entrySet()) {
@@ -455,150 +391,124 @@ public class InjectExpectationService {
         log.error("Inject expectation not found for ID: {}", injectExpectationId);
         continue;
       }
-
-      injectExpectation =
-          this.computeExpectation(
-              injectExpectation,
-              collector.getId(),
-              COLLECTOR,
-              collector.getName(),
-              input.getResult(),
-              input.getIsSuccess(),
-              input.getMetadata());
-
-      Inject inject = injectExpectation.getInject();
-      // Compute potential expectations for asset
-      propagateUpdateToAssets(injectExpectation, inject, collector);
-      // Compute potential expectations for asset groups
-      propagateUpdateToAssetGroups(inject, collector);
-      // end of computing
+      List<InjectExpectation> updated =
+          computeExpectationCascading(injectExpectation, collector, input);
+      this.updateAll(updated);
     }
   }
 
-  private void propagateUpdateToAssets(
+  public List<InjectExpectation> computeExpectationCascading(
+      InjectExpectation injectExpectation,
+      Collector collector,
+      InjectExpectationUpdateInput input) {
+    List<InjectExpectation> updated = new ArrayList<>();
+    // Update inject expectation at agent level
+    injectExpectation = this.computeExpectationAgent(injectExpectation, input, collector);
+    updated.add(injectExpectation);
+
+    Inject inject = injectExpectation.getInject();
+    // Compute potential expectations for asset
+    updated.addAll(propagateUpdateToAssets(injectExpectation, inject, collector));
+    // Compute potential expectations for asset groups
+    updated.addAll(propagateUpdateToAssetGroups(injectExpectation, inject, collector));
+    return updated;
+  }
+
+  private List<InjectExpectation> propagateUpdateToAssets(
       InjectExpectation injectExpectation, Inject inject, Collector collector) {
-    InjectExpectation finalInjectExpectation = injectExpectation;
 
     List<InjectExpectation> expectationAssets =
         inject.getExpectations().stream()
-            .filter(e -> e.getAsset() != null)
-            .filter(e -> e.getAgent() == null)
-            .filter(e -> e.getAsset().getId().equals(finalInjectExpectation.getAsset().getId()))
-            .filter(
-                e ->
-                    (finalInjectExpectation.getAssetGroup() != null)
-                        ? (e.getAssetGroup() != null
-                            && e.getAssetGroup()
-                                .getId()
-                                .equals(finalInjectExpectation.getAssetGroup().getId()))
-                        : e.getAssetGroup() == null)
-            .filter(e -> e.getType().equals(finalInjectExpectation.getType()))
+            .filter(ExpectationUtils::isAssetExpectation)
+            .filter(e -> e.getAsset().getId().equals(injectExpectation.getAsset().getId()))
+            .filter(e -> e.getType().equals(injectExpectation.getType()))
             .toList();
 
+    List<InjectExpectation> allExpectationAgents =
+        inject.getExpectations().stream()
+            .filter(ExpectationUtils::isAgentExpectation)
+            .filter(e -> e.getType().equals(injectExpectation.getType()))
+            .toList();
+
+    List<InjectExpectation> updated = new ArrayList<>();
     expectationAssets.forEach(
         (expectationAsset -> {
           List<InjectExpectation> expectationAgents =
-              this.expectationsForAgents(
-                  expectationAsset.getInject(),
-                  expectationAsset.getAsset(),
-                  expectationAsset.getAssetGroup(),
-                  expectationAsset.getType());
+              allExpectationAgents.stream()
+                  .filter(e -> e.getAsset().equals(expectationAsset.getAsset()))
+                  .toList();
           // Every agent expectation (result by collector id) is filled
           if (expectationAgents.stream()
-              .noneMatch(
-                  e ->
-                      e.getResults().stream()
-                          .filter(result -> result.getSourceId().equals(collector.getId()))
-                          .toList()
-                          .isEmpty())) {
+              .allMatch(e -> hasValidResultFromSource(e.getResults(), collector.getId()))) {
             // Update Asset inject expectation with new result and score
-            this.computeExpectationAsset(
-                expectationAsset,
-                expectationAgents,
-                collector.getId(),
-                COLLECTOR,
-                collector.getName());
+            updated.add(
+                this.computeExpectationAsset(expectationAsset, expectationAgents, collector));
           }
         }));
+    return updated;
   }
 
-  private void propagateUpdateToAssetGroups(Inject inject, Collector collector) {
+  private List<InjectExpectation> propagateUpdateToAssetGroups(
+      InjectExpectation injectExpectation, Inject inject, Collector collector) {
     List<InjectExpectation> expectationAssetGroups =
-        inject.getExpectations().stream().filter(e -> isAssetGroupExpectation(e)).toList();
+        inject.getExpectations().stream()
+            .filter(ExpectationUtils::isAssetGroupExpectation)
+            .filter(
+                e -> e.getAssetGroup().getId().equals(injectExpectation.getAssetGroup().getId()))
+            .filter(e -> e.getType().equals(injectExpectation.getType()))
+            .toList();
 
+    List<InjectExpectation> allExpectationAssets =
+        inject.getExpectations().stream()
+            .filter(ExpectationUtils::isAssetExpectation)
+            .filter(e -> e.getType().equals(injectExpectation.getType()))
+            .toList();
+
+    List<InjectExpectation> updated = new ArrayList<>();
     expectationAssetGroups.forEach(
         (expectationAssetGroup -> {
           List<InjectExpectation> expectationAssetsByAssetGroup =
-              this.expectationsForAssets(
-                  expectationAssetGroup.getInject(),
-                  expectationAssetGroup.getAssetGroup(),
-                  expectationAssetGroup.getType());
+              allExpectationAssets.stream()
+                  .filter(e -> e.getAssetGroup().equals(expectationAssetGroup.getAssetGroup()))
+                  .toList();
           // Every asset expectation is filled
           if (expectationAssetsByAssetGroup.stream()
-              .noneMatch(
-                  e ->
-                      e.getResults().stream()
-                          .filter(result -> result.getSourceId().equals(collector.getId()))
-                          .toList()
-                          .isEmpty())) {
-            this.computeExpectationGroup(
-                expectationAssetGroup,
-                expectationAssetsByAssetGroup,
-                collector.getId(),
-                COLLECTOR,
-                collector.getName());
+              .allMatch(e -> hasValidResultFromSource(e.getResults(), collector.getId()))) {
+            updated.add(
+                this.computeExpectationAssetGroup(
+                    expectationAssetGroup, expectationAssetsByAssetGroup, collector));
           }
         }));
+    return updated;
   }
 
   // -- COMPUTE RESULTS FROM INJECT EXPECTATIONS --
 
-  public InjectExpectation computeExpectation(
+  public InjectExpectation computeExpectationAgent(
       @NotNull final InjectExpectation expectation,
-      @NotBlank final String sourceId,
-      @NotBlank final String sourceType,
-      @NotBlank final String sourceName,
-      @NotBlank final String result,
-      @NotBlank final Boolean success,
-      final Map<String, String> metadata) {
-    double actualScore =
-        success
-            ? expectation.getExpectedScore()
-            : expectation.getScore() == null ? 0.0 : expectation.getScore();
-    computeResult(
-        expectation,
-        sourceId,
-        sourceType,
-        sourceName,
-        result,
-        success ? expectation.getExpectedScore() : 0.0,
-        metadata);
+      @NotNull final InjectExpectationUpdateInput input,
+      @NotNull final Collector collector) {
+    double actualScore = computeScore(expectation, input.getIsSuccess());
+    build(expectation, collector, input.getResult(), input.getIsSuccess(), input.getMetadata());
     expectation.setScore(actualScore);
-    return this.update(expectation);
+    return expectation;
   }
 
-  public void computeExpectationAsset(
-      InjectExpectation expectationAsset,
-      List<InjectExpectation> expectationAgents,
-      String sourceId,
-      String sourceType,
-      String sourceName) {
-    processExpectation(
-        expectationAsset, expectationAgents, sourceId, sourceType, sourceName, false);
+  public InjectExpectation computeExpectationAsset(
+      @NotNull final InjectExpectation expectationAsset,
+      @NotNull final List<InjectExpectation> expectationAgents,
+      @NotNull final Collector collector) {
+    return processExpectation(expectationAsset, expectationAgents, collector, false);
   }
 
-  public void computeExpectationGroup(
+  public InjectExpectation computeExpectationAssetGroup(
       @NotNull final InjectExpectation expectationAssetGroup,
       @NotNull final List<InjectExpectation> expectationAssets,
-      @NotBlank final String sourceId,
-      @NotBlank final String sourceType,
-      @NotBlank final String sourceName) {
-    processExpectation(
+      @NotNull final Collector collector) {
+    return processExpectation(
         expectationAssetGroup,
         expectationAssets,
-        sourceId,
-        sourceType,
-        sourceName,
+        collector,
         expectationAssetGroup.isExpectationGroup());
   }
 
@@ -606,61 +516,64 @@ public class InjectExpectationService {
     if (expectations.isEmpty()) {
       return false;
     }
+
     return isGroup
         ? expectations.stream().anyMatch(e -> e.getExpectedScore().equals(e.getScore()))
         : expectations.stream().allMatch(e -> e.getExpectedScore().equals(e.getScore()));
   }
 
   private boolean isSuccessScoreResult(
-      List<InjectExpectation> expectations, String sourceId, double expectedScore) {
-    return !expectations.isEmpty()
-        && expectations.stream()
-            .flatMap(exp -> exp.getResults().stream().filter(r -> r.getSourceId().equals(sourceId)))
-            .allMatch(r -> r.getScore().equals(expectedScore));
+      List<InjectExpectation> expectations, Collector collector, double expectedScore) {
+    if (expectations.isEmpty()) {
+      return false;
+    }
+
+    final List<InjectExpectationResult> allResults =
+        expectations.stream().flatMap(exp -> exp.getResults().stream()).toList();
+
+    if (hasNoResult(allResults, collector.getId())) {
+      return false;
+    }
+
+    return allResults.stream()
+        .filter(r -> collector.getId().equals(r.getSourceId()))
+        .allMatch(r -> r.getScore() != null && r.getScore().equals(expectedScore));
   }
 
-  private void processExpectation(
+  private InjectExpectation processExpectation(
       InjectExpectation expectation,
       List<InjectExpectation> expectations,
-      String sourceId,
-      String sourceType,
-      String sourceName,
+      Collector collector,
       boolean isGroup) {
 
     boolean success = isSuccess(expectations, isGroup);
     boolean successScoreResult =
-        isSuccessScoreResult(expectations, sourceId, expectation.getExpectedScore());
-    double finalScore = success ? expectation.getExpectedScore() : 0.0;
+        isSuccessScoreResult(expectations, collector, expectation.getExpectedScore());
+    double finalScore = computeScore(expectation, success);
 
-    computeResult(
+    build(
         expectation,
-        sourceId,
-        sourceType,
-        sourceName,
+        collector,
         successScoreResult
             ? computeSuccessMessage(expectation.getType())
             : computeFailedMessage(expectation.getType()),
-        successScoreResult ? finalScore : 0.0,
+        success,
         null);
     expectation.setScore(finalScore);
-    this.update(expectation);
+    return expectation;
   }
 
   // -- FINAL UPDATE --
 
-  public InjectExpectation update(@NotNull InjectExpectation injectExpectation) {
-    injectExpectation.setUpdatedAt(now());
-    Inject inject = injectExpectation.getInject();
-    inject.setUpdatedAt(now());
-    this.injectRepository.save(inject);
-    return this.injectExpectationRepository.save(injectExpectation);
+  public void updateAll(@NotNull List<InjectExpectation> injectExpectations) {
+    this.injectExpectationRepository.saveAll(injectExpectations);
   }
 
   // -- FETCH INJECT EXPECTATIONS --
 
   public List<InjectExpectation> expectationsNotFill() {
     return fromIterable(this.injectExpectationRepository.findAll()).stream()
-        .filter(e -> e.getResults().stream().toList().isEmpty())
+        .filter(e -> hasAnyEmptyResult(e.getResults()))
         .toList();
   }
 
@@ -716,12 +629,12 @@ public class InjectExpectationService {
                         Instant.now().minus(expirationTime, ChronoUnit.MINUTES)))));
   }
 
-  public List<InjectExpectation> preventionExpectationsNotFill(@NotBlank final String source) {
+  public List<InjectExpectation> preventionExpectationsNotFill(@NotBlank final String sourceId) {
     return this.injectExpectationRepository
         .findAll(Specification.where(InjectExpectationSpecification.type(PREVENTION)))
         .stream()
-        .filter(e -> e.getAsset() != null && e.getAgent() != null)
-        .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
+        .filter(ExpectationUtils::isAgentExpectation)
+        .filter(e -> hasNoResultForSource(e.getResults(), sourceId))
         .toList();
   }
 
@@ -729,8 +642,8 @@ public class InjectExpectationService {
     return this.injectExpectationRepository
         .findAll(Specification.where(InjectExpectationSpecification.type(PREVENTION)))
         .stream()
-        .filter(e -> e.getAsset() != null && e.getAgent() != null)
-        .filter(e -> e.getResults().stream().toList().isEmpty())
+        .filter(ExpectationUtils::isAgentExpectation)
+        .filter(e -> hasNoResults(e.getResults()))
         .toList();
   }
 
@@ -747,12 +660,12 @@ public class InjectExpectationService {
                         Instant.now().minus(expirationTime, ChronoUnit.MINUTES)))));
   }
 
-  public List<InjectExpectation> detectionExpectationsNotFill(@NotBlank final String source) {
+  public List<InjectExpectation> detectionExpectationsNotFill(@NotBlank final String sourceId) {
     return this.injectExpectationRepository
         .findAll(Specification.where(InjectExpectationSpecification.type(DETECTION)))
         .stream()
-        .filter(e -> e.getAsset() != null && e.getAgent() != null)
-        .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
+        .filter(ExpectationUtils::isAgentExpectation)
+        .filter(e -> hasNoResultForSource(e.getResults(), sourceId))
         .toList();
   }
 
@@ -760,8 +673,8 @@ public class InjectExpectationService {
     return this.injectExpectationRepository
         .findAll(Specification.where(InjectExpectationSpecification.type(DETECTION)))
         .stream()
-        .filter(e -> e.getAsset() != null && e.getAgent() != null)
-        .filter(e -> e.getResults().stream().toList().isEmpty())
+        .filter(ExpectationUtils::isAgentExpectation)
+        .filter(e -> hasNoResults(e.getResults()))
         .toList();
   }
 
@@ -778,11 +691,11 @@ public class InjectExpectationService {
                         Instant.now().minus(expirationTime, ChronoUnit.MINUTES)))));
   }
 
-  public List<InjectExpectation> manualExpectationsNotFill(@NotBlank final String source) {
+  public List<InjectExpectation> manualExpectationsNotFill(@NotBlank final String sourceId) {
     return this.injectExpectationRepository
         .findAll(Specification.where(InjectExpectationSpecification.type(MANUAL)))
         .stream()
-        .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
+        .filter(e -> hasNoResultForSource(e.getResults(), sourceId))
         .toList();
   }
 
@@ -790,7 +703,7 @@ public class InjectExpectationService {
     return this.injectExpectationRepository
         .findAll(Specification.where(InjectExpectationSpecification.type(MANUAL)))
         .stream()
-        .filter(e -> e.getResults().stream().toList().isEmpty())
+        .filter(e -> hasNoResults(e.getResults()))
         .toList();
   }
 
@@ -910,7 +823,7 @@ public class InjectExpectationService {
 
   private List<InjectExpectation> mergeExpectationResultsByExpectationType(
       List<InjectExpectation> expectations) {
-    List<String> notCopiedSourceTypes = List.of("collector");
+    List<String> notCopiedSourceTypes = List.of(COLLECTOR);
 
     HashMap<InjectExpectation.EXPECTATION_TYPE, InjectExpectation> electedExpectations =
         new HashMap<>();
@@ -947,98 +860,126 @@ public class InjectExpectationService {
   @Transactional
   public void buildAndSaveInjectExpectations(
       ExecutableInject executableInject, List<Expectation> expectations) {
-    boolean isAtomicTesting = executableInject.getInjection().getInject().isAtomicTesting();
-    boolean isScheduledInject = !executableInject.isDirect();
-    // Create the expectations
-    List<Team> teams = executableInject.getTeams();
-    List<Asset> assets = executableInject.getAssets();
-    List<AssetGroup> assetGroups = executableInject.getAssetGroups();
-
-    if ((isScheduledInject || isAtomicTesting) && !expectations.isEmpty()) {
-      if (!teams.isEmpty()) {
-        List<InjectExpectation> injectExpectationsByTeam;
-
-        List<InjectExpectation> injectExpectationsByUserAndTeam;
-        // If atomicTesting, We create expectation for every player and every team
-        if (isAtomicTesting) {
-          injectExpectationsByTeam =
-              teams.stream()
-                  .flatMap(
-                      team ->
-                          expectations.stream()
-                              .map(
-                                  expectation ->
-                                      expectationConverter(team, executableInject, expectation)))
-                  .collect(Collectors.toList());
-
-          injectExpectationsByUserAndTeam =
-              teams.stream()
-                  .flatMap(
-                      team ->
-                          team.getUsers().stream()
-                              .flatMap(
-                                  user ->
-                                      expectations.stream()
-                                          .map(
-                                              expectation ->
-                                                  expectationConverter(
-                                                      team, user, executableInject, expectation))))
-                  .toList();
-        } else {
-          // Create expectations for every enabled player in every team
-          injectExpectationsByUserAndTeam =
-              teams.stream()
-                  .flatMap(
-                      team ->
-                          team.getExerciseTeamUsers().stream()
-                              .filter(
-                                  exerciseTeamUser ->
-                                      exerciseTeamUser
-                                          .getExercise()
-                                          .getId()
-                                          .equals(
-                                              executableInject
-                                                  .getInjection()
-                                                  .getExercise()
-                                                  .getId()))
-                              .flatMap(
-                                  exerciseTeamUser ->
-                                      expectations.stream()
-                                          .map(
-                                              expectation ->
-                                                  expectationConverter(
-                                                      team,
-                                                      exerciseTeamUser.getUser(),
-                                                      executableInject,
-                                                      expectation))))
-                  .toList();
-
-          // Create a set of teams that have at least one enabled player
-          Set<Team> teamsWithEnabledPlayers =
-              injectExpectationsByUserAndTeam.stream()
-                  .map(InjectExpectation::getTeam)
-                  .collect(Collectors.toSet());
-
-          // Add only the expectations where the team has at least one enabled player
-          injectExpectationsByTeam =
-              teamsWithEnabledPlayers.stream()
-                  .flatMap(
-                      team ->
-                          expectations.stream()
-                              .map(
-                                  expectation ->
-                                      expectationConverter(team, executableInject, expectation)))
-                  .collect(Collectors.toList());
-        }
-        injectExpectationsByTeam.addAll(injectExpectationsByUserAndTeam);
-        injectExpectationRepository.saveAll(injectExpectationsByTeam);
-      } else if (!assets.isEmpty() || !assetGroups.isEmpty()) {
-        List<InjectExpectation> injectExpectations =
-            expectations.stream()
-                .map(expectation -> expectationConverter(executableInject, expectation))
-                .collect(Collectors.toList());
-        injectExpectationRepository.saveAll(injectExpectations);
-      }
+    if (expectations == null || expectations.isEmpty()) {
+      return;
     }
+
+    final boolean isAtomicTesting = executableInject.getInjection().getInject().isAtomicTesting();
+    final boolean isScheduledInject = !executableInject.isDirect();
+
+    if (!isScheduledInject && !isAtomicTesting) {
+      return;
+    }
+
+    // Create the expectations
+    final List<Team> teams = executableInject.getTeams();
+    final List<Asset> assets = executableInject.getAssets();
+    final List<AssetGroup> assetGroups = executableInject.getAssetGroups();
+
+    List<InjectExpectation> injectExpectations = new ArrayList<>();
+    if (!teams.isEmpty()) {
+      final String exerciseId = executableInject.getInjection().getExercise().getId();
+
+      List<InjectExpectation> injectExpectationsByUserAndTeam;
+      // If atomicTesting, We create expectation for every player and every team
+      if (isAtomicTesting) {
+        injectExpectations =
+            teams.stream()
+                .flatMap(
+                    team ->
+                        expectations.stream()
+                            .map(
+                                expectation ->
+                                    expectationConverter(
+                                        team,
+                                        executableInject,
+                                        expectation,
+                                        expectationPropertiesConfig)))
+                .collect(Collectors.toList());
+
+        injectExpectationsByUserAndTeam =
+            teams.stream()
+                .flatMap(
+                    team ->
+                        team.getUsers().stream()
+                            .flatMap(
+                                user ->
+                                    expectations.stream()
+                                        .map(
+                                            expectation ->
+                                                expectationConverter(
+                                                    team,
+                                                    user,
+                                                    executableInject,
+                                                    expectation,
+                                                    expectationPropertiesConfig))))
+                .toList();
+      } else {
+        // Create expectations for every enabled player in every team
+        injectExpectationsByUserAndTeam =
+            teams.stream()
+                .flatMap(
+                    team ->
+                        team.getExerciseTeamUsers().stream()
+                            .filter(
+                                exerciseTeamUser ->
+                                    exerciseTeamUser.getExercise().getId().equals(exerciseId))
+                            .flatMap(
+                                exerciseTeamUser ->
+                                    expectations.stream()
+                                        .map(
+                                            expectation ->
+                                                expectationConverter(
+                                                    team,
+                                                    exerciseTeamUser.getUser(),
+                                                    executableInject,
+                                                    expectation,
+                                                    expectationPropertiesConfig))))
+                .toList();
+
+        // Create a set of teams that have at least one enabled player
+        Set<Team> teamsWithEnabledPlayers =
+            injectExpectationsByUserAndTeam.stream()
+                .map(InjectExpectation::getTeam)
+                .collect(Collectors.toSet());
+
+        // Add only the expectations where the team has at least one enabled player
+        injectExpectations =
+            teamsWithEnabledPlayers.stream()
+                .flatMap(
+                    team ->
+                        expectations.stream()
+                            .map(
+                                expectation ->
+                                    expectationConverter(
+                                        team,
+                                        executableInject,
+                                        expectation,
+                                        expectationPropertiesConfig)))
+                .collect(Collectors.toList());
+      }
+      injectExpectations.addAll(injectExpectationsByUserAndTeam);
+    } else if (!assets.isEmpty() || !assetGroups.isEmpty()) {
+      injectExpectations =
+          expectations.stream()
+              .map(
+                  expectation ->
+                      expectationConverter(
+                          executableInject, expectation, expectationPropertiesConfig))
+              .collect(Collectors.toList());
+    }
+
+    if (!injectExpectations.isEmpty()) {
+      setupExpectationResults(injectExpectations);
+      injectExpectationRepository.saveAll(injectExpectations);
+    }
+  }
+
+  private void setupExpectationResults(@NotNull final List<InjectExpectation> injectExpectations) {
+    List<Collector> collectors = collectorService.securityPlatformCollectors();
+    injectExpectations.stream()
+        .filter(ie -> List.of(PREVENTION, DETECTION).contains(ie.getType()))
+        .forEach(
+            injectExpectation -> injectExpectation.setResults(setUpFromCollectors(collectors)));
   }
 }
