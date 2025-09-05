@@ -68,7 +68,7 @@ public class StixApi extends RestBehavior {
       summary =
           "The current scenario does not contain injects. "
               + "This may happen if no Attack-Pattern is defined in the STIX bundle "
-              + "or if the attack patterns (TTPs) do not exist in the OAEV platform.";
+              + "or if the Attack Patterns (TTPs) do not exist in the OAEV platform.";
     } else {
       summary = "Scenario with Injects created successfully";
     }
