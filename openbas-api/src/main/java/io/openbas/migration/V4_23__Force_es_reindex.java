@@ -6,7 +6,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V4_21__Force_es_reindex extends BaseJavaMigration {
+public class V4_23__Force_es_reindex extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
