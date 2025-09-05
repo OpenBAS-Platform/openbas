@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(StixApi.STIX_URI)
@@ -52,12 +54,17 @@ public class StixApi extends RestBehavior {
       Scenario scenario = stixService.processBundle(stixJson);
       String summary = stixService.generateBundleImportReport(scenario);
       BundleImportReport importReport = new BundleImportReport(scenario.getId(), summary);
-
       return ResponseEntity.ok(importReport);
     } catch (ParsingException | IOException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+      log.error(String.format("Parsing error while processing STIX bundle: %s", e.getMessage()), e);
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+          .body("Parsing error while processing STIX bundle.");
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+      log.error(
+          String.format(
+              "An unexpected server error occurred. Please contact support: %s", e.getMessage()),
+          e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }
 
