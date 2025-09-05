@@ -107,8 +107,8 @@ const inlineStyles: Record<string, CSSProperties> = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    cursor: 'pointer',
   },
+  clickable: { cursor: 'pointer' },
   user_email: {
     float: 'left',
     width: '30%',
@@ -324,7 +324,10 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose, canManage 
                   {onToggleUser && (
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.user_enabled}
+                      style={{
+                        ...inlineStyles.user_enabled,
+                        ...(canManage ? inlineStyles.clickable : {}),
+                      }}
                       onClick={() => canManage && onToggleUser(teamId, user.user_id, user.user_enabled)}
                     >
                       <ItemBoolean
