@@ -47,6 +47,7 @@ public class SecurityCoverageInjectService {
    *
    * @param scenario the scenario for which injects are managed
    * @param securityCoverage the related security coverage providing AttackPattern references
+   * @return list injects related to this scenario
    */
   public Set<Inject> createdInjectsForScenario(
       Scenario scenario, SecurityCoverage securityCoverage) {
