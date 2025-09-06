@@ -152,4 +152,12 @@ public class CustomDashboardService {
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
   }
+
+  public CustomDashboard findCustomDashboardBySimulationId(@NotBlank final String simulationId) {
+    return customDashboardRepository.findCustomDashboardBySimulationId(simulationId);
+  }
+
+  public CustomDashboard findCustomDashboardByScenarioId(@NotBlank final String scenarioId) {
+    return customDashboardRepository.findCustomDashboardByScenarioId(scenarioId);
+  }
 }

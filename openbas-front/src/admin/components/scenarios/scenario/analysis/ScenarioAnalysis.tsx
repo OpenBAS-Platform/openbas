@@ -2,8 +2,7 @@ import { useTheme } from '@mui/material/styles';
 import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
-import { fetchCustomDashboard } from '../../../../../actions/custom_dashboards/customdashboard-action';
-import { fetchScenario } from '../../../../../actions/scenarios/scenario-actions';
+import { fetchCustomDashboardFromScenario, fetchScenario } from '../../../../../actions/scenarios/scenario-actions';
 import { type ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import { SCENARIO_SIMULATIONS } from '../../../../../components/common/queryable/filter/constants';
 import Loader from '../../../../../components/Loader';
@@ -32,7 +31,7 @@ const ScenarioAnalysis = () => {
 
   useEffect(() => {
     if (isNotEmptyField(scenario.scenario_custom_dashboard)) {
-      fetchCustomDashboard(scenario.scenario_custom_dashboard).then((response) => {
+      fetchCustomDashboardFromScenario(scenario.scenario_id).then((response) => {
         if (response.data) {
           const dashboard = response.data;
           setCustomDashboard(dashboard);

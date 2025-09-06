@@ -4,6 +4,7 @@ import { Route, Routes, useParams } from 'react-router';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { fetchCustomDashboard } from '../../../../actions/custom_dashboards/customdashboard-action';
+import { attackPaths, count, entities, series } from '../../../../actions/dashboards/dashboard-action';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
@@ -84,6 +85,10 @@ const CustomDashboardIndex = () => {
     setCustomDashboard: setCustomDashboardValue,
     customDashboardParameters: parameters,
     setCustomDashboardParameters: setParameters,
+    fetchCount: count,
+    fetchSeries: series,
+    fetchEntities: entities,
+    fetchAttackPaths: attackPaths,
   }), [customDashboardValue, setCustomDashboardValue, parameters, setParameters]);
 
   return (
