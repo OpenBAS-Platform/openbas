@@ -4,21 +4,22 @@ import LogoCollapsed from '../static/images/logo_dark.png';
 import LogoText from '../static/images/logo_text_dark.png';
 import { hexToRGB } from '../utils/Colors';
 import { fileUri } from '../utils/Environment';
+import { FDS } from './fds-tokens.generated';
 import { FONT_FAMILY_CODE, INLINE_CONTROL_HEIGHT, type LabelColor, LabelColorDict } from './Theme';
 
 // Aligned with OpenCTI's dark theme (opencti-front/src/components/ThemeDark.ts):
 // same default palette, typography, and component overrides, so both platforms
 // share a single visual language. OpenAEV-specific tokens (labelChipMap,
 // xtmhub, widgets, background.code / paperInCard) are kept on top.
-const EE_COLOR = '#00f18d';
+const EE_COLOR = FDS.colors.dark['--color-filigran-tonic-primary'];
 
-export const THEME_DARK_DEFAULT_BACKGROUND = '#070d19';
-const THEME_DARK_DEFAULT_BODY_END_GRADIENT = '#08101D';
-const THEME_DARK_DEFAULT_PRIMARY = '#0fbcff';
-const THEME_DARK_DEFAULT_SECONDARY = '#00f18d';
-const THEME_DARK_DEFAULT_ACCENT = '#0f1e38';
-const THEME_DARK_DEFAULT_PAPER = '#09101e';
-const THEME_DARK_DEFAULT_NAV = '#070d19';
+export const THEME_DARK_DEFAULT_BACKGROUND = FDS.colors.dark['--bg-elevation-default-layer-0'];
+const THEME_DARK_DEFAULT_BODY_END_GRADIENT = FDS.colors.dark['--bg-elevation-default-layer-0-gradient'];
+const THEME_DARK_DEFAULT_PRIMARY = FDS.colors.dark['--color-filigran-brand-primary'];
+const THEME_DARK_DEFAULT_SECONDARY = EE_COLOR;
+const THEME_DARK_DEFAULT_ACCENT = FDS.colors.dark['--bg-elevation-default-layer-3'];
+const THEME_DARK_DEFAULT_PAPER = FDS.colors.dark['--bg-elevation-default-layer-1'];
+const THEME_DARK_DEFAULT_NAV = FDS.colors.dark['--bg-elevation-heading-layer-0'];
 const THEME_DARK_DEFAULT_TEXT = '#F2F2F3';
 export const THEME_DARK_DIALOG_BACKGROUND = '#0F1D34';
 
@@ -72,10 +73,10 @@ const ThemeDark = (
     warning: { main: '#ffa726' },
     primary: {
       main: primary || THEME_DARK_DEFAULT_PRIMARY,
-      light: primary ? alpha(primary, 0.08) : '#B2ECFF',
+      light: primary ? alpha(primary, 0.08) : FDS.colors.dark['--color-filigran-brand-secondary'],
     },
     secondary: { main: secondary || THEME_DARK_DEFAULT_SECONDARY },
-    gradient: { main: '#00f18d' },
+    gradient: { main: EE_COLOR },
     border: {
       primary: hexToRGB(primary || THEME_DARK_DEFAULT_PRIMARY, 0.3),
       secondary: '#424751',
@@ -113,7 +114,7 @@ const ThemeDark = (
       background: hexToRGB(EE_COLOR, 0.2),
       lightBackground: hexToRGB(EE_COLOR, 0.08),
     },
-    xtmhub: { main: '#00f1bd' },
+    xtmhub: { main: EE_COLOR },
     background: {
       default: background || THEME_DARK_DEFAULT_BACKGROUND,
       paper: paper || THEME_DARK_DEFAULT_PAPER,
@@ -121,9 +122,10 @@ const ThemeDark = (
       accent: accent || THEME_DARK_DEFAULT_ACCENT,
       shadow: 'rgba(200, 200, 200, 0.15)',
       // the only way for now to know if we should apply the paper color or not
+      // fds-migration/TOKEN-MAPPING.md § D — token value, main's custom-paper behaviour kept.
       secondary: paper === THEME_DARK_DEFAULT_PAPER
-        ? '#0C1524'
-        : (paper ?? '#0C1524'),
+        ? FDS.colors.dark['--bg-elevation-highlight-layer-0']
+        : (paper ?? FDS.colors.dark['--bg-elevation-highlight-layer-0']),
       // Compare the RESOLVED nav (param is null when no custom theme is set), so
       // the default install gets the lighter '#0f1d34' drawer blue instead of
       // darken('#0f1d34', 0.5) - the latter made every drawer body near-black.
@@ -158,8 +160,8 @@ const ThemeDark = (
       medium: '#E1B823',
       low: '#16AD34',
       info: '#1565c0',
-      none: '#424242',
-      default: '#1C2F49',
+      none: FDS.colors.dark['--color-feedback-neutral-primary'],
+      default: FDS.colors.dark['--color-feedback-neutral-primary'],
     },
     designSystem: {
       primary: {
@@ -184,16 +186,16 @@ const ThemeDark = (
       },
       background: {
         main: '#070D19',
-        bg1: '#0C1524',
-        bg2: '#0D182A',
-        bg3: '#253348',
-        bg4: '#1C2F49',
-        disabled: '#363B46',
+        bg1: FDS.colors.dark['--bg-elevation-default-layer-0'],
+        bg2: FDS.colors.dark['--bg-elevation-default-layer-1'],
+        bg3: FDS.colors.dark['--bg-elevation-default-layer-2'],
+        bg4: FDS.colors.dark['--bg-elevation-default-layer-3'],
+        disabled: FDS.colors.dark['--bg-elevation-disabled'],
       },
       border: {
-        main: '#2B3447',
-        border1: '#424751',
-        border2: '#1C253A',
+        main: FDS.colors.dark['--border-elevation-default'],
+        border1: FDS.colors.dark['--border-elevation-subtle'],
+        border2: FDS.colors.dark['--border-elevation-subtle'],
       },
       gradient: {
         background: 'linear-gradient(100.35deg, #070D19 0%, #08101d 100%)',
@@ -230,8 +232,8 @@ const ThemeDark = (
           800: '#313235',
         },
         blue: {
-          500: '#0099CC',
-          900: '#003242',
+          500: FDS.colors.dark['--color-feedback-info-secondary-transparency'],
+          900: FDS.colors.dark['--color-feedback-info-secondary-transparency'],
         },
         darkBlue: {
           300: '#7587FF',
