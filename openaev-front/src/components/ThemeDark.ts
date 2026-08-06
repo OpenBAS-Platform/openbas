@@ -185,7 +185,12 @@ const ThemeDark = (
         dark: '#5E1AD5',
       },
       background: {
-        main: '#070D19',
+        main: THEME_DARK_DEFAULT_BACKGROUND,
+        // bg1-bg4/disabled: resolved in § 9 on the matching elevation layer (bgN → layer-(N-1);
+        // lib gap-fix lib#52). bg2 had a live consumer (the legacy LeftMenu.tsx separator) when
+        // this mapping was arbitrated; that menu is now the design system's Navbar, which owns its
+        // own separator colour, so bg2 has no consumer left. The delta was confirmed imperceptible
+        // either way, see § 9 proof table.
         bg1: FDS.colors.dark['--bg-elevation-default-layer-0'],
         bg2: FDS.colors.dark['--bg-elevation-default-layer-1'],
         bg3: FDS.colors.dark['--bg-elevation-default-layer-2'],
