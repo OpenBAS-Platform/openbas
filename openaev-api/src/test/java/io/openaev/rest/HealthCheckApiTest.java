@@ -8,9 +8,9 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import io.openaev.IntegrationTest;
+import io.openaev.api.health_check.dto.HealthCheckDetailsOutput;
 import io.openaev.context.TxCtx;
 import io.openaev.rest.health_check.HealthCheckApi;
-import io.openaev.rest.health_check.dto.HealthCheckDetailsOutput;
 import io.openaev.service.HealthCheckService;
 import io.openaev.service.HealthCheckService.StorageUsage;
 import io.openaev.service.exception.HealthCheckFailureException;
