@@ -46,9 +46,12 @@ public class HealthCheckApiTest extends IntegrationTest {
   @DisplayName("Test healthCheck")
   @Test
   void test_healthCheck() throws Exception {
-    ResponseEntity<?> responseEntity = healthCheckApi.healthCheck(TxCtx.missing(), KEY, false);
+    ResponseEntity<HealthCheckDetailsOutput> responseEntity =
+        healthCheckApi.healthCheck(TxCtx.missing(), KEY, false);
     verify(healthCheckService).runHealthCheck();
-    assertEquals(new ResponseEntity<>("success", HttpStatus.OK), responseEntity);
+    assertEquals(
+        new ResponseEntity<>(new HealthCheckDetailsOutput("success", null, null, null), HttpStatus.OK),
+        responseEntity);
   }
 
   @DisplayName("Test healthCheck without details does not compute the storage usage")
@@ -65,7 +68,8 @@ public class HealthCheckApiTest extends IntegrationTest {
   void test_healthCheck_WITH_details() throws Exception {
     when(healthCheckService.getStorageUsage()).thenReturn(new StorageUsage(1L, 2L, 3L));
 
-    ResponseEntity<?> responseEntity = healthCheckApi.healthCheck(TxCtx.missing(), KEY, true);
+    ResponseEntity<HealthCheckDetailsOutput> responseEntity =
+        healthCheckApi.healthCheck(TxCtx.missing(), KEY, true);
 
     verify(healthCheckService).runHealthCheck();
     assertEquals(
