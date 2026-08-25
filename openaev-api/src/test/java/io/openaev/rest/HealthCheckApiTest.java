@@ -50,7 +50,8 @@ public class HealthCheckApiTest extends IntegrationTest {
         healthCheckApi.healthCheck(TxCtx.missing(), KEY, false);
     verify(healthCheckService).runHealthCheck();
     assertEquals(
-        new ResponseEntity<>(new HealthCheckDetailsOutput("success", null, null, null), HttpStatus.OK),
+        new ResponseEntity<>(
+            new HealthCheckDetailsOutput("success", null, null, null), HttpStatus.OK),
         responseEntity);
   }
 
