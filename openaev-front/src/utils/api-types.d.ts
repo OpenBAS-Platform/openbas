@@ -5391,6 +5391,7 @@ export interface Finding {
   finding_inject_id?: string;
   /** @deprecated */
   finding_labels?: string[];
+  finding_location_asset_id?: string;
   finding_name?: string;
   finding_remediation?: string;
   finding_resource?: string;
@@ -5516,6 +5517,105 @@ export interface FindingInput {
     | "expectation_signature"
     | "ocsf";
   /** @minLength 1 */
+  finding_value: string;
+}
+
+export interface FindingSiblingOutput {
+  /** Whether this sibling is currently archived (manually, or by re-detection timeout) - always included per Decision #10, never hidden from this panel. */
+  finding_archived?: boolean;
+  /**
+   * Time this finding was manually archived (bulk 'Archive' action), null if it has never been manually archived. Combined with the tenant's archive-days setting on the frontend to compute the 'Archived' badge.
+   * @format date-time
+   */
+  finding_archived_at?: string;
+  /**
+   * Asset groups linked to assets
+   * @uniqueItems true
+   */
+  finding_asset_groups?: AssetGroupSimple[];
+  /**
+   * Assets linked to the finding (any asset type, not only endpoints)
+   * @uniqueItems true
+   */
+  finding_assets: EndpointSimple[];
+  /** Cloud account identifier the resource belongs to (OCSF findings only) */
+  finding_cloud_account?: string;
+  /** Cloud provider the resource belongs to, e.g. "aws", "azure", "gcp", "kubernetes" (OCSF findings only) */
+  finding_cloud_provider?: string;
+  /** Cloud region of the resource (OCSF findings only) */
+  finding_cloud_region?: string;
+  /** Comma-joined violated compliance requirements (OCSF findings only) */
+  finding_compliance?: string;
+  /**
+   * First time the finding was seen
+   * @format date-time
+   */
+  finding_created_at: string;
+  /**
+   * Last time a user acted on this finding (triage status change, comment), null if no human action has ever been recorded
+   * @format date-time
+   */
+  finding_human_updated_at?: string;
+  /**
+   * Finding Id
+   * @minLength 1
+   */
+  finding_id: string;
+  /** The single asset that is this sibling Finding's Location (Triforce identity, Phase 1). Null for findings not yet covered by the Location backfill (multi-asset or unlocated finding types - see Finding#locationAsset). */
+  finding_location?: EndpointSimple;
+  /** Remediation guidance for the cloud misconfiguration (OCSF findings only) */
+  finding_remediation?: string;
+  /** Scanned cloud resource identifier, e.g. an S3 bucket ARN (OCSF findings only) */
+  finding_resource?: string;
+  /** Severity of the cloud misconfiguration (OCSF findings only) */
+  finding_severity?: string;
+  /** Injector that produced this finding (null if the finding was created manually, e.g. via the API, without a real inject/injector behind it) */
+  finding_source?: InjectorSimple;
+  /** Current triage status of the finding (UNTRIAGED if no triage decision has been made yet) */
+  finding_triage_status:
+    | "UNTRIAGED"
+    | "CONFIRMED"
+    | "FALSE_POSITIVE"
+    | "RISK_ACCEPTED";
+  /**
+   * Represents the data type being extracted.
+   * @example "text, number, port, portscan, ipv4, ipv6, credentials, cve"
+   */
+  finding_type:
+    | "text"
+    | "action_output"
+    | "number"
+    | "port"
+    | "portscan"
+    | "ipv4"
+    | "ipv6"
+    | "credentials"
+    | "cve"
+    | "username"
+    | "email"
+    | "share"
+    | "file"
+    | "admin_username"
+    | "group"
+    | "computer"
+    | "password_policy"
+    | "delegation"
+    | "sid"
+    | "vulnerability"
+    | "account_with_password_not_required"
+    | "asreproastable_account"
+    | "kerberoastable_account"
+    | "expectation_signature"
+    | "ocsf";
+  /**
+   * Last time the finding was seen
+   * @format date-time
+   */
+  finding_updated_at: string;
+  /**
+   * Finding Value
+   * @minLength 1
+   */
   finding_value: string;
 }
 
@@ -8054,6 +8154,25 @@ export interface PageEndpointTargetOutput {
 
 export interface PageExerciseSimple {
   content?: ExerciseSimple[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageFindingSiblingOutput {
+  content?: FindingSiblingOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;

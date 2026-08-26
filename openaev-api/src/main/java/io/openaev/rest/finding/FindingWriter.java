@@ -30,9 +30,13 @@ public class FindingWriter {
       String assetId,
       String[] tagIds,
       String tenantId) {
+    // Triforce Phase 1: this write path always resolves exactly one asset before being called
+    // (see FindingService#saveAgentFinding), so that same asset also serves as the Location for
+    // the new identity key - no separate parameter needed.
     String findingId =
         findingRepository.upsertFinding(
-            findingField, findingType, findingValue, findingLabels, injectId, name, tenantId);
+            findingField, findingType, findingValue, findingLabels, injectId, assetId, name,
+            tenantId);
     findingRepository.insertFindingAsset(findingId, assetId);
     findingRepository.insertFindingTags(findingId, tagIds);
   }

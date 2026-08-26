@@ -15,6 +15,7 @@ import RemediationInfoTab from '../settings/vulnerabilities/RemediationInfoTab';
 import TabLabelWithEE from '../settings/vulnerabilities/TabLabelWithEE';
 import { type VulnerabilityStatus } from '../settings/vulnerabilities/VulnerabilityDetail';
 import VulnerabilityTabPanel from '../settings/vulnerabilities/VulnerabilityTabPanel';
+import AlsoDetectedOnPanel from './AlsoDetectedOnPanel';
 import FindingComments from './FindingComments';
 import FindingTriageHistory from './FindingTriageHistory';
 import OCSFRemediationTab from './OCSFRemediationTab';
@@ -81,6 +82,9 @@ const FindingDetail = ({
       key: 'Related Injects',
       label: t('Related Injects'),
     }, {
+      key: 'Also Detected On',
+      label: t('Also Detected On'),
+    }, {
       key: 'Remediation',
       label: <TabLabelWithEE label={t('Remediation')} />,
     }, {
@@ -94,6 +98,9 @@ const FindingDetail = ({
     tabEntries = [{
       key: 'Related Injects',
       label: t('Related Injects'),
+    }, {
+      key: 'Also Detected On',
+      label: t('Also Detected On'),
     }, {
       key: 'Remediation',
       // OCSF findings are produced by the Prowler injector, which is planned to become an
@@ -113,6 +120,9 @@ const FindingDetail = ({
     tabEntries = [{
       key: 'Related Injects',
       label: t('Related Injects'),
+    }, {
+      key: 'Also Detected On',
+      label: t('Also Detected On'),
     }, {
       key: 'Comments',
       label: t('Comments'),
@@ -141,6 +151,8 @@ const FindingDetail = ({
             additionalFilterNames={additionalFilterNames}
           />
         );
+      case 'Also Detected On':
+        return <AlsoDetectedOnPanel finding={selectedFinding} />;
       case 'Remediation':
         if (isOCSF) {
           // See the isOCSF tabEntries comment above: gated the same way as CVE remediation below,

@@ -45,20 +45,34 @@ public class FindingSpecification {
         specPredicate = baseSpec.toPredicate(subRoot, query, cb);
       }
 
-      // Correlated subquery: the most recent finding_updated_at within the same (type, value)
-      // group as subRoot. Used below to restrict subRoot to only the row(s) that are the most
-      // recently seen occurrence of that group, rather than picking an arbitrary row by minimum
-      // id (an id has no guaranteed relationship to recency).
+      // Correlated subquery: the most recent finding_updated_at within the same (type, value,
+      // location) group as subRoot. Used below to restrict subRoot to only the row(s) that are
+      // the most recently seen occurrence of that group, rather than picking an arbitrary row by
+      // minimum id (an id has no guaranteed relationship to recency).
+      //
+      // Triforce Phase 1 (finding_triforce_design.md, Decision #1): the group now also includes
+      // locationAsset.id, so findings on different assets no longer collapse into a single list
+      // row. locationAsset.id is nullable (unlocated findings: multi-asset checks, or types not
+      // yet covered by this migration's backfill) - a plain cb.equal would make Postgres treat
+      // two NULLs as non-matching (NULL = NULL is unknown), which would wrongly split every
+      // unlocated finding into its own group of one instead of keeping their pre-Phase-1
+      // "grouped by (type, value) only" behavior. coalesce(...) to a sentinel that can never
+      // collide with a real asset id makes two NULLs compare equal here, matching the groupBy
+      // below (plain SQL GROUP BY already treats NULLs as equal for grouping purposes).
       Subquery<Instant> maxUpdatedAtSubquery = subquery.subquery(Instant.class);
       Root<Finding> maxRoot = maxUpdatedAtSubquery.from(Finding.class);
       Predicate maxSpecPredicate = null;
       if (baseSpec != null) {
         maxSpecPredicate = baseSpec.toPredicate(maxRoot, query, cb);
       }
+      Expression<String> noLocationSentinel = cb.literal("__no_location__");
       Predicate sameGroup =
           cb.and(
               cb.equal(maxRoot.get("type"), subRoot.get("type")),
-              cb.equal(maxRoot.get("value"), subRoot.get("value")));
+              cb.equal(maxRoot.get("value"), subRoot.get("value")),
+              cb.equal(
+                  cb.coalesce(maxRoot.get("locationAsset").get("id"), noLocationSentinel),
+                  cb.coalesce(subRoot.get("locationAsset").get("id"), noLocationSentinel)));
       maxUpdatedAtSubquery.select(cb.greatest(maxRoot.<Instant>get("updateDate")));
       maxUpdatedAtSubquery.where(
           maxSpecPredicate != null ? cb.and(sameGroup, maxSpecPredicate) : sameGroup);
@@ -68,9 +82,42 @@ public class FindingSpecification {
       subquery.select(cb.least(subRoot.<String>get("id")));
       Predicate isMostRecent = cb.equal(subRoot.get("updateDate"), maxUpdatedAtSubquery);
       subquery.where(specPredicate != null ? cb.and(specPredicate, isMostRecent) : isMostRecent);
-      subquery.groupBy(subRoot.get("type"), subRoot.get("value"));
+      subquery.groupBy(
+          subRoot.get("type"), subRoot.get("value"), subRoot.get("locationAsset").get("id"));
 
       return root.get("id").in(subquery);
+    };
+  }
+
+  /**
+   * "Also Detected On" (finding_triforce_design.md, Task 1): restricts to OTHER Findings sharing
+   * the same (type, value) as {@code referenceFinding} but a DIFFERENT Location, excluding {@code
+   * referenceFinding} itself. Meant to be wrapped in {@link #distinctTypeValueWithFilter} so
+   * exactly one representative row (the most recently updated occurrence) comes back per sibling
+   * Location, exactly like the main list's own de-duplication. Archived siblings are deliberately
+   * NOT excluded here (Decision #10: always included, flagged instead) - callers still apply
+   * {@link #withoutSoftDeleted()} as usual.
+   *
+   * <p>Phase 1 scope: if {@code referenceFinding} itself has no Location (multi-asset or a finding
+   * type not yet covered by the backfill migration - see {@code Finding#locationAsset}), siblings
+   * are still restricted to only the OTHER, located Findings of the same (type, value); this is a
+   * best-effort fallback, not an exhaustive sibling list, and is an explicitly accepted Phase 1
+   * limitation rather than a Phase 1b feature.
+   */
+  public static Specification<Finding> sameTypeValueDifferentLocation(Finding referenceFinding) {
+    return (root, query, cb) -> {
+      Predicate sameType = cb.equal(root.get("type"), referenceFinding.getType());
+      Predicate sameValue = cb.equal(root.get("value"), referenceFinding.getValue());
+      Predicate excludeSelf = cb.notEqual(root.get("id"), referenceFinding.getId());
+      Predicate differentLocation =
+          referenceFinding.getLocationAsset() == null
+              ? cb.isNotNull(root.get("locationAsset"))
+              : cb.or(
+                  cb.isNull(root.get("locationAsset")),
+                  cb.notEqual(
+                      root.get("locationAsset").get("id"),
+                      referenceFinding.getLocationAsset().getId()));
+      return cb.and(sameType, sameValue, excludeSelf, differentLocation);
     };
   }
 
@@ -92,6 +139,21 @@ public class FindingSpecification {
       return archived ? isArchived : cb.not(isArchived);
     };
   }
+
+  /**
+   * Same "effective archived" computation as {@link #withArchived}, evaluated in plain Java
+   * against an already-fetched {@link Finding} instead of in SQL - for callers (like the "Also
+   * Detected On" panel) that need a per-row boolean flag on results that were not themselves
+   * filtered by archived status (Decision #10: archived siblings are included, not excluded).
+   */
+  public static boolean isArchived(Finding finding, int archiveDays) {
+    if (finding.getArchivedAt() != null) {
+      return true;
+    }
+    Instant cutoff = Instant.now().minus(archiveDays, ChronoUnit.DAYS);
+    return finding.getUpdateDate().isBefore(cutoff);
+  }
+
 
   /**
    * Excludes findings soft-deleted by FindingSoftDeleteJob (manually archived for longer than its
