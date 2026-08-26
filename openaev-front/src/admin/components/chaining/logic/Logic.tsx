@@ -17,6 +17,7 @@ import useRemainingViewportHeight from '../../../../utils/hooks/useRemainingView
 import { type LogicContext } from './AddComponentButton';
 import ComponentStepperDrawer, { type DrawerView } from './drawer/ComponentStepperDrawer';
 import LogicGraph from './logic-graph/LogicGraph';
+import LogicReadOnlyBanner from './LogicReadOnlyBanner';
 import LogicTopBar from './LogicTopBar';
 import OutputProvidersProvider from './OutputProvidersContext';
 import type { ActionMeta, EventMeta } from './types';
@@ -32,9 +33,12 @@ interface LogicProps {
    *  authoring affordances (top bar, add-component, node edit/delete) are hidden while pan/zoom
    *  and the trigger spotlight stay available. */
   readOnly?: boolean;
+  /** Message shown in the read-only banner explaining WHY the map is frozen. When omitted, no
+   *  banner is rendered (the read-only affordances are still hidden). */
+  readOnlyMessage?: string;
 }
 
-const Logic = ({ workflowId, context, scenarioId, exerciseId, readOnly = false }: LogicProps) => {
+const Logic = ({ workflowId, context, scenarioId, exerciseId, readOnly = false, readOnlyMessage }: LogicProps) => {
   const { t } = useFormatter();
   // The canvas sizes itself to the exact space left under the page chrome (no page scrollbar).
   const [graphContainerRef, graphHeight] = useRemainingViewportHeight();
@@ -67,6 +71,9 @@ const Logic = ({ workflowId, context, scenarioId, exerciseId, readOnly = false }
   // Latest event metas
   const [eventMetas, setEventMetas] = useState<Record<string, EventMeta>>({});
 
+  // Re-read the scope perimeter whenever the workflow changes and after each graph refresh, so an
+  // action configured right after a scope edit inherits the current assets/teams (the backend
+  // realigns the already-authored steps on its side).
   useEffect(() => {
     if (workflowId) {
       fetchValidAssets(workflowId).then((assets: ScopeAssetOutput[]) => {
@@ -76,7 +83,7 @@ const Logic = ({ workflowId, context, scenarioId, exerciseId, readOnly = false }
         setValidTeams(teams);
       });
     }
-  }, [workflowId]);
+  }, [workflowId, refreshKey]);
 
   // Fingerprint of the workflow's shape (which steps/triggers exist and when each last changed) so a
   // live poll can tell a real edit from a no-op tick: it re-draws the graph on an add, a delete or an
@@ -212,6 +219,7 @@ const Logic = ({ workflowId, context, scenarioId, exerciseId, readOnly = false }
 
   return (
     <OutputProvidersProvider>
+      {readOnly && readOnlyMessage && <LogicReadOnlyBanner message={readOnlyMessage} />}
       <div
         ref={graphContainerRef}
         style={{
@@ -247,6 +255,7 @@ const Logic = ({ workflowId, context, scenarioId, exerciseId, readOnly = false }
       <ComponentStepperDrawer
         workflowId={workflowId}
         context={context}
+        readOnly={readOnly}
         scenarioId={scenarioId}
         exerciseId={exerciseId}
         validAssets={validAssets}

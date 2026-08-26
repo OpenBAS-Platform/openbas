@@ -23,6 +23,8 @@ import io.openaev.helper.MultiModelSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedEntityGraphs;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -34,7 +36,9 @@ import java.util.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.*;
+import org.hibernate.type.SqlTypes;
 
 /**
  * Entity representing a simulation scenario in OpenAEV.
@@ -202,6 +206,21 @@ public class Scenario extends ModelBehaviour implements GrantableBase, TenantBas
   private boolean autonomous;
 
   /**
+   * Saved autonomous-run configuration for this chained scenario: the serialized {@code
+   * AutonomousRunCreateInput} (objective, specialist agents + discovery modes, allow/deny scope,
+   * time budget) the operator configured in the AI builder but has not yet launched. Lets the
+   * parameters be persisted to "build later" WITHOUT parking a CREATED run (which would lock the
+   * scenario into the AI cockpit). The scenario stays a normal, editable chained scenario until the
+   * operator actually plans (Build) or launches it. Served only through the dedicated {@code
+   * /autonomous-runs/scenario-config/{scenarioId}} endpoint, never on the Scenario payload, and
+   * kept as a generic map so the model does not depend on the api DTO.
+   */
+  @JsonIgnore
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "scenario_autonomous_config")
+  private Map<String, Object> autonomousConfig;
+
+  /**
    * Virtual filter facet exposing the scenario "engine type" (Time-based / Chained / Autonomous) to
    * the list's filter bar. It is NOT a stored column: the value is derived at query time from
    * {@link #autonomous} and the presence of a chaining Workflow TEMPLATE (see {@code
@@ -230,6 +249,12 @@ public class Scenario extends ModelBehaviour implements GrantableBase, TenantBas
 
   // -- OCTI GENERATION SCENARIO FROM STIX --
 
+  // mappedBy @OneToOne: SecurityCoverage owns the FK, so Hibernate cannot proxy this side and
+  // resolves it with an immediate extra query on every Scenario load, tenant-gated once
+  // security_coverages is active. Excluded from @Data's generated toString() so logging/debugging
+  // a Scenario can never trigger that query outside a scoped transaction (ArchUnit:
+  // TenantActiveTableAccessArchTest#security_coverages_scenario_association_access_is_reviewed).
+  @ToString.Exclude
   @OneToOne(mappedBy = "scenario")
   @JsonProperty("scenario_security_coverage")
   @JsonIgnore

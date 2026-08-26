@@ -29,7 +29,7 @@ import { useOutputProviders } from '../useOutputProviders';
 import Connectors from './Connectors';
 import GraphActionCard from './GraphActionCard';
 import GraphTriggerCard from './GraphTriggerCard';
-import { buildLogicGraphLayout, type PositionedBox, routeOrthogonalEdge } from './layout';
+import { buildLogicGraphLayout, type LogicGraphLayoutMode, type PositionedBox, routeOrthogonalEdge } from './layout';
 import PanZoom from './PanZoom';
 
 interface NodePosition {
@@ -37,21 +37,13 @@ interface NodePosition {
   y: number;
 }
 
-// Distinct, mid-tone accents for the MITRE-tactic group hulls, cycled by the group's phase order.
-// Mid saturation/lightness reads on both the light and dark "paper" backgrounds once knocked back
-// to a low-alpha fill; the same colour drives the border and header label so a group reads as one.
-const TACTIC_GROUP_COLORS = [
-  '#5b8def', // blue
-  '#9b6dff', // violet
-  '#e0567a', // rose
-  '#f0a132', // amber
-  '#3fb27f', // green
-  '#48b0c7', // teal
-  '#c9508e', // magenta
-  '#8a8f2f', // olive
-];
-const tacticGroupColor = (index: number) =>
-  TACTIC_GROUP_COLORS[((index % TACTIC_GROUP_COLORS.length) + TACTIC_GROUP_COLORS.length) % TACTIC_GROUP_COLORS.length];
+// The layout mode is a personal reading preference shared by every Logic tab (scenario, simulation,
+// autonomous-run inspection), so it persists in localStorage rather than living per workflow.
+const LAYOUT_MODE_STORAGE_KEY = 'chaining_logic_layout_mode';
+const readStoredLayoutMode = (): LogicGraphLayoutMode =>
+  (typeof window !== 'undefined' && window.localStorage.getItem(LAYOUT_MODE_STORAGE_KEY) === 'chain'
+    ? 'chain'
+    : 'tactic');
 
 /** Decode HTML entities that occasionally survive in orchestrator-authored titles ("&amp;" -> "&"). */
 const decodeEntities = (value?: string): string =>
@@ -133,6 +125,9 @@ const LogicGraph = ({
   // by "Auto-organize". `refitNonce` bumps the fit signature so clearing them re-centers the view.
   const [positionOverrides, setPositionOverrides] = useState<Record<string, NodePosition>>({});
   const [refitNonce, setRefitNonce] = useState(0);
+  // 'tactic' (default): grouped MITRE-tactic columns. 'chain': grouping disabled, pure left-to-right
+  // causal layout. Persisted so the choice survives a reload.
+  const [layoutMode, setLayoutMode] = useState<LogicGraphLayoutMode>(readStoredLayoutMode);
   // Live zoom, published by PanZoom, used to convert a screen drag delta into logical units.
   const zoomRef = useRef(1);
 
@@ -175,7 +170,7 @@ const LogicGraph = ({
 
     const parsedActionMetas = buildActionMetas(stepsRes.data);
     const { eventMetas: parsedEventMetas } = buildEventData(eventsRes.data);
-    const enrichedActionMetas = await enrichActionMetasWithContracts(parsedActionMetas);
+    const enrichedActionMetas = await enrichActionMetasWithContracts(parsedActionMetas, workflowId);
 
     setActionMetas(enrichedActionMetas);
     setContextProviders(buildOutputProvidersMap(enrichedActionMetas));
@@ -193,9 +188,8 @@ const LogicGraph = ({
     [actionMetas],
   );
 
-  // Tactic name -> kill-chain phase order, so the layout orders the tactic groups by MITRE phase
-  // (keeping the lowest order when a tactic maps to several phases). Node positions come from
-  // dependency depth, not this order — it only makes the group hulls' colours/order deterministic.
+  // Tactic name -> kill-chain phase order, so the layout orders the tactic columns by MITRE phase
+  // (keeping the lowest order when a tactic maps to several phases).
   const tacticOrder = useMemo(() => {
     const order: Record<string, number> = {};
     for (const phase of Object.values(killChainPhasesMap as Record<string, KillChainPhase>)) {
@@ -214,8 +208,9 @@ const LogicGraph = ({
       outputProviders,
       tacticForStep,
       tacticOrder,
+      layoutMode,
     }),
-    [actionMetas, eventMetas, outputProviders, tacticForStep, tacticOrder],
+    [actionMetas, eventMetas, outputProviders, tacticForStep, tacticOrder, layoutMode],
   );
 
   // Apply manual overrides on top of the auto-layout positions.
@@ -274,12 +269,21 @@ const LogicGraph = ({
     };
   }, [positionedNodes, layout.bbox]);
 
-  // Stable fingerprint of the graph structure so PanZoom only re-fits on real changes (not on
-  // selection, dragging, or polling re-renders that keep the same nodes). `refitNonce` forces a
-  // re-fit after "Auto-organize" restores the auto positions.
+  // Structural fingerprint of the graph (bbox + node id SET). Drives PanZoom's ONE-TIME fit: a live
+  // run authoring steps changes this, but PanZoom fits only on first content and re-fits only on an
+  // explicit `refitNonce` bump, so authoring a step never yanks the operator's manual pan/zoom.
+  // Deliberately omits node positions and the nonce (both handled elsewhere).
   const fitSignature = useMemo(
-    () => `${Math.round(layout.bbox.width)}x${Math.round(layout.bbox.height)}|${layout.nodes.map(n => n.id).join(',')}|${refitNonce}`,
-    [layout, refitNonce],
+    () => `${Math.round(layout.bbox.width)}x${Math.round(layout.bbox.height)}|${layout.nodes.map(n => n.id).join(',')}`,
+    [layout],
+  );
+  // Tooltip dismiss key: the structural signature PLUS each node's rounded position. A pure relayout
+  // that keeps the same node-id set leaves `fitSignature` unchanged yet still slides a card out from
+  // under a stationary cursor, which would strand a rich tooltip; folding positions in force-closes
+  // it. Kept separate from `fitSignature` so a drag/relayout dismisses tooltips without re-fitting.
+  const tooltipDismissKey = useMemo(
+    () => `${fitSignature}|${positionedNodes.map(n => `${n.id}:${Math.round(n.x)},${Math.round(n.y)}`).join(';')}`,
+    [fitSignature, positionedNodes],
   );
 
   // Data-flow spotlight for the selected node (action or trigger). `flow` resolves one representative
@@ -334,6 +338,7 @@ const LogicGraph = ({
     baseX: number,
     baseY: number,
     event: ReactPointerEvent<HTMLDivElement>,
+    onClick: () => void,
   ) => {
     if (event.button !== 0) return;
     event.stopPropagation();
@@ -359,13 +364,26 @@ const LogicGraph = ({
     const up = () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
-      if (!moved) handleSelect(nodeId);
+      if (!moved) onClick();
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
-  }, [readOnly, handleSelect]);
+  }, [readOnly]);
 
   const handleAutoLayout = useCallback(() => {
+    setPositionOverrides({});
+    setRefitNonce(n => n + 1);
+  }, []);
+
+  // Switch between the grouped tactic columns and the ungrouped causal chain. Manual card positions
+  // belong to the layout that produced them and the frame that fit one mode rarely fits the other,
+  // so both are reset for a cleanly framed relayout.
+  const handleToggleLayoutMode = useCallback(() => {
+    setLayoutMode((prev) => {
+      const next: LogicGraphLayoutMode = prev === 'chain' ? 'tactic' : 'chain';
+      localStorage.setItem(LAYOUT_MODE_STORAGE_KEY, next);
+      return next;
+    });
     setPositionOverrides({});
     setRefitNonce(n => n + 1);
   }, []);
@@ -491,58 +509,62 @@ const LogicGraph = ({
         contentWidth={contentSize.width}
         contentHeight={contentSize.height}
         fitSignature={fitSignature}
+        refitNonce={refitNonce}
         onBackgroundClick={() => setSelectedNodeId(null)}
         onZoomChange={(zoom) => { zoomRef.current = zoom; }}
         onAutoLayout={readOnly ? undefined : handleAutoLayout}
+        layoutMode={layoutMode}
+        onToggleLayoutMode={handleToggleLayoutMode}
       >
-        {/* MITRE-tactic groups: a rounded, padded hull behind the action cards that share a tactic,
-            with the tactic name as a header. Purely decorative — it groups the cards without ever
-            driving their positions (the causal left-to-right layout owns that). Rendered first so it
-            sits behind the connectors and cards, and never intercepts pointer events. */}
-        {layout.groups.map((group, index) => {
-          const color = tacticGroupColor(index);
-          return (
+        {/* MITRE-tactic columns: one padded band behind each tactic's action cards, headed by the
+            tactic name. Every band uses the SAME theme blue — a real chain carries far too many
+            tactics for a colour cycle to stay legible, and near-identical hues would read as a
+            meaning they do not carry; the column and its header already identify the tactic. The
+            layout gives every tactic its own column, so bands are side by side and can never overlap.
+            Rendered first so they sit behind the connectors and cards, and they never intercept
+            pointer events. */}
+        {layout.columns.map(column => (
+          <div
+            key={`tactic-col-${column.tactic}`}
+            style={{
+              position: 'absolute',
+              left: column.x,
+              top: column.y,
+              width: column.width,
+              height: column.height,
+              pointerEvents: 'none',
+              borderRadius: 16,
+              backgroundColor: alpha(theme.palette.primary.main, 0.06),
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.28)}`,
+              boxSizing: 'border-box',
+            }}
+          >
             <div
-              key={`tactic-group-${group.tactic}`}
               style={{
                 position: 'absolute',
-                left: group.x,
-                top: group.y,
-                width: group.width,
-                height: group.height,
-                pointerEvents: 'none',
-                borderRadius: 16,
-                backgroundColor: alpha(color, 0.06),
-                border: `1px solid ${alpha(color, 0.28)}`,
+                top: 0,
+                left: 0,
+                height: column.headerHeight,
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0 12px',
                 boxSizing: 'border-box',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.09em',
+                textTransform: 'uppercase',
+                color: theme.palette.primary.main,
               }}
             >
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  height: group.headerHeight,
-                  maxWidth: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '0 12px',
-                  boxSizing: 'border-box',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.09em',
-                  textTransform: 'uppercase',
-                  color,
-                }}
-              >
-                {group.tactic || t('Other')}
-              </div>
+              {column.tactic || t('Other')}
             </div>
-          );
-        })}
+          </div>
+        ))}
         <Connectors
           edges={routedEdges}
           width={contentSize.width}
@@ -562,7 +584,18 @@ const LogicGraph = ({
                 key={node.id}
                 data-node-id={node.id}
                 data-node-kind="action"
-                onPointerDown={e => handleNodePointerDown(node.id, node.x, node.y, e)}
+                onPointerDown={e => handleNodePointerDown(
+                  node.id,
+                  node.x,
+                  node.y,
+                  e,
+                  () => {
+                    handleSelect(node.id);
+                    if (readOnly) {
+                      handleEditAction(node.id);
+                    }
+                  },
+                )}
                 style={{
                   position: 'absolute',
                   left: node.x,
@@ -586,6 +619,7 @@ const LogicGraph = ({
                   dimmed={dimmed}
                   pathIndex={flow.pathIndex[node.id]}
                   readOnly={readOnly}
+                  tooltipDismissKey={tooltipDismissKey}
                   onEdit={handleEditAction}
                   onDelete={setPendingDeleteNodeId}
                 />
@@ -603,7 +637,18 @@ const LogicGraph = ({
               key={node.id}
               data-node-id={node.id}
               data-node-kind="trigger"
-              onPointerDown={e => handleNodePointerDown(node.id, node.x, node.y, e)}
+              onPointerDown={e => handleNodePointerDown(
+                node.id,
+                node.x,
+                node.y,
+                e,
+                () => {
+                  handleSelect(node.id);
+                  if (readOnly) {
+                    handleEditTrigger(node.id);
+                  }
+                },
+              )}
               style={{
                 position: 'absolute',
                 left: node.x,
@@ -624,6 +669,7 @@ const LogicGraph = ({
                 dimmed={dimmed}
                 pathIndex={flow.pathIndex[node.id]}
                 readOnly={readOnly}
+                tooltipDismissKey={tooltipDismissKey}
                 onEdit={handleEditTrigger}
                 onDelete={setPendingDeleteNodeId}
                 onAddAction={onAddActionToEvent}

@@ -12,9 +12,13 @@ interface DialogConfirmationProps {
   handleSubmit: ((resetLoading?: () => void) => void | Promise<void>) | null | undefined; // Updated: Callback is now optional
   text: string;
   submitLabel: string;
+  /** Color of the confirm button. Use 'error' for destructive/irreversible confirmations so the
+   *  action reads as dangerous at a glance. Defaults to 'primary'. */
+  submitColor?: 'primary' | 'error';
   richContent?: React.ReactNode;
   /** Disables the submit button without touching the loading state (e.g. client-side form validation). */
   disableSubmit?: boolean;
+  extraContent?: React.ReactNode;
 }
 
 const isPromiseLike = (value: unknown): value is Promise<void> => {
@@ -27,8 +31,10 @@ const DialogConfirmation: FunctionComponent<DialogConfirmationProps> = ({
   handleSubmit = undefined,
   text,
   submitLabel,
+  submitColor = 'primary',
   richContent,
   disableSubmit = false,
+  extraContent,
 }) => {
   const { t } = useFormatter();
   const [loading, setLoading] = useState(false);
@@ -77,13 +83,14 @@ const DialogConfirmation: FunctionComponent<DialogConfirmationProps> = ({
             {text}
           </DialogContentText>
         )}
+        {extraContent}
       </DialogContent>
       <DialogActions>
         <Button variant="outlined" color="primary" onClick={handleClose} disabled={loading}>
           {t('Cancel')}
         </Button>
         {handleSubmit && (
-          <Button variant="contained" color="primary" loading={loading} disabled={disableSubmit} onClick={handleLoadingAndSubmit}>
+          <Button variant="contained" color={submitColor} loading={loading} disabled={disableSubmit} onClick={handleLoadingAndSubmit}>
             {submitLabel}
           </Button>
         )}

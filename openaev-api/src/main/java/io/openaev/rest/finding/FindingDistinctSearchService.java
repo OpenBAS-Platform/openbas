@@ -27,6 +27,8 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -383,12 +385,10 @@ public class FindingDistinctSearchService {
   public Page<AggregatedFindingOutput> searchDistinctBySpecification(
       Specification<Finding> baseFilterSpec, Page<Finding> page) {
 
-    // Step 1: Extract distinct (type, value) keys
+    // Step 1: Extract distinct (type, value, location) keys - Triforce Phase 1: location is part
+    // of a Finding's grouping identity now, not just (type, value).
     List<TypeValueKey> typeValueKeys =
-        page.getContent().stream()
-            .map(f -> new TypeValueKey(f.getType(), f.getValue()))
-            .distinct()
-            .toList();
+        page.getContent().stream().map(FindingDistinctSearchService::keyOf).distinct().toList();
 
     if (typeValueKeys.isEmpty()) {
       return Page.empty(page.getPageable());
@@ -402,22 +402,34 @@ public class FindingDistinctSearchService {
         findingRepository.findAll(
             FindingSpecification.findAllWithAssetsByTypeValueIn(types, values, baseFilterSpec));
 
-    // Step 3: Group assets by (type, value)
+    // Step 3: Group assets by (type, value, location)
     Map<TypeValueKey, List<Asset>> groupedAssets =
         findingsWithAssets.stream()
-            .filter(f -> typeValueKeys.contains(new TypeValueKey(f.getType(), f.getValue())))
+            .filter(f -> typeValueKeys.contains(keyOf(f)))
             .flatMap(
                 finding ->
-                    finding.getAssets().stream()
-                        .map(
-                            asset ->
-                                Map.entry(
-                                    new TypeValueKey(finding.getType(), finding.getValue()),
-                                    asset)))
+                    finding.getAssets().stream().map(asset -> Map.entry(keyOf(finding), asset)))
             .collect(
                 Collectors.groupingBy(
                     Map.Entry::getKey,
                     Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+
+    // Step 3b: Group-wide first/last seen per (type, value, location). The page row is the most
+    // recent occurrence per group (see FindingSpecification.distinctTypeValueWithFilter), so its
+    // own updateDate already matches the group last seen; its creationDate, however, is that
+    // single occurrence's, not the group's. Compute first seen as the MIN creation date and last
+    // seen as the MAX update date across all occurrences in scope - findingsWithAssets holds
+    // exactly that set - so both cells stay group-correct.
+    Map<TypeValueKey, Instant> firstSeenByKey = new HashMap<>();
+    Map<TypeValueKey, Instant> lastSeenByKey = new HashMap<>();
+    for (Finding occurrence : findingsWithAssets) {
+      TypeValueKey key = keyOf(occurrence);
+      if (!typeValueKeys.contains(key)) {
+        continue;
+      }
+      firstSeenByKey.merge(key, occurrence.getCreationDate(), (a, b) -> a.isBefore(b) ? a : b);
+      lastSeenByKey.merge(key, occurrence.getUpdateDate(), (a, b) -> a.isAfter(b) ? a : b);
+    }
 
     // Step 4: Bulk-fetch triage statuses for the page's findings (one query total, not one per
     // finding) to avoid N+1 - see FindingTriageRepository#findByFinding_IdIn.
@@ -427,14 +439,30 @@ public class FindingDistinctSearchService {
             .collect(
                 Collectors.toMap(triage -> triage.getFinding().getId(), FindingTriage::getStatus));
 
-    // Step 5: Map page findings + grouped assets + triage statuses to AggregatedFindingOutput
+    // Step 5: Map page findings + grouped assets + first/last seen + triage statuses to
+    // AggregatedFindingOutput
     return page.map(
         finding -> {
-          TypeValueKey key = new TypeValueKey(finding.getType(), finding.getValue());
+          TypeValueKey key = keyOf(finding);
           List<Asset> relatedAssets = groupedAssets.getOrDefault(key, List.of());
           return findingMapper.toAggregatedFindingOutput(
-              finding, relatedAssets, triageStatusByFindingId);
+              finding,
+              relatedAssets,
+              firstSeenByKey.getOrDefault(key, finding.getCreationDate()),
+              lastSeenByKey.getOrDefault(key, finding.getUpdateDate()),
+              triageStatusByFindingId);
         });
+  }
+
+  /**
+   * Triforce Phase 1: a Finding's grouping identity is (type, value, location) - see {@code
+   * FindingSpecification#distinctTypeValueWithFilter}. {@code locationAsset} is nullable
+   * (unlocated findings still group by (type, value) alone, same as before Phase 1).
+   */
+  private static TypeValueKey keyOf(Finding finding) {
+    Asset location = finding.getLocationAsset();
+    return new TypeValueKey(
+        finding.getType(), finding.getValue(), location == null ? null : location.getId());
   }
 
   /**

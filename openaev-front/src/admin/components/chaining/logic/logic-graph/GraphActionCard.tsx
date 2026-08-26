@@ -1,5 +1,5 @@
 import { BoltOutlined, GpsFixedOutlined, MoreVert, OutputOutlined } from '@mui/icons-material';
-import { Box, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type MouseEvent, type ReactNode, useState } from 'react';
 
@@ -8,7 +8,7 @@ import ActionTypeIcon from '../ActionTypeIcon';
 import NodePopover from '../chaining_flow/nodes/NodePopover';
 import LogicNodeTooltip, { type TooltipRow } from '../chaining_flow/NodeTooltip';
 import { formatConditionKeyLabel } from '../events/event-types';
-import graphTooltipSlotProps from './graphTooltipSlotProps';
+import GraphCardTooltip from './GraphCardTooltip';
 
 export interface GraphActionCardProps {
   id: string;
@@ -17,7 +17,10 @@ export interface GraphActionCardProps {
   injectorType?: string;
   payloadType?: string;
   isPayload?: boolean;
-  /** MITRE tactic this action belongs to (shown as a chip). */
+  /**
+   * MITRE tactic this action belongs to. Surfaced in the tooltip only: the canvas already groups the
+   * cards under a per-tactic hull whose header names the tactic, so a chip on the card would repeat it.
+   */
   tacticLabel?: string;
   /** Finding/output types this action produces (feeds triggers). */
   outputTypes?: string[];
@@ -30,6 +33,8 @@ export interface GraphActionCardProps {
   /** 1-based badge index in the selected trigger's data-flow path. */
   pathIndex?: number;
   readOnly?: boolean;
+  /** Force-closes the rich tooltip when it changes (graph structural relayout). */
+  tooltipDismissKey?: unknown;
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
 }
@@ -76,6 +81,7 @@ const GraphActionCard = ({
   dimmed = false,
   pathIndex,
   readOnly = false,
+  tooltipDismissKey,
   onEdit,
   onDelete,
 }: GraphActionCardProps) => {
@@ -128,7 +134,7 @@ const GraphActionCard = ({
   );
 
   return (
-    <Tooltip title={tooltip} placement="top" arrow disableInteractive enterDelay={300} slotProps={graphTooltipSlotProps}>
+    <GraphCardTooltip title={tooltip} dismissKey={tooltipDismissKey}>
       <Box
         sx={{
           'position': 'relative',
@@ -199,9 +205,23 @@ const GraphActionCard = ({
             'lineHeight': 0,
             'color': 'transparent',
             'backgroundColor': theme.palette.action.hover,
-            '& img': {
-              maxWidth: '100%',
-              maxHeight: '100%',
+            // The glyph arrives wrapped in CustomTooltip's inline <span> (which carries its own
+            // inline line-height) and with a fixed 20px inline size; both leave it floating
+            // off-center in the square. Flatten the wrapper into a centering flex layer and force
+            // the glyph to fill the padded square so every logo is centered horizontally and
+            // vertically, whatever its intrinsic shape.
+            'padding': '3px',
+            '& > span': {
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              height: '100%',
+            },
+            '& img, & svg': {
+              display: 'block',
+              width: '100% !important',
+              height: '100% !important',
               objectFit: 'contain',
             },
           }}
@@ -226,29 +246,9 @@ const GraphActionCard = ({
           >
             {typeLabel}
           </Typography>
-          {tacticLabel && (
-            <Box
-              component="span"
-              sx={{
-                flexShrink: 0,
-                maxWidth: 96,
-                fontSize: '0.5625rem',
-                fontWeight: 700,
-                letterSpacing: '0.03em',
-                textTransform: 'uppercase',
-                color: theme.palette.primary.main,
-                backgroundColor: `${theme.palette.primary.main}1f`,
-                borderRadius: 0.5,
-                paddingInline: 0.5,
-                paddingBlock: '1px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {tacticLabel}
-            </Box>
-          )}
+          {/* No tactic chip here: the canvas draws a hull around the cards sharing a tactic and puts
+              the tactic name in its header, so repeating it per card was pure duplication. The tactic
+              stays reachable in the tooltip above. */}
           {!readOnly && (
             <IconButton
               size="small"
@@ -328,7 +328,7 @@ const GraphActionCard = ({
           />
         )}
       </Box>
-    </Tooltip>
+    </GraphCardTooltip>
   );
 };
 

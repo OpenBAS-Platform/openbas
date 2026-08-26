@@ -32,24 +32,36 @@ public class FindingSpecification {
     return (root, query, cb) -> cb.equal(root.get("assets").get("id"), endpointId);
   }
 
+  /**
+   * Restricts the query to exactly one representative row per (type, value) group: the MOST RECENT
+   * occurrence, i.e. the one with the greatest {@code updateDate}, tie-broken by the smallest
+   * {@code id} for determinism. Selecting the most recent occurrence (instead of an arbitrary
+   * MIN(id)) is what fixes issue #7273: the row's detail link opens the latest occurrence, and
+   * because the representative's own {@code updateDate} now equals the group's max, the outer
+   * query's ORDER BY / pagination on {@code finding_updated_at} ("Last seen") matches the displayed
+   * group value.
+   *
+   * <p>Group membership honours {@code baseSpec}: it is applied to the candidate rows AND
+   * re-applied inside the "is there a newer sibling?" check, so the representative is the most
+   * recent occurrence <em>among the occurrences matching the filter</em>. A filter that matches
+   * only an older occurrence therefore makes that occurrence the representative rather than making
+   * the group vanish.
+   */
   public static Specification<Finding> distinctTypeValueWithFilter(
       Specification<Finding> baseSpec) {
     return (root, query, cb) -> {
       query.distinct(true);
 
-      Subquery<String> subquery = query.subquery(String.class);
-      Root<Finding> subRoot = subquery.from(Finding.class);
+      // Candidate representative rows: one per (type, value) group is the answer.
+      Subquery<String> representatives = query.subquery(String.class);
+      Root<Finding> candidate = representatives.from(Finding.class);
 
-      Predicate specPredicate = null;
-      if (baseSpec != null) {
-        specPredicate = baseSpec.toPredicate(subRoot, query, cb);
-      }
+      // A strictly-more-recent sibling in the same group: greater updateDate, or the same
+      // updateDate with a smaller id (the tie-break that guarantees a single representative).
+      Subquery<String> newerSibling = representatives.subquery(String.class);
+      Root<Finding> other = newerSibling.from(Finding.class);
+      newerSibling.select(other.get("id"));
 
-      // Correlated subquery: the most recent finding_updated_at within the same (type, value,
-      // location) group as subRoot. Used below to restrict subRoot to only the row(s) that are
-      // the most recently seen occurrence of that group, rather than picking an arbitrary row by
-      // minimum id (an id has no guaranteed relationship to recency).
-      //
       // Triforce Phase 1 (finding_triforce_design.md, Decision #1): the group now also includes
       // locationAsset.id, so findings on different assets no longer collapse into a single list
       // row. locationAsset.id is nullable (unlocated findings: multi-asset checks, or types not
@@ -57,35 +69,42 @@ public class FindingSpecification {
       // two NULLs as non-matching (NULL = NULL is unknown), which would wrongly split every
       // unlocated finding into its own group of one instead of keeping their pre-Phase-1
       // "grouped by (type, value) only" behavior. coalesce(...) to a sentinel that can never
-      // collide with a real asset id makes two NULLs compare equal here, matching the groupBy
-      // below (plain SQL GROUP BY already treats NULLs as equal for grouping purposes).
-      Subquery<Instant> maxUpdatedAtSubquery = subquery.subquery(Instant.class);
-      Root<Finding> maxRoot = maxUpdatedAtSubquery.from(Finding.class);
-      Predicate maxSpecPredicate = null;
-      if (baseSpec != null) {
-        maxSpecPredicate = baseSpec.toPredicate(maxRoot, query, cb);
-      }
+      // collide with a real asset id makes two NULLs compare equal here.
       Expression<String> noLocationSentinel = cb.literal("__no_location__");
       Predicate sameGroup =
           cb.and(
-              cb.equal(maxRoot.get("type"), subRoot.get("type")),
-              cb.equal(maxRoot.get("value"), subRoot.get("value")),
+              cb.equal(other.get("type"), candidate.get("type")),
+              cb.equal(other.get("value"), candidate.get("value")),
               cb.equal(
-                  cb.coalesce(maxRoot.get("locationAsset").get("id"), noLocationSentinel),
-                  cb.coalesce(subRoot.get("locationAsset").get("id"), noLocationSentinel)));
-      maxUpdatedAtSubquery.select(cb.greatest(maxRoot.<Instant>get("updateDate")));
-      maxUpdatedAtSubquery.where(
-          maxSpecPredicate != null ? cb.and(sameGroup, maxSpecPredicate) : sameGroup);
+                  cb.coalesce(other.get("locationAsset").get("id"), noLocationSentinel),
+                  cb.coalesce(candidate.get("locationAsset").get("id"), noLocationSentinel)));
+      Predicate strictlyNewer =
+          cb.or(
+              cb.greaterThan(
+                  other.<Instant>get("updateDate"), candidate.<Instant>get("updateDate")),
+              cb.and(
+                  cb.equal(other.get("updateDate"), candidate.get("updateDate")),
+                  cb.lessThan(other.<String>get("id"), candidate.<String>get("id"))));
+      Predicate newerWhere = cb.and(sameGroup, strictlyNewer);
+      if (baseSpec != null) {
+        Predicate otherSpec = baseSpec.toPredicate(other, query, cb);
+        if (otherSpec != null) {
+          newerWhere = cb.and(newerWhere, otherSpec);
+        }
+      }
+      newerSibling.where(newerWhere);
 
-      // Tie-break on the minimum id when several rows within a group share the exact same
-      // finding_updated_at, so the picked representative stays deterministic.
-      subquery.select(cb.least(subRoot.<String>get("id")));
-      Predicate isMostRecent = cb.equal(subRoot.get("updateDate"), maxUpdatedAtSubquery);
-      subquery.where(specPredicate != null ? cb.and(specPredicate, isMostRecent) : isMostRecent);
-      subquery.groupBy(
-          subRoot.get("type"), subRoot.get("value"), subRoot.get("locationAsset").get("id"));
+      Predicate candidateWhere = cb.not(cb.exists(newerSibling));
+      if (baseSpec != null) {
+        Predicate candidateSpec = baseSpec.toPredicate(candidate, query, cb);
+        if (candidateSpec != null) {
+          candidateWhere = cb.and(candidateSpec, candidateWhere);
+        }
+      }
+      representatives.select(candidate.get("id"));
+      representatives.where(candidateWhere);
 
-      return root.get("id").in(subquery);
+      return root.get("id").in(representatives);
     };
   }
 

@@ -17,6 +17,7 @@ import io.openaev.context.TenantContext;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.FindingRepository;
 import io.openaev.database.specification.FindingSpecification;
+import io.openaev.rest.finding.form.AggregatedFindingOutput;
 import io.openaev.rest.finding.form.FindingInput;
 import io.openaev.rest.finding.form.RelatedFindingOutput;
 import io.openaev.utils.TenantIsolationTestHelper;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -65,6 +67,7 @@ class FindingApiTest extends IntegrationTest {
   @Autowired private InjectorFixture injectorFixture;
   @Autowired private FindingRepository findingRepository;
   @Autowired private FindingMapper findingMapper;
+  @Autowired private FindingDistinctSearchService findingDistinctSearchService;
   @Autowired private EntityManager entityManager;
   @Autowired private TenantIsolationTestHelper tenantIsolationHelper;
 
@@ -1065,101 +1068,131 @@ class FindingApiTest extends IntegrationTest {
               f3.getType().getLabel() + "::" + f3.getValue());
     }
 
-    /**
-     * Bypasses {@link Finding#updateDate}'s {@code @UpdateTimestamp} generator (which would
-     * otherwise stamp "now" on every insert/update regardless of any value set on the entity) via a
-     * bulk JPQL update, then clears the persistence context so subsequent repository reads reflect
-     * the forced value rather than a stale in-memory one.
-     */
-    private void forceUpdatedAt(String findingId, Instant instant) {
-      entityManager
-          .createQuery("UPDATE Finding f SET f.updateDate = :d WHERE f.id = :id")
-          .setParameter("d", instant)
-          .setParameter("id", findingId)
-          .executeUpdate();
-      entityManager.clear();
-    }
-
     @Test
-    @DisplayName(
-        "distinctTypeValueWithFilter picks the most recently updated occurrence, not the minimum id")
-    void distinctTypeValueWithFilter_picksMostRecentlyUpdatedOccurrence() {
-      // Two findings sharing the same (type, value): f1 has a lexicographically smaller id (would
-      // have been picked by the old cb.least(id) logic) but f2 is the most recently seen
-      // occurrence.
-      Finding f1 =
+    @DisplayName("Distinct list uses the most recent occurrence as representative (issue #7273)")
+    void distinctList_usesMostRecentOccurrenceAsRepresentative() {
+      // Group A: the SAME (type, value) reported by two injects, i.e. two runs. finding_updated_at
+      // is set via native SQL because the JPA listeners overwrite it on persist.
+      Finding olderA =
           findingComposer
               .forFinding(FindingFixture.createDefaultTextFinding())
               .withInject(injectWrapper)
+              .withEndpoint(endpointComposer.forEndpoint(savedEndpoint))
               .persist()
               .get();
-      Finding f2 =
+      Finding newerA =
           findingComposer
               .forFinding(FindingFixture.createDefaultTextFinding())
               .withInject(injectWrapper2)
+              .withEndpoint(endpointComposer.forEndpoint(savedEndpoint))
               .persist()
               .get();
-
-      String olderId = f1.getId().compareTo(f2.getId()) < 0 ? f1.getId() : f2.getId();
-      String newerId = olderId.equals(f1.getId()) ? f2.getId() : f1.getId();
-
-      Instant now = Instant.now();
-      forceUpdatedAt(olderId, now.minus(1, ChronoUnit.HOURS));
-      forceUpdatedAt(newerId, now);
-
-      List<Finding> results =
-          findingRepository.findAll(FindingSpecification.distinctTypeValueWithFilter(null));
-
-      assertThat(results.size()).isEqualTo(1);
-      assertThat(results.getFirst().getId()).isEqualTo(newerId);
-    }
-
-    @Test
-    @DisplayName(
-        "distinctTypeValueWithFilter ties on identical finding_updated_at and falls back to the minimum id")
-    void distinctTypeValueWithFilter_tieBreaksOnMinIdWhenUpdatedAtEqual() {
-      Finding f1 =
-          findingComposer
-              .forFinding(FindingFixture.createDefaultTextFinding())
-              .withInject(injectWrapper)
-              .persist()
-              .get();
-      Finding f2 =
-          findingComposer
-              .forFinding(FindingFixture.createDefaultTextFinding())
-              .withInject(injectWrapper2)
-              .persist()
-              .get();
-
-      Instant sameInstant = Instant.now();
-      forceUpdatedAt(f1.getId(), sameInstant);
-      forceUpdatedAt(f2.getId(), sameInstant);
-
-      String expectedId = f1.getId().compareTo(f2.getId()) < 0 ? f1.getId() : f2.getId();
-
-      List<Finding> results =
-          findingRepository.findAll(FindingSpecification.distinctTypeValueWithFilter(null));
-
-      assertThat(results.size()).isEqualTo(1);
-      assertThat(results.getFirst().getId()).isEqualTo(expectedId);
-    }
-
-    @Test
-    @DisplayName(
-        "distinctTypeValueWithFilter returns the single finding of a single-occurrence group")
-    void distinctTypeValueWithFilter_singleOccurrenceGroup() {
-      Finding onlyFinding =
+      // Group B: a single, different (type, value) whose last seen sits between group A's two runs,
+      // so a correct sort by finding_updated_at DESC must place group A (latest run) before it.
+      Finding onlyB =
           findingComposer
               .forFinding(FindingFixture.createDefaultIPV6Finding())
               .withInject(injectWrapper)
+              .withEndpoint(endpointComposer.forEndpoint(savedEndpoint))
               .persist()
               .get();
 
-      List<Finding> results =
-          findingRepository.findAll(FindingSpecification.distinctTypeValueWithFilter(null));
+      Instant aCreatedEarliest = Instant.parse("2026-01-01T00:00:00Z");
+      Instant aUpdatedOlder = Instant.parse("2026-01-02T00:00:00Z");
+      Instant aCreatedLater = Instant.parse("2026-03-01T00:00:00Z");
+      Instant aUpdatedNewest = Instant.parse("2026-03-02T00:00:00Z");
+      Instant bUpdated = Instant.parse("2026-02-01T00:00:00Z");
+      setFindingDates(olderA.getId(), aCreatedEarliest, aUpdatedOlder);
+      setFindingDates(newerA.getId(), aCreatedLater, aUpdatedNewest);
+      setFindingDates(onlyB.getId(), bUpdated, bUpdated);
 
-      assertThat(results.size()).isEqualTo(1);
-      assertThat(results.getFirst().getId()).isEqualTo(onlyFinding.getId());
+      entityManager.flush();
+      entityManager.clear();
+
+      SearchPaginationInput input = PaginationFixture.getDefault().size(500).build();
+      input.setSorts(List.of(new SortField("finding_updated_at", "desc", null)));
+
+      Page<AggregatedFindingOutput> page =
+          findingDistinctSearchService.searchDistinctFindings(input);
+
+      // Exactly two groups, none duplicated
+      assertThat(page.getContent()).hasSize(2);
+      List<AggregatedFindingOutput> groupA =
+          page.getContent().stream().filter(o -> o.getValue().equals(olderA.getValue())).toList();
+      assertThat(groupA).as("group A must appear exactly once").hasSize(1);
+      AggregatedFindingOutput representativeA = groupA.getFirst();
+
+      // (a) the representative is the MOST RECENT occurrence
+      assertThat(representativeA.getId()).isEqualTo(newerA.getId());
+      // (b) displayed last seen == latest updateDate, first seen == earliest creationDate
+      assertThat(representativeA.getUpdateDate()).isEqualTo(aUpdatedNewest);
+      assertThat(representativeA.getCreationDate()).isEqualTo(aCreatedEarliest);
+      // (c) sort by finding_updated_at DESC orders groups by their group-wide last seen: group A
+      // (last seen 2026-03-02) must come before group B (last seen 2026-02-01)
+      assertThat(page.getContent().getFirst().getValue()).isEqualTo(olderA.getValue());
+      assertThat(page.getContent().getLast().getValue()).isEqualTo(onlyB.getValue());
+    }
+
+    @Test
+    @DisplayName("A group does not vanish when a filter matches only an older occurrence (#7273)")
+    void distinctList_groupSurvivesFilterMatchingOnlyOlderOccurrence() {
+      Finding olderA =
+          findingComposer
+              .forFinding(FindingFixture.createDefaultTextFinding())
+              .withInject(injectWrapper)
+              .withEndpoint(endpointComposer.forEndpoint(savedEndpoint))
+              .persist()
+              .get();
+      Finding newerA =
+          findingComposer
+              .forFinding(FindingFixture.createDefaultTextFinding())
+              .withInject(injectWrapper2)
+              .withEndpoint(endpointComposer.forEndpoint(savedEndpoint))
+              .persist()
+              .get();
+
+      setFindingDates(
+          olderA.getId(),
+          Instant.parse("2026-01-01T00:00:00Z"),
+          Instant.parse("2026-01-02T00:00:00Z"));
+      setFindingDates(
+          newerA.getId(),
+          Instant.parse("2026-03-01T00:00:00Z"),
+          Instant.parse("2026-03-02T00:00:00Z"));
+
+      entityManager.flush();
+      entityManager.clear();
+
+      // Filter matches only the OLDER occurrence (its own inject). The group must still appear,
+      // with
+      // the older occurrence promoted to representative (most recent among the matching rows).
+      SearchPaginationInput input = new SearchPaginationInput();
+      Filters.FilterGroup group = new Filters.FilterGroup();
+      group.setMode(Filters.FilterMode.and);
+      group.setFilters(
+          List.of(
+              buildFilter(
+                  "finding_inject_id",
+                  Filters.FilterOperator.contains,
+                  List.of(olderA.getInject().getId()))));
+      input.setFilterGroup(group);
+
+      Page<AggregatedFindingOutput> page =
+          findingDistinctSearchService.searchDistinctFindings(input);
+
+      assertThat(page.getContent()).hasSize(1);
+      assertThat(page.getContent().getFirst().getId()).isEqualTo(olderA.getId());
+    }
+
+    private void setFindingDates(String findingId, Instant createdAt, Instant updatedAt) {
+      entityManager
+          .createNativeQuery(
+              "UPDATE findings SET finding_created_at = :createdAt, finding_updated_at = :updatedAt"
+                  + " WHERE finding_id = :id")
+          .setParameter("createdAt", createdAt)
+          .setParameter("updatedAt", updatedAt)
+          .setParameter("id", findingId)
+          .executeUpdate();
     }
   }
 

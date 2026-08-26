@@ -75,4 +75,42 @@ class ImportMapperActivationConfigTest {
             + active
             + "'");
   }
+
+  @Test
+  @DisplayName("openaev.tenant.active-tables in application.properties contains security_coverages")
+  void prodConfigActivatesSecurityCoverages() throws Exception {
+    Properties props = new Properties();
+    try (InputStream in = new FileInputStream("src/main/resources/application.properties")) {
+      props.load(in);
+    }
+    String active = props.getProperty("openaev.tenant.active-tables", "");
+    assertTrue(
+        active.contains("security_coverages"),
+        "security_coverages must stay in openaev.tenant.active-tables: its v1 @Filter was"
+            + " removed, so dropping it would leave the table with no tenant isolation. Found: '"
+            + active
+            + "'");
+  }
+
+  @Test
+  @DisplayName(
+      "openaev.tenant.active-tables in application.properties contains autonomous_runs,"
+          + " autonomous_events and autonomous_directives")
+  void prodConfigActivatesAutonomousTables() throws Exception {
+    Properties props = new Properties();
+    try (InputStream in = new FileInputStream("src/main/resources/application.properties")) {
+      props.load(in);
+    }
+    String active = props.getProperty("openaev.tenant.active-tables", "");
+    assertTrue(
+        active.contains("autonomous_runs")
+            && active.contains("autonomous_events")
+            && active.contains("autonomous_directives"),
+        "autonomous_runs, autonomous_events and autonomous_directives must stay in"
+            + " openaev.tenant.active-tables: they have no v1 @Filter (listener default was"
+            + " removed on activation), so dropping them would leave the tables with no tenant"
+            + " isolation. Found: '"
+            + active
+            + "'");
+  }
 }

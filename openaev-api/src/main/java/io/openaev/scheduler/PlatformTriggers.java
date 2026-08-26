@@ -13,17 +13,18 @@ import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.SimpleScheduleBuilder.*;
 import static org.quartz.TriggerBuilder.newTrigger;
 
-import io.openaev.service.InjectChainingCondition;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+// Safe mode keeps web/UI available by not registering Quartz triggers at startup.
+@ConditionalOnProperty(name = "openaev.run-mode", havingValue = "normal", matchIfMissing = true)
 public class PlatformTriggers {
 
   private PlatformJobDefinitions platformJobs;
@@ -55,6 +56,7 @@ public class PlatformTriggers {
   }
 
   @Bean
+  @Profile("!test")
   public Trigger scenarioExecutionTrigger() {
     return newTrigger()
         .forJob(this.platformJobs.getScenarioExecution())
@@ -132,7 +134,6 @@ public class PlatformTriggers {
 
   @Bean
   @Profile("!test")
-  @Conditional(InjectChainingCondition.class)
   public Trigger queueChainingTrigger() {
     SimpleScheduleBuilder _10_seconds =
         simpleSchedule().withIntervalInMilliseconds(stepDelayQueue).repeatForever();
@@ -146,7 +147,6 @@ public class PlatformTriggers {
 
   @Bean
   @Profile("!test")
-  @Conditional(InjectChainingCondition.class)
   public Trigger workflowTimeoutTrigger() {
     SimpleScheduleBuilder every30Seconds =
         simpleSchedule().withIntervalInSeconds(30).repeatForever();
@@ -160,7 +160,6 @@ public class PlatformTriggers {
 
   @Bean
   @Profile("!test")
-  @Conditional(InjectChainingCondition.class)
   public Trigger autonomousTimeoutTrigger() {
     SimpleScheduleBuilder every30Seconds =
         simpleSchedule().withIntervalInSeconds(30).repeatForever();
