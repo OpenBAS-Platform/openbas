@@ -8,6 +8,7 @@ import static io.openaev.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
 import io.openaev.database.model.Tag;
+import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.TagRepository;
 import io.openaev.rest.exception.ElementNotFoundException;
 import io.openaev.rest.tag.form.TagCreateInput;
@@ -32,8 +33,15 @@ public class TagService {
   // -- CREATE --
 
   public Tag createTag(TagCreateInput input) {
+    return createTag(input, null);
+  }
+
+  public Tag createTag(TagCreateInput input, String tenantId) {
     Tag tag = new Tag();
     tag.setUpdateAttributes(input);
+    if (tenantId != null) {
+      tag.setTenant(new Tenant(tenantId));
+    }
     return tagRepository.save(tag);
   }
 
@@ -45,12 +53,22 @@ public class TagService {
   }
 
   public Tag upsertTag(TagCreateInput input) {
-    Optional<Tag> tag = tagRepository.findByName(input.getName().toLowerCase());
+    return upsertTag(input, null);
+  }
+
+  public Tag upsertTag(TagCreateInput input, String tenantId) {
+    Optional<Tag> tag =
+        tenantId == null
+            ? tagRepository.findByName(input.getName().toLowerCase())
+            : tagRepository.findByNameAndTenantId(input.getName().toLowerCase(), tenantId);
     if (tag.isPresent()) {
       return tag.get();
     } else {
       Tag newTag = new Tag();
       newTag.setUpdateAttributes(input);
+      if (tenantId != null) {
+        newTag.setTenant(new Tenant(tenantId));
+      }
       return tagRepository.save(newTag);
     }
   }
