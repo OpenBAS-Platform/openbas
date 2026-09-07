@@ -59,16 +59,20 @@ public class PayloadImportService {
    * synchronization method.
    *
    * @param file the ZIP file containing the JSON:API payload document
+   * @param tenantId the tenant the imported attack patterns are attributed to (resolved by the
+   *     caller from the request's write scope)
    * @return the import result containing the persisted payload and the synchronised injector
    *     contract
    */
-  public PayloadImportResult importPayload(MultipartFile file) throws Exception {
+  public PayloadImportResult importPayload(MultipartFile file, String tenantId) throws Exception {
     ZipJsonService.ImportOutput<Payload> response =
         zipJsonApi.handleImport(file, "payload_name", IMPORT_OPTIONS, null);
 
     List<AttackPattern> attackPatterns =
         extractRelationshipObjects(
-            "attack_patterns", this::handleAttackPatternImport, response.sourceDocument());
+            "attack_patterns",
+            object -> handleAttackPatternImport(object, tenantId),
+            response.sourceDocument());
     List<Domain> domains =
         extractRelationshipObjects("domains", this::handleDomainImport, response.sourceDocument());
     List<Tag> tags =
@@ -93,7 +97,7 @@ public class PayloadImportService {
   public record PayloadImportResult(
       ZipJsonService.ImportOutput<Payload> payloadOutput, InjectorContract injectorContract) {}
 
-  private AttackPattern handleAttackPatternImport(ResourceObject object) {
+  private AttackPattern handleAttackPatternImport(ResourceObject object, String tenantId) {
     AttackPatternCreateInput input = new AttackPatternCreateInput();
     input.setName(object.attributes().get("attack_pattern_name").toString());
     input.setDescription(object.attributes().get("attack_pattern_description").toString());
@@ -102,7 +106,7 @@ public class PayloadImportService {
     input.setPlatforms(asStringArray(object.attributes().get("attack_pattern_platforms")));
     input.setPermissionsRequired(
         asStringArray(object.attributes().get("attack_pattern_permissions_required")));
-    return attackPatternService.findOrCreate(input);
+    return attackPatternService.findOrCreate(input, tenantId);
   }
 
   private Domain handleDomainImport(ResourceObject object) {

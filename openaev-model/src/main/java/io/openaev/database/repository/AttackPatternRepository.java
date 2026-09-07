@@ -42,15 +42,32 @@ public interface AttackPatternRepository
 
   Optional<AttackPattern> findByExternalId(@NotNull String externalId);
 
+  /**
+   * Tenant-scoped business-key lookup, used by upsert to find (or decide to create) a tenant's own
+   * row for a given external id. The unique constraint on {@code (attack_pattern_external_id,
+   * tenant_id)} is per-tenant, so a bare {@code findByExternalId} can match another tenant's row
+   * with the same MITRE id once the write tenant is resolved.
+   */
+  Optional<AttackPattern> findByExternalIdAndTenantId(
+      @NotNull String externalId, @NotNull String tenantId);
+
   List<AttackPattern> findAllByExternalIdInIgnoreCaseAndTenantId(
       List<String> externalIds, String tenantId);
+
+  /**
+   * Same as {@link #findAllByExternalIdInIgnoreCaseAndTenantId} but without an explicit tenant
+   * filter: the {@code TenantStatementInspector} already scopes this read to the caller's request
+   * scope, so callers that only have a read scope (not a resolved write tenant) should use this
+   * instead of guessing a tenant id.
+   */
+  List<AttackPattern> findAllByExternalIdInIgnoreCase(List<String> externalIds);
 
   Optional<AttackPattern> findByStixId(@NotNull String stixId);
 
   @Query(
       value =
           "select ap.*, array_remove(array_agg(apphase.phase_id), NULL) as attack_pattern_kill_chain_phases from attack_patterns ap "
-              + "left join attack_patterns_kill_chain_phases apphase ON ap.attack_pattern_id = apphase.attack_pattern_id WHERE ap.tenant_id = :#{#tenantContext.currentTenant} GROUP BY ap.attack_pattern_id",
+              + "left join attack_patterns_kill_chain_phases apphase ON ap.attack_pattern_id = apphase.attack_pattern_id GROUP BY ap.attack_pattern_id",
       nativeQuery = true)
   List<RawAttackPatternIndexing> rawAll();
 

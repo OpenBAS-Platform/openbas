@@ -7,6 +7,7 @@ import static io.openaev.helper.StreamHelper.fromIterable;
 import static io.openaev.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openaev.aop.AccessControl;
+import io.openaev.config.TenantWriteScopeResolver;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.raw.RawAttackPatternIndexing;
@@ -52,6 +53,7 @@ public class AttackPatternApi extends RestBehavior {
   private final InjectorContractRepository injectorContractRepository;
   private final KillChainPhaseRepository killChainPhaseRepository;
   private final KillChainPhaseService killChainPhaseService;
+  private final TenantWriteScopeResolver writeScopeResolver;
 
   @GetMapping
   @Transactional
@@ -112,12 +114,14 @@ public class AttackPatternApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   public AttackPattern createAttackPattern(
       TxCtx ctx, @Valid @RequestBody AttackPatternCreateInput input) {
+    String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
     AttackPattern attackPattern = new AttackPattern();
     attackPattern.setUpdateAttributes(input);
     attackPattern.setKillChainPhases(
         fromIterable(killChainPhaseRepository.findAllById(input.getKillChainPhasesIds())));
     attackPattern.setParent(
         updateRelation(input.getParentId(), attackPattern.getParent(), attackPatternRepository));
+    attackPattern.setTenant(new Tenant(tenantId));
     return attackPatternRepository.save(attackPattern);
   }
 
@@ -160,6 +164,7 @@ public class AttackPatternApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   public Iterable<AttackPattern> upsertAttackPatterns(
       TxCtx ctx, @Valid @RequestBody AttackPatternUpsertInput input) {
+    String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
     List<AttackPattern> upserted = new ArrayList<>();
     List<AttackPatternCreateInput> attackPatterns = input.getAttackPatterns();
     List<AttackPatternCreateInput> patternsWithoutParent =
@@ -168,10 +173,10 @@ public class AttackPatternApi extends RestBehavior {
         attackPatterns.stream().filter(a -> a.getParentId() != null).toList();
     upserted.addAll(
         attackPatternService.internalUpsertAttackPatterns(
-            patternsWithoutParent, input.getIgnoreDependencies()));
+            patternsWithoutParent, input.getIgnoreDependencies(), tenantId));
     upserted.addAll(
         attackPatternService.internalUpsertAttackPatterns(
-            patternsWithParent, input.getIgnoreDependencies()));
+            patternsWithParent, input.getIgnoreDependencies(), tenantId));
     return upserted;
   }
 

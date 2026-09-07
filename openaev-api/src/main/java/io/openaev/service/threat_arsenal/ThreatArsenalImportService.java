@@ -40,7 +40,7 @@ public class ThreatArsenalImportService {
     if (isInjectorContractExport(file)) {
       return importFromInjectorContract(file, tenantId);
     }
-    return importFromPayload(file);
+    return importFromPayload(file, tenantId);
   }
 
   private ThreatArsenalAction importFromInjectorContract(MultipartFile file, String tenantId)
@@ -82,8 +82,10 @@ public class ThreatArsenalImportService {
    * format handled by {@link #importFromInjectorContract(MultipartFile)}. This path will be removed
    * soon.
    */
-  private ThreatArsenalAction importFromPayload(MultipartFile file) throws Exception {
-    PayloadImportService.PayloadImportResult result = payloadImportService.importPayload(file);
+  private ThreatArsenalAction importFromPayload(MultipartFile file, String tenantId)
+      throws Exception {
+    PayloadImportService.PayloadImportResult result =
+        payloadImportService.importPayload(file, tenantId);
     return threatArsenalMapper.toThreatArsenalAction(result.injectorContract());
   }
 
