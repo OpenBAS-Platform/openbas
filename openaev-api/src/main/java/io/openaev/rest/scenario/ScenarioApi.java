@@ -37,6 +37,7 @@ import io.openaev.rest.exception.ElementNotFoundException;
 import io.openaev.rest.exercise.form.LessonsInput;
 import io.openaev.rest.exercise.form.ScenarioTeamPlayersEnableInput;
 import io.openaev.rest.helper.RestBehavior;
+import io.openaev.rest.kill_chain_phase.KillChainPhaseInitializer;
 import io.openaev.rest.scenario.form.*;
 import io.openaev.rest.scenario.response.ScenarioOutput;
 import io.openaev.rest.team.output.TeamOutput;
@@ -56,6 +57,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -147,9 +149,6 @@ public class ScenarioApi extends RestBehavior {
   @Transactional(propagation = Propagation.SUPPORTS)
   @AccessControl(actionPerformed = Action.CREATE, resourceType = ResourceType.SCENARIO)
   public ScenarioSimple createScenarioWithInjectorContracts(
-      // TxCtx is still declared so the resolver injects the request scope; there is no real
-      // transaction here to write the GUC into (SUPPORTS), so it is passed down manually into
-      // ScenarioService's own @Transactional method.
       TxCtx ctx, @Valid @RequestBody final ScenarioAndInjectorContractsInputs inputs) {
     return BulkOperationContext.runSuppressed(
         () ->
@@ -171,9 +170,6 @@ public class ScenarioApi extends RestBehavior {
   @Transactional(propagation = Propagation.SUPPORTS)
   @AccessControl(actionPerformed = Action.WRITE, resourceType = ResourceType.SCENARIO)
   public List<ScenarioSimple> updateScenariosWithInjectorContracts(
-      // TxCtx is still declared so the resolver injects the request scope; there is no real
-      // transaction here to write the GUC into (SUPPORTS), so it is passed down manually into
-      // ScenarioService's own @Transactional method.
       TxCtx ctx, @Valid @RequestBody final ScenarioIdsAndInjectorContractsInputs inputs) {
     return BulkOperationContext.runSuppressed(
         () ->
@@ -190,8 +186,8 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.DUPLICATE,
       resourceType = ResourceType.SCENARIO)
-  public Scenario duplicateScenario(@PathVariable @NotBlank final String scenarioId) {
-    return scenarioService.getDuplicateScenario(scenarioId);
+  public Scenario duplicateScenario(TxCtx ctx, @PathVariable @NotBlank final String scenarioId) {
+    return hydrateKillChainPhases(scenarioService.getDuplicateScenario(scenarioId));
   }
 
   @GetMapping({SCENARIO_URI, TENANT_SCENARIO_URI})
@@ -228,7 +224,7 @@ public class ScenarioApi extends RestBehavior {
       resourceId = "#scenarioId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.SCENARIO)
-  public ScenarioOutput scenario(@PathVariable @NotBlank final String scenarioId) {
+  public ScenarioOutput scenario(TxCtx ctx, @PathVariable @NotBlank final String scenarioId) {
     return scenarioService.getScenarioById(scenarioId);
   }
 
@@ -317,11 +313,18 @@ public class ScenarioApi extends RestBehavior {
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
   public Scenario updateScenario(
+      TxCtx ctx,
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final UpdateScenarioInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     Set<Tag> currentTagList = scenario.getTags();
+    // Absent (null) reply-to means "not provided" and must not wipe the stored addresses: the
+    // update is a full-entity PUT, so an API consumer omitting the field would otherwise clear it.
+    List<String> currentReplyTos = new ArrayList<>(scenario.getReplyTos());
     scenario.setUpdateAttributes(input);
+    if (input.getReplyTos() == null) {
+      scenario.setReplyTos(currentReplyTos);
+    }
     scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     if (hasText(input.getCustomDashboard())) {
       scenario.setCustomDashboard(
@@ -329,7 +332,8 @@ public class ScenarioApi extends RestBehavior {
     } else {
       scenario.setCustomDashboard(null);
     }
-    return this.scenarioService.updateScenario(scenario, currentTagList, input.isApplyTagRule());
+    return hydrateKillChainPhases(
+        this.scenarioService.updateScenario(scenario, currentTagList, input.isApplyTagRule()));
   }
 
   @DeleteMapping({SCENARIO_URI + "/{scenarioId}", TENANT_SCENARIO_URI + "/{scenarioId}"})
@@ -373,12 +377,14 @@ public class ScenarioApi extends RestBehavior {
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
   public Scenario updateScenarioTags(
+      TxCtx ctx,
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final ScenarioUpdateTagsInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     Set<Tag> currentTagList = scenario.getTags();
     scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    return this.scenarioService.updateScenario(scenario, currentTagList, input.isApplyTagRule());
+    return hydrateKillChainPhases(
+        this.scenarioService.updateScenario(scenario, currentTagList, input.isApplyTagRule()));
   }
 
   // -- EXPORT --
@@ -390,6 +396,7 @@ public class ScenarioApi extends RestBehavior {
       actionPerformed = Action.SEARCH,
       resourceType = ResourceType.SCENARIO)
   public void exportScenario(
+      TxCtx ctx,
       @PathVariable @NotBlank final String scenarioId,
       @RequestParam(required = false) final boolean isWithTeams,
       @RequestParam(required = false) final boolean isWithPlayers,
@@ -411,13 +418,9 @@ public class ScenarioApi extends RestBehavior {
   @PostMapping({SCENARIO_URI + "/import", TENANT_SCENARIO_URI + "/import"})
   @Transactional
   @AccessControl(actionPerformed = Action.WRITE, resourceType = ResourceType.SCENARIO)
-  public ImportResult importScenario(
-      // Unused by the handler body; TenantScopeTransactionAspect reads it to set the tenant scope
-      // for the transaction (the V1_DataImporter resolves InjectorContract#getFirstInjector() and
-      // InjectorService#injectorTypeExists(...), both v2 tenant-scoped through the injectors
-      // table; without a scope, imported injects silently lose their injector).
-      TxCtx ctx, @RequestPart("file") @NotNull MultipartFile file) throws Exception {
-    return this.importService.handleFileImport(file, null, null);
+  public ImportResult importScenario(TxCtx ctx, @RequestPart("file") @NotNull MultipartFile file)
+      throws Exception {
+    return this.importService.handleFileImport(ctx, file, null, null);
   }
 
   // -- TEAMS --
@@ -485,11 +488,13 @@ public class ScenarioApi extends RestBehavior {
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
   public Scenario enableScenarioTeamPlayers(
+      TxCtx ctx,
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String teamId,
       @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
-    return this.scenarioService.enableAddScenarioTeamPlayer(
-        scenarioId, teamId, input.getPlayersIds());
+    return hydrateKillChainPhases(
+        this.scenarioService.enableAddScenarioTeamPlayer(
+            scenarioId, teamId, input.getPlayersIds()));
   }
 
   @Transactional(rollbackFor = Exception.class)
@@ -502,10 +507,12 @@ public class ScenarioApi extends RestBehavior {
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
   public Scenario disableScenarioTeamPlayers(
+      TxCtx ctx,
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String teamId,
       @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
-    return this.scenarioService.disablePlayers(scenarioId, teamId, input.getPlayersIds());
+    return hydrateKillChainPhases(
+        this.scenarioService.disablePlayers(scenarioId, teamId, input.getPlayersIds()));
   }
 
   @Transactional(rollbackFor = Exception.class)
@@ -518,10 +525,12 @@ public class ScenarioApi extends RestBehavior {
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
   public Scenario addScenarioTeamPlayers(
+      TxCtx ctx,
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String teamId,
       @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
-    return this.scenarioService.addScenarioPlayer(scenarioId, teamId, input.getPlayersIds());
+    return hydrateKillChainPhases(
+        this.scenarioService.addScenarioPlayer(scenarioId, teamId, input.getPlayersIds()));
   }
 
   @Transactional(rollbackFor = Exception.class)
@@ -534,6 +543,7 @@ public class ScenarioApi extends RestBehavior {
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SCENARIO)
   public Scenario removeScenarioTeamPlayers(
+      TxCtx ctx,
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String teamId,
       @Valid @RequestBody final ScenarioTeamPlayersEnableInput input) {
@@ -544,7 +554,8 @@ public class ScenarioApi extends RestBehavior {
     Iterable<User> teamUsers = userRepository.findAllById(input.getPlayersIds());
     team.getUsers().removeAll(fromIterable(teamUsers));
     teamRepository.save(team);
-    return this.scenarioService.disablePlayers(scenarioId, teamId, input.getPlayersIds());
+    return hydrateKillChainPhases(
+        this.scenarioService.disablePlayers(scenarioId, teamId, input.getPlayersIds()));
   }
 
   // -- RECURRENCE --
@@ -627,7 +638,7 @@ public class ScenarioApi extends RestBehavior {
       resourceType = ResourceType.SCENARIO)
   @Transactional(rollbackFor = Exception.class)
   public Scenario updateScenarioLessons(
-      @PathVariable String scenarioId, @Valid @RequestBody LessonsInput input) {
+      TxCtx ctx, @PathVariable String scenarioId, @Valid @RequestBody LessonsInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     // Partial update: absent fields keep their current value (older API consumers
     // only send lessons_anonymized and must not reset the enabled flag).
@@ -637,7 +648,7 @@ public class ScenarioApi extends RestBehavior {
     if (input.getLessonsEnabled() != null) {
       scenario.setLessonsEnabled(input.getLessonsEnabled());
     }
-    return scenarioRepository.save(scenario);
+    return hydrateKillChainPhases(scenarioRepository.save(scenario));
   }
 
   @PostMapping({
@@ -808,4 +819,14 @@ public class ScenarioApi extends RestBehavior {
   }
 
   // end region
+
+  /**
+   * {@code scenario_kill_chain_phases} walks the scenario's injects down to the LAZY attack-pattern
+   * phases. See {@link KillChainPhaseInitializer}: hydrate them here, inside the scoped
+   * transaction, or open-in-view rendering serializes an empty list.
+   */
+  private static Scenario hydrateKillChainPhases(Scenario scenario) {
+    KillChainPhaseInitializer.initializeFromInjects(scenario.getInjects());
+    return scenario;
+  }
 }

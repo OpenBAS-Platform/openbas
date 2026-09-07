@@ -54,6 +54,7 @@ import io.openaev.rest.exercise.form.ExerciseSimple;
 import io.openaev.rest.inject.service.InjectDuplicateService;
 import io.openaev.rest.inject.service.InjectService;
 import io.openaev.rest.injector_contract.input.InjectorContractSearchPaginationInput;
+import io.openaev.rest.kill_chain_phase.KillChainPhaseInitializer;
 import io.openaev.rest.kill_chain_phase.response.KillChainPhaseOutput;
 import io.openaev.rest.scenario.export.ScenarioFileExport;
 import io.openaev.rest.scenario.form.ScenarioBulkProcessingInput;
@@ -186,10 +187,7 @@ public class ScenarioService {
 
   @Transactional
   public ScenarioSimple createScenarioWithInjectorContracts(
-      // Unused by the method body; TenantScopeTransactionAspect reads it to set the tenant scope
-      // for this transaction (the arsenal selection resolves injector contracts and their linked
-      // injector, both v2 tenant-scoped through the injectors table).
-      TxCtx ctx,
+      final TxCtx ctx,
       @NotBlank final String tenantId,
       @NotNull final ScenarioInput scenarioInput,
       @NotNull final InjectorContractSearchPaginationInput injectorContractSearchPaginationInput,
@@ -198,35 +196,50 @@ public class ScenarioService {
     Scenario scenario = computeAndCreateScenario(preparedScenario);
     this.injectService.createInjectsFromInjectorContractInput(
         null, new ArrayList<>(List.of(scenario)), injectorContractSearchPaginationInput, locale);
+    KillChainPhaseInitializer.initializeFromInjects(scenario.getInjects());
     return ScenarioSimple.fromScenario(scenario);
   }
 
   @Transactional
   public List<ScenarioSimple> updateScenariosWithInjectorContracts(
-      // Unused by the method body; TenantScopeTransactionAspect reads it to set the tenant scope
-      // for this transaction (same reason as createScenarioWithInjectorContracts above).
-      TxCtx ctx,
+      final TxCtx ctx,
       @NotNull final List<String> scenarioIds,
       @NotNull final InjectorContractSearchPaginationInput injectorContractSearchPaginationInput,
       @NotBlank final String locale) {
     List<Scenario> scenarios = this.scenarioRepository.findAllById(scenarioIds);
     this.injectService.createInjectsFromInjectorContractInput(
         null, scenarios, injectorContractSearchPaginationInput, locale);
+    scenarios.forEach(
+        scenario -> KillChainPhaseInitializer.initializeFromInjects(scenario.getInjects()));
     return scenarios.stream().map(ScenarioSimple::fromScenario).toList();
   }
 
+  /**
+   * Fills in the platform email defaults for the fields the caller left empty.
+   *
+   * <p>Each field is defaulted independently: the creation input carries no {@code from}, so gating
+   * the whole block on it used to overwrite the sender display name and the reply-to addresses the
+   * user had just typed in the creation form.
+   */
   public void computeEmails(@NotNull Scenario scenario) {
+    // getFromName() derives the display name from `from` when unset, so it must be evaluated
+    // before `from` is defaulted, otherwise the derived value hides the missing display name.
+    boolean hasFromName = hasText(scenario.getFromName());
     if (!hasText(scenario.getFrom())) {
-      if (this.imapEnabled) {
-        scenario.setFrom(this.imapUsername);
-        scenario.setFromName(resolveFromName(null, this.imapUsername));
-        scenario.setReplyTos(new ArrayList<>(Arrays.asList(this.imapUsername)));
-      } else {
-        scenario.setFrom(this.openAEVConfig.getDefaultMailer());
-        scenario.setFromName(this.openAEVConfig.getDefaultMailerName());
-        scenario.setReplyTos(
-            new ArrayList<>(Arrays.asList(this.openAEVConfig.getDefaultReplyTo())));
-      }
+      scenario.setFrom(
+          this.imapEnabled ? this.imapUsername : this.openAEVConfig.getDefaultMailer());
+    }
+    if (!hasFromName) {
+      scenario.setFromName(
+          this.imapEnabled
+              ? resolveFromName(null, this.imapUsername)
+              : this.openAEVConfig.getDefaultMailerName());
+    }
+    if (scenario.getReplyTos() == null || scenario.getReplyTos().isEmpty()) {
+      String defaultReplyTo =
+          this.imapEnabled ? this.imapUsername : this.openAEVConfig.getDefaultReplyTo();
+      scenario.setReplyTos(
+          hasText(defaultReplyTo) ? new ArrayList<>(List.of(defaultReplyTo)) : new ArrayList<>());
     }
   }
 
