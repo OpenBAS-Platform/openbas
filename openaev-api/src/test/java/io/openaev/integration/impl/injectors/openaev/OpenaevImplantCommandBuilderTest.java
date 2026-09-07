@@ -252,6 +252,12 @@ class OpenaevImplantCommandBuilderTest {
     // is strictly worse than the behaviour we are replacing.
     assertThat(command).contains("& ipid=\\$!");
     assertThat(command).contains("wait \\$ipid");
+
+    // And the watchdog is reaped once the implant is done, as the generic command already did.
+    // Leaving it to sleep out its budget would keep a shell alive per agent, and if the implant's
+    // pid were recycled in the meantime the watchdog would signal an unrelated process.
+    assertThat(command).contains("wpid=\\$!");
+    assertThat(command).contains("kill \\$wpid");
   }
 
   @DisplayName("A detached Unix command reports whether the implant could be launched")

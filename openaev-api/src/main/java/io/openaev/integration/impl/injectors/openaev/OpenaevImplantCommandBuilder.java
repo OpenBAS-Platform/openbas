@@ -366,7 +366,11 @@ final class OpenaevImplantCommandBuilder {
             + "(sleep "
             + timeoutSeconds
             + ";if kill -0 \\$ipid 2>/dev/null;then kill -TERM \\$ipid 2>/dev/null;sleep 5;"
-            + "kill -KILL \\$ipid 2>/dev/null;fi) & wait \\$ipid";
+            + "kill -KILL \\$ipid 2>/dev/null;fi) & wpid=\\$!;wait \\$ipid;"
+            // Reap the watchdog once the implant is done, exactly as the generic command does.
+            // Without this it sleeps out the rest of its budget, and worse, if the implant's pid
+            // gets recycled in the meantime the watchdog would signal an unrelated process.
+            + "kill \\$wpid 2>/dev/null";
 
     commands.put(
         executorNameKey + "." + platform.name() + "." + Endpoint.PLATFORM_ARCH.x86_64.name(),
