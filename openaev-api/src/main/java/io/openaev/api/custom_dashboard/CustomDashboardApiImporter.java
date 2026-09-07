@@ -1,6 +1,7 @@
 package io.openaev.api.custom_dashboard;
 
 import io.openaev.aop.AccessControl;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.Action;
 import io.openaev.database.model.CustomDashboard;
 import io.openaev.database.model.ResourceType;
@@ -43,6 +44,7 @@ public class CustomDashboardApiImporter extends RestBehavior {
   @Transactional
   @AccessControl(actionPerformed = Action.WRITE, resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<JsonApiDocument<ResourceObject>> importJson(
+      TxCtx ctx,
       @RequestPart("file") @NotNull MultipartFile file) throws IOException {
     return ResponseEntity.ok(
         zipJsonApi
