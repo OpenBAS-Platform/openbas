@@ -87,7 +87,8 @@ import SchedulingDialog from '../../common/scheduling/SchedulingDialog';
 import TriggerSubscribeButton from '../../profile/triggers/TriggerSubscribeButton';
 import EntityReportsPanel from '../../reporting/EntityReportsPanel';
 import { CONTEXTUAL_ENTITY_WIDGET_IDS, contextualResultsUrl } from '../../workspaces/custom_dashboards/results/contextualWidgets';
-import ScenarioConfiguration, { SCENARIO_CONFIGURATION_QUERY_PARAM, SCENARIO_CONFIGURATION_VARIABLES_QUERY_VALUE, ScenarioConfigurationTab } from './ScenarioConfiguration';
+import ScenarioConfigurationTab from '../ScenarioConfigurationTab';
+import ScenarioConfiguration, { SCENARIO_CONFIGURATION_QUERY_PARAM, SCENARIO_CONFIGURATION_VARIABLES_QUERY_VALUE } from './ScenarioConfiguration';
 import ScenarioPopover from './ScenarioPopover';
 
 interface ScenarioHeaderProps {

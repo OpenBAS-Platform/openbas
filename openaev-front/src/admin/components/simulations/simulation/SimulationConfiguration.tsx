@@ -6,18 +6,10 @@ import { type ExercisesHelper } from '../../../../actions/exercises/exercise-hel
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import { type Exercise } from '../../../../utils/api-types';
+import SimulationConfigurationTab from '../SimulationConfigurationTab';
 import ExerciseArticles from './articles/ExerciseArticles';
 import SimulationTeams from './teams/SimulationTeams';
 import SimulationVariables from './variables/SimulationVariables';
-
-// Tab indices are surfaced as a named enum (rather than magic numbers) so deep-link callers
-// (e.g. the "manage custom variables" link in AvailableVariablesDialog) can target a specific
-// tab without duplicating/guessing its position, and stay correct if tabs are ever reordered.
-export enum SimulationConfigurationTab {
-  TEAMS = 0,
-  VARIABLES = 1,
-  MEDIA_PRESSURE = 2,
-}
 
 export const SIMULATION_CONFIGURATION_QUERY_PARAM = 'config';
 export const SIMULATION_CONFIGURATION_VARIABLES_QUERY_VALUE = 'variables';
