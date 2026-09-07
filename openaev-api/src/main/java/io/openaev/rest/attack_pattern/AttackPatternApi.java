@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
@@ -131,11 +132,20 @@ public class AttackPatternApi extends RestBehavior {
       resourceId = "#attackPatternId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.ATTACK_PATTERN)
+  // ctx scopes the lazy attackPatterns association on each returned InjectorContract: with
+  // open-in-view, an uninitialized association resolves after this method returns and the scope
+  // is gone, so once attack_patterns is tenant-active the fail-closed inspector would silently
+  // render it empty (the #7026 shape).
   public Iterable<InjectorContract> injectorContracts(
       TxCtx ctx, @PathVariable String attackPatternId) {
     attackPatternRepository.findById(attackPatternId).orElseThrow(ElementNotFoundException::new);
-    return injectorContractRepository.findAll(
-        InjectorContractSpecification.fromAttackPattern(attackPatternId));
+    List<InjectorContract> injectorContracts =
+        fromIterable(
+            injectorContractRepository.findAll(
+                InjectorContractSpecification.fromAttackPattern(attackPatternId)));
+    injectorContracts.forEach(
+        injectorContract -> Hibernate.initialize(injectorContract.getAttackPatterns()));
+    return injectorContracts;
   }
 
   @PutMapping("/{attackPatternId}")

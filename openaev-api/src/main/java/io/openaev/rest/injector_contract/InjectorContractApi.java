@@ -30,6 +30,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -161,9 +162,14 @@ public class InjectorContractApi extends RestBehavior {
       resourceId = "#injectorContractId",
       actionPerformed = Action.READ,
       resourceType = ResourceType.INJECTOR_CONTRACT)
-  // ctx scopes the eager injectorLinks -> injector fetch triggered when the contract loads.
+  // ctx scopes the eager injectorLinks -> injector fetch triggered when the contract loads, and
+  // the lazy attackPatterns association: with open-in-view, an uninitialized association resolves
+  // after this method returns and the scope is gone, so once attack_patterns is tenant-active the
+  // fail-closed inspector would silently render it empty (the #7026 shape).
   public InjectorContract injectorContract(TxCtx ctx, @PathVariable String injectorContractId) {
-    return injectorContractService.injectorContract(injectorContractId);
+    InjectorContract injectorContract = injectorContractService.injectorContract(injectorContractId);
+    Hibernate.initialize(injectorContract.getAttackPatterns());
+    return injectorContract;
   }
 
   /**
