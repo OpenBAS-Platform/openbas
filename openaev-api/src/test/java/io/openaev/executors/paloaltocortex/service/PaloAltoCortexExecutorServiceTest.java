@@ -95,8 +95,10 @@ public class PaloAltoCortexExecutorServiceTest {
     assertEquals(0, agents.getValue().size());
 
     ArgumentCaptor<AssetGroup> assetGroupCaptor = ArgumentCaptor.forClass(AssetGroup.class);
+    ArgumentCaptor<String> tenantCaptor = ArgumentCaptor.forClass(String.class);
     verify(assetGroupService)
-        .createOrUpdateAssetGroupWithoutDynamicAssets(assetGroupCaptor.capture());
+        .createOrUpdateAssetGroupWithoutDynamicAssets(
+            assetGroupCaptor.capture(), tenantCaptor.capture());
     assertEquals(
         PALOALTOCORTEX_EXECUTOR_TYPE + "_groupName",
         assetGroupCaptor.getValue().getExternalReference());

@@ -93,8 +93,10 @@ public class SentinelOneExecutorServiceTest {
     assertEquals(0, agents.getValue().size());
 
     ArgumentCaptor<AssetGroup> assetGroupCaptor = ArgumentCaptor.forClass(AssetGroup.class);
+    ArgumentCaptor<String> tenantCaptor = ArgumentCaptor.forClass(String.class);
     verify(assetGroupService, times(3))
-        .createOrUpdateAssetGroupWithoutDynamicAssets(assetGroupCaptor.capture());
+        .createOrUpdateAssetGroupWithoutDynamicAssets(
+            assetGroupCaptor.capture(), tenantCaptor.capture());
     assertEquals(3, assetGroupCaptor.getAllValues().size());
     assertEquals(
         sentinelOneAgent.getAccountId(),

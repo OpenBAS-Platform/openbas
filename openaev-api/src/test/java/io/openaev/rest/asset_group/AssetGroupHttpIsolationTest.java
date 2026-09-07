@@ -193,6 +193,22 @@ class AssetGroupHttpIsolationTest extends IntegrationTest {
   }
 
   @Test
+  @DisplayName("a create with no tenant selector is refused, not silently attributed")
+  void createWithoutSelectorIsRejected() throws Exception {
+    // Today TenantBaseListener silently stamps whatever the v1 thread-local holds, so an ambiguous
+    // create succeeds and lands somewhere. The go-live commit removes that listener; attribution
+    // must be explicit and an ambiguous write must be refused loudly, per TenantWriteScopeResolver.
+    AssetGroupInput input = new AssetGroupInput();
+    input.setName("no-selector-" + UUID.randomUUID());
+    mvc.perform(
+            post("/api/asset_groups")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(input))
+                .with(csrf()))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
   @DisplayName("under tenant A's path: updating B's group is not found and leaves it untouched")
   void updateOtherTenantGroupIsBlocked() throws Exception {
     AssetGroupInput input = new AssetGroupInput();
