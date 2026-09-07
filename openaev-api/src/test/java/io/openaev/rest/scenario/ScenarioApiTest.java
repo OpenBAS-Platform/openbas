@@ -804,22 +804,20 @@ public class ScenarioApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.ACCESS_ASSESSMENT));
 
-      ScenarioInput input = new ScenarioInput();
-      input.setName("Isolation Test Scenario");
-
-      String createResponse =
-          mvc.perform(
-                  post("/api/tenants/" + tenantX.getId() + "/scenarios")
-                      .content(asJsonString(input))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      String scenarioId = JsonPath.read(createResponse, "$.scenario_id");
+      // Seeded directly (native insert), not through the create endpoint: creating under tenant
+      // X's path would set the tenant scope (TxCtx) to X on this test's wrapping transaction, and
+      // the read call below sets it to Y - the aspect refuses a scope change within one
+      // transaction (see TenantScopeTransactionAspect). Seeding bypasses that entirely.
+      String scenarioId = UUID.randomUUID().toString();
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO scenarios (scenario_id, scenario_name, scenario_mail_from, tenant_id)"
+                  + " VALUES (:id, :name, :mailFrom, CAST(:tenant AS uuid))")
+          .setParameter("id", scenarioId)
+          .setParameter("name", "Isolation Test Scenario")
+          .setParameter("mailFrom", "isolation-test@openaev.io")
+          .setParameter("tenant", tenantX.getId())
+          .executeUpdate();
 
       entityManager.flush();
       entityManager.clear();
@@ -931,22 +929,20 @@ public class ScenarioApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.MANAGE_ASSESSMENT, Capability.ACCESS_ASSESSMENT));
 
-      ScenarioInput input = new ScenarioInput();
-      input.setName("Update Isolation Test Scenario");
-
-      String createResponse =
-          mvc.perform(
-                  post("/api/tenants/" + tenantX.getId() + "/scenarios")
-                      .content(asJsonString(input))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      String scenarioId = JsonPath.read(createResponse, "$.scenario_id");
+      // Seeded directly (native insert), not through the create endpoint: creating under tenant
+      // X's path would set the tenant scope (TxCtx) to X on this test's wrapping transaction, and
+      // the update call below sets it to Y - the aspect refuses a scope change within one
+      // transaction (see TenantScopeTransactionAspect). Seeding bypasses that entirely.
+      String scenarioId = UUID.randomUUID().toString();
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO scenarios (scenario_id, scenario_name, scenario_mail_from, tenant_id)"
+                  + " VALUES (:id, :name, :mailFrom, CAST(:tenant AS uuid))")
+          .setParameter("id", scenarioId)
+          .setParameter("name", "Update Isolation Test Scenario")
+          .setParameter("mailFrom", "isolation-test@openaev.io")
+          .setParameter("tenant", tenantX.getId())
+          .executeUpdate();
 
       entityManager.flush();
       entityManager.clear();
@@ -1026,22 +1022,20 @@ public class ScenarioApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.ACCESS_ASSESSMENT));
 
-      ScenarioInput input = new ScenarioInput();
-      input.setName("SearchById Isolation Scenario");
-
-      String createResponse =
-          mvc.perform(
-                  post("/api/tenants/" + tenantX.getId() + "/scenarios")
-                      .content(asJsonString(input))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      String scenarioId = JsonPath.read(createResponse, "$.scenario_id");
+      // Seeded directly (native insert), not through the create endpoint: creating under tenant
+      // X's path would set the tenant scope (TxCtx) to X on this test's wrapping transaction, and
+      // the search-by-id call below sets it to Y - the aspect refuses a scope change within one
+      // transaction (see TenantScopeTransactionAspect). Seeding bypasses that entirely.
+      String scenarioId = UUID.randomUUID().toString();
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO scenarios (scenario_id, scenario_name, scenario_mail_from, tenant_id)"
+                  + " VALUES (:id, :name, :mailFrom, CAST(:tenant AS uuid))")
+          .setParameter("id", scenarioId)
+          .setParameter("name", "SearchById Isolation Scenario")
+          .setParameter("mailFrom", "isolation-test@openaev.io")
+          .setParameter("tenant", tenantX.getId())
+          .executeUpdate();
 
       entityManager.flush();
       entityManager.clear();

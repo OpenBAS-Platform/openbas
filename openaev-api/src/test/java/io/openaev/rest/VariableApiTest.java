@@ -251,6 +251,26 @@ public class VariableApiTest extends IntegrationTest {
       return scenarioId;
     }
 
+    // Seeded directly (native insert), not through the create endpoint: variables carry no
+    // tenant_id of their own (scoped indirectly through variable_scenario), but creating one via
+    // the API under scenarioX's tenant would still set the tenant scope (TxCtx) to that tenant on
+    // this test's wrapping transaction, conflicting with the cross-tenant Act call below (see
+    // TenantScopeTransactionAspect). Seeding bypasses that entirely.
+    private String seedVariableInScenario(String scenarioId, String key) {
+      String variableId = UUID.randomUUID().toString();
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO variables (variable_id, variable_key, variable_value, variable_type,"
+                  + " variable_scenario) VALUES (:id, :key, :value, :type, :scenarioId)")
+          .setParameter("id", variableId)
+          .setParameter("key", key)
+          .setParameter("value", "test_value")
+          .setParameter("type", "String")
+          .setParameter("scenarioId", scenarioId)
+          .executeUpdate();
+      return variableId;
+    }
+
     @Test
     @DisplayName("Variable in scenario X should NOT be updatable via scenario Y (cross-tenant)")
     void given_variableInScenarioX_should_notBeUpdatableViaScenarioY() throws Exception {
@@ -262,9 +282,9 @@ public class VariableApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.MANAGE_ASSESSMENT, Capability.ACCESS_ASSESSMENT));
 
-      String scenarioX = createScenarioInTenant(tenantX.getId());
+      String scenarioX = seedScenarioInTenant(tenantX.getId());
       String scenarioY = seedScenarioInTenant(tenantY.getId());
-      String variableId = createVariableInScenario(tenantX.getId(), scenarioX, "isolation_key");
+      String variableId = seedVariableInScenario(scenarioX, "isolation_key");
 
       entityManager.flush();
       entityManager.clear();
@@ -334,9 +354,9 @@ public class VariableApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.MANAGE_ASSESSMENT, Capability.ACCESS_ASSESSMENT));
 
-      String scenarioX = createScenarioInTenant(tenantX.getId());
+      String scenarioX = seedScenarioInTenant(tenantX.getId());
       String scenarioY = seedScenarioInTenant(tenantY.getId());
-      String variableId = createVariableInScenario(tenantX.getId(), scenarioX, "delete_iso_key");
+      String variableId = seedVariableInScenario(scenarioX, "delete_iso_key");
 
       entityManager.flush();
       entityManager.clear();
