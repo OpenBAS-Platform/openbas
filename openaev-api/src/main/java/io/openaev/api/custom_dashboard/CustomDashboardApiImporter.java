@@ -44,8 +44,7 @@ public class CustomDashboardApiImporter extends RestBehavior {
   @Transactional
   @AccessControl(actionPerformed = Action.WRITE, resourceType = ResourceType.DASHBOARD)
   public ResponseEntity<JsonApiDocument<ResourceObject>> importJson(
-      TxCtx ctx,
-      @RequestPart("file") @NotNull MultipartFile file) throws IOException {
+      TxCtx ctx, @RequestPart("file") @NotNull MultipartFile file) throws IOException {
     return ResponseEntity.ok(
         zipJsonApi
             .handleImport(file, "custom_dashboard_name", null, CustomDashboardService::sanityCheck)
