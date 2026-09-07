@@ -224,8 +224,7 @@ class TxCtxArgumentResolverTest {
   }
 
   @Test
-  @DisplayName(
-      "on the tenant-prefixed route a tenant outside the caller's rights stays refused")
+  @DisplayName("on the tenant-prefixed route a tenant outside the caller's rights stays refused")
   void runTenantScopeOnTenantPrefixedRouteRefusesForeignTenant() {
     // The annotated handler must not become a caller-independent door on the prefixed route: a
     // caller addressing a tenant it is not a member of is refused exactly like on any other

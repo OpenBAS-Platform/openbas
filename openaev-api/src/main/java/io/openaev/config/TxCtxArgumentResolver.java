@@ -108,8 +108,8 @@ public class TxCtxArgumentResolver implements HandlerMethodArgumentResolver {
    * {@link TxCtx} onto endpoints the v1 {@link TenantInterceptor} already made anonymous-safe by
    * trusting the path tenant outright, without a membership check.
    *
-   * <p>This mirrors that same, long-standing v1 posture instead of reinventing one: the path
-   * tenant (if the route names one) is trusted directly; deliberately does not consult the {@code
+   * <p>This mirrors that same, long-standing v1 posture instead of reinventing one: the path tenant
+   * (if the route names one) is trusted directly; deliberately does not consult the {@code
    * X-Tenant-Ids} header here, since an anonymous caller has no memberships to select from and only
    * a path-addressed tenant is a well-formed anonymous request. No path tenant resolves to {@link
    * TxCtx#missing()}, same as a caller-authorized request with an empty authorized set.
