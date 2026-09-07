@@ -1,6 +1,5 @@
 package io.openaev.utilstest;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import io.openaev.config.EngineConfig;
 import java.util.*;
 import java.util.stream.Collectors;
