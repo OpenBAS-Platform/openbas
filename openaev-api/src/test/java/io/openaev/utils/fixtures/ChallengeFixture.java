@@ -4,7 +4,6 @@ import static io.openaev.database.model.ChallengeFlag.FLAG_TYPE.VALUE;
 
 import io.openaev.database.model.Challenge;
 import io.openaev.database.model.ChallengeFlag;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +12,7 @@ public class ChallengeFixture {
   public static Challenge createDefaultChallenge() {
     Challenge challenge = createChallengeWithDefaultName();
     ChallengeFlag challengeFlag = createDefaultChallengeFlag();
-    challenge.setFlags(new ArrayList<>(List.of(challengeFlag)));
+    challenge.setFlags(List.of(challengeFlag));
     challengeFlag.setChallenge(challenge);
     challenge.setScore(100.0);
     challenge.setMaxAttempts(2);
