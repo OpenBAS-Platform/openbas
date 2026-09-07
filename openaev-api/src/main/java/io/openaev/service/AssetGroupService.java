@@ -58,6 +58,12 @@ public class AssetGroupService {
    */
   public AssetGroup createAssetGroup(
       @NotNull final AssetGroup assetGroup, @NotBlank final String tenantId) {
+    // Explicit, not @NotBlank: this bean is not @Validated, so the annotation alone would
+    // never fire and a null tenant would silently write tenant_id = NULL.
+    if (tenantId == null || tenantId.isBlank()) {
+      throw new IllegalArgumentException(
+          "an asset group create must carry the tenant that owns it");
+    }
     assetGroup.setTenant(new Tenant(tenantId));
     AssetGroup assetGroupCreated = this.assetGroupRepository.save(assetGroup);
     return computeDynamicAssets(assetGroupCreated);
@@ -198,6 +204,12 @@ public class AssetGroupService {
    */
   public AssetGroup createOrUpdateAssetGroupWithoutDynamicAssets(
       AssetGroup assetGroup, @NotBlank final String tenantId) {
+    // Explicit, not @NotBlank: this bean is not @Validated, so the annotation alone would
+    // never fire and a null tenant would silently write tenant_id = NULL.
+    if (tenantId == null || tenantId.isBlank()) {
+      throw new IllegalArgumentException(
+          "an asset group create must carry the tenant that owns it");
+    }
     assetGroup.setTenant(new Tenant(tenantId));
     return this.assetGroupRepository.save(assetGroup);
   }

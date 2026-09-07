@@ -110,6 +110,10 @@ public class CrowdstrikeExecutorServiceTest {
     verify(assetGroupService)
         .createOrUpdateAssetGroupWithoutDynamicAssets(
             assetGroupCaptor.capture(), tenantCaptor.capture());
+    assertEquals(
+        crowdstrikeExecutor.getTenantId(),
+        tenantCaptor.getValue(),
+        "the asset group must be attributed to the executor's own tenant");
     assertEquals(HOST_GROUP_CS, assetGroupCaptor.getValue().getExternalReference());
   }
 

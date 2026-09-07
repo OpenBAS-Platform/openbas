@@ -111,6 +111,10 @@ public class MdeExecutorServiceTest {
     verify(assetGroupService)
         .createOrUpdateAssetGroupWithoutDynamicAssets(
             assetGroupCaptor.capture(), tenantCaptor.capture());
+    assertEquals(
+        mdeExecutor.getTenantId(),
+        tenantCaptor.getValue(),
+        "the asset group must be attributed to the executor's own tenant");
     assertEquals(DEVICE_GROUP_ID, assetGroupCaptor.getValue().getExternalReference());
     assertEquals("Test Device Group", assetGroupCaptor.getValue().getName());
   }

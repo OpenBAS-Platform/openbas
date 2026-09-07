@@ -110,6 +110,10 @@ public class TaniumExecutorServiceTest {
     verify(assetGroupService)
         .createOrUpdateAssetGroupWithoutDynamicAssets(
             assetGroupCaptor.capture(), tenantCaptor.capture());
+    assertEquals(
+        taniumExecutor.getTenantId(),
+        tenantCaptor.getValue(),
+        "the asset group must be attributed to the executor's own tenant");
     assertEquals(HOST_GROUP_TANIUM, assetGroupCaptor.getValue().getExternalReference());
   }
 

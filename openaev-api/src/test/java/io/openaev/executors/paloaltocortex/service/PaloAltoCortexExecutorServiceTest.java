@@ -100,6 +100,10 @@ public class PaloAltoCortexExecutorServiceTest {
         .createOrUpdateAssetGroupWithoutDynamicAssets(
             assetGroupCaptor.capture(), tenantCaptor.capture());
     assertEquals(
+        paloAltoCortexExecutor.getTenantId(),
+        tenantCaptor.getValue(),
+        "the asset group must be attributed to the executor's own tenant");
+    assertEquals(
         PALOALTOCORTEX_EXECUTOR_TYPE + "_groupName",
         assetGroupCaptor.getValue().getExternalReference());
   }

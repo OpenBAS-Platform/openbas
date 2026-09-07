@@ -97,6 +97,10 @@ public class SentinelOneExecutorServiceTest {
     verify(assetGroupService, times(3))
         .createOrUpdateAssetGroupWithoutDynamicAssets(
             assetGroupCaptor.capture(), tenantCaptor.capture());
+    assertEquals(
+        sentinelOneExecutor.getTenantId(),
+        tenantCaptor.getValue(),
+        "the asset group must be attributed to the executor's own tenant");
     assertEquals(3, assetGroupCaptor.getAllValues().size());
     assertEquals(
         sentinelOneAgent.getAccountId(),
