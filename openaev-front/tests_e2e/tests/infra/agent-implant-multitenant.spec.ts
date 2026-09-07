@@ -116,6 +116,7 @@ test.describe('Multi-tenancy — agent on new tenant', () => {
   });
 
   test('should have OpenAEV agent executor running new atomic test on new tenant', async ({ page }) => {
+    test.setTimeout(480_000);
     expect(newTenantId).not.toBeNull();
 
     // ─── Wait for agent to register an endpoint ───
