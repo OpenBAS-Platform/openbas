@@ -74,6 +74,9 @@ class InjectsExecutionJobTenantScopeTest {
   @Mock private TenantScopedJobRunner tenantScopedJobRunner;
   @Mock private HealthCheckUtils healthCheckUtils;
 
+  @Mock
+  private io.openaev.database.repository.InjectDependenciesRepository injectDependenciesRepository;
+
   @InjectMocks private InjectsExecutionJob job;
 
   /** The tenant the executor saw while the inject was running. */
@@ -106,6 +109,9 @@ class InjectsExecutionJobTenantScopeTest {
     doReturn(List.of()).when(exerciseRepository).saveAll(any());
     when(injectService.resolveAllAssetsToExecute(any(Inject.class))).thenReturn(List.of());
     when(healthCheckUtils.runContentChecks(any(Inject.class))).thenReturn(List.of());
+    // Exercise injects run checkErrorMessagesPreExecution, which queries parent dependencies:
+    // no parents here so the pre-execution gate is a no-op and the inject reaches the executor.
+    when(injectDependenciesRepository.findParents(any())).thenReturn(List.of());
 
     // Built before the when(): the helper stubs its own mocks, and nesting that inside
     // thenReturn(...) argument evaluation trips Mockito's unfinished-stubbing detection.

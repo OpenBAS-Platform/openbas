@@ -1047,9 +1047,12 @@ class InjectApiTest extends IntegrationTest {
           .satisfies(
               expectation ->
                   assertThat(
-                          expectation.getSignatures().stream()
-                              .filter(
-                                  s -> EXPECTATION_SIGNATURE_TYPE_START_DATE.equals(s.getType())))
+                          ((TechnicalInjectExpectation) expectation)
+                              .getSignatures().stream()
+                                  .filter(
+                                      s ->
+                                          EXPECTATION_SIGNATURE_TYPE_START_DATE.equals(
+                                              s.getType())))
                       .hasSize(1));
     }
 
@@ -1492,9 +1495,10 @@ class InjectApiTest extends IntegrationTest {
             injectExpectationRepository.findAllByInjectAndAgent(inject.getId(), agent.getId());
         assertEquals(1, injectExpectationSaved.size());
         List<InjectExpectationSignature> endDatesignatures =
-            injectExpectationSaved.getFirst().getSignatures().stream()
-                .filter(s -> EXPECTATION_SIGNATURE_TYPE_END_DATE.equals(s.getType()))
-                .toList();
+            ((TechnicalInjectExpectation) injectExpectationSaved.getFirst())
+                .getSignatures().stream()
+                    .filter(s -> EXPECTATION_SIGNATURE_TYPE_END_DATE.equals(s.getType()))
+                    .toList();
         assertEquals(1, endDatesignatures.size());
       }
 

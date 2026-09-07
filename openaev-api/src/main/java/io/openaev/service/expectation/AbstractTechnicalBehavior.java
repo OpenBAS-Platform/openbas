@@ -66,6 +66,16 @@ public abstract class AbstractTechnicalBehavior
     }
 
     Inject inject = executableInject.getInjection().getInject();
+    // Detection / prevention expectations can only ever be fulfilled by a security platform
+    // collector: with none able to answer this template's expected platforms, nothing would fill
+    // the expectation, so we create none (neither leaves nor parents). Vulnerability expectations
+    // are fulfilled by the assessment injector itself (e.g. Nuclei), not a collector, so they are
+    // always created regardless (see requiresCollectorToInitialize).
+    List<Collector> collectors = resolveCollectors(inject.getTenant().getId(), expectationTemplate);
+    if (requiresCollectorToInitialize() && collectors.isEmpty()) {
+      return;
+    }
+
     List<TechnicalInjectExpectation> allExpectations = new ArrayList<>();
 
     // Executors pre-cache the resolved assets; direct callers (e.g. atomic testing, chaining)
@@ -113,9 +123,6 @@ public abstract class AbstractTechnicalBehavior
                   });
         });
 
-    List<Collector> tenantCollectors =
-        collectorService.securityPlatformCollectors(inject.getTenant().getId());
-
     allExpectations.stream()
         .filter(e -> !isAssetGroupExpectation(e))
         .filter(
@@ -123,7 +130,7 @@ public abstract class AbstractTechnicalBehavior
                 isAgentExpectation(e) || isAgentlessAssetExpectationNecessary(e.getAsset(), inject))
         .forEach(
             e -> {
-              initializeResults(e, tenantCollectors);
+              initializeResults(e, collectors);
               String agentId = e.getAgent() != null ? e.getAgent().getId() : null;
               List<ExpectationSignature> expectationSignatures =
                   computeSignatures(
@@ -160,12 +167,28 @@ public abstract class AbstractTechnicalBehavior
   }
 
   /** Batch-friendly variant reusing tenant collectors already loaded by the caller. */
-  protected void initializeResults(
-      BaseInjectExpectation expectation, List<Collector> tenantCollectors) {
-    List<InjectExpectationResult> defaults = buildDefaultResults(expectation, tenantCollectors);
+  protected void initializeResults(BaseInjectExpectation expectation, List<Collector> collectors) {
+    List<InjectExpectationResult> defaults = buildDefaultResults(expectation, collectors);
     if (!defaults.isEmpty()) {
       expectation.setResults(defaults);
     }
+  }
+
+  private List<Collector> resolveCollectors(
+      String tenantId, TechnicalInjectExpectation expectation) {
+    List<Collector> tenantCollectors = collectorService.securityPlatformCollectors(tenantId);
+    return filterCollectorsForExpectation(
+        tenantCollectors, expectation.getExpectedSecurityPlatforms());
+  }
+
+  /**
+   * Whether a security platform collector is required for this behavior to create expectations.
+   * Detection / prevention are collector-fulfilled, so with no matching collector no expectation is
+   * created. Vulnerability expectations are fulfilled by the assessment injector itself and
+   * override this to {@code false}.
+   */
+  protected boolean requiresCollectorToInitialize() {
+    return true;
   }
 
   /**
@@ -175,14 +198,12 @@ public abstract class AbstractTechnicalBehavior
    * get to answer before the expiration manager - the same rules the legacy creation path applied.
    */
   protected List<InjectExpectationResult> buildDefaultResults(
-      BaseInjectExpectation expectation, List<Collector> tenantCollectors) {
+      BaseInjectExpectation expectation, List<Collector> collectors) {
     if (!(expectation instanceof TechnicalInjectExpectation tech)) {
       return List.of();
     }
-    List<Collector> expectedCollectors =
-        filterCollectorsForExpectation(tenantCollectors, tech.getExpectedSecurityPlatforms());
-    applyExpirationOrderingGuarantee(tech, expectedCollectors);
-    return setUpFromCollectors(expectedCollectors);
+    applyExpirationOrderingGuarantee(tech, collectors);
+    return setUpFromCollectors(collectors);
   }
 
   // ----- END INITIALIZE

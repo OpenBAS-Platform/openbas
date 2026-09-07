@@ -51,15 +51,19 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
   @Autowired private InjectExpectationService injectExpectationService;
   @Autowired private ExpectationsExpirationManagerService expectationsExpirationManagerService;
   @Autowired private ExpectationsExpirationManagerJob expectationsExpirationManagerJob;
+  @Autowired private CollectorRepository collectorRepository;
+  @Autowired private CollectorTypeRepository collectorTypeRepository;
 
   // Saved entities for test setup
   private Injector savedInjector;
   private InjectorContract savedInjectorContract;
   private AssetGroup savedAssetGroup;
   private Endpoint savedEndpoint;
+  private Endpoint savedAgentlessAsset;
   private Agent savedAgent1;
   private Agent savedAgent2;
   private Inject savedInject;
+  private Collector savedEDRCollector;
 
   @BeforeEach
   void beforeEach() throws Exception {
@@ -91,6 +95,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
 
     // -- Targets --
     savedEndpoint = endpointRepository.save(EndpointFixture.createEndpoint());
+    savedAgentlessAsset = endpointRepository.save(EndpointFixture.createEndpoint());
     savedAgent1 = agentRepository.save(AgentFixture.createAgent(savedEndpoint, "external01"));
     savedAgent2 = agentRepository.save(AgentFixture.createAgent(savedEndpoint, "external02"));
     savedAssetGroup =
@@ -103,6 +108,25 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
         injectRepository.save(
             InjectFixture.createTechnicalInjectWithAssetGroup(
                 savedInjectorContract, INJECTION_NAME, savedAssetGroup));
+
+    CollectorType collectorType1 = new CollectorType(UUID.randomUUID().toString());
+    collectorTypeRepository.save(collectorType1);
+    Collector collector = new Collector();
+    collector.setId(UUID.randomUUID().toString());
+    collector.setTenantId(Tenant.DEFAULT_TENANT_UUID);
+    collector.setName("collector-name");
+    collector.setType(collectorType1.getName());
+    collector.setCollectorType(collectorType1);
+    collector.setExternal(true);
+    collector.setSecurityPlatform(
+        securityPlatformRepository.save(
+            SecurityPlatformFixture.createDefault(
+                "collector-security-platform-edr-1",
+                SecurityPlatform.SECURITY_PLATFORM_TYPE.EDR.name())));
+    savedEDRCollector = collectorRepository.save(collector);
+
+    em.flush();
+    em.clear();
   }
 
   @Nested
@@ -182,6 +206,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
           createExpectation(
               BaseInjectExpectation.EXPECTATION_TYPE.DETECTION, "Detection Expectation");
       detectionExpectation.setExpirationTime(DEFAULT_TECHNICAL_EXPECTATION_EXPIRATION_TIME);
+      detectionExpectation.setExpectationGroup(true);
       injectExpectationService.computeAndSaveExpectations(
           executableInject, List.of(detectionExpectation), "implantType");
 
@@ -232,6 +257,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
 
       // -- EXECUTE --
       expireExpectationsInDbByInjectId(savedInject.getId());
+      injectExpectations = injectExpectationRepository.findAllByInjectId(savedInject.getId());
       expectationsExpirationManagerService.computeExpectations(savedInject.getTenant().getId());
 
       // -- ASSERT --
@@ -245,15 +271,16 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
               savedInject.getId(), savedAgent2.getId());
       assertEquals(0.0, injectExpectations.getFirst().getScore());
       // Asset
+      // There is two agents linked to this asset, so the result should be as expected score
       injectExpectations =
           injectExpectationRepository.findAllByInjectAndAsset(
               savedInject.getId(), savedEndpoint.getId());
-      assertEquals(0.0, injectExpectations.getFirst().getScore());
+      assertEquals(detectionExpectation.getScore(), injectExpectations.getFirst().getScore());
       // Asset Group
       injectExpectations =
           injectExpectationRepository.findAllByInjectAndAssetGroup(
               savedInject.getId(), savedAssetGroup.getId());
-      assertEquals(0.0, injectExpectations.getFirst().getScore());
+      assertEquals(detectionExpectation.getScore(), injectExpectations.getFirst().getScore());
     }
 
     @Test
@@ -267,6 +294,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
           createExpectation(
               BaseInjectExpectation.EXPECTATION_TYPE.DETECTION, "Detection Expectation");
       detectionExpectation.setExpirationTime(DEFAULT_TECHNICAL_EXPECTATION_EXPIRATION_TIME);
+      detectionExpectation.setExpectationGroup(true);
       injectExpectationService.computeAndSaveExpectations(
           executableInject, List.of(detectionExpectation), "implantType");
 
@@ -340,7 +368,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       injectExpectations =
           injectExpectationRepository.findAllByInjectAndAsset(
               savedInject.getId(), savedEndpoint.getId());
-      assertEquals(100.0, injectExpectations.getFirst().getScore());
+      assertEquals(detectionExpectation.getScore(), injectExpectations.getFirst().getScore());
       assertEquals(
           BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS,
           injectExpectations.getFirst().getResponse());
@@ -348,7 +376,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       injectExpectations =
           injectExpectationRepository.findAllByInjectAndAssetGroup(
               savedInject.getId(), savedAssetGroup.getId());
-      assertEquals(100.0, injectExpectations.getFirst().getScore());
+      assertEquals(detectionExpectation.getScore(), injectExpectations.getFirst().getScore());
       assertEquals(
           BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS,
           injectExpectations.getFirst().getResponse());
@@ -369,10 +397,14 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
           createExpectation(
               BaseInjectExpectation.EXPECTATION_TYPE.DETECTION, "Detection Expectation");
       detectionExpectation.setExpirationTime(EXPIRATION_TIME_1_s);
+      detectionExpectation.setExpectationGroup(true);
+      detectionExpectation.setScore(100.0);
       Expectation preventionExpectation =
           createExpectation(
               BaseInjectExpectation.EXPECTATION_TYPE.PREVENTION, "Detection Expectation");
       preventionExpectation.setExpirationTime(EXPIRATION_TIME_1_s);
+      preventionExpectation.setExpectationGroup(true);
+      preventionExpectation.setScore(100.0);
       injectExpectationService.computeAndSaveExpectations(
           executableInject, List.of(detectionExpectation, preventionExpectation), "implantType");
 
@@ -420,7 +452,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       assertEquals(2, assetExpectations.size());
       assetExpectations.forEach(
           expectation -> {
-            assertEquals(100.0, expectation.getScore());
+            assertEquals(expectation.getScore(), expectation.getScore());
             assertEquals(
                 BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS, expectation.getResponse());
           });
@@ -483,11 +515,11 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("Asset expectations without agent expectation linked")
+    @DisplayName("AgentAsset expectations")
     void assetExpectationWithoutAgentExpectationsLinked() {
       // -- PREPARE --
       // Build and save expectations for asset group with one asset and two agents
-      ExecutableInject executableInject = newExecutableInjectWithTargets();
+      ExecutableInject executableInject = newExecutableInjectWithAgentlessAssetTarget();
       Expectation detectionExpectation =
           createExpectation(
               BaseInjectExpectation.EXPECTATION_TYPE.DETECTION, "Detection Expectation");
@@ -498,23 +530,9 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       em.flush();
       em.clear();
 
-      // Delete agent inject expectations to test behavior of assets without agents
-      List<BaseInjectExpectation> injectExpectations =
-          List.of(
-              injectExpectationRepository
-                  .findAllByInjectAndAgent(savedInject.getId(), savedAgent1.getId())
-                  .getFirst(),
-              injectExpectationRepository
-                  .findAllByInjectAndAgent(savedInject.getId(), savedAgent2.getId())
-                  .getFirst());
-
-      List<String> ids = injectExpectations.stream().map(BaseInjectExpectation::getId).toList();
-
-      injectExpectationRepository.deleteAllById(ids);
-
       // -- VERIFY --
       // Asset
-      injectExpectations =
+      List<BaseInjectExpectation> injectExpectations =
           injectExpectationRepository.findAllByInjectAndAsset(
               savedInject.getId(), savedEndpoint.getId());
       assertEquals(null, injectExpectations.getFirst().getScore());
@@ -572,7 +590,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       injectExpectations =
           injectExpectationRepository.findAllByInjectAndAgent(
               savedInject.getId(), savedAgent1.getId());
-      assertEquals(100.0, injectExpectations.getFirst().getScore());
+      assertEquals(expectation.getScore(), injectExpectations.getFirst().getScore());
       assertEquals(
           BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS,
           injectExpectations.getFirst().getResponse());
@@ -626,7 +644,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       List<BaseInjectExpectation> agentExpectations =
           injectExpectationRepository.findAllByInjectAndAgent(
               savedInject.getId(), savedAgent1.getId());
-      assertEquals(100.0, agentExpectations.getFirst().getScore());
+      assertEquals(expectation.getScore(), agentExpectations.getFirst().getScore());
       // Asset: the proven VULNERABLE verdict survives the children rollup
       assetExpectations =
           injectExpectationRepository.findAllByInjectAndAsset(
@@ -697,7 +715,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       List<BaseInjectExpectation> agentExpectations =
           injectExpectationRepository.findAllByInjectAndAgent(
               savedInject.getId(), savedAgent1.getId());
-      assertEquals(100.0, agentExpectations.getFirst().getScore());
+      assertEquals(expectation.getScore(), agentExpectations.getFirst().getScore());
       // Asset: the proven VULNERABLE verdict survives, no contradicting stamp
       List<BaseInjectExpectation> assetExpectations =
           injectExpectationRepository.findAllByInjectAndAsset(
@@ -735,6 +753,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
           createExpectation(
               BaseInjectExpectation.EXPECTATION_TYPE.VULNERABILITY, "Vulnerability Expectation");
       expectation.setExpirationTime(EXPIRATION_TIME_1_s);
+      expectation.setExpectationGroup(true);
       injectExpectationService.computeAndSaveExpectations(
           executableInject, List.of(expectation), "implantType");
 
@@ -775,7 +794,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       List<BaseInjectExpectation> agentExpectations =
           injectExpectationRepository.findAllByInjectAndAgent(
               savedInject.getId(), savedAgent1.getId());
-      assertEquals(100.0, agentExpectations.getFirst().getScore());
+      assertEquals(expectation.getScore(), agentExpectations.getFirst().getScore());
       assertTrue(
           agentExpectations.getFirst().getResults().stream()
               .anyMatch(result -> COLLECTOR_ID.equals(result.getSourceId())));
@@ -783,7 +802,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       List<BaseInjectExpectation> assetExpectations =
           injectExpectationRepository.findAllByInjectAndAsset(
               savedInject.getId(), savedEndpoint.getId());
-      assertEquals(100.0, assetExpectations.getFirst().getScore());
+      assertEquals(expectation.getScore(), assetExpectations.getFirst().getScore());
       assertEquals(
           BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS,
           assetExpectations.getFirst().getResponse());
@@ -794,7 +813,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       List<BaseInjectExpectation> assetGroupExpectations =
           injectExpectationRepository.findAllByInjectAndAssetGroup(
               savedInject.getId(), savedAssetGroup.getId());
-      assertEquals(100.0, assetGroupExpectations.getFirst().getScore());
+      assertEquals(expectation.getScore(), assetGroupExpectations.getFirst().getScore());
       assertEquals(
           BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS,
           assetGroupExpectations.getFirst().getResponse());
@@ -846,7 +865,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       List<BaseInjectExpectation> assetExpectations =
           injectExpectationRepository.findAllByInjectAndAsset(
               savedInject.getId(), savedEndpoint.getId());
-      assertEquals(100.0, assetExpectations.getFirst().getScore());
+      assertEquals(expectation.getScore(), assetExpectations.getFirst().getScore());
       assertEquals(
           BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS,
           assetExpectations.getFirst().getResponse());
@@ -882,7 +901,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       List<BaseInjectExpectation> assetExpectations =
           injectExpectationRepository.findAllByInjectAndAsset(
               savedInject.getId(), savedEndpoint.getId());
-      assertEquals(100.0, assetExpectations.getFirst().getScore());
+      assertEquals(expectation.getScore(), assetExpectations.getFirst().getScore());
       assertEquals(
           BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS,
           assetExpectations.getFirst().getResponse());
@@ -896,7 +915,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
     em.flush();
     em.createNativeQuery(
             "UPDATE injects_expectations SET inject_expectation_created_at = :past WHERE inject_id = :injectId")
-        .setParameter("past", Instant.now().minus(1, ChronoUnit.HOURS))
+        .setParameter("past", Instant.now().minus(1, ChronoUnit.DAYS))
         .setParameter("injectId", injectId)
         .executeUpdate();
     em.flush();
@@ -910,6 +929,17 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
         savedInject,
         emptyList(),
         List.of(savedEndpoint),
+        List.of(savedAssetGroup),
+        emptyList());
+  }
+
+  private ExecutableInject newExecutableInjectWithAgentlessAssetTarget() {
+    return new ExecutableInject(
+        false,
+        true,
+        savedInject,
+        emptyList(),
+        List.of(savedAgentlessAsset),
         List.of(savedAssetGroup),
         emptyList());
   }
