@@ -76,8 +76,6 @@ const ChallengesPreview: FunctionComponent<Props> = ({
       return acc;
     }, {});
 
-    console.log('sortedChallenges', sortedChallenges);
-
     return (
       <div className={classes.root}>
         {permissions.isLoggedIn && permissions.canAccess && value.linkToPlayerMode.length > 0 && (

@@ -40,7 +40,6 @@ export const tryChallenge = (challengeId: string, data: ChallengeTryInput) => {
 
 export const validateChallenge = (exerciseId: string, challengeId: string, userId: string | null, data: ChallengeTryInput) => (dispatch: Dispatch) => {
   const query = userId ? `?userId=${encodeURIComponent(userId)}` : '';
-  console.log('query', query);
   return postReferential(
     simulationChallengesReaders,
     `/api/player/challenges/${exerciseId}/${challengeId}/validate${query}`,
