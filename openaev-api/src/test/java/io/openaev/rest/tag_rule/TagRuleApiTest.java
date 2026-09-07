@@ -368,19 +368,12 @@ public class TagRuleApiTest extends IntegrationTest {
       entityManager.flush();
       entityManager.clear();
 
-      // Act — read from tenant Y
-      String response =
-          mvc.perform(
-                  get("/api/tenants/" + tenantY.getId() + "/tag-rules/" + rule.getId())
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      // Assert — should return empty (findById returns null via .orElse(null))
-      assertEquals("", response);
+      // Act & Assert — read from tenant Y is denied
+      mvc.perform(
+              get("/api/tenants/" + tenantY.getId() + "/tag-rules/" + rule.getId())
+                  .accept(MediaType.APPLICATION_JSON)
+                  .with(csrf()))
+          .andExpect(status().isNotFound());
     }
 
     @Test

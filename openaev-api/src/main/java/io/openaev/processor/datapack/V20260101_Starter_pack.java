@@ -100,14 +100,13 @@ public class V20260101_Starter_pack extends DataPack {
     }
 
     // TODO v2: once tags get v2 activated
-    // https://github.com/OpenAEV-Platform/openaev/issues/6424, and tag_rules get v2 activated
-    // https://github.com/OpenAEV-Platform/openaev/issues/6407, remove this call - the SQL
-    // rewriter will scope both entities independently of the v1 filter
+    // https://github.com/OpenAEV-Platform/openaev/issues/6424, remove this call - tags are still
+    // on v1 and need the Hibernate filter in datapacks
     enableV1TenantFilter(tenant);
 
     // unconditionally run this code
     Set<Tag> tags = tagService.ensureWellKnownTags();
-    Set<TagRule> tagRules = tagRuleService.ensurePresetRules();
+    Set<TagRule> tagRules = tagRuleService.ensurePresetRules(tenant.getId());
 
     try {
       Endpoint honeyScanMeEndpoint =
@@ -130,8 +129,7 @@ public class V20260101_Starter_pack extends DataPack {
       this.tagRuleService.updateTagRule(
           openCTITagRule.getId(),
           openCTITagRule.getTag().getName(),
-          new ArrayList<>(List.of(allEndpointAssetGroup.getId())),
-          tenant.getId());
+          new ArrayList<>(List.of(allEndpointAssetGroup.getId())));
 
       this.importScenariosFromResources(tenant.getId(), honeyScanMeEndpoint, allEndpointAssetGroup);
       this.importDashboardsFromResources(tenant);

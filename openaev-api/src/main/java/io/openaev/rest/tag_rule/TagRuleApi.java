@@ -5,10 +5,11 @@ import static io.openaev.config.TenantUriUtils.TENANT_PREFIX;
 import io.openaev.aop.AccessControl;
 import io.openaev.aop.LogExecutionTime;
 import io.openaev.aop.UserRoleDescription;
-import io.openaev.context.TenantContext;
+import io.openaev.config.TenantWriteScopeResolver;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.Action;
 import io.openaev.database.model.ResourceType;
+import io.openaev.rest.exception.ElementNotFoundException;
 import io.openaev.rest.helper.RestBehavior;
 import io.openaev.rest.tag_rule.form.TagRuleInput;
 import io.openaev.rest.tag_rule.form.TagRuleMapper;
@@ -40,11 +41,16 @@ public class TagRuleApi extends RestBehavior {
 
   private final TagRuleService tagRuleService;
   private final TagRuleMapper tagRuleMapper;
+  private final TenantWriteScopeResolver writeScopeResolver;
 
-  public TagRuleApi(TagRuleService tagRuleService, TagRuleMapper tagRuleMapper) {
+  public TagRuleApi(
+      TagRuleService tagRuleService,
+      TagRuleMapper tagRuleMapper,
+      TenantWriteScopeResolver writeScopeResolver) {
     super();
     this.tagRuleService = tagRuleService;
     this.tagRuleMapper = tagRuleMapper;
+    this.writeScopeResolver = writeScopeResolver;
   }
 
   @LogExecutionTime
@@ -60,9 +66,9 @@ public class TagRuleApi extends RestBehavior {
       TxCtx ctx,
       @PathVariable @NotBlank @Schema(description = "ID of the tag rule") final String tagRuleId) {
     return tagRuleService
-        .findById(tagRuleId, TenantContext.getCurrentTenant())
+        .findById(tagRuleId)
         .map(tagRuleMapper::toTagRuleOutput)
-        .orElse(null);
+        .orElseThrow(() -> new ElementNotFoundException("TagRule not found with id: " + tagRuleId));
   }
 
   @LogExecutionTime
@@ -92,7 +98,7 @@ public class TagRuleApi extends RestBehavior {
   public void deleteTagRule(
       TxCtx ctx,
       @PathVariable @NotBlank @Schema(description = "ID of the tag rule") final String tagRuleId) {
-    tagRuleService.deleteTagRule(tagRuleId, TenantContext.getCurrentTenant());
+    tagRuleService.deleteTagRule(tagRuleId);
   }
 
   @LogExecutionTime
@@ -106,8 +112,9 @@ public class TagRuleApi extends RestBehavior {
         @ApiResponse(responseCode = "404", description = "Tag or Asset Group not found")
       })
   public TagRuleOutput createTagRule(TxCtx ctx, @Valid @RequestBody final TagRuleInput input) {
+    String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
     return tagRuleMapper.toTagRuleOutput(
-        tagRuleService.createTagRule(input.getTagName(), input.getAssetGroups(), false));
+        tagRuleService.createTagRule(input.getTagName(), input.getAssetGroups(), false, tenantId));
   }
 
   @LogExecutionTime
@@ -128,11 +135,7 @@ public class TagRuleApi extends RestBehavior {
       @PathVariable @NotBlank @Schema(description = "ID of the tag rule") final String tagRuleId,
       @Valid @RequestBody final TagRuleInput input) {
     return tagRuleMapper.toTagRuleOutput(
-        tagRuleService.updateTagRule(
-            tagRuleId,
-            input.getTagName(),
-            input.getAssetGroups(),
-            TenantContext.getCurrentTenant()));
+        tagRuleService.updateTagRule(tagRuleId, input.getTagName(), input.getAssetGroups()));
   }
 
   @LogExecutionTime

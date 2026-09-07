@@ -52,13 +52,12 @@ public class V20260107_Tags_and_tagrules_and_assetgroups extends DataPack {
   public boolean doProcess(Tenant tenant) {
     try {
       // TODO v2: once tags get v2 activated
-      // https://github.com/OpenAEV-Platform/openaev/issues/6424, and tag_rules get v2 activated
-      // https://github.com/OpenAEV-Platform/openaev/issues/6407, remove this call - the SQL
-      // rewriter will scope both entities independently of the v1 filter
+      // https://github.com/OpenAEV-Platform/openaev/issues/6424, remove this call - tags are
+      // still on v1 and need the Hibernate filter in datapacks
       enableV1TenantFilter(tenant);
 
       tagService.ensureWellKnownTags();
-      Set<TagRule> presetRules = tagRuleService.ensurePresetRules();
+      Set<TagRule> presetRules = tagRuleService.ensurePresetRules(tenant.getId());
 
       Set<Endpoint.PLATFORM_TYPE> platformsToConsider =
           Set.of(

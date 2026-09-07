@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openaev.annotation.Queryable;
 import io.openaev.database.audit.ModelBaseListener;
-import io.openaev.database.audit.TenantBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
@@ -15,14 +14,14 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.Data;
 import lombok.Getter;
-import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.UuidGenerator;
 
 @Data
 @Entity
 @Table(name = "tag_rules")
-@EntityListeners({ModelBaseListener.class, TenantBaseListener.class})
-@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
+@EntityListeners({ModelBaseListener.class})
+// tag_rules is fully on v2 tenant isolation (TenantStatementInspector + can_access_tenant).
+// The v1 @Filter and TenantBaseListener have been removed. Do NOT add them back.
 public class TagRule implements TenantBase {
   public static Set<String> RESERVED_TAG_NAMES =
       Set.of(

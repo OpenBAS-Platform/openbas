@@ -43,8 +43,8 @@ public abstract class DataPack implements Processable {
    * explicitly, when doing a datapack that touches v1 tables. Once the tables are migrated to v2,
    * this call can be removed.
    */
-  // TODO v2: once tags, tags_rules get v2 activated, remove this method and all calls to it (and
-  // the v1 filter itself)
+  // TODO v2: once tags get v2 activated, remove this method and all calls to it (and the v1
+  // filter itself)
   protected void enableV1TenantFilter(Tenant tenant) {
     entityManager
         .unwrap(Session.class)

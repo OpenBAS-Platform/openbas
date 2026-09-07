@@ -28,6 +28,7 @@ import io.openaev.database.repository.KillChainPhaseRepository;
 import io.openaev.database.repository.LessonsTemplateRepository;
 import io.openaev.database.repository.MitigationRepository;
 import io.openaev.database.repository.SecurityCoverageRepository;
+import io.openaev.database.repository.TagRuleRepository;
 import io.openaev.database.repository.attackpath.AttackPathExecutionRepository;
 import io.openaev.database.repository.attackpath.AttackPathFindingRepository;
 import io.openaev.database.repository.autonomous.AutonomousDirectiveRepository;
@@ -86,6 +87,7 @@ import io.openaev.rest.payload.service.PayloadService;
 import io.openaev.rest.payload.service.PayloadUpsertService;
 import io.openaev.rest.scenario.ScenarioApi;
 import io.openaev.rest.scenario.ScenarioImportApi;
+import io.openaev.rest.tag_rule.TagRuleApi;
 import io.openaev.rest.vulnerability.service.VulnerabilityService;
 import io.openaev.scheduler.jobs.ComchecksExecutionJob;
 import io.openaev.service.EndpointService;
@@ -98,6 +100,7 @@ import io.openaev.service.MailingService;
 import io.openaev.service.MapperService;
 import io.openaev.service.ScenarioToExerciseService;
 import io.openaev.service.SecurityCoverageSendJobService;
+import io.openaev.service.TagRuleService;
 import io.openaev.service.attackpath.AttackPathCausalSeedService;
 import io.openaev.service.attackpath.AttackPathDeltaService;
 import io.openaev.service.attackpath.AttackPathGraphService;
@@ -174,7 +177,8 @@ class TenantActiveTableAccessArchTest {
           "autonomous_events",
           "autonomous_directives",
           "kill_chain_phases",
-          "security_coverages");
+          "security_coverages",
+          "tag_rules");
 
   @ArchTest
   static void every_active_table_is_guarded(JavaClasses classes) throws Exception {
@@ -597,6 +601,22 @@ class TenantActiveTableAccessArchTest {
           .because(
               "attackpath_execution is tenant-active: an accessor without a tenant scope silently"
                   + " reads zero rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule tag_rules_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // TxCtx-carrying entrypoints, pinned by TenantScopedEntrypointsTxCtxArchTest:
+              TagRuleApi.class,
+              // Service behind TagRuleApi and datapacks:
+              TagRuleService.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(TagRuleRepository.class)
+          .because(
+              "tag_rules is tenant-active: an accessor without a tenant scope silently reads zero"
+                  + " rows. New accessors must carry a scope and be allowlisted here");
 
   @ArchTest
   static final ArchRule attackpath_finding_repository_access_is_reviewed =
