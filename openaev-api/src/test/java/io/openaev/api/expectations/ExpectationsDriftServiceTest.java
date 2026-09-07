@@ -149,6 +149,8 @@ class ExpectationsDriftServiceTest {
   }
 
   private void stubChunkRunnerPassthrough() {
+    when(chunkRunner.call(any()))
+        .thenAnswer(invocation -> ((Supplier<?>) invocation.getArgument(0)).get());
     when(chunkRunner.call(any(), any()))
         .thenAnswer(invocation -> ((Supplier<?>) invocation.getArgument(1)).get());
   }

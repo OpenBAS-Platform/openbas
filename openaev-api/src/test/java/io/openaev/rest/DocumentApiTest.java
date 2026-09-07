@@ -82,16 +82,19 @@ class DocumentApiTest extends IntegrationTest {
   }
 
   private Document getDocumentWithPayload() {
-    PayloadComposer.Composer payload =
-        payloadComposer.forPayload(PayloadFixture.createDefaultExecutable());
-
     BinaryFile badCoffeeFileContent = FileFixture.getBadCoffeeFileContent();
-    return documentComposer
+    Document document =
+        documentComposer
         .forDocument(DocumentFixture.getDocument(badCoffeeFileContent))
         .withInMemoryFile(badCoffeeFileContent)
-        .withPayloadExecutable(payload)
         .persist()
         .get();
+
+    payloadComposer.forPayload(PayloadFixture.createDefaultExecutable(document)).persist();
+    entityManager.flush();
+    entityManager.clear();
+
+    return documentRepository.findById(document.getId()).orElseThrow();
   }
 
   private Document getDocumentUsedAsSecurityPlatformLogo() {

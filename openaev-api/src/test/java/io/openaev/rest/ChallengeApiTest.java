@@ -138,6 +138,19 @@ class ChallengeApiTest extends IntegrationTest {
       return JsonPath.read(response, "$.challenge_id");
     }
 
+    private String seedChallengeInTenant(String tenantId, String name) {
+      String challengeId = UUID.randomUUID().toString();
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO challenges (challenge_id, challenge_name, tenant_id)"
+                  + " VALUES (?1, ?2, CAST(?3 AS uuid))")
+          .setParameter(1, challengeId)
+          .setParameter(2, name)
+          .setParameter(3, tenantId)
+          .executeUpdate();
+      return challengeId;
+    }
+
     @Test
     @DisplayName("Challenge created in tenant X should NOT be updatable from tenant Y")
     void given_challengeInTenantX_should_notBeUpdatableFromTenantY() throws Exception {
@@ -149,7 +162,7 @@ class ChallengeApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.MANAGE_CHALLENGES, Capability.ACCESS_CHALLENGES));
 
-      String challengeId = createChallengeInTenant(tenantX.getId(), "Update Isolation Challenge");
+      String challengeId = seedChallengeInTenant(tenantX.getId(), "Update Isolation Challenge");
 
       entityManager.flush();
       entityManager.clear();
@@ -212,7 +225,7 @@ class ChallengeApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.DELETE_CHALLENGES, Capability.ACCESS_CHALLENGES));
 
-      String challengeId = createChallengeInTenant(tenantX.getId(), "Delete Isolation Challenge");
+      String challengeId = seedChallengeInTenant(tenantX.getId(), "Delete Isolation Challenge");
 
       entityManager.flush();
       entityManager.clear();
@@ -241,19 +254,7 @@ class ChallengeApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.MANAGE_CHALLENGES, Capability.ACCESS_CHALLENGES));
 
-      // Seeded directly (native insert), not through the create endpoint: creating under tenant
-      // X's path would set the tenant scope (TxCtx) to X on this test's wrapping transaction, and
-      // the try call below sets it to Y - the aspect refuses a scope change within one
-      // transaction (see TenantScopeTransactionAspect). Seeding bypasses that entirely.
-      String challengeId = UUID.randomUUID().toString();
-      entityManager
-          .createNativeQuery(
-              "INSERT INTO challenges (challenge_id, challenge_name, tenant_id)"
-                  + " VALUES (:id, :name, CAST(:tenant AS uuid))")
-          .setParameter("id", challengeId)
-          .setParameter("name", "Try Isolation Challenge")
-          .setParameter("tenant", tenantX.getId())
-          .executeUpdate();
+      String challengeId = seedChallengeInTenant(tenantX.getId(), "Try Isolation Challenge");
 
       entityManager.flush();
       entityManager.clear();
