@@ -282,7 +282,47 @@ public class ScenarioService {
         findAll = getFindAllFunction(deepFilterSpecification, joinMap);
 
     // Compute pagination from find all
-    return buildPaginationCriteriaBuilder(findAll, searchPaginationInput, Scenario.class, joinMap);
+    Page<RawPaginationScenario> page =
+        buildPaginationCriteriaBuilder(findAll, searchPaginationInput, Scenario.class, joinMap);
+    return enrichScenarioPlatforms(page);
+  }
+
+  private Page<RawPaginationScenario> enrichScenarioPlatforms(Page<RawPaginationScenario> page) {
+    Map<String, Set<String>> workflowPlatformsByScenarioId =
+        resolveWorkflowPlatforms(
+            page.getContent().stream()
+                .filter(scenario -> hasText(scenario.getScenario_workflow_id()))
+                .map(RawPaginationScenario::getScenario_id)
+                .toList());
+    return page.map(
+        scenario -> {
+          Set<String> platforms =
+              new LinkedHashSet<>(
+                  Optional.ofNullable(scenario.getScenario_platforms()).orElseGet(Set::of));
+          platforms.addAll(
+              Optional.ofNullable(workflowPlatformsByScenarioId.get(scenario.getScenario_id()))
+                  .orElseGet(Set::of));
+          scenario.setScenario_platforms(platforms);
+          return scenario;
+        });
+  }
+
+  private Map<String, Set<String>> resolveWorkflowPlatforms(List<String> scenarioIds) {
+    if (scenarioIds == null || scenarioIds.isEmpty()) {
+      return Map.of();
+    }
+    return scenarioRepository.findWorkflowPlatformsByScenarioIds(scenarioIds).stream()
+        .collect(
+            Collectors.toMap(
+                RawScenarioSimpleIndexing::getScenario_id,
+                platform ->
+                    new LinkedHashSet<>(
+                        Optional.ofNullable(platform.getScenario_platforms()).orElseGet(Set::of)),
+                (left, right) -> {
+                  left.addAll(right);
+                  return left;
+                },
+                LinkedHashMap::new));
   }
 
   private TriFunction<

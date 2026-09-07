@@ -304,6 +304,53 @@ public interface ScenarioRepository
       nativeQuery = true)
   RawScenario getScenarioByIdAndTenantId(@Param("scenarioId") final String scenarioId);
 
+  @Query(
+      value =
+          """
+      WITH scenario_workflows AS (
+          SELECT s.scenario_id, w.workflow_id
+          FROM scenarios s
+            JOIN workflows w ON w.workflow_scenario_id = s.scenario_id
+          WHERE s.scenario_id IN :scenarioIds
+            AND s.tenant_id = :#{#tenantContext.currentTenant}
+            AND w.workflow_status = 'TEMPLATE'
+      ),
+      allowed_assets AS (
+          SELECT sw.scenario_id, a.asset_id
+          FROM scenario_workflows sw
+            JOIN workflow_scope_rules r ON r.workflow_id = sw.workflow_id
+            JOIN assets a
+              ON a.asset_id = r.workflow_scope_rule_value
+             AND a.tenant_id = :#{#tenantContext.currentTenant}
+          WHERE r.workflow_scope_rule_selected_mode = 'ALLOWLIST'
+            AND r.workflow_scope_rule_value_type = 'ASSET_ID'
+            AND a.asset_type = 'Endpoint'
+          UNION
+          SELECT sw.scenario_id, a.asset_id
+          FROM scenario_workflows sw
+            JOIN workflow_scope_rules r ON r.workflow_id = sw.workflow_id
+            JOIN asset_groups ag
+              ON ag.asset_group_id = r.workflow_scope_rule_value
+             AND ag.tenant_id = :#{#tenantContext.currentTenant}
+            JOIN asset_groups_assets aga ON aga.asset_group_id = ag.asset_group_id
+            JOIN assets a
+              ON a.asset_id = aga.asset_id
+             AND a.tenant_id = :#{#tenantContext.currentTenant}
+          WHERE r.workflow_scope_rule_selected_mode = 'ALLOWLIST'
+            AND r.workflow_scope_rule_value_type = 'ASSET_GROUP_ID'
+            AND a.asset_type = 'Endpoint'
+      ),
+      SELECT allowed.scenario_id, array_agg(DISTINCT a.endpoint_platform) AS scenario_platforms
+      FROM allowed_assets allowed
+        JOIN assets a ON a.asset_id = allowed.asset_id
+      WHERE a.endpoint_platform IS NOT NULL
+        AND a.endpoint_platform <> 'Unknown'
+      GROUP BY allowed.scenario_id
+      """,
+      nativeQuery = true)
+  List<RawScenarioSimpleIndexing> findWorkflowPlatformsByScenarioIds(
+      @Param("scenarioIds") List<String> scenarioIds);
+
   // -- CATEGORY --
 
   @Query(
