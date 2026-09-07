@@ -29,6 +29,7 @@ import io.openaev.execution.ExecutableInject;
 import io.openaev.expectation.ExpectationSignature;
 import io.openaev.expectation.ExpectationType;
 import io.openaev.injectors.common.model.BaseInjectContent;
+import io.openaev.model.inject.form.Expectation;
 import io.openaev.output_processor.CVEOutputProcessor;
 import io.openaev.rest.atomic_testing.form.InjectExpectationAgentOutput;
 import io.openaev.rest.collector.service.CollectorService;
@@ -106,7 +107,7 @@ public class InjectExpectationService {
    */
   public void computeAndSaveExpectations(
       ExecutableInject executableInject,
-      List<io.openaev.model.inject.form.Expectation> contentExpectations,
+      List<Expectation> contentExpectations,
       @Nullable String implantType) {
     if (contentExpectations == null || contentExpectations.isEmpty()) {
       return;

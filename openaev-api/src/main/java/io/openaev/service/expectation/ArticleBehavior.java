@@ -9,12 +9,15 @@ import io.openaev.database.repository.ArticleRepository;
 import io.openaev.database.repository.InjectExpectationRepository;
 import io.openaev.execution.ExecutableInject;
 import io.openaev.injectors.channel.model.ChannelContent;
+import io.openaev.model.inject.form.Expectation;
 import io.openaev.service.InjectExpectationUtils;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /** Behavior implementation for {@link ArticleInjectExpectation}. */
 @Component
+@Slf4j
 public class ArticleBehavior extends AbstractTableTopBehavior {
 
   private final ArticleRepository articleRepository;
@@ -46,7 +49,7 @@ public class ArticleBehavior extends AbstractTableTopBehavior {
 
   @Override
   public ArticleInjectExpectation convertFormExpectationToBaseInjectExpectation(
-      io.openaev.model.inject.form.Expectation formExpectation, Exercise exercise, Inject inject) {
+      Expectation formExpectation, Exercise exercise, Inject inject) {
     ArticleInjectExpectation articleExpectation = new ArticleInjectExpectation();
     InjectExpectationUtils.setCommonFields(
         articleExpectation, formExpectation, exercise, inject, this.expectationPropertiesConfig);
@@ -81,6 +84,10 @@ public class ArticleBehavior extends AbstractTableTopBehavior {
               executableInject.getInjection().getInject().getContent(), ChannelContent.class);
       return fromIterable(articleRepository.findAllById(content.getArticles()));
     } catch (Exception e) {
+      log.warn(
+          "Failed to resolve articles for inject {}: {}",
+          executableInject.getInjection().getInject().getId(),
+          e.getMessage());
       return List.of();
     }
   }

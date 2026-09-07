@@ -9,6 +9,7 @@ import io.openaev.collectors.expectations_expiration_manager.config.Expectations
 import io.openaev.database.model.*;
 import io.openaev.execution.ExecutableInject;
 import io.openaev.expectation.*;
+import io.openaev.model.inject.form.Expectation;
 import io.openaev.utils.StringUtils;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
@@ -30,7 +31,6 @@ public class InjectExpectationUtils {
 
   public static final double FAILED_SCORE_VALUE = 0.0;
 
-  //  public static buildChallengeExpectation
   // -- VALIDATION --
 
   /**
@@ -304,7 +304,7 @@ public class InjectExpectationUtils {
 
   public static void setCommonFields(
       @NotNull BaseInjectExpectation baseInjectExpectation,
-      @NotNull io.openaev.model.inject.form.Expectation formExpectation,
+      @NotNull Expectation formExpectation,
       @NotNull Exercise exercise,
       @NotNull Inject inject,
       @NotNull ExpectationPropertiesConfig expectationPropertiesConfig) {

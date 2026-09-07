@@ -4,10 +4,12 @@ import static io.openaev.injectors.phishing.service.PhishingTrackingService.NO_I
 import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.buildForPlayerManualValidation;
 
 import io.openaev.database.model.BaseInjectExpectation;
+import io.openaev.database.model.Inject;
 import io.openaev.database.model.InjectExpectationResult;
 import io.openaev.database.model.ManualInjectExpectation;
 import io.openaev.database.repository.InjectExpectationRepository;
 import io.openaev.injectors.phishing.PhishingContract;
+import io.openaev.model.inject.form.Expectation;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -34,9 +36,7 @@ public class PhishingBehavior extends ManualBehavior {
   }
 
   @Override
-  public boolean supportsFormExpectation(
-      io.openaev.model.inject.form.Expectation formExpectation,
-      io.openaev.database.model.Inject inject) {
+  public boolean supportsFormExpectation(Expectation formExpectation, Inject inject) {
     return formExpectation.getType() == BaseInjectExpectation.EXPECTATION_TYPE.MANUAL
         && inject != null
         && PhishingContract.TYPE.equals(inject.getType());

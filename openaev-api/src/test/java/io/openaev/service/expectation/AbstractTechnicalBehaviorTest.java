@@ -51,6 +51,7 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
     injectorContractComposer.reset();
     collectorComposer.reset();
     securityPlatformComposer.reset();
+    persistCollector("collector-siem", "EDR");
   }
 
   // -- Shared helpers --
@@ -70,7 +71,7 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
     return template;
   }
 
-  private void persistTwoCollector(String name, String type) {
+  private void persistCollector(String name, String type) {
     collectorComposer
         .forCollector(CollectorFixture.createDefaultCollector(name))
         .withSecurityPlatform(
@@ -395,8 +396,7 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
               .persist()
               .get();
 
-      persistTwoCollector("collector-siem", "EDR");
-      persistTwoCollector("collector-edr", "EDR");
+      persistCollector("collector-edr", "EDR");
       Exercise exercise = persistDefaultExercise();
 
       Inject inject =
@@ -458,8 +458,7 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
       Endpoint endpoint =
           endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist().get();
 
-      persistTwoCollector("collector-siem", "EDR");
-      persistTwoCollector("collector-edr", "EDR");
+      persistCollector("collector-edr", "EDR");
 
       Exercise exercise = persistDefaultExercise();
 
@@ -524,7 +523,7 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
               .get();
       Agent agent = endpoint.getAgents().getFirst();
 
-      persistTwoCollector("collector-edr", "EDR");
+      persistCollector("collector-edr", "EDR");
       Exercise exercise = persistDefaultExercise();
 
       Inject inject =
@@ -570,7 +569,7 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
       Endpoint endpoint =
           endpointComposer.forEndpoint(EndpointFixture.createEndpoint()).persist().get();
 
-      persistTwoCollector("collector-edr", "EDR");
+      persistCollector("collector-edr", "EDR");
       Exercise exercise = persistDefaultExercise();
 
       Injector nonPayloadInjector = InjectorFixture.createDefaultInjector("nmap");

@@ -8,13 +8,16 @@ import io.openaev.database.repository.ChallengeRepository;
 import io.openaev.database.repository.InjectExpectationRepository;
 import io.openaev.execution.ExecutableInject;
 import io.openaev.injectors.challenge.model.ChallengeContent;
+import io.openaev.model.inject.form.Expectation;
 import io.openaev.service.InjectExpectationUtils;
 import io.openaev.utils.challenge.ChallengeExpectationUtils;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /** Behavior implementation for {@link ChallengeInjectExpectation}. */
 @Component
+@Slf4j
 public class ChallengeBehavior extends AbstractTableTopBehavior {
 
   private final ChallengeRepository challengeRepository;
@@ -39,8 +42,6 @@ public class ChallengeBehavior extends AbstractTableTopBehavior {
     return type == BaseInjectExpectation.EXPECTATION_TYPE.CHALLENGE;
   }
 
-  // TODO /!\ /!\ : The UI needs to be fixed: when the score and result are initialized to
-  //  null, the user can no longer validate the flag.
   @Override
   protected InjectExpectationResult buildDefaultPlayerResult(Double expectedScore) {
     return ChallengeExpectationUtils.buildDefaultChallengeInjectExpectationResult();
@@ -48,7 +49,7 @@ public class ChallengeBehavior extends AbstractTableTopBehavior {
 
   @Override
   public ChallengeInjectExpectation convertFormExpectationToBaseInjectExpectation(
-      io.openaev.model.inject.form.Expectation formExpectation, Exercise exercise, Inject inject) {
+      Expectation formExpectation, Exercise exercise, Inject inject) {
     ChallengeInjectExpectation challengeExpectation = new ChallengeInjectExpectation();
     InjectExpectationUtils.setCommonFields(
         challengeExpectation, formExpectation, exercise, inject, this.expectationPropertiesConfig);
@@ -85,6 +86,10 @@ public class ChallengeBehavior extends AbstractTableTopBehavior {
               executableInject.getInjection().getInject().getContent(), ChallengeContent.class);
       return fromIterable(challengeRepository.findAllById(content.getChallenges()));
     } catch (Exception e) {
+      log.warn(
+          "Failed to resolve challenges for inject {}: {}",
+          executableInject.getInjection().getInject().getId(),
+          e.getMessage());
       return List.of();
     }
   }

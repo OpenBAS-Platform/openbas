@@ -4,6 +4,7 @@ import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilde
 
 import io.openaev.database.model.*;
 import io.openaev.database.repository.InjectExpectationRepository;
+import io.openaev.model.inject.form.Expectation;
 import io.openaev.service.InjectExpectationUtils;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +33,7 @@ public class ManualBehavior extends AbstractTableTopBehavior {
 
   @Override
   public ManualInjectExpectation convertFormExpectationToBaseInjectExpectation(
-      io.openaev.model.inject.form.Expectation formExpectation, Exercise exercise, Inject inject) {
+      Expectation formExpectation, Exercise exercise, Inject inject) {
     ManualInjectExpectation manualExpectation = new ManualInjectExpectation();
     InjectExpectationUtils.setCommonFields(
         manualExpectation, formExpectation, exercise, inject, this.expectationPropertiesConfig);

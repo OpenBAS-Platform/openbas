@@ -1,7 +1,7 @@
-import { PendingActionsOutlined } from '@mui/icons-material';
+import { CheckCircleOutlined, HighlightOffOutlined, PendingActionsOutlined } from '@mui/icons-material';
 import { Alert, Button, IconButton, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
+import { type JSX, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 
 import { fetchMe } from '../../../actions/Application';
@@ -10,7 +10,7 @@ import { fetchSimulationPlayerDocuments } from '../../../actions/Document';
 import { type SimulationChallengesReaderHelper } from '../../../actions/helper';
 import ChallengeCard from '../../../admin/components/common/challenges/ChallengeCard';
 import ChallengesPreviewDocumentsList from '../../../admin/components/common/challenges/ChallengesPreviewDocumentsList';
-import { FAILED } from '../../../admin/components/common/injects/expectations/ExpectationUtils';
+import { FAILED, SUCCESS } from '../../../admin/components/common/injects/expectations/ExpectationUtils';
 import ChallengeTryForm from '../../../admin/components/components/challenges/ChallengeTryForm';
 import Dialog from '../../../components/common/dialog/Dialog';
 import Empty from '../../../components/Empty';
@@ -18,14 +18,20 @@ import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../components/i18n';
 import Loader from '../../../components/Loader';
 import { useHelper } from '../../../store';
-import { type ChallengeInformation, type ChallengeTryInput, type Exercise, type SimulationChallengesReader } from '../../../utils/api-types';
+import {
+  type ChallengeInformation,
+  type ChallengeTryInput,
+  type Exercise,
+  type InjectExpectationResult,
+  type SimulationChallengesReader,
+} from '../../../utils/api-types';
 import { useQueryParameter } from '../../../utils/Environment';
 import { useAppDispatch } from '../../../utils/hooks';
 import useSimulationPermissions from '../../../utils/permissions/useSimulationPermissions';
 
 interface ValidateChallengeResult {
   result: string;
-  entities?: { simulationchallengesreaders?: Record<string, SimulationChallengesReader> };
+  entities?: { simulationChallengesReaders?: Record<string, SimulationChallengesReader> };
 }
 
 const NO_CATEGORY = 'null';
@@ -41,7 +47,7 @@ const ChallengesPlayer = () => {
   const { challengesReader }: { challengesReader: SimulationChallengesReader } = useHelper(
     (helper: SimulationChallengesReaderHelper) => ({ challengesReader: helper.getSimulationChallengesReader(exerciseId) }),
   );
-  console.log('challengesReader', challengesReader);
+
   const { exercise_information: exercise, exercise_challenges: challenges } = challengesReader ?? {};
   const {
     challenge_detail: currentChallenge,
@@ -68,7 +74,7 @@ const ChallengesPlayer = () => {
     }
     dispatch(validateChallenge(exerciseId, challengeId, userId, data)).then(
       (response: ValidateChallengeResult) => {
-        const challengeEntries = response.entities?.simulationchallengesreaders?.[response.result]?.exercise_challenges ?? [];
+        const challengeEntries = response.entities?.simulationChallengesReaders?.[response.result]?.exercise_challenges ?? [];
         setCurrentChallengeEntry(
           challengeEntries.find(entry => entry.challenge_detail?.challenge_id === challengeId) ?? null,
         );
@@ -81,10 +87,9 @@ const ChallengesPlayer = () => {
 
   const resultList = currentExpectation?.inject_expectation_results ?? [];
 
-  const noResult = () => resultList.length === 0 && !hasSubmitted;
   const hasResult = () => resultList.length > 0 || hasSubmitted;
-  const validResult = () => resultList.length > 0 && resultList.every(r => r.result !== FAILED);
-  const invalidResult = () => (resultList.length === 0 && hasSubmitted) || resultList.some(r => r.result === FAILED);
+  const validResult = () => resultList.length > 0 && resultList.some(r => r.result === SUCCESS);
+  const invalidResult = () => (resultList.length === 0 && hasSubmitted) || resultList.every(r => r.result === FAILED);
   const maxAttemptsExceeded = () => !!currentChallenge?.challenge_max_attempts && (currentAttempt ?? 0) >= currentChallenge.challenge_max_attempts;
 
   if (!exercise) {
@@ -97,6 +102,28 @@ const ChallengesPlayer = () => {
     acc[category].push(challengeEntry);
     return acc;
   }, {});
+
+  const challengeStatus: (result: InjectExpectationResult) => ({
+    color: 'inherit' | 'success' | 'error';
+    icon: JSX.Element;
+  }) = (result: InjectExpectationResult) => {
+    if (result.result == null) {
+      return {
+        color: 'inherit',
+        icon: <PendingActionsOutlined fontSize="large" />,
+      };
+    } else if (result.result === SUCCESS) {
+      return {
+        color: 'success',
+        icon: <CheckCircleOutlined fontSize="large" />,
+      };
+    } else {
+      return {
+        color: 'error',
+        icon: <HighlightOffOutlined fontSize="large" />,
+      };
+    }
+  };
 
   return (
     <div style={{
@@ -193,27 +220,27 @@ const ChallengesPlayer = () => {
                 if (!challenge) {
                   return null;
                 }
-                const expectation = challengeEntry.challenge_expectation;
-                const hasSubmittedResult = (expectation?.inject_expectation_results ?? []).some(
-                  r => r.result != null,
-                );
+                const status = challengeStatus(
+                  challengeEntry.challenge_expectation?.inject_expectation_results?.[0]
+                  ?? ({} as InjectExpectationResult));
                 return (
                   <ChallengeCard
                     key={challenge.challenge_id}
                     challenge={challenge}
-                    onClick={() => setCurrentChallengeEntry(challengeEntry)}
+                    attempt={challengeEntry.challenge_attempt ?? 0}
+                    onClick={() => {
+                      setCurrentChallengeEntry(challengeEntry);
+                    }}
                     clickable
                     actionHeader={(
-                      <IconButton
-                        size="large"
-                        color={hasSubmittedResult ? 'success' : 'inherit'}
-                      >
-                        <PendingActionsOutlined fontSize="large" />
+                      <IconButton size="large" color={status.color}>
+                        {status.icon}
                       </IconButton>
                     )}
                   />
                 );
               })}
+
             </div>
           </div>
         ))}
@@ -266,10 +293,10 @@ const ChallengesPlayer = () => {
               </div>
             </div>
           )}
-          {maxAttemptsExceeded() && noResult() && (
+          {maxAttemptsExceeded() && !hasResult() && (
             <Alert severity="error">{t('Max attempts exceeded.')}</Alert>
           )}
-          {!maxAttemptsExceeded() && noResult() && (
+          {!maxAttemptsExceeded() && !hasResult() && (
             <ChallengeTryForm
               onSubmit={data => submit(currentChallenge?.challenge_id, data)}
               handleClose={handleClose}

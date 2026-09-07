@@ -11,6 +11,7 @@ import io.openaev.database.repository.InjectExpectationRepository;
 import io.openaev.execution.ExecutableInject;
 import io.openaev.expectation.ExpectationPropertiesConfig;
 import io.openaev.expectation.ExpectationSignature;
+import io.openaev.model.inject.form.Expectation;
 import io.openaev.rest.collector.service.CollectorService;
 import io.openaev.rest.inject.service.AssetToExecute;
 import io.openaev.rest.inject.service.InjectService;
@@ -39,7 +40,7 @@ public abstract class AbstractTechnicalBehavior
   /** {@inheritDoc} Builds an untargeted technical template carrying the expected platform types. */
   @Override
   public TechnicalInjectExpectation convertFormExpectationToBaseInjectExpectation(
-      io.openaev.model.inject.form.Expectation formExpectation, Exercise exercise, Inject inject) {
+      Expectation formExpectation, Exercise exercise, Inject inject) {
     TechnicalInjectExpectation expectation = newTechnicalExpectation();
     setCommonFields(
         expectation, formExpectation, exercise, inject, this.expectationPropertiesConfig);

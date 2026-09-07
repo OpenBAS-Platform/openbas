@@ -38,11 +38,15 @@ export const tryChallenge = (challengeId: string, data: ChallengeTryInput) => {
   return simplePostCall(`/api/challenges/${challengeId}/try`, data);
 };
 
-export const validateChallenge = (exerciseId: string, challengeId: string, userId: string | null, data: ChallengeTryInput) => (dispatch: Dispatch) => postReferential(
-  simulationChallengesReaders,
-  `/api/player/challenges/${exerciseId}/${challengeId}/validate?userId=${userId}`,
-  data,
-)(dispatch);
+export const validateChallenge = (exerciseId: string, challengeId: string, userId: string | null, data: ChallengeTryInput) => (dispatch: Dispatch) => {
+  const query = userId ? `?userId=${encodeURIComponent(userId)}` : '';
+  console.log('query', query);
+  return postReferential(
+    simulationChallengesReaders,
+    `/api/player/challenges/${exerciseId}/${challengeId}/validate${query}`,
+    data,
+  )(dispatch);
+};
 
 export const deleteChallenge = (channelId: string) => (dispatch: Dispatch) => {
   const uri = `/api/challenges/${channelId}`;

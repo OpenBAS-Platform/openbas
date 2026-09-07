@@ -10,6 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.jayway.jsonpath.JsonPath;
 import io.openaev.IntegrationTest;
+import io.openaev.context.TenantScopedTransaction;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.AssetGroupRepository;
 import io.openaev.database.repository.CollectorRepository;
@@ -68,6 +70,7 @@ class AiDefenseFeedTenantScopeTest extends IntegrationTest {
   @Autowired private SecurityPlatformRepository securityPlatformRepository;
   @Autowired private InjectExpectationRepository injectExpectationRepository;
   @Autowired private InjectExpectationService injectExpectationService;
+  @Autowired private TenantScopedTransaction tenantTx;
 
   private Inject savedInject;
   private Endpoint agentlessEndpoint;
@@ -136,20 +139,15 @@ class AiDefenseFeedTenantScopeTest extends IntegrationTest {
         ExpectationFixture.createExpectation(
             BaseInjectExpectation.EXPECTATION_TYPE.DETECTION, "Detection Expectation");
     templateDetectionExpectation.setExpirationTime(DEFAULT_TECHNICAL_EXPECTATION_EXPIRATION_TIME);
-
-    injectExpectationService.computeAndSaveExpectations(
-        executableInject, List.of(templateDetectionExpectation), "implantType");
-
-    TechnicalInjectExpectation leaf =
-        (TechnicalInjectExpectation)
-            injectExpectationRepository
-                .findAllByInjectAndAsset(savedInject.getId(), agentlessEndpoint.getId())
-                .getFirst();
-    leaf.setExpectedSecurityPlatforms(
+    templateDetectionExpectation.setExpectedSecurityPlatformTypes(
         List.of(SecurityPlatform.SECURITY_PLATFORM_TYPE.LLM_FIREWALL));
-    injectExpectationRepository.save(leaf);
+
     em.flush();
     em.clear();
+
+    tenantTx.setScopeOnCurrentTransaction(TxCtx.forTenant(Tenant.DEFAULT_TENANT_UUID));
+    injectExpectationService.computeAndSaveExpectations(
+        executableInject, List.of(templateDetectionExpectation), "implantType");
   }
 
   @Test

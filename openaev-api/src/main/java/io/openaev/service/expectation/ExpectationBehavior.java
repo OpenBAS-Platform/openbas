@@ -7,6 +7,7 @@ import io.openaev.database.model.BaseInjectExpectation;
 import io.openaev.database.model.Exercise;
 import io.openaev.database.model.Inject;
 import io.openaev.execution.ExecutableInject;
+import io.openaev.model.inject.form.Expectation;
 import io.openaev.rest.exercise.form.ExpectationUpdateInput;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
@@ -126,8 +127,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @param formExpectation the content-form expectation
    * @param inject the inject the expectation is attached to
    */
-  default boolean supportsFormExpectation(
-      io.openaev.model.inject.form.Expectation formExpectation, Inject inject) {
+  default boolean supportsFormExpectation(Expectation formExpectation, Inject inject) {
     return supportsFormExpectationType(formExpectation.getType());
   }
 
@@ -144,7 +144,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @return an untargeted expectation template
    */
   default T convertFormExpectationToBaseInjectExpectation(
-      io.openaev.model.inject.form.Expectation formExpectation, Exercise exercise, Inject inject) {
+      Expectation formExpectation, Exercise exercise, Inject inject) {
     throw new UnsupportedOperationException(
         "Behavior " + getClass().getSimpleName() + " does not support form conversion");
   }

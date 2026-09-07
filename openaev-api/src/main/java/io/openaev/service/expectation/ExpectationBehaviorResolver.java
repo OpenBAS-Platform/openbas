@@ -2,6 +2,7 @@ package io.openaev.service.expectation;
 
 import io.openaev.database.model.BaseInjectExpectation;
 import io.openaev.database.model.Inject;
+import io.openaev.model.inject.form.Expectation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -48,7 +49,7 @@ public class ExpectationBehaviorResolver {
    */
   @SuppressWarnings("unchecked")
   public ExpectationBehavior<BaseInjectExpectation> resolveForForm(
-      io.openaev.model.inject.form.Expectation formExpectation, Inject inject) {
+      Expectation formExpectation, Inject inject) {
     return (ExpectationBehavior<BaseInjectExpectation>)
         behaviors.stream()
             .filter(b -> b.supportsFormExpectation(formExpectation, inject))
