@@ -6,14 +6,12 @@ import static io.openaev.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openaev.rest.scenario.ScenarioApi.TENANT_SCENARIO_URI;
 
 import io.openaev.aop.AccessControl;
-import io.openaev.context.TenantContext;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
-import io.openaev.database.repository.ExerciseRepository;
-import io.openaev.rest.exception.ElementNotFoundException;
 import io.openaev.rest.helper.RestBehavior;
 import io.openaev.rest.variable.form.VariableInput;
 import io.openaev.service.VariableService;
+import io.openaev.rest.exercise.service.ExerciseService;
 import io.openaev.service.scenario.ScenarioService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -27,7 +25,7 @@ public class VariableApi extends RestBehavior {
 
   private final VariableService variableService;
   private final ScenarioService scenarioService;
-  private final ExerciseRepository exerciseRepository;
+  private final ExerciseService exerciseService;
 
   // -- EXERCISES --
 
@@ -46,10 +44,7 @@ public class VariableApi extends RestBehavior {
       @Valid @RequestBody final VariableInput input) {
     Variable variable = new Variable();
     variable.setUpdateAttributes(input);
-    Exercise exercise =
-        this.exerciseRepository
-            .findByIdAndTenantId(exerciseId, TenantContext.getCurrentTenant())
-            .orElseThrow(ElementNotFoundException::new);
+    Exercise exercise = this.exerciseService.exercise(exerciseId);
     variable.setExercise(exercise);
     return this.variableService.createVariable(variable);
   }
