@@ -77,6 +77,24 @@ class ImportMapperActivationConfigTest {
   }
 
   @Test
+  @DisplayName(
+      "openaev.tenant.active-tables in application.properties contains tenant_xtmhub_registrations")
+  void prodConfigActivatesTenantXtmHubRegistrations() throws Exception {
+    Properties props = new Properties();
+    try (InputStream in = new FileInputStream("src/main/resources/application.properties")) {
+      props.load(in);
+    }
+    String active = props.getProperty("openaev.tenant.active-tables", "");
+    assertTrue(
+        active.contains("tenant_xtmhub_registrations"),
+        "tenant_xtmhub_registrations must stay in openaev.tenant.active-tables: its v1 @Filter"
+            + " and TenantBaseListener were removed, so dropping it would leave the table with no"
+            + " tenant isolation. Found: '"
+            + active
+            + "'");
+  }
+
+  @Test
   @DisplayName("openaev.tenant.active-tables in application.properties contains security_coverages")
   void prodConfigActivatesSecurityCoverages() throws Exception {
     Properties props = new Properties();

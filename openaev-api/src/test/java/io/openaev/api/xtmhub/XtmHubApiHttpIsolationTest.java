@@ -1,0 +1,318 @@
+package io.openaev.api.xtmhub;
+
+import static io.openaev.utils.JsonTestUtils.asJsonString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.jayway.jsonpath.JsonPath;
+import io.openaev.IntegrationTest;
+import io.openaev.database.model.TenantXtmHubRegistration;
+import io.openaev.utils.TenantIsolationTestHelper;
+import io.openaev.utils.mockUser.WithMockUser;
+import io.openaev.xtmhub.XtmHubClient;
+import io.openaev.xtmhub.XtmHubRegistrationStatus;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * End-to-end proof that activating {@code tenant_xtmhub_registrations} scopes the real XTM Hub HTTP
+ * endpoints. The table is one-row-per-tenant, so the tenant path must expose only that tenant's
+ * registration and write paths must attribute or refuse based on the request scope, never the v1
+ * thread-local default tenant fallback.
+ */
+@Transactional
+@TestPropertySource(properties = "openaev.tenant.active-tables=tenant_xtmhub_registrations")
+@WithMockUser(isAdmin = true)
+@DisplayName("tenant_xtmhub_registrations isolation through the real XTM Hub HTTP endpoints")
+class XtmHubApiHttpIsolationTest extends IntegrationTest {
+
+  private static final String REGISTRATION_URI = XtmHubApi.TENANT_XTMHUB_URI + "/registration";
+  private static final String REGISTER_URI = XtmHubApi.TENANT_XTMHUB_URI + "/register";
+  private static final String UNREGISTER_URI = XtmHubApi.TENANT_XTMHUB_URI + "/unregister";
+
+  @Autowired private MockMvc mvc;
+  @Autowired private TenantIsolationTestHelper tenantHelper;
+
+  @MockitoBean private XtmHubClient xtmHubClient;
+
+  private String tenantA;
+  private String tenantB;
+
+  @BeforeEach
+  void setUp() throws Exception {
+    tenantA = tenantHelper.createTenantWithCurrentUser("xtmhub-http-a").getId();
+    tenantB = tenantHelper.createTenantWithCurrentUser("xtmhub-http-b").getId();
+    seedRegistration(tenantA, "token-a");
+    seedRegistration(tenantB, "token-b");
+  }
+
+  @Test
+  @DisplayName("given tenant A path when reading registration then tenant A data is returned")
+  void givenTenantAPath_whenReadingRegistration_thenTenantADataIsReturned() throws Exception {
+    // Arrange
+
+    // Act
+    String response =
+        mvc.perform(get(REGISTRATION_URI, tenantA).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // Assert
+    assertEquals(
+        "token-a",
+        JsonPath.read(response, "$.tenant_xtmhub_registration_token"),
+        "tenant A must read only its own registration");
+  }
+
+  @Test
+  @DisplayName(
+      "given only tenant B has a registration when reading under tenant A path then no content is returned")
+  void givenOnlyTenantBRegistration_whenReadingUnderTenantAPath_thenNoContent() throws Exception {
+    // Arrange
+    deleteByTenantId(tenantA);
+
+    // Act
+    mvc.perform(get(REGISTRATION_URI, tenantA).accept(MediaType.APPLICATION_JSON))
+        // Assert
+        .andExpect(status().isNoContent());
+  }
+
+  @Test
+  @DisplayName("given tenant C path when registering then the row is attributed to tenant C")
+  void givenTenantCPath_whenRegistering_thenRowIsAttributedToTenantC() throws Exception {
+    // Arrange
+    String tenantC = tenantHelper.createTenantWithCurrentUser("xtmhub-http-c").getId();
+    XtmHubRegisterInput input = XtmHubRegisterInput.builder().token("token-c").build();
+
+    // Act
+    String response =
+        mvc.perform(
+                put(REGISTER_URI, tenantC)
+                    .content(asJsonString(input))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(csrf()))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // Assert
+    assertEquals(
+        tenantC,
+        rawTenantId(JsonPath.read(response, "$.tenant_xtmhub_registration_id")),
+        "the created row must belong to the tenant named by the path");
+  }
+
+  @Test
+  @DisplayName(
+      "given a multi-tenant caller with no selector when registering then the write is refused with 400")
+  void givenMultiTenantCallerWithoutSelector_whenRegistering_thenBadRequest() throws Exception {
+    // Arrange
+    XtmHubRegisterInput input = XtmHubRegisterInput.builder().token("no-selector").build();
+
+    // Act / Assert
+    mvc.perform(
+            put(XtmHubApi.XTMHUB_URI + "/register")
+                .content(asJsonString(input))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .with(csrf()))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName(
+      "given tenant A header selector when auto-registering then the row is attributed to tenant A")
+  void givenHeaderSelector_whenAutoRegistering_thenRowIsAttributedToHeaderTenant()
+      throws Exception {
+    // Arrange
+    String tenantC = tenantHelper.createTenantWithCurrentUser("xtmhub-http-auto-c").getId();
+    when(xtmHubClient.autoRegister(any(), any(), any(), any(), any(), any(), any(), any(), any()))
+        .thenReturn(true);
+    XtmHubRegisterInput input = XtmHubRegisterInput.builder().token("auto-token-c").build();
+
+    // Act
+    mvc.perform(
+            put(XtmHubApi.XTMHUB_URI + "/auto-register")
+                .header("X-Tenant-Ids", tenantC)
+                .content(asJsonString(input))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf()))
+        .andExpect(status().isOk());
+
+    // Assert
+    assertEquals(
+        tenantC,
+        rawSingleRegistrationTenant("auto-token-c"),
+        "auto-register must attribute the row to the header-selected tenant");
+  }
+
+  @Test
+  @DisplayName(
+      "given tenant A already has a registration when registering again then the same row is reused")
+  void givenExistingTenantARegistration_whenRegisteringAgain_thenSameRowIsReused()
+      throws Exception {
+    // Arrange
+    String existingRegistrationId = registrationIdForTenant(tenantA);
+    XtmHubRegisterInput input = XtmHubRegisterInput.builder().token("token-a-updated").build();
+
+    // Act
+    String response =
+        mvc.perform(
+                put(REGISTER_URI, tenantA)
+                    .content(asJsonString(input))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(csrf()))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // Assert
+    assertEquals(
+        existingRegistrationId,
+        JsonPath.read(response, "$.tenant_xtmhub_registration_id"),
+        "register must reuse tenant A's single row");
+    assertEquals(1L, rawCountForTenant(tenantA), "tenant A must still own exactly one row");
+    assertEquals("token-a-updated", rawTokenForTenant(tenantA), "tenant A's row must be updated");
+  }
+
+  @Test
+  @DisplayName(
+      "given tenant A path when unregistering then only tenant A row is deleted and tenant B survives")
+  void givenTenantAPath_whenUnregistering_thenOnlyTenantARowIsDeleted() throws Exception {
+    // Arrange
+
+    // Act
+    mvc.perform(put(UNREGISTER_URI, tenantA).contentType(MediaType.APPLICATION_JSON).with(csrf()))
+        .andExpect(status().isNoContent());
+
+    // Assert
+    assertEquals(0L, rawCountForTenant(tenantA), "tenant A's row must be deleted");
+    assertEquals(1L, rawCountForTenant(tenantB), "tenant B's row must stay untouched");
+    assertEquals("token-b", rawTokenForTenant(tenantB), "tenant B must keep its registration");
+  }
+
+  private void seedRegistration(String tenantId, String token) {
+    TenantXtmHubRegistration registration = new TenantXtmHubRegistration();
+    registration.setId(UUID.randomUUID().toString());
+    registration.setToken(token);
+    registration.setRegistrationDate(LocalDateTime.now());
+    registration.setRegistrationStatus(XtmHubRegistrationStatus.REGISTERED);
+    registration.setRegistrationUserId("user-" + tenantId);
+    registration.setRegistrationUserName("User " + tenantId);
+    registration.setLastConnectivityCheck(LocalDateTime.now());
+    registration.setConnectivityEmailEligible(true);
+    entityManager
+        .createNativeQuery(
+            """
+            INSERT INTO tenant_xtmhub_registrations (
+              registration_id,
+              tenant_id,
+              registration_token,
+              registration_date,
+              registration_status,
+              registration_user_id,
+              registration_user_name,
+              registration_last_connectivity_check,
+              registration_connectivity_email_eligible
+            ) VALUES (
+              :id,
+              :tenantId,
+              :token,
+              :registrationDate,
+              :registrationStatus,
+              :registrationUserId,
+              :registrationUserName,
+              :lastConnectivityCheck,
+              :connectivityEmailEligible
+            )
+            """)
+        .setParameter("id", registration.getId())
+        .setParameter("tenantId", tenantId)
+        .setParameter("token", token)
+        .setParameter("registrationDate", registration.getRegistrationDate())
+        .setParameter("registrationStatus", registration.getRegistrationStatus().name())
+        .setParameter("registrationUserId", registration.getRegistrationUserId())
+        .setParameter("registrationUserName", registration.getRegistrationUserName())
+        .setParameter("lastConnectivityCheck", registration.getLastConnectivityCheck())
+        .setParameter("connectivityEmailEligible", registration.isConnectivityEmailEligible())
+        .executeUpdate();
+  }
+
+  private void deleteByTenantId(String tenantId) {
+    entityManager
+        .createNativeQuery("DELETE FROM tenant_xtmhub_registrations WHERE tenant_id = :tenantId")
+        .setParameter("tenantId", tenantId)
+        .executeUpdate();
+  }
+
+  private String rawTenantId(String registrationId) {
+    entityManager.flush();
+    return (String)
+        entityManager
+            .createNativeQuery(
+                "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_id = :id")
+            .setParameter("id", registrationId)
+            .getSingleResult();
+  }
+
+  private String rawSingleRegistrationTenant(String token) {
+    entityManager.flush();
+    return (String)
+        entityManager
+            .createNativeQuery(
+                "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_token = :token")
+            .setParameter("token", token)
+            .getSingleResult();
+  }
+
+  private String registrationIdForTenant(String tenantId) {
+    return (String)
+        entityManager
+            .createNativeQuery(
+                "SELECT registration_id FROM tenant_xtmhub_registrations WHERE tenant_id = :tenantId")
+            .setParameter("tenantId", tenantId)
+            .getSingleResult();
+  }
+
+  private long rawCountForTenant(String tenantId) {
+    entityManager.flush();
+    Number count =
+        (Number)
+            entityManager
+                .createNativeQuery(
+                    "SELECT count(*) FROM tenant_xtmhub_registrations WHERE tenant_id = :tenantId")
+                .setParameter("tenantId", tenantId)
+                .getSingleResult();
+    return count.longValue();
+  }
+
+  private String rawTokenForTenant(String tenantId) {
+    entityManager.flush();
+    return (String)
+        entityManager
+            .createNativeQuery(
+                "SELECT registration_token FROM tenant_xtmhub_registrations WHERE tenant_id = :tenantId")
+            .setParameter("tenantId", tenantId)
+            .getSingleResult();
+  }
+}

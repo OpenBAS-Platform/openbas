@@ -13,7 +13,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.openaev.authorisation.HttpClientFactory;
+import io.openaev.config.TenantWriteScopeResolver;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TenantScopedTransaction;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.model.TenantXtmHubRegistration;
 import io.openaev.database.model.User;
@@ -31,10 +34,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockserver.integration.ClientAndServer;
@@ -59,6 +65,8 @@ class XtmHubServiceTest {
   @Mock private HttpClientFactory httpClientFactory;
   @Mock private TenantXtmHubRegistrationRepository tenantXtmHubRegistrationRepository;
   @Mock private TenantRepository tenantRepository;
+  @Mock private TenantWriteScopeResolver tenantWriteScopeResolver;
+  @Mock private TenantScopedTransaction tenantTx;
 
   private XtmHubConfig xtmHubConfig;
   private XtmHubService xtmHubService;
@@ -99,6 +107,24 @@ class XtmHubServiceTest {
     lenient()
         .when(tenantSettingsService.buildTenantUrl(any()))
         .thenAnswer(inv -> "http://localhost/" + inv.getArgument(0));
+    lenient()
+        .when(tenantWriteScopeResolver.tenantForWrite(any(), any()))
+        .thenAnswer(inv -> ((TxCtx.Restricted) inv.getArgument(0)).tenantIds().getFirst());
+    lenient()
+        .when(tenantTx.execute(any(TxCtx.class), ArgumentMatchers.<Supplier<Object>>any()))
+        .thenAnswer(inv -> inv.<Supplier<Object>>getArgument(1).get());
+    lenient()
+        .doAnswer(
+            inv -> {
+              Consumer<String> work = inv.getArgument(0);
+              tenantXtmHubRegistrationRepository.findAllByTenantNotDeleted().stream()
+                  .map(registration -> registration.getTenant().getId())
+                  .distinct()
+                  .forEach(work);
+              return null;
+            })
+        .when(tenantTx)
+        .forEachTenant(ArgumentMatchers.<Consumer<String>>any());
 
     XtmHubClient xtmHubClient =
         new XtmHubClient(xtmHubConfig, httpClientFactory, platformSettingsService);
@@ -113,7 +139,9 @@ class XtmHubServiceTest {
             xtmHubClient,
             xtmHubEmailService,
             tenantXtmHubRegistrationRepository,
-            tenantRepository);
+            tenantRepository,
+            tenantWriteScopeResolver,
+            tenantTx);
   }
 
   @AfterEach
@@ -225,6 +253,11 @@ class XtmHubServiceTest {
     return registration;
   }
 
+  private TxCtx currentScope() {
+    String tenantId = TenantContext.getCurrentTenant();
+    return TxCtx.forTenant(tenantId == null ? Tenant.DEFAULT_TENANT_UUID : tenantId);
+  }
+
   /**
    * Stubs MockServer to return connectivity statuses for multiple tenants from the all-tenants
    * mutation. The map key is tenantId, value is the status label.
@@ -272,7 +305,7 @@ class XtmHubServiceTest {
       whenHubReturnsConnectivityStatus("active");
 
       // When
-      xtmHubService.refreshConnectivity();
+      xtmHubService.refreshConnectivity(currentScope());
 
       // Then
       verifyRefreshConnectivityRequest(platformId, platformVersion, token, platformBaseUrl);
@@ -284,7 +317,7 @@ class XtmHubServiceTest {
       // Given — repository returns empty by default (setUp)
 
       // When
-      TenantXtmHubRegistration result = xtmHubService.refreshConnectivity();
+      TenantXtmHubRegistration result = xtmHubService.refreshConnectivity(currentScope());
 
       // Then
       assertNull(result);
@@ -313,7 +346,7 @@ class XtmHubServiceTest {
       whenHubReturnsConnectivityStatus("not_found");
 
       // When
-      xtmHubService.refreshConnectivity();
+      xtmHubService.refreshConnectivity(currentScope());
 
       // Then
       verify(tenantXtmHubRegistrationRepository).deleteByTenantId(any());
@@ -340,7 +373,7 @@ class XtmHubServiceTest {
       when(tenantXtmHubRegistrationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
       // When
-      TenantXtmHubRegistration result = xtmHubService.refreshConnectivity();
+      TenantXtmHubRegistration result = xtmHubService.refreshConnectivity(currentScope());
 
       // Then
       ArgumentCaptor<TenantXtmHubRegistration> captor =
@@ -374,7 +407,7 @@ class XtmHubServiceTest {
       when(tenantXtmHubRegistrationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
       // When
-      TenantXtmHubRegistration result = xtmHubService.refreshConnectivity();
+      TenantXtmHubRegistration result = xtmHubService.refreshConnectivity(currentScope());
 
       // Then
       ArgumentCaptor<TenantXtmHubRegistration> captor =
@@ -406,7 +439,7 @@ class XtmHubServiceTest {
       when(tenantXtmHubRegistrationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
       // When
-      TenantXtmHubRegistration result = xtmHubService.refreshConnectivity();
+      TenantXtmHubRegistration result = xtmHubService.refreshConnectivity(currentScope());
 
       // Then
       assertNotNull(result);
@@ -875,7 +908,7 @@ class XtmHubServiceTest {
       whenHubAutoRegisters(true);
 
       // When
-      xtmHubService.autoRegister(token);
+      xtmHubService.autoRegister(currentScope(), token);
 
       // Then
       JsonObject input = verifyAutoRegisterRequest(token, "platform-123");
@@ -897,7 +930,7 @@ class XtmHubServiceTest {
       whenHubAutoRegisters(true);
 
       // When
-      xtmHubService.autoRegister(token);
+      xtmHubService.autoRegister(currentScope(), token);
 
       // Then
       JsonObject input = verifyAutoRegisterRequest(token, "platform-123");
@@ -920,7 +953,7 @@ class XtmHubServiceTest {
       whenHubAutoRegisters(true);
 
       // When
-      xtmHubService.autoRegister(token);
+      xtmHubService.autoRegister(currentScope(), token);
 
       // Then
       JsonObject input = verifyAutoRegisterRequest(token, "platform-123");
@@ -945,7 +978,7 @@ class XtmHubServiceTest {
       whenHubAutoRegisters(true);
 
       // When
-      xtmHubService.autoRegister(token);
+      xtmHubService.autoRegister(currentScope(), token);
 
       // Then
       ArgumentCaptor<TenantXtmHubRegistration> captor =
@@ -980,7 +1013,7 @@ class XtmHubServiceTest {
       whenHubAutoRegisters(true);
 
       // When
-      xtmHubService.autoRegister(token);
+      xtmHubService.autoRegister(currentScope(), token);
 
       // Then
       JsonObject input = verifyAutoRegisterRequest(token, "platform-123");
@@ -1013,7 +1046,9 @@ class XtmHubServiceTest {
 
       // When
       ResponseStatusException exception =
-          assertThrows(ResponseStatusException.class, () -> xtmHubService.autoRegister(token));
+          assertThrows(
+              ResponseStatusException.class,
+              () -> xtmHubService.autoRegister(currentScope(), token));
 
       // Then
       assertEquals(HttpStatus.BAD_GATEWAY, exception.getStatusCode());
@@ -1043,7 +1078,7 @@ class XtmHubServiceTest {
       when(tenantXtmHubRegistrationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
       // When
-      xtmHubService.register(token);
+      xtmHubService.register(currentScope(), token);
 
       // Then
       ArgumentCaptor<TenantXtmHubRegistration> captor =
@@ -1067,7 +1102,7 @@ class XtmHubServiceTest {
       when(tenantXtmHubRegistrationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
       // When
-      xtmHubService.register(token);
+      xtmHubService.register(currentScope(), token);
 
       // Then
       ArgumentCaptor<TenantXtmHubRegistration> captor =
@@ -1091,7 +1126,7 @@ class XtmHubServiceTest {
       when(tenantXtmHubRegistrationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
       // When
-      xtmHubService.register(token);
+      xtmHubService.register(currentScope(), token);
 
       // Then
       ArgumentCaptor<TenantXtmHubRegistration> captor =
@@ -1109,7 +1144,7 @@ class XtmHubServiceTest {
     @DisplayName("Should delete tenant registration")
     void shouldDeleteTenantRegistration() {
       // When
-      xtmHubService.unregister();
+      xtmHubService.unregister(currentScope());
 
       // Then
       verify(tenantXtmHubRegistrationRepository).deleteByTenantId(Tenant.DEFAULT_TENANT_UUID);

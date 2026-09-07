@@ -169,16 +169,15 @@ public class XtmHubApiTest extends IntegrationTest {
   @DisplayName("Should scope registration to the correct tenant and not leak to other tenants")
   public void whenRegisterForCustomTenant_ShouldSaveForThatTenantOnlyAndIsolateFromOthers()
       throws Exception {
-    // Setup: create a second tenant and switch context to it
+    // Setup: create a second tenant
     Tenant customTenant = tenantIsolationTestHelper.createTenantWithCurrentUser("Custom Tenant");
-    tenantIsolationTestHelper.switchToTenant(customTenant.getId(), entityManager);
 
     XtmHubRegisterInput input = new XtmHubRegisterInput();
     input.setToken("custom-tenant-token");
 
     // When: register under the custom tenant
     mvc.perform(
-            put(XtmHubApi.XTMHUB_URI + "/register")
+            put(XtmHubApi.TENANT_XTMHUB_URI + "/register", customTenant.getId())
                 .with(csrf())
                 .content(asJsonString(input))
                 .contentType(MediaType.APPLICATION_JSON)
