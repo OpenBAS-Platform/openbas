@@ -3,10 +3,13 @@
 // tab stays focused on the inject list alone.
 // Challenges are authored inside injects, so they are not configured here -
 // the hero exposes a "Preview challenges page" action instead.
-enum ScenarioConfigurationTab {
+export enum ScenarioConfigurationTab {
   TEAMS = 0,
   VARIABLES = 1,
   MEDIA_PRESSURE = 2,
 }
-
-export default ScenarioConfigurationTab;
+export const SCENARIO_CONFIGURATION_QUERY_PARAM = 'config';
+export const SCENARIO_CONFIGURATION_VARIABLES_QUERY_VALUE = 'variables';
+export const buildScenarioVariablesConfigurationUrl = (scenarioId: string, returnPath: string = `/admin/scenarios/${scenarioId}/injects`) => (
+  `${returnPath}${returnPath.includes('?') ? '&' : '?'}${SCENARIO_CONFIGURATION_QUERY_PARAM}=${SCENARIO_CONFIGURATION_VARIABLES_QUERY_VALUE}`
+);

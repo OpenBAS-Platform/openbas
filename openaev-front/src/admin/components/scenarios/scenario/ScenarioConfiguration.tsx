@@ -6,16 +6,10 @@ import { type ScenariosHelper } from '../../../../actions/scenarios/scenario-hel
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import { type Scenario } from '../../../../utils/api-types';
-import ScenarioConfigurationTab from '../ScenarioConfigurationTab';
+import { ScenarioConfigurationTab } from '../ScenarioConfigurationTab';
 import ScenarioArticles from './articles/ScenarioArticles';
 import ScenarioTeams from './teams/ScenarioTeams';
 import ScenarioVariables from './variables/ScenarioVariables';
-
-export const SCENARIO_CONFIGURATION_QUERY_PARAM = 'config';
-export const SCENARIO_CONFIGURATION_VARIABLES_QUERY_VALUE = 'variables';
-export const buildScenarioVariablesConfigurationUrl = (scenarioId: string, returnPath: string = `/admin/scenarios/${scenarioId}/injects`) => (
-  `${returnPath}${returnPath.includes('?') ? '&' : '?'}${SCENARIO_CONFIGURATION_QUERY_PARAM}=${SCENARIO_CONFIGURATION_VARIABLES_QUERY_VALUE}`
-);
 
 const ScenarioConfiguration: FunctionComponent<{ initialTab?: ScenarioConfigurationTab }> = ({ initialTab = ScenarioConfigurationTab.TEAMS }) => {
   const { t } = useFormatter();

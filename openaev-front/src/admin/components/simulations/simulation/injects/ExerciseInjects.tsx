@@ -34,12 +34,12 @@ import InjectDistributionByTeam from '../../../common/injects/InjectDistribution
 import InjectDistributionByType from '../../../common/injects/InjectDistributionByType';
 import Injects from '../../../common/injects/Injects';
 import InjectsListButtons from '../../../common/injects/InjectsListButtons';
+import { buildSimulationVariablesConfigurationUrl } from '../../SimulationConfigurationTab';
 import articleContextForExercise from '../articles/articleContextForExercise';
 import ExerciseDistributionScoreByTeamInPercentage from '../overview/ExerciseDistributionScoreByTeamInPercentage';
 import ExerciseDistributionScoreOverTimeByInjectorContract from '../overview/ExerciseDistributionScoreOverTimeByInjectorContract';
 import ExerciseDistributionScoreOverTimeByTeam from '../overview/ExerciseDistributionScoreOverTimeByTeam';
 import ExerciseDistributionScoreOverTimeByTeamInPercentage from '../overview/ExerciseDistributionScoreOverTimeByTeamInPercentage';
-import { buildSimulationVariablesConfigurationUrl } from '../SimulationConfiguration';
 import teamContextForExercise from '../teams/teamContextForExercise';
 
 const ExerciseInjects: FunctionComponent = () => {

@@ -85,12 +85,12 @@ import {
   CONTEXTUAL_ENTITY_WIDGET_IDS,
   contextualResultsUrl,
 } from '../../workspaces/custom_dashboards/results/contextualWidgets';
-import SimulationConfigurationTab from '../SimulationConfigurationTab';
+import SimulationConfigurationTab, { SIMULATION_CONFIGURATION_QUERY_PARAM, SIMULATION_CONFIGURATION_VARIABLES_QUERY_VALUE } from '../SimulationConfigurationTab';
 import ExerciseDatePopover from './ExerciseDatePopover';
 import ExercisePopover, { type ExerciseActionPopover } from './ExercisePopover';
 import ExerciseStatus from './ExerciseStatus';
 import SecurityPlatformIndicator from './SecurityPlatformIndicator';
-import SimulationConfiguration, { SIMULATION_CONFIGURATION_QUERY_PARAM, SIMULATION_CONFIGURATION_VARIABLES_QUERY_VALUE } from './SimulationConfiguration';
+import SimulationConfiguration from './SimulationConfiguration';
 
 // Exported for testing: the lifecycle CTAs are pure props-driven UI, so they are covered on their
 // own rather than through the whole (store/router-bound) header.

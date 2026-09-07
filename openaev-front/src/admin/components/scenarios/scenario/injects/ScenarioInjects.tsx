@@ -28,8 +28,8 @@ import {
   ViewModeContext,
 } from '../../../common/Context';
 import Injects from '../../../common/injects/Injects';
+import { buildScenarioVariablesConfigurationUrl } from '../../ScenarioConfigurationTab';
 import articleContextForScenario from '../articles/articleContextForScenario';
-import { buildScenarioVariablesConfigurationUrl } from '../ScenarioConfiguration';
 import teamContextForScenario from '../teams/teamContextForScenario';
 
 const ScenarioInjects: FunctionComponent = () => {

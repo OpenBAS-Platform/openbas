@@ -28,9 +28,9 @@ import { ArticleContext, ChallengeContext, TeamContext } from '../../../common/C
 import TagsFilter from '../../../common/filters/TagsFilter';
 import UpdateInject from '../../../common/injects/UpdateInject';
 import SamplePreview from '../../../workspaces/custom_dashboards/widgets/viz/sample/SamplePreview';
+import { buildSimulationVariablesConfigurationUrl } from '../../SimulationConfigurationTab';
 import articleContextForExercise from '../articles/articleContextForExercise';
 import ExecutionMenu from '../ExecutionMenu';
-import { buildSimulationVariablesConfigurationUrl } from '../SimulationConfiguration';
 import teamContextForExercise from '../teams/teamContextForExercise';
 import AttackTimeline from './AttackTimeline';
 import ExecutionBoard from './ExecutionBoard';

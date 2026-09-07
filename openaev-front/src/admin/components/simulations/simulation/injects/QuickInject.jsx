@@ -51,7 +51,7 @@ import InjectAddTeams from '../../../common/injects/form/teams/InjectAddTeams';
 import DocumentPopover from '../../../components/documents/DocumentPopover';
 import DocumentType from '../../../components/documents/DocumentType';
 import TeamPopover from '../../../components/teams/TeamPopover';
-import { buildSimulationVariablesConfigurationUrl } from '../SimulationConfiguration';
+import { buildSimulationVariablesConfigurationUrl } from '../../SimulationConfigurationTab';
 import AvailableVariablesDialog from '../variables/AvailableVariablesDialog';
 
 export const EMAIL_CONTRACT = '138ad8f8-32f8-4a22-8114-aaa12322bd09';

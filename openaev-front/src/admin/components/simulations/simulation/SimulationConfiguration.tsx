@@ -11,12 +11,6 @@ import ExerciseArticles from './articles/ExerciseArticles';
 import SimulationTeams from './teams/SimulationTeams';
 import SimulationVariables from './variables/SimulationVariables';
 
-export const SIMULATION_CONFIGURATION_QUERY_PARAM = 'config';
-export const SIMULATION_CONFIGURATION_VARIABLES_QUERY_VALUE = 'variables';
-export const buildSimulationVariablesConfigurationUrl = (exerciseId: string, returnPath: string = `/admin/simulations/${exerciseId}/injects`) => (
-  `${returnPath}${returnPath.includes('?') ? '&' : '?'}${SIMULATION_CONFIGURATION_QUERY_PARAM}=${SIMULATION_CONFIGURATION_VARIABLES_QUERY_VALUE}`
-);
-
 // The simulation authoring context (teams, variables, media pressure) surfaced
 // from the hero "Configuration" action, one section per tab, so the Injects
 // tab stays focused on the inject list alone (mirrors the scenario).
