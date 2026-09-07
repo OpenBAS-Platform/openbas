@@ -17,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -66,5 +67,17 @@ class ActuatorSecurityTest extends IntegrationTest {
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("openaev_dependency_up")))
         .andExpect(content().string(containsString("openaev_storage_used_bytes")));
+  }
+
+  @DisplayName("Given an unexposed actuator endpoint, should answer 404 rather than serve the SPA")
+  @Test
+  void given_an_unexposed_actuator_endpoint_should_answer_404() throws Exception {
+    // The SPA catch-all otherwise swallows /actuator/* into a 200 text/html, which makes a
+    // misconfigured scrape look like a working page.
+    mvc.perform(
+            get("/actuator/env")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + SCRAPE_KEY)
+                .accept(MediaType.TEXT_HTML))
+        .andExpect(status().isNotFound());
   }
 }
