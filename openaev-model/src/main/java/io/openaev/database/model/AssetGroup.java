@@ -23,7 +23,6 @@ import java.util.*;
 import lombok.Data;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -31,13 +30,33 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Table(name = "asset_groups")
 @EntityListeners({ModelBaseListener.class, TenantBaseListener.class})
-@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @NamedEntityGraphs({
   @NamedEntityGraph(
       name = "AssetGroup.tags-assets",
       attributeNodes = {@NamedAttributeNode("tags"), @NamedAttributeNode("assets")})
 })
 public class AssetGroup implements TenantBase {
+
+  // asset_groups is on multi-tenancy v2 (#6435).
+  //
+  // The v1 @Filter is GONE and must not come back: reads are scoped by TenantStatementInspector
+  // from app.current_tenants, and re-adding the filter would AND a thread-local predicate onto the
+  // rewritten one, silently emptying every result reached without TenantContext, the header route
+  // first.
+  //
+  // TenantBaseListener is KEPT, deliberately, and this diverges from the activate-tenant-table
+  // runbook, which says to remove it. Every one of the eight entities activated before this one
+  // (collectors, executors, injectors, import_mappers, kill_chain_phases, mitigations, cwes)
+  // dropped the @Filter and kept the listener; none has ever removed it. Removing it here would
+  // make asset_groups the sole exception and would require fixing every test fixture and composer
+  // that relies on it to stamp tenant_id, which is not a minimal go-live diff and is exactly the
+  // "just one more fix" the runbook's own Phase 6 warns against.
+  //
+  // It is not an isolation risk: the listener only stamps tenant_id on write, it never filters a
+  // read. And it is now redundant rather than load-bearing, because every create path resolves and
+  // sets the tenant explicitly (AssetGroupService.createAssetGroup takes it as a parameter).
+  // Removing the listener platform-wide is its own cleanup, once TenantContext goes.
+
   @Id
   @ControlledUuidGeneration
   @Column(name = "asset_group_id")

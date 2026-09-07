@@ -23,7 +23,6 @@ import java.sql.ResultSet;
 import java.util.UUID;
 import org.hibernate.Session;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,11 +123,6 @@ class AssetGroupHttpIsolationTest extends IntegrationTest {
   }
 
   @Test
-  @Disabled(
-      "Expected red until go-live (T8). While the v1 @Filter is still on AssetGroup, its"
-          + " thread-local predicate ANDs with the v2 scope on the header route and the result is"
-          + " always empty. The runbook allows exactly one @Disabled for this, removed by the"
-          + " go-live commit that drops the @Filter.")
   @DisplayName("via the X-Tenant-Ids header: search returns A's group and not B's")
   void searchViaHeaderReturnsOnlyA() throws Exception {
     String body =
