@@ -5,7 +5,6 @@ import io.openaev.database.model.Document;
 import io.openaev.database.model.Tag;
 import io.openaev.database.repository.ChallengeRepository;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,9 +48,6 @@ public class ChallengeComposer extends ComposerBase<Challenge> {
     public Composer persist() {
       this.tagComposers.forEach(TagComposer.Composer::persist);
       this.documentComposers.forEach(DocumentComposer.Composer::persist);
-      challenge.setFlags(new ArrayList<>(challenge.getFlags()));
-      challenge.setDocuments(new ArrayList<>(challenge.getDocuments()));
-      challenge.setTags(new HashSet<>(challenge.getTags()));
       challengeRepository.save(challenge);
       return this;
     }
