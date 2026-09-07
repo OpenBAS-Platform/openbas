@@ -304,33 +304,6 @@ public class PhishingTrackingService {
   }
 
   /**
-   * Pre-scores every phishing-awareness expectation of the inject to its full expected score
-   * (GREEN, "resisted"). Called once by the executor right after the expectations are built, before
-   * any lure email is sent, so a recipient starts out having resisted every step. A step is only
-   * flipped to RED later, when the recipient actually performs it. Idempotent: a step that already
-   * carries a result (pre-scored or flipped) is left untouched.
-   */
-  public void initializeExpectationsAsResisted(@NotBlank final String injectId) {
-    injectExpectationRepository.findAllByInjectId(injectId).stream()
-        .filter(PhishingTrackingService::isPhishingStep)
-        .filter(expectation -> hasNoResults(expectation.getResults()))
-        .forEach(
-            expectation -> {
-              boolean team = isTeamRow(expectation);
-              InjectExpectationResult result =
-                  team
-                      ? buildForTeamManualValidation(
-                          NO_INTERACTION_MESSAGE, expectation.getExpectedScore())
-                      : buildForPlayerManualValidation(
-                          NO_INTERACTION_MESSAGE, expectation.getExpectedScore());
-              expectation.setResults(List.of(result));
-              expectation.setScore(expectation.getExpectedScore());
-              expectation.setUpdatedAt(now());
-              injectExpectationRepository.save(expectation);
-            });
-  }
-
-  /**
    * Resolves a tracking token, backfilling {@link PhishingResult#getInject} from {@link
    * PhishingResult#getStep} when the row was created before its inject was committed (chaining
    * execution, see {@code createResult}). The step's {@code data} JSON carries the inject id once
