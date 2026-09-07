@@ -1,7 +1,7 @@
-package io.openaev.engine.es9;
+package io.openaev.engine.es8;
 
 import static io.openaev.utils.CustomDashboardQueryUtils.*;
-import static io.openaev.engine.es9.ElasticUtils.*;
+import static io.openaev.engine.es8.ElasticUtils.*;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -556,7 +556,7 @@ public class ElasticService implements EngineService {
               .script(
                   Script.of(
                       s ->
-                          s.source(SIDE_CLEANUP_SCRIPT)
+                          s.source(src -> src.scriptString(SIDE_CLEANUP_SCRIPT))
                               .params("valuesToRemove", JsonData.of(ids))
                               .lang("painless")))
               .refresh(true)
@@ -1215,7 +1215,7 @@ public class ElasticService implements EngineService {
     try {
       Set<String> versions = new HashSet<>();
       mapper
-          .readTree(elasticClient.cluster().state().valueBody().toJson().toString())
+          .readTree(elasticClient.cluster().state().state().toJson().toString())
           .get("nodes")
           .elements()
           .forEachRemaining(jsonNode -> versions.add(jsonNode.get("version").textValue()));
@@ -1224,6 +1224,11 @@ public class ElasticService implements EngineService {
       log.warn("Unable to retrieve engine version", e);
     }
     return null;
+  }
+
+  /** The configured low-level client, for the few components needing raw index access. */
+  public ElasticsearchClient getElasticClient() {
+    return elasticClient;
   }
 
   @Override
