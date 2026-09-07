@@ -85,10 +85,10 @@ class DocumentApiTest extends IntegrationTest {
     BinaryFile badCoffeeFileContent = FileFixture.getBadCoffeeFileContent();
     Document document =
         documentComposer
-        .forDocument(DocumentFixture.getDocument(badCoffeeFileContent))
-        .withInMemoryFile(badCoffeeFileContent)
-        .persist()
-        .get();
+            .forDocument(DocumentFixture.getDocument(badCoffeeFileContent))
+            .withInMemoryFile(badCoffeeFileContent)
+            .persist()
+            .get();
 
     payloadComposer.forPayload(PayloadFixture.createDefaultExecutable(document)).persist();
     entityManager.flush();
