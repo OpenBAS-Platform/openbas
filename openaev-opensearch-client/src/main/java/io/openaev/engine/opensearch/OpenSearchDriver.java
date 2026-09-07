@@ -1,4 +1,4 @@
-package io.openaev.opensearch;
+package io.openaev.engine.opensearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openaev.config.EngineConfig;

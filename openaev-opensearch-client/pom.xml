@@ -7,15 +7,15 @@
         <version>3.260831.0</version>
     </parent>
 
-    <artifactId>es8</artifactId>
+    <artifactId>openaev-opensearch-client</artifactId>
     <packaging>jar</packaging>
 
-    <name>es8</name>
+    <name>OpenAEV Opensearch Client</name>
     <url>http://maven.apache.org</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <elasticsearch.version>8.19.21</elasticsearch.version>
+        <opensearch.version>3.9.0</opensearch.version>
     </properties>
 
     <dependencies>
@@ -32,13 +32,19 @@
         <dependency>
             <groupId>io.openaev</groupId>
             <artifactId>openaev-model</artifactId>
-            <version>3.260831.0</version>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>co.elastic.clients</groupId>
-            <artifactId>elasticsearch-java</artifactId>
-            <version>${elasticsearch.version}</version>
+            <groupId>org.opensearch.client</groupId>
+            <artifactId>opensearch-java</artifactId>
+            <version>${opensearch.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

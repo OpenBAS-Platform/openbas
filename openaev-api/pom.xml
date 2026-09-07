@@ -362,14 +362,14 @@
         </dependency>
         <dependency>
             <groupId>io.openaev</groupId>
-            <artifactId>es8</artifactId>
-            <version>3.260831.0</version>
+            <artifactId>openaev-es8-client</artifactId>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.openaev</groupId>
-            <artifactId>es-opensearch</artifactId>
-            <version>3.260831.0</version>
+            <artifactId>openaev-opensearch-client</artifactId>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

@@ -51,6 +51,7 @@
         <rabbit-amqp-client.version>${amqp-client.version}</rabbit-amqp-client.version>
         <micrometer.version>1.17.1</micrometer.version>
         <micrometer-tracing.version>1.7.1</micrometer-tracing.version>
+        <elasticsearch.version>9.5.1</elasticsearch.version>
     </properties>
 
     <distributionManagement>
@@ -98,6 +99,11 @@
     </repositories>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>co.elastic.clients</groupId>
+                <artifactId>elasticsearch-java</artifactId>
+                <version>${elasticsearch.version}</version>
+            </dependency>
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-api</artifactId>
@@ -188,6 +194,24 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.openaev</groupId>
+            <artifactId>openaev-model</artifactId>
+            <version>3.260831.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>co.elastic.clients</groupId>
+            <artifactId>elasticsearch-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpasyncclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-client</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -244,7 +268,8 @@
         <module>openaev-framework</module>
         <module>openaev-api</module>
         <module>openaev-maven-plugin</module>
-        <module>es8</module>
-        <module>es-opensearch</module>
+        <module>openaev-es8-client</module>
+        <module>openaev-es9-client</module>
+        <module>openaev-opensearch-client</module>
     </modules>
 </project>

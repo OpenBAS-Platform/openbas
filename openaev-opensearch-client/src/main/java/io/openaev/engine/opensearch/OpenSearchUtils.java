@@ -1,4 +1,4 @@
-package io.openaev.utils;
+package io.openaev.engine.opensearch;
 
 import io.openaev.database.model.Filters;
 import io.openaev.engine.api.HistogramInterval;
