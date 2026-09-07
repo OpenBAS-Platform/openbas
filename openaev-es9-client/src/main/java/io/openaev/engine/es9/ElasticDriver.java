@@ -44,7 +44,7 @@ import org.apache.hc.core5.util.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("ES9Driver")
 @RequiredArgsConstructor
 @Slf4j
 public class ElasticDriver {

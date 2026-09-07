@@ -44,7 +44,7 @@ import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("ES8Driver")
 @RequiredArgsConstructor
 @Slf4j
 public class ElasticDriver {
