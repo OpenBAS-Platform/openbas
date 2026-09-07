@@ -45,12 +45,14 @@ public class AssetGroup implements TenantBase {
   // first.
   //
   // TenantBaseListener is KEPT, deliberately, and this diverges from the activate-tenant-table
-  // runbook, which says to remove it. Every one of the eight entities activated before this one
-  // (collectors, executors, injectors, import_mappers, kill_chain_phases, mitigations, cwes)
-  // dropped the @Filter and kept the listener; none has ever removed it. Removing it here would
-  // make asset_groups the sole exception and would require fixing every test fixture and composer
-  // that relies on it to stamp tenant_id, which is not a minimal go-live diff and is exactly the
-  // "just one more fix" the runbook's own Phase 6 warns against.
+  // runbook, which says to remove it. Of the eight entities activated before this one, seven keep a
+  // tenant listener: collectors, executors and injectors carry TenantIdBaseListener, while
+  // import_mappers, kill_chain_phases, mitigations and cwes carry TenantBaseListener. Only
+  // security_coverages, the most recent, has none, and its fixtures were built to set the tenant
+  // themselves from the start. Removing it here would require fixing every fixture and composer
+  // that relies on it to stamp tenant_id (19 tests failed when it was tried), which is not a
+  // minimal go-live diff and is exactly the "just one more fix" the runbook's Phase 6 warns
+  // against.
   //
   // It is not an isolation risk: the listener only stamps tenant_id on write, it never filters a
   // read. And it is now redundant rather than load-bearing, because every create path resolves and

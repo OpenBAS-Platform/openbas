@@ -140,9 +140,8 @@ class ImportMapperActivationConfigTest {
     String active = props.getProperty("openaev.tenant.active-tables", "");
     assertTrue(
         active.contains("asset_groups"),
-        "asset_groups must stay in openaev.tenant.active-tables: its v1 @Filter and"
-            + " TenantBaseListener were removed, so dropping it would leave the table with no"
-            + " tenant isolation at all. Found: '"
+        "asset_groups must stay in openaev.tenant.active-tables: its v1 @Filter was removed, so"
+            + " dropping it would leave the table with no read isolation at all. Found: '"
             + active
             + "'");
   }

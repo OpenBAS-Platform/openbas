@@ -189,9 +189,10 @@ class AssetGroupHttpIsolationTest extends IntegrationTest {
   @Test
   @DisplayName("a create with no tenant selector is refused, not silently attributed")
   void createWithoutSelectorIsRejected() throws Exception {
-    // Today TenantBaseListener silently stamps whatever the v1 thread-local holds, so an ambiguous
-    // create succeeds and lands somewhere. The go-live commit removes that listener; attribution
-    // must be explicit and an ambiguous write must be refused loudly, per TenantWriteScopeResolver.
+    // An ambiguous create must be refused loudly rather than attributed to whichever tenant the v1
+    // thread-local happens to hold. TenantBaseListener is still on the entity and would happily
+    // stamp one, which is exactly why the refusal has to happen upstream, in
+    // TenantWriteScopeResolver, before the row is ever built.
     AssetGroupInput input = new AssetGroupInput();
     input.setName("no-selector-" + UUID.randomUUID());
     mvc.perform(
