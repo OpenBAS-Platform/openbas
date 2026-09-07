@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.quality.Strictness.LENIENT;
 
+import io.openaev.context.TenantScopedTransaction;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.ExerciseRepository;
 import io.openaev.helper.InjectHelper;
@@ -17,11 +18,7 @@ import io.openaev.service.SecurityCoverageSendJobService;
 import io.openaev.service.chaining.WorkflowService;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.hibernate.Session;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("InjectsFinalizationJob Unit Tests")
@@ -45,6 +43,7 @@ class InjectsFinalizationJobUnitTest {
   @Mock private NotificationEventService notificationEventService;
   @Mock private EntityManager entityManager;
   @Mock private TenantScopedJobRunner tenantScopedJobRunner;
+  @Mock private TenantScopedTransaction tenantScopedTransaction;
 
   @InjectMocks private InjectsFinalizationJob finalizationJob;
 
@@ -55,6 +54,73 @@ class InjectsFinalizationJobUnitTest {
         workflowService,
         securityCoverageSendJobService,
         notificationEventService);
+  }
+
+  @Nested
+  @DisplayName("handlePendingInject")
+  class HandlePendingInjectTests {
+
+    @Test
+    @DisplayName("should process pending injects per owning tenant without cross-tenant id mixing")
+    void given_pendingInjectsInDifferentTenants_should_processEachTenantScopeSeparately() {
+      // Arrange
+      ReflectionTestUtils.setField(finalizationJob, "injectExecutionThreshold", 10);
+
+      Inject tenantASeed = new Inject();
+      tenantASeed.setId("inject-a");
+      tenantASeed.setTenant(new Tenant("tenant-a"));
+      Inject tenantBSeed = new Inject();
+      tenantBSeed.setId("inject-b");
+      tenantBSeed.setTenant(new Tenant("tenant-b"));
+
+      when(injectHelper.getAllPendingInjectsWithThresholdMinutes(10))
+          .thenReturn(List.of(tenantASeed, tenantBSeed));
+
+      InjectStatus statusA = new InjectStatus();
+      statusA.setName(ExecutionStatus.PENDING);
+      statusA.setTraces(new ArrayList<>());
+      Inject tenantARefetched = new Inject();
+      tenantARefetched.setId("inject-a");
+      tenantARefetched.setTenant(new Tenant("tenant-a"));
+      tenantARefetched.setStatus(statusA);
+
+      InjectStatus statusB = new InjectStatus();
+      statusB.setName(ExecutionStatus.PENDING);
+      statusB.setTraces(new ArrayList<>());
+      Inject tenantBRefetched = new Inject();
+      tenantBRefetched.setId("inject-b");
+      tenantBRefetched.setTenant(new Tenant("tenant-b"));
+      tenantBRefetched.setStatus(statusB);
+
+      when(injectService.findAllByIds(List.of("inject-a"))).thenReturn(List.of(tenantARefetched));
+      when(injectService.findAllByIds(List.of("inject-b"))).thenReturn(List.of(tenantBRefetched));
+      when(injectService.getAgentsByInject(any(Inject.class))).thenReturn(List.of());
+
+      doAnswer(
+              invocation -> {
+                Runnable work = invocation.getArgument(1);
+                work.run();
+                return null;
+              })
+          .when(tenantScopedJobRunner)
+          .runInTenant(anyString(), any(Runnable.class));
+
+      // Act
+      finalizationJob.handlePendingInject();
+
+      // Assert
+      ArgumentCaptor<String> tenantCaptor = ArgumentCaptor.forClass(String.class);
+      ArgumentCaptor<List<String>> idsCaptor = ArgumentCaptor.forClass(List.class);
+      verify(tenantScopedJobRunner, times(2))
+          .runInTenant(tenantCaptor.capture(), any(Runnable.class));
+      verify(injectService, times(2)).findAllByIds(idsCaptor.capture());
+
+      assertEquals(Set.of("tenant-a", "tenant-b"), new HashSet<>(tenantCaptor.getAllValues()));
+      assertEquals(
+          Set.of(List.of("inject-a"), List.of("inject-b")),
+          new HashSet<>(idsCaptor.getAllValues()));
+      verify(injectStatusService, times(2)).saveAndStreamInject(any(InjectStatus.class));
+    }
   }
 
   @Nested
@@ -351,7 +417,23 @@ class InjectsFinalizationJobUnitTest {
       Session session = mock(Session.class, withSettings().strictness(LENIENT));
       when(entityManager.unwrap(Session.class)).thenReturn(session);
       inject = new Inject();
+      Tenant tenant = new Tenant();
+      tenant.setId("tenant-a");
+      inject.setTenant(tenant);
       when(injectService.getExecutedAndNotFinished()).thenReturn(List.of(inject));
+      when(tenantScopedTransaction.execute(
+              any(io.openaev.context.TxCtx.class),
+              ArgumentMatchers.<java.util.function.Supplier<Map<String, List<String>>>>any()))
+          .thenAnswer(
+              invocation -> invocation.<java.util.function.Supplier<?>>getArgument(1).get());
+      doAnswer(
+              invocation -> {
+                Runnable work = invocation.getArgument(1);
+                work.run();
+                return null;
+              })
+          .when(tenantScopedJobRunner)
+          .runInTenant(any(), any(Runnable.class));
     }
 
     private BaseInjectExpectation buildExpectation(

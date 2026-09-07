@@ -11,6 +11,7 @@ import io.openaev.api.expectations.dto.ExpectationsDriftDismissInput;
 import io.openaev.api.expectations.dto.ExpectationsDriftOutput;
 import io.openaev.api.expectations.dto.ExpectationsRealignOutput;
 import io.openaev.api.expectations.dto.InjectExpectationOutput;
+import io.openaev.config.TenantWriteScopeResolver;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.Action;
 import io.openaev.database.model.ResourceType;
@@ -53,13 +54,14 @@ public class AtomicTestingApi extends RestBehavior {
   private final DetectionRemediationService detectionRemediationService;
   private final InjectImportService injectImportService;
   private final ExpectationsDriftService expectationsDriftService;
+  private final TenantWriteScopeResolver writeScopeResolver;
 
   @LogExecutionTime
   @PostMapping("/search")
   @AccessControl(actionPerformed = Action.SEARCH, resourceType = ResourceType.ATOMIC_TESTING)
   @Transactional(readOnly = true)
   public Page<InjectResultOutput> findAllAtomicTestings(
-      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+      TxCtx ctx, @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return atomicTestingService.searchAtomicTestingsForCurrentUser(searchPaginationInput);
   }
 
@@ -104,7 +106,8 @@ public class AtomicTestingApi extends RestBehavior {
       // tenant scope for this write (createOrUpdate resolves the Injector via
       // InjectUtils#resolveInjector, which reads the v2-scoped injectors table).
       TxCtx ctx, @Valid @RequestBody AtomicTestingInput input) {
-    return this.atomicTestingService.createOrUpdate(input, null);
+    return this.atomicTestingService.createOrUpdate(
+        input, null, writeScopeResolver.tenantForWrite(ctx, null));
   }
 
   @PutMapping("/{injectId}")
@@ -120,7 +123,7 @@ public class AtomicTestingApi extends RestBehavior {
       TxCtx ctx,
       @PathVariable @NotBlank final String injectId,
       @Valid @RequestBody final AtomicTestingInput input) {
-    return atomicTestingService.createOrUpdate(input, injectId);
+    return atomicTestingService.createOrUpdate(input, injectId, null);
   }
 
   @DeleteMapping("/{injectId}")

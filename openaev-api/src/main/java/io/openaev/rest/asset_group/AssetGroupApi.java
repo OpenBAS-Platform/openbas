@@ -8,6 +8,7 @@ import static io.openaev.helper.StreamHelper.iterableToSet;
 import io.openaev.aop.AccessControl;
 import io.openaev.aop.LogExecutionTime;
 import io.openaev.api.asset.dto.AssetOutput;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.Action;
 import io.openaev.database.model.Asset;
 import io.openaev.database.model.AssetGroup;
@@ -146,6 +147,7 @@ public class AssetGroupApi extends RestBehavior {
       resourceType = ResourceType.ASSET_GROUP)
   @Transactional(readOnly = true)
   public Page<InjectResultOutput> searchInjectsForAssetGroup(
+      TxCtx ctx,
       @PathVariable @NotBlank final String assetGroupId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return injectSearchService.getPageOfInjectResultsForAssetGroup(

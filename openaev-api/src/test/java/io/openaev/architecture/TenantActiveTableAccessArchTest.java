@@ -23,6 +23,7 @@ import io.openaev.database.repository.ConnectorInstanceRepository;
 import io.openaev.database.repository.CweRepository;
 import io.openaev.database.repository.ExecutorRepository;
 import io.openaev.database.repository.ImportMapperRepository;
+import io.openaev.database.repository.InjectRepository;
 import io.openaev.database.repository.InjectorRepository;
 import io.openaev.database.repository.KillChainPhaseRepository;
 import io.openaev.database.repository.LessonsTemplateRepository;
@@ -165,6 +166,7 @@ class TenantActiveTableAccessArchTest {
           "collectors",
           "executors",
           "injectors",
+          "injects",
           "attackpath_execution",
           "attackpath_finding",
           "secret_references",
@@ -565,6 +567,36 @@ class TenantActiveTableAccessArchTest {
                   + " this lazy association is rendered open-in-view: new callers must initialize it"
                   + " inside a scoped transaction and be allowlisted here so the #7025 blind spot"
                   + " cannot recur when the table is activated");
+
+  @ArchTest
+  static final ArchRule injects_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .resideOutsideOfPackages(
+              "io.openaev.rest.inject..",
+              "io.openaev.rest.challenge..",
+              "io.openaev.rest.channel..",
+              "io.openaev.rest.exercise..",
+              "io.openaev.rest.scenario..",
+              "io.openaev.rest.atomic_testing..",
+              "io.openaev.api.detection_remediation..",
+              "io.openaev.api.expectations..",
+              "io.openaev.service..",
+              "io.openaev.service.attackpath..",
+              "io.openaev.service.autonomous..",
+              "io.openaev.service.inject..",
+              "io.openaev.service.stix..",
+              "io.openaev.importer..",
+              "io.openaev.helper..",
+              "io.openaev.injectors..",
+              "io.openaev.telemetry.metric_collectors..",
+              "io.openaev.utils.mapper..")
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(InjectRepository.class)
+          .because(
+              "injects is tenant-active: an accessor without a tenant scope silently reads zero"
+                  + " rows. New accessors must carry a scope and be allowlisted here");
 
   @ArchTest
   static final ArchRule attackpath_execution_repository_access_is_reviewed =

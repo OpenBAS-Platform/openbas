@@ -159,7 +159,7 @@ public class InjectService {
       @Nullable final Exercise exercise,
       @Nullable final Scenario scenario,
       @NotNull final InjectInput input) {
-    return injectRepository.save(buildInject(exercise, scenario, input));
+    return injectRepository.save(ensureTenantAttribution(buildInject(exercise, scenario, input)));
   }
 
   public List<Inject> createAndSaveInjectList(
@@ -168,7 +168,9 @@ public class InjectService {
       List<InjectInput> injectInputs) {
 
     List<Inject> injects = new ArrayList<>();
-    injectInputs.forEach(injectInput -> injects.add(buildInject(exercise, scenario, injectInput)));
+    injectInputs.forEach(
+        injectInput ->
+            injects.add(ensureTenantAttribution(buildInject(exercise, scenario, injectInput))));
     return injectRepository.saveAll(injects);
   }
 
@@ -282,6 +284,10 @@ public class InjectService {
     return this.injectRepository.findById(injectId).orElse(null);
   }
 
+  public List<Inject> findAllByIds(@NotNull final List<String> injectIds) {
+    return this.injectRepository.findAllById(injectIds);
+  }
+
   /**
    * Builds an Inject object based on the provided InjectorContract, title, description and enabled
    *
@@ -363,6 +369,7 @@ public class InjectService {
   @Transactional(rollbackFor = Exception.class)
   public List<Inject> saveAll(List<Inject> injects) {
     if (!CollectionUtils.isEmpty(injects)) {
+      injects.forEach(this::ensureTenantAttribution);
       return injectRepository.saveAll(injects);
     }
     // empty collection
@@ -487,7 +494,7 @@ public class InjectService {
   public InjectResultOverviewOutput duplicate(String id) {
     Inject duplicatedInject = findAndDuplicateInject(id);
     duplicatedInject.setTitle(duplicateString(duplicatedInject.getTitle()));
-    Inject savedInject = injectRepository.save(duplicatedInject);
+    Inject savedInject = injectRepository.save(ensureTenantAttribution(duplicatedInject));
     return injectMapper.toInjectResultOverviewOutput(savedInject);
   }
 
@@ -618,7 +625,7 @@ public class InjectService {
   }
 
   private Inject saveInjectAndStatusAsQueuing(Inject inject) {
-    Inject savedInject = injectRepository.save(inject);
+    Inject savedInject = injectRepository.save(ensureTenantAttribution(inject));
     InjectStatus injectStatus = saveInjectStatusAsQueuing(savedInject);
     savedInject.setStatus(injectStatus);
     return savedInject;
@@ -1523,7 +1530,22 @@ public class InjectService {
    * @return the saved inject
    */
   public Inject createInject(Inject inject) {
-    return injectRepository.save(inject);
+    return injectRepository.save(ensureTenantAttribution(inject));
+  }
+
+  private Inject ensureTenantAttribution(Inject inject) {
+    if (inject.getExercise() != null && inject.getExercise().getTenant() != null) {
+      inject.setTenant(inject.getExercise().getTenant());
+      return inject;
+    }
+    if (inject.getScenario() != null && inject.getScenario().getTenant() != null) {
+      inject.setTenant(inject.getScenario().getTenant());
+      return inject;
+    }
+    if (inject.getId() == null && inject.getTenant() == null) {
+      throw new IllegalStateException("Cannot persist a new inject without tenant attribution");
+    }
+    return inject;
   }
 
   /**

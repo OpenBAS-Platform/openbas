@@ -6,6 +6,7 @@ import io.openaev.aop.AccessControl;
 import io.openaev.aop.LogExecutionTime;
 import io.openaev.api.detection_remediation.dto.DetectionRemediationAIOutput;
 import io.openaev.api.detection_remediation.dto.PayloadInput;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.rest.inject.service.InjectService;
 import io.openaev.rest.payload.form.DetectionRemediationInput;
@@ -153,6 +154,7 @@ public class DetectionRemediationApi {
   @Transactional
   public ResponseEntity<DetectionRemediationOutput>
       postRuleDetectionRemediationByInjectIdAndSecurityPlatformId(
+          TxCtx ctx,
           @PathVariable @NotBlank String injectId,
           @PathVariable @NotBlank String securityPlatformId,
           @RequestParam(value = "agent_slug", required = false) String agentSlug) {

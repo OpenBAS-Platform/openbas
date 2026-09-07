@@ -243,6 +243,7 @@ public class ScenarioToExerciseService {
           exerciseInject.setEnabled(scenarioInject.isEnabled());
           exerciseInject.setAllTeams(scenarioInject.isAllTeams());
           exerciseInject.setExercise(exerciseSaved);
+          exerciseInject.setTenant(exerciseSaved.getTenant());
           exerciseInject.setDependsDuration(scenarioInject.getDependsDuration());
           exerciseInject.setUser(scenarioInject.getUser());
           exerciseInject.setStatus(scenarioInject.getStatus().orElse(null));

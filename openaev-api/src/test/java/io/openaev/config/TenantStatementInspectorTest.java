@@ -221,6 +221,81 @@ class TenantStatementInspectorTest {
     assertTrue(out.contains("jsonb_exists"), out);
   }
 
+  @Test
+  @DisplayName("the inject indexing query is accepted with injects active")
+  void injectIndexingQueryPassesWithInjectsActive() throws Exception {
+    String sql =
+        io.openaev.database.repository.InjectRepository.class
+            .getMethod("findForIndexing", java.time.Instant.class, int.class)
+            .getAnnotation(org.springframework.data.jpa.repository.Query.class)
+            .value();
+    TenantStatementInspector injectsActive =
+        new TenantStatementInspector(new TenantTables(Set.of("injects"), Set.of()));
+    String out = injectsActive.inspect(sql).replaceAll("\\s+", " ").trim();
+    assertTrue(out.contains("can_access_tenant(i2.tenant_id)"), out);
+    assertTrue(out.contains("can_access_tenant(f.tenant_id)"), out);
+    assertTrue(out.contains("can_access_tenant(child.tenant_id)"), out);
+    assertTrue(out.contains("LATERAL"), out);
+  }
+
+  @Test
+  @DisplayName("the asset indexing query is accepted with injects active")
+  void assetIndexingQueryPassesWithInjectsActive() throws Exception {
+    String sql =
+        io.openaev.database.repository.AssetRepository.class
+            .getMethod("findForIndexing", java.time.Instant.class, int.class)
+            .getAnnotation(org.springframework.data.jpa.repository.Query.class)
+            .value();
+    TenantStatementInspector injectsActive =
+        new TenantStatementInspector(new TenantTables(Set.of("injects"), Set.of()));
+    String out = injectsActive.inspect(sql).replaceAll("\\s+", " ").trim();
+    assertTrue(out.contains("can_access_tenant(i.tenant_id)"), out);
+    assertTrue(out.contains("JOIN injects"), out);
+  }
+
+  @Test
+  @DisplayName("the vulnerable endpoint indexing query is accepted with injects active")
+  void vulnerableEndpointIndexingQueryPassesWithInjectsActive() throws Exception {
+    String sql =
+        io.openaev.database.repository.VulnerableEndpointRepository.class
+            .getMethod("findForIndexing", java.time.Instant.class, int.class)
+            .getAnnotation(org.springframework.data.jpa.repository.Query.class)
+            .value();
+    TenantStatementInspector injectsActive =
+        new TenantStatementInspector(new TenantTables(Set.of("injects"), Set.of()));
+    String out = injectsActive.inspect(sql).replaceAll("\\s+", " ").trim();
+    assertTrue(out.contains("can_access_tenant(i.tenant_id)"), out);
+    assertTrue(out.contains("LATERAL"), out);
+  }
+
+  @Test
+  @DisplayName("the asset-group by exercise query is accepted with injects active")
+  void assetGroupsByExerciseQueryPassesWithInjectsActive() throws Exception {
+    String sql =
+        io.openaev.database.repository.AssetGroupRepository.class
+            .getMethod("assetGroupsByExerciseIds", java.util.Set.class)
+            .getAnnotation(org.springframework.data.jpa.repository.Query.class)
+            .value();
+    TenantStatementInspector injectsActive =
+        new TenantStatementInspector(new TenantTables(Set.of("injects"), Set.of()));
+    String out = injectsActive.inspect(sql).replaceAll("\\s+", " ").trim();
+    assertTrue(out.contains("can_access_tenant(i.tenant_id)"), out);
+  }
+
+  @Test
+  @DisplayName("the teams by exercise query is accepted with injects active")
+  void teamsByExerciseQueryPassesWithInjectsActive() throws Exception {
+    String sql =
+        io.openaev.database.repository.TeamRepository.class
+            .getMethod("teamsByExerciseIds", java.util.Set.class)
+            .getAnnotation(org.springframework.data.jpa.repository.Query.class)
+            .value();
+    TenantStatementInspector injectsActive =
+        new TenantStatementInspector(new TenantTables(Set.of("injects"), Set.of()));
+    String out = injectsActive.inspect(sql).replaceAll("\\s+", " ").trim();
+    assertTrue(out.contains("can_access_tenant(i.tenant_id)"), out);
+  }
+
   // --- Single table --------------------------------------------------------
 
   @Test

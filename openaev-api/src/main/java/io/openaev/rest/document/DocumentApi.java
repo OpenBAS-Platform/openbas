@@ -11,6 +11,7 @@ import io.openaev.aop.AccessControl;
 import io.openaev.aop.LogExecutionTime;
 import io.openaev.aop.UrlAccessControl;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.raw.RawDocument;
 import io.openaev.database.raw.RawPaginationDocument;
@@ -458,7 +459,7 @@ public class DocumentApi extends RestBehavior {
   @AccessControl(skipRBAC = true)
   @UrlAccessControl(userId = "#userId")
   public List<Document> playerDocuments(
-      @PathVariable String exerciseOrScenarioId, @RequestParam Optional<String> userId)
+      TxCtx ctx, @PathVariable String exerciseOrScenarioId, @RequestParam Optional<String> userId)
       throws AuthenticationError {
     Optional<Exercise> exerciseOpt =
         this.exerciseRepository.findByIdAndTenantId(
@@ -494,6 +495,7 @@ public class DocumentApi extends RestBehavior {
   @AccessControl(skipRBAC = true)
   @UrlAccessControl(userId = "#userId")
   public ResponseEntity<InputStreamResource> downloadPlayerDocument(
+      TxCtx ctx,
       @PathVariable String exerciseOrScenarioId,
       @PathVariable String documentId,
       @RequestParam Optional<String> userId)

@@ -8,6 +8,7 @@ import static java.time.Instant.now;
 
 import io.openaev.aop.AccessControl;
 import io.openaev.aop.LogExecutionTime;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.raw.RawOrganization;
 import io.openaev.database.repository.OrganizationRepository;
@@ -96,6 +97,7 @@ public class OrganizationApi extends RestBehavior {
       resourceType = ResourceType.ORGANIZATION)
   @Transactional(readOnly = true)
   public Page<InjectResultOutput> searchInjectsForOrganization(
+      TxCtx ctx,
       @PathVariable @NotBlank final String organizationId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return injectSearchService.getPageOfInjectResultsForOrganization(

@@ -202,7 +202,20 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.atomic_testing.AtomicTestingApi#launchAtomicTesting",
           "io.openaev.rest.atomic_testing.AtomicTestingApi#relaunchAtomicTesting",
           "io.openaev.rest.atomic_testing.AtomicTestingApi#updateAtomicTestingRecurrence",
+          "io.openaev.rest.atomic_testing.AtomicTestingApi#findAllAtomicTestings",
           "io.openaev.rest.inject.InjectApi#injectTargetSearch",
+          "io.openaev.rest.inject.InjectApi#injectsExportFromSearch",
+          "io.openaev.rest.inject.InjectApi#injectsExport",
+          "io.openaev.rest.inject.InjectApi#injectsIndividualExport",
+          "io.openaev.rest.inject.InjectApi#targetOptions",
+          "io.openaev.rest.inject.InjectApi#getExecutablePayloadInject",
+          "io.openaev.rest.inject.InjectApi#optionsByTitleLinkedToFindings",
+          "io.openaev.rest.inject.InjectApi#optionsById",
+          "io.openaev.rest.inject.InjectApi#getInjectTracesFromInjectAndTarget",
+          "io.openaev.rest.inject.InjectApi#getInjectStatusWithGlobalExecutionTraces",
+          "io.openaev.rest.inject.InjectApi#getInjectStatusWithAllExecutionTraces",
+          "io.openaev.rest.inject.InjectApi#getPayloadDetectionRemediations",
+          "io.openaev.rest.inject.InjectApi#getPayloadDocumentsByInjectIdAndPayloadId",
           // payload: upsert reads collectors via PayloadUpsertService; collectorsFromPayload reads
           // directly
           "io.openaev.rest.payload.PayloadApi#upsertPayload",
@@ -307,14 +320,21 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.inject.SimulationInjectApi#exerciseInjectsSimple",
           "io.openaev.rest.inject.SimulationInjectApi#searchExerciseInjects",
           "io.openaev.rest.inject.SimulationInjectApi#exerciseInjectsResults",
+          "io.openaev.rest.inject.SimulationInjectApi#exerciseInjectTeams",
+          "io.openaev.rest.inject.SimulationInjectApi#exerciseInjectCommunications",
           "io.openaev.rest.inject.SimulationInjectApi#updateInjectActivationForExercise",
           "io.openaev.rest.inject.SimulationInjectApi#updateInjectTrigger",
           "io.openaev.rest.inject.SimulationInjectApi#setInjectStatus",
           "io.openaev.rest.inject.SimulationInjectApi#updateInjectTeams",
+          "io.openaev.rest.inject.SimulationInjectApi#bulkDeleteInjectsForSimulation",
+          "io.openaev.rest.inject.SimulationInjectApi#deleteInject",
           "io.openaev.rest.inject.ScenarioInjectApi#scenarioInjects",
           "io.openaev.rest.inject.ScenarioInjectApi#scenarioInjectsSimple",
           "io.openaev.rest.inject.ScenarioInjectApi#scenarioInject",
           "io.openaev.rest.inject.ScenarioInjectApi#updateInjectActivationForScenario",
+          "io.openaev.rest.inject.ScenarioInjectApi#bulkDeleteInjectsForScenario",
+          "io.openaev.rest.inject.ScenarioInjectApi#deleteInjectForScenario",
+          "io.openaev.rest.inject.InjectExecutionResultApi#injectExecutionResultPayload",
           // health-check streams: runChecks -> securityPlatformCollectors
           "io.openaev.rest.scenario.ScenarioApi#streamHealthChecks",
           "io.openaev.rest.exercise.ExerciseApi#streamHealthChecks",
@@ -328,6 +348,8 @@ class TenantScopedEntrypointsTxCtxArchTest {
           // security_coverages reads in the propagation path.
           "io.openaev.rest.challenge.ChallengeApi#tryChallenge",
           "io.openaev.rest.challenge.SimulationChallengeApi#validateChallenge",
+          "io.openaev.rest.challenge.SimulationChallengeApi#exerciseChallenges",
+          "io.openaev.rest.challenge.ScenarioChallengeApi#scenarioChallenges",
           // inject execution callback (legacy, non-queued path): the vulnerability-verdict
           // propagation chain (matchesVulnerabilityExpectations -> ... ->
           // propagateTechnicalExpectation)
@@ -437,7 +459,25 @@ class TenantScopedEntrypointsTxCtxArchTest {
           // to be threaded into the service method that opens one (same shape as
           // ScenarioApi#bulkDeleteScenarios). Dropping it would silently empty the phase lists.
           "io.openaev.rest.inject.SimulationInjectApi#bulkUpdateInjectsForSimulation",
-          "io.openaev.rest.inject.ScenarioInjectApi#bulkUpdateInjectsForScenario");
+          "io.openaev.rest.inject.ScenarioInjectApi#bulkUpdateInjectsForScenario",
+          // injects (v2): channel article projections enrich with channel publish injects.
+          // Losing TxCtx here silently empties the virtual-publication merge.
+          "io.openaev.rest.channel.ExerciseArticleApi#exerciseArticles",
+          "io.openaev.rest.channel.ScenarioArticleApi#scenarioArticles",
+          "io.openaev.rest.channel.ChannelApi#observerArticles",
+          "io.openaev.rest.channel.ChannelApi#playerArticles",
+          "io.openaev.rest.channel.ChannelApi#createArticleForExercise",
+          "io.openaev.rest.channel.ChannelApi#updateArticleForExercise",
+          "io.openaev.rest.channel.ChannelApi#createArticleForScenario",
+          "io.openaev.rest.channel.ChannelApi#updateArticleForScenario",
+          "io.openaev.rest.asset_group.AssetGroupApi#searchInjectsForAssetGroup",
+          "io.openaev.rest.organization.OrganizationApi#searchInjectsForOrganization",
+          "io.openaev.rest.team.TeamApi#searchInjectsForTeam",
+          "io.openaev.rest.user.PlayerApi#searchInjectsForPlayer",
+          "io.openaev.rest.document.DocumentApi#playerDocuments",
+          "io.openaev.rest.document.DocumentApi#downloadPlayerDocument",
+          // injects (v2): detection/remediation entrypoint starts by loading the inject.
+          "io.openaev.api.detection_remediation.DetectionRemediationApi#postRuleDetectionRemediationByInjectIdAndSecurityPlatformId");
 
   @ArchTest
   static final ArchRule tx_scoped_entrypoints_must_declare_tx_ctx =

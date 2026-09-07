@@ -13,7 +13,6 @@ import io.openaev.execution.ExecutableInject;
 import io.openaev.execution.ExecutionContext;
 import io.openaev.execution.ExecutionContextService;
 import jakarta.annotation.Resource;
-import jakarta.persistence.EntityManager;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -49,7 +47,6 @@ public class InjectHelper {
 
   private final InjectRepository injectRepository;
   private final ExecutionContextService executionContextService;
-  private final EntityManager entityManager;
   private final TenantScopedTransaction tenantTx;
 
   /**
@@ -131,10 +128,11 @@ public class InjectHelper {
    * @return list of pending injects scheduled within the threshold
    */
   public List<Inject> getAllPendingInjectsWithThresholdMinutes(int thresholdMinutes) {
-    // Disable tenant filter — called from InjectsExecutionJob which runs cross-tenant
-    entityManager.unwrap(Session.class).disableFilter("tenantFilter");
-    return this.injectRepository.findAll(
-        InjectSpecification.pendingInjectWithThresholdMinutes(thresholdMinutes));
+    return tenantTx.execute(
+        TxCtx.allTenants(),
+        () ->
+            this.injectRepository.findAll(
+                InjectSpecification.pendingInjectWithThresholdMinutes(thresholdMinutes)));
   }
 
   // -- EXECUTABLE INJECT --

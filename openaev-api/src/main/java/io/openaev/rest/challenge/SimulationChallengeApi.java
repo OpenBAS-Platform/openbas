@@ -57,7 +57,7 @@ public class SimulationChallengeApi extends RestBehavior {
       resourceType = ResourceType.SIMULATION)
   @Transactional(readOnly = true)
   public Iterable<ChallengeOutput> exerciseChallenges(
-      @PathVariable @NotBlank final String exerciseId) {
+      TxCtx ctx, @PathVariable @NotBlank final String exerciseId) {
     List<Inject> injects =
         this.injectRepository.findAll(
             InjectSpecification.fromSimulation(exerciseId)

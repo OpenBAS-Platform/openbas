@@ -8,6 +8,7 @@ import static io.openaev.helper.StreamHelper.iterableToSet;
 import io.openaev.aop.AccessControl;
 import io.openaev.aop.LogExecutionTime;
 import io.openaev.config.SessionManager;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.raw.RawPlayer;
 import io.openaev.database.repository.*;
@@ -90,6 +91,7 @@ public class PlayerApi extends RestBehavior {
       resourceType = ResourceType.PLAYER)
   @Transactional(readOnly = true)
   public Page<InjectResultOutput> searchInjectsForPlayer(
+      TxCtx ctx,
       @PathVariable @NotBlank final String userId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return injectSearchService.getPageOfInjectResultsForPlayer(userId, searchPaginationInput);

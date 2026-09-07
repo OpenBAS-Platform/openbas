@@ -404,8 +404,10 @@ public class InjectImportService {
                 Inject inject = rowSummary.getInject();
                 if (scenario != null && inject != null) {
                   inject.setScenario(scenario);
+                  inject.setTenant(scenario.getTenant());
                 } else if (exercise != null && inject != null) {
                   inject.setExercise(exercise);
+                  inject.setTenant(exercise.getTenant());
                 }
                 rowSummary.setInject(inject);
 

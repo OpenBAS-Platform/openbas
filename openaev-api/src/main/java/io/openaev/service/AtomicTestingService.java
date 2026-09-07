@@ -7,7 +7,6 @@ import static io.openaev.utils.pagination.PaginationUtils.buildPaginationCriteri
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openaev.context.TenantContext;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.*;
 import io.openaev.database.specification.InjectSpecification;
@@ -23,6 +22,7 @@ import io.openaev.utils.injector_contract.InjectorContractContentUtils;
 import io.openaev.utils.mapper.InjectMapper;
 import io.openaev.utils.mapper.PayloadMapper;
 import io.openaev.utils.pagination.SearchPaginationInput;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.persistence.criteria.Join;
 import jakarta.validation.constraints.NotNull;
@@ -68,20 +68,11 @@ public class AtomicTestingService {
   // -- CRUD --
 
   private Inject findInject(String injectId) {
-    String tenantId = TenantContext.getCurrentTenant();
-    return (tenantId != null)
-        ? injectRepository
-            .findByIdAndTenantId(injectId, tenantId)
-            .orElseThrow(ElementNotFoundException::new)
-        : injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+    return injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
   }
 
   public InjectResultOverviewOutput findById(String injectId) {
-    String tenantId = TenantContext.getCurrentTenant();
-    Optional<Inject> injectOpt =
-        (tenantId != null)
-            ? injectRepository.findByIdAndTenantId(injectId, tenantId)
-            : injectRepository.findWithStatusById(injectId);
+    Optional<Inject> injectOpt = injectRepository.findWithStatusById(injectId);
 
     // Compute dynamic assets for display, in place on the SAME managed AssetGroup instances
     // (AssetGroup.dynamicAssets is @Transient: this mutation is never persisted).
@@ -93,16 +84,13 @@ public class AtomicTestingService {
   }
 
   public StatusPayloadOutput findPayloadOutputByInjectId(String injectId) {
-    String tenantId = TenantContext.getCurrentTenant();
-    Optional<Inject> inject =
-        (tenantId != null)
-            ? injectRepository.findByIdAndTenantId(injectId, tenantId)
-            : injectRepository.findById(injectId);
+    Optional<Inject> inject = injectRepository.findById(injectId);
     return payloadMapper.getStatusPayloadOutputFromInject(inject);
   }
 
   @Transactional
-  public InjectResultOverviewOutput createOrUpdate(AtomicTestingInput input, String injectId) {
+  public InjectResultOverviewOutput createOrUpdate(
+      AtomicTestingInput input, String injectId, @Nullable String tenantId) {
     Inject injectToSave = new Inject();
     if (injectId != null) {
       injectToSave = findInject(injectId);
@@ -129,6 +117,12 @@ public class AtomicTestingService {
             .findById(currentUser().getId())
             .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
     injectToSave.setExercise(null);
+    if (injectId == null) {
+      if (tenantId == null || tenantId.isBlank()) {
+        throw new IllegalStateException("Cannot create atomic testing without tenant attribution");
+      }
+      injectToSave.setTenant(new Tenant(tenantId));
+    }
 
     // Set dependencies
     injectToSave.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));

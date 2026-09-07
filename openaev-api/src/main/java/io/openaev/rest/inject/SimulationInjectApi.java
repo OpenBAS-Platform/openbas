@@ -210,7 +210,7 @@ public class SimulationInjectApi extends RestBehavior {
       actionPerformed = Action.READ,
       resourceType = ResourceType.INJECT)
   public Iterable<Team> exerciseInjectTeams(
-      @PathVariable String exerciseId, @PathVariable String injectId) {
+      TxCtx ctx, @PathVariable String exerciseId, @PathVariable String injectId) {
     return simulationInjectService.findInjectTeamsForSimulation(exerciseId, injectId);
   }
 
@@ -224,7 +224,7 @@ public class SimulationInjectApi extends RestBehavior {
       actionPerformed = Action.READ,
       resourceType = ResourceType.INJECT)
   public Iterable<Communication> exerciseInjectCommunications(
-      @PathVariable String exerciseId, @PathVariable String injectId) {
+      TxCtx ctx, @PathVariable String exerciseId, @PathVariable String injectId) {
     return simulationInjectService.findAndAckCommunicationsForSimulation(exerciseId, injectId);
   }
 
@@ -321,6 +321,7 @@ public class SimulationInjectApi extends RestBehavior {
         this.exerciseRepository
             .findById(exerciseId)
             .orElseThrow(() -> new ElementNotFoundException("Exercise not found")));
+    inject.setTenant(inject.getExercise().getTenant());
     inject.setDependsDuration(0L);
     Inject savedInject = this.injectRepository.save(inject);
     Iterable<User> users = this.userRepository.findAllById(input.getUserIds());
@@ -465,6 +466,7 @@ public class SimulationInjectApi extends RestBehavior {
       resourceType = ResourceType.SIMULATION)
   @LogExecutionTime
   public List<Inject> bulkDeleteInjectsForSimulation(
+      TxCtx ctx,
       @PathVariable @NotBlank final String exerciseId,
       @RequestBody @Valid final InjectBulkProcessingInput input) {
     input.setSimulationOrScenarioId(exerciseId);
@@ -482,7 +484,8 @@ public class SimulationInjectApi extends RestBehavior {
       resourceId = "#exerciseId",
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
-  public void deleteInject(@PathVariable String exerciseId, @PathVariable String injectId) {
+  public void deleteInject(
+      TxCtx ctx, @PathVariable String exerciseId, @PathVariable String injectId) {
     this.simulationInjectService.deleteInject(exerciseId, injectId);
   }
 

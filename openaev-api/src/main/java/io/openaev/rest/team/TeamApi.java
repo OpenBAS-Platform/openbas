@@ -14,6 +14,7 @@ import io.openaev.aop.AccessControl;
 import io.openaev.aop.LogExecutionTime;
 import io.openaev.aop.UserRoleDescription;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.raw.RawTeamIndexing;
 import io.openaev.database.repository.*;
@@ -148,6 +149,7 @@ public class TeamApi extends RestBehavior {
       description =
           "Search every inject that concerns the team (direct targeting or execution evidence)")
   public Page<InjectResultOutput> searchInjectsForTeam(
+      TxCtx ctx,
       @PathVariable @NotBlank final String teamId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return injectSearchService.getPageOfInjectResultsForTeam(teamId, searchPaginationInput);

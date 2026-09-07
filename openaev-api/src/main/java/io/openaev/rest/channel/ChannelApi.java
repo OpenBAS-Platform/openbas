@@ -9,6 +9,7 @@ import static io.openaev.rest.scenario.ScenarioApi.TENANT_SCENARIO_URI;
 import io.openaev.aop.AccessControl;
 import io.openaev.aop.UrlAccessControl;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.raw.RawDocument;
 import io.openaev.database.repository.*;
@@ -139,7 +140,7 @@ public class ChannelApi extends RestBehavior {
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
   public ChannelReader observerArticles(
-      @PathVariable String exerciseId, @PathVariable String channelId) {
+      TxCtx ctx, @PathVariable String exerciseId, @PathVariable String channelId) {
     ChannelReader channelReader;
     Channel channel =
         channelRepository.findById(channelId).orElseThrow(ElementNotFoundException::new);
@@ -174,6 +175,7 @@ public class ChannelApi extends RestBehavior {
   @AccessControl(skipRBAC = true)
   @UrlAccessControl(exerciseId = "#exerciseId", userId = "#userId")
   public ChannelReader playerArticles(
+      TxCtx ctx,
       @PathVariable String exerciseId,
       @PathVariable String channelId,
       @RequestParam Optional<String> userId)
@@ -197,7 +199,7 @@ public class ChannelApi extends RestBehavior {
       resourceType = ResourceType.SIMULATION)
   @Transactional(rollbackFor = Exception.class)
   public Article createArticleForExercise(
-      @PathVariable String exerciseId, @Valid @RequestBody ArticleCreateInput input) {
+      TxCtx ctx, @PathVariable String exerciseId, @Valid @RequestBody ArticleCreateInput input) {
     Exercise exercise =
         exerciseRepository
             .findByIdAndTenantId(exerciseId, TenantContext.getCurrentTenant())
@@ -239,6 +241,7 @@ public class ChannelApi extends RestBehavior {
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.SIMULATION)
   public Article updateArticleForExercise(
+      TxCtx ctx,
       @PathVariable String exerciseId,
       @PathVariable String articleId,
       @Valid @RequestBody ArticleUpdateInput input) {
@@ -309,6 +312,7 @@ public class ChannelApi extends RestBehavior {
       resourceType = ResourceType.SCENARIO)
   @Transactional(rollbackFor = Exception.class)
   public Article createArticleForScenario(
+      TxCtx ctx,
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody ArticleCreateInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
@@ -349,6 +353,7 @@ public class ChannelApi extends RestBehavior {
       resourceType = ResourceType.SCENARIO)
   @Transactional(rollbackFor = Exception.class)
   public Article updateArticleForScenario(
+      TxCtx ctx,
       @PathVariable @NotBlank final String scenarioId,
       @PathVariable @NotBlank final String articleId,
       @Valid @RequestBody ArticleUpdateInput input) {
