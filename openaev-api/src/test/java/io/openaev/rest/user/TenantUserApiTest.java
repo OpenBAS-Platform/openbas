@@ -248,6 +248,12 @@ public class TenantUserApiTest extends IntegrationTest {
   @DisplayName("Cross-tenant isolation")
   class CrossTenantIsolation {
 
+    private String seedUserInTenant(String tenantId) {
+      User user = userRepository.save(UserFixture.getUserWithDefaultEmail());
+      tenantRepository.addUserToTenant(user.getId(), tenantId);
+      return user.getId();
+    }
+
     @Test
     @WithMockUser
     @DisplayName("A user created in tenant X is not readable from tenant Y")
@@ -263,18 +269,7 @@ public class TenantUserApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", java.util.Set.of(Capability.ACCESS_TENANT_USERS_GROUPS_AND_ROLES));
 
-      String createResponse =
-          mvc.perform(
-                  post("/api/tenants/" + tenantX.getId() + "/users")
-                      .content(asJsonString(userInput()))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-      String userId = JsonPath.read(createResponse, "$.user_id");
+      String userId = seedUserInTenant(tenantX.getId());
 
       int status =
           mvc.perform(
