@@ -1,5 +1,6 @@
 package io.openaev.telemetry.metric_collectors;
 
+import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.openaev.IntegrationTest;
@@ -39,11 +40,15 @@ class ProductInventoryTenantScopeTest extends IntegrationTest {
 
   private JdbcTemplate jdbc;
   private final List<String> seededTenants = new ArrayList<>();
+  private long baseline;
 
   @BeforeEach
   void seedTwoTenantsWithOneAssetGroupEach() {
     jdbc = new JdbcTemplate(dataSource);
-    jdbc.update("DELETE FROM asset_groups");
+    // Raw JDBC bypasses Hibernate and therefore the inspector, so this sees every row whatever the
+    // scope. Asserting on a DELTA rather than an absolute count keeps the test independent of what
+    // else lives in the shared test database: never delete rows this test did not create.
+    baseline = requireNonNull(jdbc.queryForObject("SELECT count(*) FROM asset_groups", Long.class));
     seedAssetGroup(seedTenant("telemetry-a-" + UUID.randomUUID()), "telemetry-group-a");
     seedAssetGroup(seedTenant("telemetry-b-" + UUID.randomUUID()), "telemetry-group-b");
   }
@@ -63,11 +68,11 @@ class ProductInventoryTenantScopeTest extends IntegrationTest {
     // Non-empty on purpose: asserting zero would stay green through exactly the fail-closed
     // regression this pins. Two tenants, one asset group each, one platform-wide count.
     assertEquals(
-        2L,
+        baseline + 2L,
         collector.countAssetGroups(),
-        "the platform-wide asset-group gauge must count both tenants' rows once asset_groups is"
-            + " v2-active; a zero here is the silent telemetry corruption this test exists to"
-            + " catch");
+        "the platform-wide asset-group gauge must pick up both tenants' new rows once asset_groups"
+            + " is v2-active; an unchanged or zero count here is the silent telemetry corruption"
+            + " this test exists to catch");
   }
 
   private String seedTenant(String name) {
