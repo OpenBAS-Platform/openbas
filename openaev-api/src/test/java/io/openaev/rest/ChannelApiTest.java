@@ -204,6 +204,20 @@ class ChannelApiTest extends IntegrationTest {
       return JsonPath.read(response, "$.channel_id");
     }
 
+    private String seedChannelInTenant(String tenantId, String name) {
+      String channelId = java.util.UUID.randomUUID().toString();
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO channels (channel_id, channel_name, channel_type, tenant_id)"
+                  + " VALUES (?1, ?2, ?3, CAST(?4 AS uuid))")
+          .setParameter(1, channelId)
+          .setParameter(2, name)
+          .setParameter(3, "Journal")
+          .setParameter(4, tenantId)
+          .executeUpdate();
+      return channelId;
+    }
+
     @Test
     @DisplayName("Channel created in tenant X should NOT be readable from tenant Y")
     void given_channelInTenantX_should_notBeReadableFromTenantY() throws Exception {
@@ -215,15 +229,11 @@ class ChannelApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.ACCESS_CHANNELS));
 
-      String channelId = createChannelInTenant(tenantX.getId(), "Read Isolation Channel");
+      String channelId = seedChannelInTenant(tenantX.getId(), "Read Isolation Channel");
       entityManager.flush();
       entityManager.clear();
 
       // Act — read from tenant Y
-      // NOTE: build the path the same way as the other isolation tests below
-      // ("/api/tenants/{tenantId}/channels/{id}"). Using CHANNEL_URI here would double the
-      // "/api" prefix (CHANNEL_URI == "/api/channels") and 404 for the wrong reason, hiding
-      // whether tenant isolation is actually enforced.
       int responseStatus =
           mvc.perform(
                   get("/api/tenants/" + tenantY.getId() + "/channels/" + channelId)
@@ -247,7 +257,7 @@ class ChannelApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.MANAGE_CHANNELS, Capability.ACCESS_CHANNELS));
 
-      String channelId = createChannelInTenant(tenantX.getId(), "Update Isolation Channel");
+      String channelId = seedChannelInTenant(tenantX.getId(), "Update Isolation Channel");
       entityManager.flush();
       entityManager.clear();
 
@@ -315,7 +325,7 @@ class ChannelApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.DELETE_CHANNELS, Capability.ACCESS_CHANNELS));
 
-      String channelId = createChannelInTenant(tenantX.getId(), "Delete Isolation Channel");
+      String channelId = seedChannelInTenant(tenantX.getId(), "Delete Isolation Channel");
       entityManager.flush();
       entityManager.clear();
 

@@ -482,6 +482,14 @@ public class TenantRoleApiTest extends IntegrationTest {
   @WithMockUser(withCapabilities = {Capability.ACCESS_TENANT_USERS_GROUPS_AND_ROLES})
   class TenantIsolation {
 
+    private String seedRoleInTenant(String tenantId, String roleName) {
+      Role role =
+          TenantRoleFixture.getRole(
+              roleName, Set.of(Capability.MANAGE_TENANT_USERS_GROUPS_AND_ROLES));
+      role.setTenant(new Tenant(tenantId));
+      return roleRepository.save(role).getId();
+    }
+
     @Test
     @DisplayName("Platform roles should not appear in tenant role list")
     void given_platformRoleExists_should_notAppearInTenantList() throws Exception {
@@ -553,23 +561,7 @@ public class TenantRoleApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.ACCESS_TENANT_USERS_GROUPS_AND_ROLES));
 
-      RoleInput input =
-          new RoleInput(
-              "Isolated Role", null, Set.of(Capability.MANAGE_TENANT_USERS_GROUPS_AND_ROLES));
-
-      String createResponse =
-          mvc.perform(
-                  post("/api/tenants/" + tenantX.getId() + "/roles")
-                      .content(asJsonString(input))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      String roleId = JsonPath.read(createResponse, "$.role_id");
+      String roleId = seedRoleInTenant(tenantX.getId(), "Isolated Role");
 
       // -------- Act — read from tenant Y (expect 403 or 404) --------
       int status =
@@ -605,25 +597,7 @@ public class TenantRoleApiTest extends IntegrationTest {
                   Capability.MANAGE_TENANT_USERS_GROUPS_AND_ROLES,
                   Capability.ACCESS_TENANT_USERS_GROUPS_AND_ROLES));
 
-      RoleInput input =
-          new RoleInput(
-              "Update Isolation Role",
-              null,
-              Set.of(Capability.MANAGE_TENANT_USERS_GROUPS_AND_ROLES));
-
-      String createResponse =
-          mvc.perform(
-                  post("/api/tenants/" + tenantX.getId() + "/roles")
-                      .content(asJsonString(input))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      String roleId = JsonPath.read(createResponse, "$.role_id");
+      String roleId = seedRoleInTenant(tenantX.getId(), "Update Isolation Role");
 
       // -------- Act — update from tenant Y --------
       RoleInput updateInput =
@@ -665,25 +639,7 @@ public class TenantRoleApiTest extends IntegrationTest {
                   Capability.DELETE_TENANT_USERS_GROUPS_AND_ROLES,
                   Capability.ACCESS_TENANT_USERS_GROUPS_AND_ROLES));
 
-      RoleInput input =
-          new RoleInput(
-              "Delete Isolation Role",
-              null,
-              Set.of(Capability.MANAGE_TENANT_USERS_GROUPS_AND_ROLES));
-
-      String createResponse =
-          mvc.perform(
-                  post("/api/tenants/" + tenantX.getId() + "/roles")
-                      .content(asJsonString(input))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      String roleId = JsonPath.read(createResponse, "$.role_id");
+      String roleId = seedRoleInTenant(tenantX.getId(), "Delete Isolation Role");
 
       // -------- Act — delete from tenant Y --------
       int status =
