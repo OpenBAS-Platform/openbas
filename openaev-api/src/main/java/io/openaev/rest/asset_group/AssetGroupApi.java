@@ -58,6 +58,7 @@ public class AssetGroupApi extends RestBehavior {
   private final TagRepository tagRepository;
   private final AssetGroupRepository assetGroupRepository;
   private final InjectSearchService injectSearchService;
+  private final io.openaev.config.TenantWriteScopeResolver writeScopeResolver;
 
   @PostMapping({ASSET_GROUP_URI, TENANT_ASSET_GROUP_URI})
   @AccessControl(actionPerformed = Action.CREATE, resourceType = ResourceType.ASSET_GROUP)
@@ -66,7 +67,10 @@ public class AssetGroupApi extends RestBehavior {
     AssetGroup assetGroup = new AssetGroup();
     assetGroup.setUpdateAttributes(input);
     assetGroup.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    return this.assetGroupService.createAssetGroup(assetGroup);
+    // Resolves the single tenant this write belongs to, and refuses an ambiguous multi-tenant
+    // scope with a 400 rather than picking one silently.
+    String tenantId = this.writeScopeResolver.tenantForWrite(ctx, null);
+    return this.assetGroupService.createAssetGroup(assetGroup, tenantId);
   }
 
   @GetMapping({ASSET_GROUP_URI, TENANT_ASSET_GROUP_URI})

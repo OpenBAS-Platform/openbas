@@ -47,7 +47,18 @@ public class AssetGroupService {
 
   // -- ASSET GROUP --
 
-  public AssetGroup createAssetGroup(@NotNull final AssetGroup assetGroup) {
+  /**
+   * Creates an asset group owned by {@code tenantId}.
+   *
+   * <p>The tenant is an explicit parameter, never inferred. {@code asset_groups} is v2-active and
+   * the go-live commit removed {@code TenantBaseListener}, so nothing stamps the row implicitly any
+   * more: a create that does not carry its tenant would write {@code tenant_id = NULL}. HTTP
+   * callers resolve it through {@link io.openaev.config.TenantWriteScopeResolver}, which refuses an
+   * ambiguous multi-tenant scope; background callers pass the tenant they are already scoped to.
+   */
+  public AssetGroup createAssetGroup(
+      @NotNull final AssetGroup assetGroup, @NotBlank final String tenantId) {
+    assetGroup.setTenant(new Tenant(tenantId));
     AssetGroup assetGroupCreated = this.assetGroupRepository.save(assetGroup);
     return computeDynamicAssets(assetGroupCreated);
   }
@@ -179,7 +190,15 @@ public class AssetGroupService {
         chunk -> this.assetGroupRepository.deleteAll(this.assetGroupRepository.findAllById(chunk)));
   }
 
-  public AssetGroup createOrUpdateAssetGroupWithoutDynamicAssets(AssetGroup assetGroup) {
+  /**
+   * Upserts an asset group owned by {@code tenantId}, without resolving dynamic members.
+   *
+   * <p>Same rule as {@link #createAssetGroup}: the tenant is explicit. Connector callers run inside
+   * a {@code TenantScopedTransaction} and pass the tenant that scope was opened for.
+   */
+  public AssetGroup createOrUpdateAssetGroupWithoutDynamicAssets(
+      AssetGroup assetGroup, @NotBlank final String tenantId) {
+    assetGroup.setTenant(new Tenant(tenantId));
     return this.assetGroupRepository.save(assetGroup);
   }
 
