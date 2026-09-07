@@ -152,7 +152,6 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
             .withTag(tagComposer.forTag(TagFixture.getTagWithText("Exercise tag")))
             .withVariable(variableComposer.forVariable(VariableFixture.getDefaultVariable()));
     exercise.get().setLessonsEnabled(true);
-    exercise.persist();
     return exercise;
   }
 
