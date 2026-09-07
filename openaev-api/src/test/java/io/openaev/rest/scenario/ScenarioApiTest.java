@@ -323,6 +323,143 @@ public class ScenarioApiTest extends IntegrationTest {
     assertEquals(subtitle, JsonPath.read(response, "$.scenario_subtitle"));
   }
 
+  @Nested
+  @DisplayName("Scenario email configuration")
+  class ScenarioEmails {
+
+    private static final String CUSTOM_REPLY_TO = "custom-reply@openaev.io";
+    private static final String OTHER_REPLY_TO = "other-reply@openaev.io";
+
+    private String createScenarioWithReplyTos(List<String> replyTos) throws Exception {
+      ScenarioInput input = new ScenarioInput();
+      input.setName("Scenario with emails");
+      input.setFromName("Custom sender");
+      input.setReplyTos(replyTos);
+      String response =
+          mvc.perform(
+                  post(SCENARIO_URI)
+                      .content(asJsonString(input))
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .accept(MediaType.APPLICATION_JSON)
+                      .with(csrf()))
+              .andExpect(status().is2xxSuccessful())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+      return JsonPath.read(response, "$.scenario_id");
+    }
+
+    private String getScenarioAsJson(String scenarioId) throws Exception {
+      return mvc.perform(
+              get(SCENARIO_URI + "/" + scenarioId).accept(MediaType.APPLICATION_JSON).with(csrf()))
+          .andExpect(status().is2xxSuccessful())
+          .andReturn()
+          .getResponse()
+          .getContentAsString();
+    }
+
+    @DisplayName("Creation keeps the reply-to and sender name typed by the user")
+    @Test
+    @WithMockUser(isAdmin = true)
+    void given_customEmails_should_notBeOverriddenByPlatformDefaults() throws Exception {
+      // Arrange & Act
+      String scenarioId = createScenarioWithReplyTos(List.of(CUSTOM_REPLY_TO));
+
+      // Assert
+      Scenario created = scenarioRepository.findById(scenarioId).orElseThrow();
+      assertEquals(List.of(CUSTOM_REPLY_TO), created.getReplyTos());
+      assertEquals("Custom sender", created.getFromName());
+    }
+
+    @DisplayName("Read exposes the reply-to addresses")
+    @Test
+    @WithMockUser(isAdmin = true)
+    void given_aScenarioWithReplyTos_should_returnThemOnRead() throws Exception {
+      // Arrange
+      String scenarioId = createScenarioWithReplyTos(List.of(CUSTOM_REPLY_TO));
+
+      // Act
+      String response = getScenarioAsJson(scenarioId);
+
+      // Assert
+      assertEquals(List.of(CUSTOM_REPLY_TO), JsonPath.read(response, "$.scenario_mails_reply_to"));
+    }
+
+    @DisplayName("Replaying the read payload as an update keeps the reply-to addresses")
+    @Test
+    @WithMockUser(isAdmin = true)
+    void given_theReadPayloadReplayedAsUpdate_should_keepReplyTos() throws Exception {
+      // Arrange
+      String scenarioId = createScenarioWithReplyTos(List.of(CUSTOM_REPLY_TO));
+      String read = getScenarioAsJson(scenarioId);
+      ScenarioInput replayed = new ScenarioInput();
+      replayed.setName(JsonPath.read(read, "$.scenario_name"));
+      replayed.setFromName(JsonPath.read(read, "$.scenario_mail_from_name"));
+      replayed.setReplyTos(JsonPath.read(read, "$.scenario_mails_reply_to"));
+
+      // Act
+      mvc.perform(
+              put(SCENARIO_URI + "/" + scenarioId)
+                  .content(asJsonString(replayed))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON)
+                  .with(csrf()))
+          .andExpect(status().is2xxSuccessful());
+
+      // Assert
+      assertEquals(
+          List.of(CUSTOM_REPLY_TO),
+          scenarioRepository.findById(scenarioId).orElseThrow().getReplyTos());
+    }
+
+    @DisplayName("An update omitting the reply-to field keeps the stored addresses")
+    @Test
+    @WithMockUser(isAdmin = true)
+    void given_anUpdateWithoutReplyTos_should_keepThem() throws Exception {
+      // Arrange
+      String scenarioId = createScenarioWithReplyTos(List.of(CUSTOM_REPLY_TO));
+      ScenarioInput update = new ScenarioInput();
+      update.setName("Renamed scenario");
+
+      // Act
+      mvc.perform(
+              put(SCENARIO_URI + "/" + scenarioId)
+                  .content(asJsonString(update))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON)
+                  .with(csrf()))
+          .andExpect(status().is2xxSuccessful());
+
+      // Assert
+      assertEquals(
+          List.of(CUSTOM_REPLY_TO),
+          scenarioRepository.findById(scenarioId).orElseThrow().getReplyTos());
+    }
+
+    @DisplayName("An update with an explicit empty array clears the reply-to addresses")
+    @Test
+    @WithMockUser(isAdmin = true)
+    void given_anUpdateWithEmptyReplyTos_should_clearThem() throws Exception {
+      // Arrange
+      String scenarioId = createScenarioWithReplyTos(List.of(CUSTOM_REPLY_TO, OTHER_REPLY_TO));
+      ScenarioInput update = new ScenarioInput();
+      update.setName("Renamed scenario");
+      update.setReplyTos(new ArrayList<>());
+
+      // Act
+      mvc.perform(
+              put(SCENARIO_URI + "/" + scenarioId)
+                  .content(asJsonString(update))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON)
+                  .with(csrf()))
+          .andExpect(status().is2xxSuccessful());
+
+      // Assert
+      assertTrue(scenarioRepository.findById(scenarioId).orElseThrow().getReplyTos().isEmpty());
+    }
+  }
+
   @DisplayName("Delete scenario")
   @Test
   @WithMockUser(withCapabilities = {Capability.DELETE_ASSESSMENT})
@@ -804,22 +941,16 @@ public class ScenarioApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.ACCESS_ASSESSMENT));
 
-      ScenarioInput input = new ScenarioInput();
-      input.setName("Isolation Test Scenario");
-
-      String createResponse =
-          mvc.perform(
-                  post("/api/tenants/" + tenantX.getId() + "/scenarios")
-                      .content(asJsonString(input))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      String scenarioId = JsonPath.read(createResponse, "$.scenario_id");
+      String scenarioId = UUID.randomUUID().toString();
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO scenarios (scenario_id, scenario_name, scenario_mail_from, tenant_id)"
+                  + " VALUES (:id, :name, :mailFrom, CAST(:tenant AS uuid))")
+          .setParameter("id", scenarioId)
+          .setParameter("name", "Isolation Test Scenario")
+          .setParameter("mailFrom", "isolation-test@openaev.io")
+          .setParameter("tenant", tenantX.getId())
+          .executeUpdate();
 
       entityManager.flush();
       entityManager.clear();
@@ -883,16 +1014,15 @@ public class ScenarioApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.ACCESS_ASSESSMENT));
 
-      ScenarioInput input = new ScenarioInput();
-      input.setName("CrossTenantSearchScenario");
-
-      mvc.perform(
-              post("/api/tenants/" + tenantX.getId() + "/scenarios")
-                  .content(asJsonString(input))
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .accept(MediaType.APPLICATION_JSON)
-                  .with(csrf()))
-          .andExpect(status().is2xxSuccessful());
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO scenarios (scenario_id, scenario_name, scenario_mail_from, tenant_id)"
+                  + " VALUES (:id, :name, :mailFrom, CAST(:tenant AS uuid))")
+          .setParameter("id", UUID.randomUUID().toString())
+          .setParameter("name", "CrossTenantSearchScenario")
+          .setParameter("mailFrom", "isolation-test@openaev.io")
+          .setParameter("tenant", tenantX.getId())
+          .executeUpdate();
 
       entityManager.flush();
       entityManager.clear();
@@ -928,22 +1058,16 @@ public class ScenarioApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.MANAGE_ASSESSMENT, Capability.ACCESS_ASSESSMENT));
 
-      ScenarioInput input = new ScenarioInput();
-      input.setName("Update Isolation Test Scenario");
-
-      String createResponse =
-          mvc.perform(
-                  post("/api/tenants/" + tenantX.getId() + "/scenarios")
-                      .content(asJsonString(input))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      String scenarioId = JsonPath.read(createResponse, "$.scenario_id");
+      String scenarioId = UUID.randomUUID().toString();
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO scenarios (scenario_id, scenario_name, scenario_mail_from, tenant_id)"
+                  + " VALUES (:id, :name, :mailFrom, CAST(:tenant AS uuid))")
+          .setParameter("id", scenarioId)
+          .setParameter("name", "Update Isolation Test Scenario")
+          .setParameter("mailFrom", "isolation-test@openaev.io")
+          .setParameter("tenant", tenantX.getId())
+          .executeUpdate();
 
       entityManager.flush();
       entityManager.clear();
@@ -981,19 +1105,16 @@ public class ScenarioApiTest extends IntegrationTest {
       ScenarioInput input = new ScenarioInput();
       input.setName("Delete Isolation Test Scenario");
 
-      String createResponse =
-          mvc.perform(
-                  post("/api/tenants/" + tenantX.getId() + "/scenarios")
-                      .content(asJsonString(input))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      String scenarioId = JsonPath.read(createResponse, "$.scenario_id");
+      String scenarioId = UUID.randomUUID().toString();
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO scenarios (scenario_id, scenario_name, scenario_mail_from, tenant_id)"
+                  + " VALUES (:id, :name, :mailFrom, CAST(:tenant AS uuid))")
+          .setParameter("id", scenarioId)
+          .setParameter("name", input.getName())
+          .setParameter("mailFrom", "isolation-test@openaev.io")
+          .setParameter("tenant", tenantX.getId())
+          .executeUpdate();
 
       entityManager.flush();
       entityManager.clear();
@@ -1022,22 +1143,16 @@ public class ScenarioApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.ACCESS_ASSESSMENT));
 
-      ScenarioInput input = new ScenarioInput();
-      input.setName("SearchById Isolation Scenario");
-
-      String createResponse =
-          mvc.perform(
-                  post("/api/tenants/" + tenantX.getId() + "/scenarios")
-                      .content(asJsonString(input))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      String scenarioId = JsonPath.read(createResponse, "$.scenario_id");
+      String scenarioId = UUID.randomUUID().toString();
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO scenarios (scenario_id, scenario_name, scenario_mail_from, tenant_id)"
+                  + " VALUES (:id, :name, :mailFrom, CAST(:tenant AS uuid))")
+          .setParameter("id", scenarioId)
+          .setParameter("name", "SearchById Isolation Scenario")
+          .setParameter("mailFrom", "isolation-test@openaev.io")
+          .setParameter("tenant", tenantX.getId())
+          .executeUpdate();
 
       entityManager.flush();
       entityManager.clear();
@@ -1100,24 +1215,15 @@ public class ScenarioApiTest extends IntegrationTest {
 
       String scenarioId = JsonPath.read(scenarioResponse, "$.scenario_id");
 
-      // Create team in tenant Y
-      io.openaev.rest.team.form.TeamCreateInput teamInput =
-          new io.openaev.rest.team.form.TeamCreateInput();
-      teamInput.setName("CrossTenant Scenario Team");
-
-      String teamResponse =
-          mvc.perform(
-                  post("/api/tenants/" + tenantY.getId() + "/teams")
-                      .content(asJsonString(teamInput))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      String teamId = JsonPath.read(teamResponse, "$.team_id");
+      String teamId = UUID.randomUUID().toString();
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO teams (team_id, team_name, tenant_id)"
+                  + " VALUES (:id, :name, CAST(:tenant AS uuid))")
+          .setParameter("id", teamId)
+          .setParameter("name", "CrossTenant Scenario Team")
+          .setParameter("tenant", tenantY.getId())
+          .executeUpdate();
 
       entityManager.flush();
       entityManager.clear();
@@ -1187,24 +1293,15 @@ public class ScenarioApiTest extends IntegrationTest {
 
       String scenarioId = JsonPath.read(scenarioResponse, "$.scenario_id");
 
-      // Create team in tenant Y
-      io.openaev.rest.team.form.TeamCreateInput teamInput =
-          new io.openaev.rest.team.form.TeamCreateInput();
-      teamInput.setName("CrossTenant Add Scenario Team");
-
-      String teamResponse =
-          mvc.perform(
-                  post("/api/tenants/" + tenantY.getId() + "/teams")
-                      .content(asJsonString(teamInput))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      String teamId = JsonPath.read(teamResponse, "$.team_id");
+      String teamId = UUID.randomUUID().toString();
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO teams (team_id, team_name, tenant_id)"
+                  + " VALUES (:id, :name, CAST(:tenant AS uuid))")
+          .setParameter("id", teamId)
+          .setParameter("name", "CrossTenant Add Scenario Team")
+          .setParameter("tenant", tenantY.getId())
+          .executeUpdate();
 
       entityManager.flush();
       entityManager.clear();
@@ -1274,24 +1371,15 @@ public class ScenarioApiTest extends IntegrationTest {
 
       String scenarioId = JsonPath.read(scenarioResponse, "$.scenario_id");
 
-      // Create team in tenant Y
-      io.openaev.rest.team.form.TeamCreateInput teamInput =
-          new io.openaev.rest.team.form.TeamCreateInput();
-      teamInput.setName("CrossTenant Remove Scenario Team");
-
-      String teamResponse =
-          mvc.perform(
-                  post("/api/tenants/" + tenantY.getId() + "/teams")
-                      .content(asJsonString(teamInput))
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .accept(MediaType.APPLICATION_JSON)
-                      .with(csrf()))
-              .andExpect(status().is2xxSuccessful())
-              .andReturn()
-              .getResponse()
-              .getContentAsString();
-
-      String teamId = JsonPath.read(teamResponse, "$.team_id");
+      String teamId = UUID.randomUUID().toString();
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO teams (team_id, team_name, tenant_id)"
+                  + " VALUES (:id, :name, CAST(:tenant AS uuid))")
+          .setParameter("id", teamId)
+          .setParameter("name", "CrossTenant Remove Scenario Team")
+          .setParameter("tenant", tenantY.getId())
+          .executeUpdate();
 
       entityManager.flush();
       entityManager.clear();
