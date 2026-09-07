@@ -45,6 +45,20 @@ public class AssetGroupService {
   private final AssetGroupMapper assetGroupMapper;
   private final BulkDeleteExecutor bulkDeleteExecutor;
 
+  /**
+   * Builds the owning tenant reference, refusing a blank one loudly.
+   *
+   * <p>Explicit rather than {@code @NotBlank}: this bean is not {@code @Validated}, so the
+   * annotation alone never fires and a blank tenant would reach the database as {@code tenant_id =
+   * NULL}, which is the silent corruption explicit attribution exists to prevent.
+   */
+  private static Tenant requireTenant(final String tenantId) {
+    if (tenantId == null || tenantId.isBlank()) {
+      throw new IllegalArgumentException("an asset group write must carry the tenant that owns it");
+    }
+    return new Tenant(tenantId);
+  }
+
   // -- ASSET GROUP --
 
   /**
@@ -60,13 +74,7 @@ public class AssetGroupService {
    */
   public AssetGroup createAssetGroup(
       @NotNull final AssetGroup assetGroup, @NotBlank final String tenantId) {
-    // Explicit, not @NotBlank: this bean is not @Validated, so the annotation alone would
-    // never fire and a null tenant would silently write tenant_id = NULL.
-    if (tenantId == null || tenantId.isBlank()) {
-      throw new IllegalArgumentException(
-          "an asset group create must carry the tenant that owns it");
-    }
-    assetGroup.setTenant(new Tenant(tenantId));
+    assetGroup.setTenant(requireTenant(tenantId));
     AssetGroup assetGroupCreated = this.assetGroupRepository.save(assetGroup);
     return computeDynamicAssets(assetGroupCreated);
   }
@@ -206,13 +214,7 @@ public class AssetGroupService {
    */
   public AssetGroup createOrUpdateAssetGroupWithoutDynamicAssets(
       AssetGroup assetGroup, @NotBlank final String tenantId) {
-    // Explicit, not @NotBlank: this bean is not @Validated, so the annotation alone would
-    // never fire and a null tenant would silently write tenant_id = NULL.
-    if (tenantId == null || tenantId.isBlank()) {
-      throw new IllegalArgumentException(
-          "an asset group create must carry the tenant that owns it");
-    }
-    assetGroup.setTenant(new Tenant(tenantId));
+    assetGroup.setTenant(requireTenant(tenantId));
     return this.assetGroupRepository.save(assetGroup);
   }
 

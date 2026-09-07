@@ -53,7 +53,7 @@ import org.springframework.stereotype.Service;
  * ZERO. Such a gauge must open an explicit {@code TxCtx.allTenants()} scope through {@link
  * TenantScopedTransaction}, as {@link #countAssetGroups()} does.
  *
- * <p>TODO v2: #6420 - once findings gets v2 activated, {@code findings_total} needs the same
+ * <p>TODO v2: #6442 - once findings gets v2 activated, {@code findings_total} needs the same
  * explicit scope. The same applies to any other gauge here whose table joins a future activation.
  */
 @Slf4j
