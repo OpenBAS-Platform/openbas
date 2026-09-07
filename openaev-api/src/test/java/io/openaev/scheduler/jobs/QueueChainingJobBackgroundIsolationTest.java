@@ -30,6 +30,7 @@ import io.openaev.utils.fixtures.StepFixture;
 import io.openaev.utils.fixtures.WorkflowFixture;
 import io.openaev.utils.fixtures.composers.ExerciseComposer;
 import io.openaev.utils.fixtures.composers.WorkflowComposer;
+import io.openaev.utils.mockUser.WithMockUser;
 import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import io.openaev.utils.mockUser.WithMockUser;
 
 @DisplayName("QueueChainingJob scopes each delayed step to its owning tenant")
 @WithMockUser
@@ -89,8 +89,7 @@ class QueueChainingJobBackgroundIsolationTest extends IntegrationTest {
 
     @Test
     @DisplayName("given one delayed step should scope create and enqueue to the workflow tenant")
-    void given_oneDelayedStep_should_scopeCreateAndEnqueueToTheWorkflowTenant()
-        throws Exception {
+    void given_oneDelayedStep_should_scopeCreateAndEnqueueToTheWorkflowTenant() throws Exception {
       // Arrange
       String tenantA = createTenant("queue-job-a");
       Workflow workflowA = createWorkflowRunInTenant(tenantA);
@@ -100,7 +99,9 @@ class QueueChainingJobBackgroundIsolationTest extends IntegrationTest {
       queueChainingJob.execute(null);
 
       // Assert
-      assertThat(popScopes).singleElement().satisfies(scope -> assertThat(scope.gucScope()).contains(tenantA));
+      assertThat(popScopes)
+          .singleElement()
+          .satisfies(scope -> assertThat(scope.gucScope()).contains(tenantA));
       assertThat(createScopes)
           .singleElement()
           .satisfies(
@@ -142,12 +143,18 @@ class QueueChainingJobBackgroundIsolationTest extends IntegrationTest {
                 assertThat(scope.gucScope()).contains(tenantB);
               });
       assertThat(createScopes)
-          .extracting(ScopeObservation::workflowId, ScopeObservation::threadTenant, ScopeObservation::gucScope)
+          .extracting(
+              ScopeObservation::workflowId,
+              ScopeObservation::threadTenant,
+              ScopeObservation::gucScope)
           .containsExactly(
               org.assertj.core.groups.Tuple.tuple(workflowA.getId(), tenantA, tenantA),
               org.assertj.core.groups.Tuple.tuple(workflowB.getId(), tenantB, tenantB));
       assertThat(enqueueScopes)
-          .extracting(ScopeObservation::workflowId, ScopeObservation::threadTenant, ScopeObservation::gucScope)
+          .extracting(
+              ScopeObservation::workflowId,
+              ScopeObservation::threadTenant,
+              ScopeObservation::gucScope)
           .containsExactly(
               org.assertj.core.groups.Tuple.tuple(workflowA.getId(), tenantA, tenantA),
               org.assertj.core.groups.Tuple.tuple(workflowB.getId(), tenantB, tenantB));
@@ -170,14 +177,21 @@ class QueueChainingJobBackgroundIsolationTest extends IntegrationTest {
 
     // Assert
     assertThat(createScopes)
-        .extracting(ScopeObservation::workflowId, ScopeObservation::threadTenant, ScopeObservation::gucScope)
+        .extracting(
+            ScopeObservation::workflowId,
+            ScopeObservation::threadTenant,
+            ScopeObservation::gucScope)
         .containsExactly(
             org.assertj.core.groups.Tuple.tuple(workflowA.getId(), tenantA, tenantA),
             org.assertj.core.groups.Tuple.tuple(workflowB.getId(), tenantB, tenantB));
     assertThat(enqueueScopes)
-        .extracting(ScopeObservation::workflowId, ScopeObservation::threadTenant, ScopeObservation::gucScope)
+        .extracting(
+            ScopeObservation::workflowId,
+            ScopeObservation::threadTenant,
+            ScopeObservation::gucScope)
         .containsExactly(org.assertj.core.groups.Tuple.tuple(workflowB.getId(), tenantB, tenantB));
-    verify(stepService, never()).enqueueReadySteps(anyList(), org.mockito.ArgumentMatchers.eq(workflowA));
+    verify(stepService, never())
+        .enqueueReadySteps(anyList(), org.mockito.ArgumentMatchers.eq(workflowA));
     verify(stepService, times(1))
         .enqueueReadySteps(anyList(), org.mockito.ArgumentMatchers.eq(workflowB));
   }
@@ -229,7 +243,8 @@ class QueueChainingJobBackgroundIsolationTest extends IntegrationTest {
   }
 
   private Workflow createWorkflowRunInTenant(String tenantId) {
-    String previousTenant = TenantContext.hasCurrentTenant() ? TenantContext.getCurrentTenant() : null;
+    String previousTenant =
+        TenantContext.hasCurrentTenant() ? TenantContext.getCurrentTenant() : null;
     TenantContext.setCurrentTenant(tenantId);
     try {
       Workflow workflowRun =
@@ -238,7 +253,8 @@ class QueueChainingJobBackgroundIsolationTest extends IntegrationTest {
               .withSimulation(exerciseComposer.forExercise(ExerciseFixture.createDefaultExercise()))
               .persist()
               .get();
-      assertThat(workflowRepository.findTenantIdByWorkflowId(workflowRun.getId())).contains(tenantId);
+      assertThat(workflowRepository.findTenantIdByWorkflowId(workflowRun.getId()))
+          .contains(tenantId);
       return workflowRun;
     } finally {
       if (previousTenant == null) {

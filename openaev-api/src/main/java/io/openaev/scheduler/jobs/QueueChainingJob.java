@@ -36,6 +36,8 @@ public class QueueChainingJob implements Job {
   /** Periodically processes the next eligible step from the delay queue. */
   @Override
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    // The pop is one cross-tenant DELETE ... RETURNING, so it must run in its own all-tenants
+    // transaction rather than under any single workflow tenant.
     List<StepDelayQueue> stepsDelayQueue =
         tenantTx.execute(TxCtx.allTenants(), stepDelayQueueService::popNextToProcess);
     if (stepsDelayQueue.isEmpty()) {
@@ -45,6 +47,8 @@ public class QueueChainingJob implements Job {
     log.info("[Chaining] QueueChainingJob: processing {} delayed step(s)", stepsDelayQueue.size());
 
     for (StepDelayQueue stepDelayQueue : stepsDelayQueue) {
+      // Each delayed row belongs to one workflow run. Scope each item separately so a failing
+      // tenant rolls back only its own writes and cannot poison the rest of the batch.
       String tenantId = tenantIdOf(stepDelayQueue.getWorkflowRun());
       TenantContext.setCurrentTenant(tenantId);
       try {
@@ -88,7 +92,9 @@ public class QueueChainingJob implements Job {
     if (workflowRun == null || workflowRun.getId() == null) {
       return DEFAULT_TENANT_UUID;
     }
-    return workflowRepository.findTenantIdByWorkflowId(workflowRun.getId()).orElse(DEFAULT_TENANT_UUID);
+    return workflowRepository
+        .findTenantIdByWorkflowId(workflowRun.getId())
+        .orElse(DEFAULT_TENANT_UUID);
   }
 
   private static final class UncheckedChainingException extends RuntimeException {

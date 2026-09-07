@@ -8,11 +8,11 @@ import static org.mockito.Mockito.*;
 
 import io.openaev.api.chaining.ActionStep;
 import io.openaev.api.chaining.InjectExecutionStep;
-import io.openaev.context.TenantScopedTransaction;
-import io.openaev.context.TxCtx;
 import io.openaev.api.chaining.dto.ConditionCreateInput;
 import io.openaev.api.chaining.dto.StepInput;
 import io.openaev.api.chaining.dto.StepsCreateInput;
+import io.openaev.context.TenantScopedTransaction;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.StepDelayQueueRepository;
 import io.openaev.database.repository.StepRepository;
@@ -70,7 +70,9 @@ class StepServiceTest {
   @BeforeEach
   void setUp() {
     lenient()
-        .when(tenantTx.execute(any(TxCtx.class), ArgumentMatchers.<Supplier<List<StepDelayQueue>>>any()))
+        .when(
+            tenantTx.execute(
+                any(TxCtx.class), ArgumentMatchers.<Supplier<List<StepDelayQueue>>>any()))
         .thenAnswer(invocation -> invocation.<Supplier<List<StepDelayQueue>>>getArgument(1).get());
     lenient()
         .doAnswer(
@@ -81,7 +83,8 @@ class StepServiceTest {
         .when(tenantTx)
         .execute(any(TxCtx.class), any(Runnable.class));
     queueChainingJob =
-        new QueueChainingJob(stepDelayQueueService, stepService, workflowService, tenantTx, workflowRepository);
+        new QueueChainingJob(
+            stepDelayQueueService, stepService, workflowService, tenantTx, workflowRepository);
     workflow = mock(Workflow.class);
   }
 
