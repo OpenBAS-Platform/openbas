@@ -194,11 +194,20 @@ public interface EngineService {
    * replication factor) instead of the real data volume.
    *
    * <p>This call hits the engine cluster; it is not meant to be issued on a hot path (see the
-   * caching done by the health check service).
+   * periodic storage probe of the health subsystem).
    *
    * @return the used size in bytes, or {@code null} if it cannot be retrieved
    */
   Long getIndexesUsedSize();
+
+  /**
+   * Checks the engine is reachable, with the cheapest call the client offers. Unlike {@link
+   * #getIndexesUsedSize()} it does not walk the index stats, so it can be issued on a short
+   * connectivity probe schedule.
+   *
+   * @throws io.openaev.exception.AnalyticsEngineException if the engine cannot be contacted
+   */
+  void ping();
 
   /**
    * Returns the ObjectMapper used by the search engine client for document serialization. Other

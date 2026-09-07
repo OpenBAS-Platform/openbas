@@ -3,9 +3,9 @@ package io.openaev.rest.health_check;
 import io.openaev.aop.AccessControl;
 import io.openaev.api.health_check.dto.HealthCheckDetailsOutput;
 import io.openaev.context.TxCtx;
+import io.openaev.health.StorageUsage;
 import io.openaev.rest.helper.RestBehavior;
 import io.openaev.service.HealthCheckService;
-import io.openaev.service.HealthCheckService.StorageUsage;
 import io.openaev.service.exception.HealthCheckFailureException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -54,13 +54,12 @@ public class HealthCheckApi extends RestBehavior {
   @Operation(
       summary = "Run an healthcheck ",
       description =
-          "Tries to connect to dependencies (DB/Minio/RabbitMQ). With details=true, also returns"
-              + " the storage used by each dependency (periodically refreshed, not computed on"
-              + " every call)")
-  // NOT_SUPPORTED: this endpoint performs external network I/O (RabbitMQ, MinIO). Opening a
-  // transaction here pins a Hikari connection for the whole request, which exhausts the pool
-  // when a dependency is slow (frequent LB probes x 30s+ waits). The DB check runs in its own
-  // short-lived repository transaction instead.
+          "Reports the connectivity to the dependencies (DB/RabbitMQ/file storage) as observed by"
+              + " the background probes. With details=true, also returns the storage used by each"
+              + " dependency. Nothing is computed on call: both come from the periodically"
+              + " refreshed state that also feeds /actuator/prometheus")
+  // NOT_SUPPORTED: this endpoint only reads in-memory probe results. Opening a transaction would
+  // pin a Hikari connection for every load balancer probe, for nothing.
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
   @ApiResponses(
       value = {

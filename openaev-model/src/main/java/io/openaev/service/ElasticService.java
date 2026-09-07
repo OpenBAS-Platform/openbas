@@ -1249,6 +1249,17 @@ public class ElasticService implements EngineService {
     }
   }
 
+  @Override
+  public void ping() {
+    try {
+      if (!elasticClient.ping().value()) {
+        throw new AnalyticsEngineException("Engine ping returned a negative response");
+      }
+    } catch (IOException | ElasticsearchException e) {
+      throw new AnalyticsEngineException("Unable to reach the engine", e);
+    }
+  }
+
   // endregion
 
   private String toElasticField(@NotBlank final String field) {

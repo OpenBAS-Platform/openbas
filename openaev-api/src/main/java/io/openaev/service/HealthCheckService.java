@@ -1,158 +1,66 @@
 package io.openaev.service;
 
-import com.cronutils.utils.VisibleForTesting;
-import io.minio.MinioClient;
-import io.openaev.database.repository.HealthCheckRepository;
-import io.openaev.engine.EngineService;
+import io.openaev.health.DependencyHealthStore;
+import io.openaev.health.StorageUsage;
 import io.openaev.service.exception.HealthCheckFailureException;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-/** Service containing the logic related to service health checks */
+/**
+ * Serves the platform health from the state published by the background probes, without ever
+ * contacting a dependency: the endpoint is polled by load balancers far more often than the
+ * dependencies change state, and synchronous probes let a degraded dependency pin request threads.
+ */
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class HealthCheckService {
 
-  private final HealthCheckRepository healthCheckRepository;
-  private final MinioService minioService;
-
-  @Qualifier("healthCheckMinioClient")
-  private final MinioClient healthCheckMinioClient;
-
-  private final RabbitmqService rabbitmqService;
-  private final EngineService engineService;
-
   /**
-   * How long a computed {@link StorageUsage} stays valid. The health check endpoint is polled very
-   * frequently (load balancer probes) while computing the usage walks the whole object storage
-   * listing and queries the engine cluster, so the result is cached and only recomputed once this
-   * duration has elapsed.
+   * A probe result older than this many intervals is treated as a failure: a scheduler that stopped
+   * probing can no longer vouch for the platform, so the endpoint must not keep serving a success.
    */
-  @Value("${openaev.healthcheck.storage-usage-cache-duration:PT4H}")
-  private Duration storageUsageCacheDuration = Duration.ofHours(4);
+  private static final int STALE_PROBE_INTERVALS = 3;
 
-  private final AtomicReference<CachedStorageUsage> cachedStorageUsage = new AtomicReference<>();
-  private final ReentrantLock storageUsageRefreshLock = new ReentrantLock();
+  private final DependencyHealthStore dependencyHealthStore;
+
+  @Value("${openaev.healthcheck.connectivity-probe-interval:PT10S}")
+  private Duration connectivityProbeInterval = Duration.ofSeconds(10);
 
   /**
-   * Run health checks by testing connection to the service dependencies (database/rabbitMq/file
-   * storage)
+   * Checks that every liveness-gating dependency (database, RabbitMQ, file storage) was seen up by
+   * a recent probe.
    *
-   * <p>Note: the analytics engine (Elasticsearch/OpenSearch) connectivity is deliberately NOT
-   * checked here, and there is no Redis dependency on this platform. The engine is only contacted
-   * for the (cached) storage metrics of {@link #getStorageUsage()}, so an engine outage never turns
-   * this probe into a 503.
+   * <p>The analytics engine is deliberately excluded: it is probed and exported as a metric, but an
+   * engine outage degrades analytics only and must never turn this probe into a 503.
    *
-   * @throws HealthCheckFailureException if any dependency check fails
+   * @throws HealthCheckFailureException if a dependency is down or has not been probed recently
    */
   public void runHealthCheck() throws HealthCheckFailureException {
-    runDatabaseCheck();
-    runRabbitMQCheck();
-    runFileStorageCheck();
+    List<String> failures = dependencyHealthStore.livenessFailures(stalenessThreshold());
+    if (!failures.isEmpty()) {
+      throw new HealthCheckFailureException(String.join(", ", failures));
+    }
   }
 
   /**
-   * Storage used by the platform dependencies, served from a cache refreshed at most once per
-   * {@code openaev.healthcheck.storage-usage-cache-duration}.
+   * Storage used by the platform dependencies, as of the last storage probe.
    *
-   * <p>Metrics are best effort: a dependency failing to report its size yields a {@code null} value
+   * <p>Sizes are best effort: a dependency failing to report its size yields a {@code null} value
    * instead of failing the health check, which only reflects connectivity.
    *
    * @return the used size of PostgreSQL, of the engine indexes and of the object storage
    */
   public StorageUsage getStorageUsage() {
-    CachedStorageUsage cached = cachedStorageUsage.get();
-    if (cached != null && !cached.isExpired(storageUsageCacheDuration)) {
-      return cached.usage();
-    }
-    // Single flight: refreshing is expensive, so concurrent probes must not pile up on it. Only one
-    // caller recomputes; the others keep serving the previous (stale) value and only block when
-    // there is nothing to serve yet.
-    if (!storageUsageRefreshLock.tryLock()) {
-      if (cached != null) {
-        return cached.usage();
-      }
-      storageUsageRefreshLock.lock();
-    }
-    try {
-      CachedStorageUsage current = cachedStorageUsage.get();
-      if (current != null && !current.isExpired(storageUsageCacheDuration)) {
-        return current.usage();
-      }
-      StorageUsage usage = computeStorageUsage();
-      cachedStorageUsage.set(new CachedStorageUsage(usage, Instant.now()));
-      return usage;
-    } finally {
-      storageUsageRefreshLock.unlock();
-    }
+    return dependencyHealthStore.getStorageUsage();
   }
 
-  @VisibleForTesting
-  protected void runDatabaseCheck() {
-    healthCheckRepository.healthCheck();
-  }
-
-  @VisibleForTesting
-  protected void runRabbitMQCheck() throws HealthCheckFailureException {
-    try {
-      rabbitmqService.checkHealth();
-    } catch (IOException | TimeoutException e) {
-      throw new HealthCheckFailureException("RabbitMQ check failure", e);
-    }
-  }
-
-  @VisibleForTesting
-  protected void runFileStorageCheck() throws HealthCheckFailureException {
-    try {
-      minioService.checkStorageAccessible(healthCheckMinioClient);
-    } catch (Exception e) {
-      throw new HealthCheckFailureException("FileStorage check failure", e);
-    }
-  }
-
-  @VisibleForTesting
-  protected StorageUsage computeStorageUsage() {
-    return new StorageUsage(
-        computeQuietly("PostgreSQL", healthCheckRepository::databaseUsedSize),
-        computeQuietly("engine indexes", engineService::getIndexesUsedSize),
-        computeQuietly("file storage", minioService::computeUsedSize));
-  }
-
-  private Long computeQuietly(String target, Supplier<Long> sizeSupplier) {
-    try {
-      return sizeSupplier.get();
-    } catch (Exception e) {
-      // Sizes are informative only: an unavailable metric must not turn a healthy platform into a
-      // 503, it is simply reported as null.
-      log.warn("Unable to compute the {} used size", target, e);
-      return null;
-    }
-  }
-
-  /**
-   * Used size, in bytes, of each storage dependency. A {@code null} value means the metric could
-   * not be retrieved.
-   *
-   * @param pgUsedSize size of the PostgreSQL database
-   * @param esUsedSize size of the engine (Elasticsearch/OpenSearch) indexes, replicas excluded
-   * @param s3UsedSize size of the objects stored in the bucket
-   */
-  public record StorageUsage(Long pgUsedSize, Long esUsedSize, Long s3UsedSize) {}
-
-  private record CachedStorageUsage(StorageUsage usage, Instant computedAt) {
-    private boolean isExpired(Duration validity) {
-      return Instant.now().isAfter(computedAt.plus(validity));
-    }
+  private Instant stalenessThreshold() {
+    return Instant.now().minus(connectivityProbeInterval.multipliedBy(STALE_PROBE_INTERVALS));
   }
 }

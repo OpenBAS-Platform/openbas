@@ -1326,6 +1326,17 @@ public class OpenSearchService implements EngineService {
     return null;
   }
 
+  @Override
+  public void ping() {
+    try {
+      if (!openSearchClient.ping().value()) {
+        throw new AnalyticsEngineException("Engine ping returned a negative response");
+      }
+    } catch (IOException | OpenSearchException e) {
+      throw new AnalyticsEngineException("Unable to reach the engine", e);
+    }
+  }
+
   // endregion
 
   /**
