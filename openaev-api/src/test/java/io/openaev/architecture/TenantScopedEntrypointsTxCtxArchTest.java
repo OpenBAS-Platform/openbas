@@ -437,7 +437,18 @@ class TenantScopedEntrypointsTxCtxArchTest {
           // to be threaded into the service method that opens one (same shape as
           // ScenarioApi#bulkDeleteScenarios). Dropping it would silently empty the phase lists.
           "io.openaev.rest.inject.SimulationInjectApi#bulkUpdateInjectsForSimulation",
-          "io.openaev.rest.inject.ScenarioInjectApi#bulkUpdateInjectsForScenario");
+          "io.openaev.rest.inject.ScenarioInjectApi#bulkUpdateInjectsForScenario",
+          // challenges (v2, #6416): the table's own API, plus every path that reads or writes it.
+          "io.openaev.rest.challenge.ChallengeApi#challenges",
+          "io.openaev.rest.challenge.ChallengeApi#findEndpoints",
+          "io.openaev.rest.challenge.ChallengeApi#updateChallenge",
+          "io.openaev.rest.challenge.ChallengeApi#createChallenge",
+          "io.openaev.rest.challenge.ChallengeApi#deleteChallenge",
+          "io.openaev.rest.challenge.ChallengeApi#documentsFromChallenge",
+          "io.openaev.rest.challenge.ScenarioChallengeApi#scenarioChallenges",
+          "io.openaev.rest.challenge.SimulationChallengeApi#exerciseChallenges",
+          "io.openaev.rest.challenge.SimulationChallengeApi#observerChallenges",
+          "io.openaev.rest.challenge.SimulationChallengeApi#playerChallenges");
 
   @ArchTest
   static final ArchRule tx_scoped_entrypoints_must_declare_tx_ctx =

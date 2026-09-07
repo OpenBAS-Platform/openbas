@@ -11,6 +11,7 @@ import com.tngtech.archunit.lang.ArchRule;
 import io.openaev.api.chaining.InjectExecutionStep;
 import io.openaev.database.model.AttackPattern;
 import io.openaev.database.model.CatalogConnector;
+import io.openaev.database.model.Document;
 import io.openaev.database.model.Exercise;
 import io.openaev.database.model.Inject;
 import io.openaev.database.model.InjectorContract;
@@ -18,6 +19,7 @@ import io.openaev.database.model.Scenario;
 import io.openaev.database.model.SecurityPlatform;
 import io.openaev.database.model.Vulnerability;
 import io.openaev.database.model.attackpath.AttackPathExecution;
+import io.openaev.database.repository.ChallengeRepository;
 import io.openaev.database.repository.CollectorRepository;
 import io.openaev.database.repository.ConnectorInstanceRepository;
 import io.openaev.database.repository.CweRepository;
@@ -46,6 +48,7 @@ import io.openaev.export.WorkflowExportInitializer;
 import io.openaev.healthcheck.utils.HealthCheckUtils;
 import io.openaev.helper.InjectHelper;
 import io.openaev.importer.V1_DataImporter;
+import io.openaev.injectors.challenge.ChallengeExecutor;
 import io.openaev.injectors.phishing.service.PhishingLandingPageService;
 import io.openaev.integration.ManagerFactory;
 import io.openaev.integration.migration.ConfigurationMigration;
@@ -56,6 +59,9 @@ import io.openaev.rest.asset.security_platforms.SecurityPlatformApi;
 import io.openaev.rest.atomic_testing.AtomicTestingApi;
 import io.openaev.rest.attack_pattern.AttackPatternApi;
 import io.openaev.rest.attack_pattern.service.AttackPatternService;
+import io.openaev.rest.challenge.ChallengeApi;
+import io.openaev.rest.challenge.ScenarioChallengeApi;
+import io.openaev.rest.challenge.SimulationChallengeApi;
 import io.openaev.rest.collector.CollectorApi;
 import io.openaev.rest.collector.service.CollectorService;
 import io.openaev.rest.connector_instance.ConnectorInstanceApi;
@@ -88,6 +94,7 @@ import io.openaev.rest.scenario.ScenarioApi;
 import io.openaev.rest.scenario.ScenarioImportApi;
 import io.openaev.rest.vulnerability.service.VulnerabilityService;
 import io.openaev.scheduler.jobs.ComchecksExecutionJob;
+import io.openaev.service.ChallengeService;
 import io.openaev.service.EndpointService;
 import io.openaev.service.EsAttackPathService;
 import io.openaev.service.InjectExpectationTraceService;
@@ -119,6 +126,7 @@ import io.openaev.telemetry.metric_collectors.InventoryMetricCollector;
 import io.openaev.telemetry.metric_collectors.ProductInventoryMetricCollector;
 import io.openaev.utils.ExpectationUtils;
 import io.openaev.utils.InjectUtils;
+import io.openaev.utils.mapper.DocumentMapper;
 import io.openaev.utils.mapper.InjectMapper;
 import io.openaev.utils.mapper.VulnerabilityMapper;
 import java.io.FileInputStream;
@@ -174,7 +182,8 @@ class TenantActiveTableAccessArchTest {
           "autonomous_events",
           "autonomous_directives",
           "kill_chain_phases",
-          "security_coverages");
+          "security_coverages",
+          "challenges");
 
   @ArchTest
   static void every_active_table_is_guarded(JavaClasses classes) throws Exception {
@@ -817,6 +826,52 @@ class TenantActiveTableAccessArchTest {
                   + " open-in-view renders after the commit, so a lazy load at rendering time"
                   + " silently serializes an EMPTY phase list. New callers must run inside a scoped"
                   + " transaction and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule challenges_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // TxCtx-carrying entrypoints, pinned by TenantScopedEntrypointsTxCtxArchTest:
+              ChallengeApi.class,
+              ScenarioChallengeApi.class,
+              SimulationChallengeApi.class,
+              // Reads only (tryChallenge, enrichment lookups), driven by the TxCtx-carrying
+              // entrypoints above:
+              ChallengeService.class,
+              // Execution-engine background path: already scoped by TenantScopedJobRunner, which
+              // opens the tenant transaction InjectsExecutionJob runs every inject execution
+              // under, independently of the TxCtx/@Transactional aspect:
+              ChallengeExecutor.class,
+              // Import path: resolves the write tenant explicitly and looks rows up by the
+              // per-tenant business-key predicate before create:
+              V1_DataImporter.class,
+              // Platform-wide telemetry counter, intentionally unscoped (documented degradation):
+              // once challenges is active it counts only the caller's tenant, not the platform
+              // total. Tracked as an accepted limitation, not a blocker.
+              ProductInventoryMetricCollector.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(ChallengeRepository.class)
+          .because(
+              "challenges is tenant-active: an accessor without a tenant scope silently reads"
+                  + " zero rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule challenges_association_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // Renders the response inside the scoped transaction of the wired handler
+              // (DocumentApi#getDocumentRelations, which already carries TxCtx):
+              DocumentMapper.class)
+          .should()
+          .callMethod(Document.class, "getChallenges")
+          .because(
+              "challenges is reached through Document's association WITHOUT touching the"
+                  + " repository: a lazy getChallenges() in an unscoped context silently loads"
+                  + " zero rows. New callers must run inside a scoped transaction and be"
+                  + " allowlisted here");
 
   @ArchTest
   static final ArchRule autonomous_directives_repository_access_is_reviewed =
