@@ -1,8 +1,8 @@
 package io.openaev.engine.opensearch;
 
+import static io.openaev.engine.opensearch.OpenSearchUtils.*;
 import static io.openaev.utils.CustomDashboardQueryUtils.*;
 import static io.openaev.utils.CustomDashboardTimeRange.ALL_TIME;
-import static io.openaev.engine.opensearch.OpenSearchUtils.*;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
 

@@ -1,17 +1,15 @@
 package io.openaev.engine;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import io.openaev.config.EngineConfig;
 import io.openaev.database.repository.IndexingStatusRepository;
+import io.openaev.engine.es9.ElasticDriver;
+import io.openaev.engine.es9.ElasticService;
 import io.openaev.engine.facade.EngineService;
-import io.openaev.engine.es8.ElasticDriver;
-import io.openaev.engine.es8.ElasticService;
 import io.openaev.engine.opensearch.OpenSearchDriver;
 import io.openaev.engine.opensearch.OpenSearchService;
 import io.openaev.service.CommonSearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
@@ -63,20 +61,5 @@ public class EngineComponent {
           searchEngine, openSearchDriver, indexingStatusRepository, config, commonSearchService);
     }
     throw new IllegalStateException("engine selector not supported");
-  }
-
-  /**
-   * Publishes the Elasticsearch client built from the {@code engine.*} configuration. Spring Boot
-   * used to autoconfigure one from the legacy low-level client, wired from {@code
-   * spring.elasticsearch.*} and therefore pointing somewhere else entirely; the Rest5 transport
-   * carries no such autoconfiguration, and this platform has a single engine endpoint anyway.
-   */
-  @Bean
-  @ConditionalOnProperty(
-      name = "engine.engine-selector",
-      havingValue = "elk",
-      matchIfMissing = true)
-  public ElasticsearchClient elasticsearchClient(EngineService engine) {
-    return ((ElasticService) engine).getElasticClient();
   }
 }

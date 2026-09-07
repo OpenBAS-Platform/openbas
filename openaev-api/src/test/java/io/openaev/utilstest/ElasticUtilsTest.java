@@ -2,8 +2,8 @@ package io.openaev.utilstest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import io.openaev.engine.es9.ElasticUtils;
 import io.openaev.exception.InvalidDateRangeException;
-import io.openaev.engine.es8.ElasticUtils;
 import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

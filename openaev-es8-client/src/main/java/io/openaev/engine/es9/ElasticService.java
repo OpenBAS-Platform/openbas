@@ -1,7 +1,7 @@
 package io.openaev.engine.es9;
 
-import static io.openaev.utils.CustomDashboardQueryUtils.*;
 import static io.openaev.engine.es9.ElasticUtils.*;
+import static io.openaev.utils.CustomDashboardQueryUtils.*;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
 
