@@ -305,6 +305,10 @@ public class ExerciseApi extends RestBehavior {
       resourceType = ResourceType.SIMULATION)
   public Comcheck comcheck(
       TxCtx ctx, @PathVariable String exercise, @PathVariable String comcheck) {
+    return findComcheck(exercise, comcheck);
+  }
+
+  private Comcheck findComcheck(String exercise, String comcheck) {
     Specification<Comcheck> filters =
         ComcheckSpecification.fromExercise(exercise).and(ComcheckSpecification.id(comcheck));
     return comcheckRepository.findOne(filters).orElseThrow(ElementNotFoundException::new);
@@ -321,7 +325,7 @@ public class ExerciseApi extends RestBehavior {
       resourceType = ResourceType.SIMULATION)
   public List<ComcheckStatus> comcheckStatuses(
       TxCtx ctx, @PathVariable String exercise, @PathVariable String comcheck) {
-    return comcheck(ctx, exercise, comcheck).getComcheckStatus();
+    return findComcheck(exercise, comcheck).getComcheckStatus();
   }
 
   // endregion

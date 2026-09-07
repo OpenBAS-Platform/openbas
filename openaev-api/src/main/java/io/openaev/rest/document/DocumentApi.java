@@ -308,6 +308,10 @@ public class DocumentApi extends RestBehavior {
       resourceType = ResourceType.DOCUMENT)
   public ResponseEntity<InputStreamResource> downloadDocument(
       TxCtx ctx, @PathVariable String documentId) {
+    return buildDocumentDownloadResponse(documentId);
+  }
+
+  private ResponseEntity<InputStreamResource> buildDocumentDownloadResponse(String documentId) {
     Document document = documentService.document(documentId);
 
     String encodedFilename = DocumentService.encodeFileName(document.getName());
@@ -349,9 +353,9 @@ public class DocumentApi extends RestBehavior {
             .findById(assetId)
             .orElseThrow(() -> new ElementNotFoundException("Security platform not found"));
     if (theme.equals("dark") && securityPlatform.getLogoDark() != null) {
-      return downloadDocument(ctx, securityPlatform.getLogoDark().getId());
+      return buildDocumentDownloadResponse(securityPlatform.getLogoDark().getId());
     } else if (securityPlatform.getLogoLight() != null) {
-      return downloadDocument(ctx, securityPlatform.getLogoLight().getId());
+      return buildDocumentDownloadResponse(securityPlatform.getLogoLight().getId());
     } else {
       return downloadCollectorImage("openaev_fake_detector");
     }
@@ -378,9 +382,9 @@ public class DocumentApi extends RestBehavior {
     Channel channel = channelService.channel(channelId);
 
     if (theme.equals("dark") && channel.getLogoDark() != null) {
-      return downloadDocument(ctx, channel.getLogoDark().getId());
+      return buildDocumentDownloadResponse(channel.getLogoDark().getId());
     } else if (channel.getLogoLight() != null) {
-      return downloadDocument(ctx, channel.getLogoLight().getId());
+      return buildDocumentDownloadResponse(channel.getLogoLight().getId());
     } else {
       return downloadCollectorImage("openaev_fake_detector");
     }

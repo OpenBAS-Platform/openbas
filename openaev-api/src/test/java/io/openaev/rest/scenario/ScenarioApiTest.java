@@ -804,10 +804,6 @@ public class ScenarioApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.ACCESS_ASSESSMENT));
 
-      // Seeded directly (native insert), not through the create endpoint: creating under tenant
-      // X's path would set the tenant scope (TxCtx) to X on this test's wrapping transaction, and
-      // the read call below sets it to Y - the aspect refuses a scope change within one
-      // transaction (see TenantScopeTransactionAspect). Seeding bypasses that entirely.
       String scenarioId = UUID.randomUUID().toString();
       entityManager
           .createNativeQuery(
@@ -881,10 +877,6 @@ public class ScenarioApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.ACCESS_ASSESSMENT));
 
-      // Seeded directly (native insert), not through the create endpoint: creating under tenant
-      // X's path would set the tenant scope (TxCtx) to X on this test's wrapping transaction, and
-      // the search call below sets it to Y - the aspect refuses a scope change within one
-      // transaction (see TenantScopeTransactionAspect). Seeding bypasses that entirely.
       entityManager
           .createNativeQuery(
               "INSERT INTO scenarios (scenario_id, scenario_name, scenario_mail_from, tenant_id)"
@@ -929,10 +921,6 @@ public class ScenarioApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.MANAGE_ASSESSMENT, Capability.ACCESS_ASSESSMENT));
 
-      // Seeded directly (native insert), not through the create endpoint: creating under tenant
-      // X's path would set the tenant scope (TxCtx) to X on this test's wrapping transaction, and
-      // the update call below sets it to Y - the aspect refuses a scope change within one
-      // transaction (see TenantScopeTransactionAspect). Seeding bypasses that entirely.
       String scenarioId = UUID.randomUUID().toString();
       entityManager
           .createNativeQuery(
@@ -980,10 +968,6 @@ public class ScenarioApiTest extends IntegrationTest {
       ScenarioInput input = new ScenarioInput();
       input.setName("Delete Isolation Test Scenario");
 
-      // Seeded directly (native insert), not through the create endpoint: creating under tenant
-      // X's path would set the tenant scope (TxCtx) to X on this test's wrapping transaction, and
-      // the delete call below sets it to Y - the aspect refuses a scope change within one
-      // transaction (see TenantScopeTransactionAspect). Seeding bypasses that entirely.
       String scenarioId = UUID.randomUUID().toString();
       entityManager
           .createNativeQuery(
@@ -1022,10 +1006,6 @@ public class ScenarioApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.ACCESS_ASSESSMENT));
 
-      // Seeded directly (native insert), not through the create endpoint: creating under tenant
-      // X's path would set the tenant scope (TxCtx) to X on this test's wrapping transaction, and
-      // the search-by-id call below sets it to Y - the aspect refuses a scope change within one
-      // transaction (see TenantScopeTransactionAspect). Seeding bypasses that entirely.
       String scenarioId = UUID.randomUUID().toString();
       entityManager
           .createNativeQuery(
@@ -1098,11 +1078,6 @@ public class ScenarioApiTest extends IntegrationTest {
 
       String scenarioId = JsonPath.read(scenarioResponse, "$.scenario_id");
 
-      // Create team in tenant Y - seeded directly (native insert), not through the create
-      // endpoint: creating under tenant X's path already set the tenant scope (TxCtx) to X on
-      // this test's wrapping transaction, and createTeam under tenant Y would try to change it -
-      // the aspect refuses a scope change within one transaction (see
-      // TenantScopeTransactionAspect). Seeding bypasses that entirely.
       String teamId = UUID.randomUUID().toString();
       entityManager
           .createNativeQuery(
@@ -1181,11 +1156,6 @@ public class ScenarioApiTest extends IntegrationTest {
 
       String scenarioId = JsonPath.read(scenarioResponse, "$.scenario_id");
 
-      // Create team in tenant Y - seeded directly (native insert), not through the create
-      // endpoint: creating under tenant X's path already set the tenant scope (TxCtx) to X on
-      // this test's wrapping transaction, and createTeam under tenant Y would try to change it -
-      // the aspect refuses a scope change within one transaction (see
-      // TenantScopeTransactionAspect). Seeding bypasses that entirely.
       String teamId = UUID.randomUUID().toString();
       entityManager
           .createNativeQuery(
@@ -1264,11 +1234,6 @@ public class ScenarioApiTest extends IntegrationTest {
 
       String scenarioId = JsonPath.read(scenarioResponse, "$.scenario_id");
 
-      // Create team in tenant Y - seeded directly (native insert), not through the create
-      // endpoint: creating under tenant X's path already set the tenant scope (TxCtx) to X on
-      // this test's wrapping transaction, and createTeam under tenant Y would try to change it -
-      // the aspect refuses a scope change within one transaction (see
-      // TenantScopeTransactionAspect). Seeding bypasses that entirely.
       String teamId = UUID.randomUUID().toString();
       entityManager
           .createNativeQuery(
