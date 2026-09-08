@@ -113,22 +113,26 @@ public class WithMockUserTestExecutionListener extends AbstractTestExecutionList
     // mock user, so any endpoint that attributes a tenant for writes (TenantWriteScopeResolver)
     // fails closed with a 400, even though the test never cares about multi-tenancy. Tests that
     // need a different/explicit tenant membership can still call
-    // tenantRepository.addUserToTenant(...) themselves (idempotent, ON CONFLICT DO NOTHING).
+    // tenantRepository.addUserToTenant(...) themselves (idempotent, ON CONFLICT DO NOTHING), or opt
+    // out entirely via @WithMockUser(autoJoinDefaultTenant = false) when they assert behavior for a
+    // user with NO membership, or manage their own precise single-tenant membership set.
     //
     // The @Modifying membership insert needs an active transaction to execute at all (not just to
     // flush), but this listener also runs for test classes that are NOT @Transactional (e.g.
     // ImportExportMapperApiTest), where no test-managed transaction exists yet at this point. A
     // TransactionTemplate joins the current test transaction when one is active, or opens and
     // commits a short-lived one of its own otherwise, so this works for both kinds of test classes.
-    TenantRepository tenantRepository = ctx.getBean(TenantRepository.class);
-    TenantMembershipCacheManager tenantMembershipCacheManager =
-        ctx.getBean(TenantMembershipCacheManager.class);
-    PlatformTransactionManager transactionManager = ctx.getBean(PlatformTransactionManager.class);
-    new TransactionTemplate(transactionManager)
-        .executeWithoutResult(
-            status ->
-                tenantRepository.addUserToTenant(testUser.getId(), Tenant.DEFAULT_TENANT_UUID));
-    tenantMembershipCacheManager.evict(testUser.getId(), Tenant.DEFAULT_TENANT_UUID);
+    if (annotation.autoJoinDefaultTenant()) {
+      TenantRepository tenantRepository = ctx.getBean(TenantRepository.class);
+      TenantMembershipCacheManager tenantMembershipCacheManager =
+          ctx.getBean(TenantMembershipCacheManager.class);
+      PlatformTransactionManager transactionManager = ctx.getBean(PlatformTransactionManager.class);
+      new TransactionTemplate(transactionManager)
+          .executeWithoutResult(
+              status ->
+                  tenantRepository.addUserToTenant(testUser.getId(), Tenant.DEFAULT_TENANT_UUID));
+      tenantMembershipCacheManager.evict(testUser.getId(), Tenant.DEFAULT_TENANT_UUID);
+    }
 
     if (TransactionSynchronizationManager.isActualTransactionActive()) {
       entityManager.flush();
