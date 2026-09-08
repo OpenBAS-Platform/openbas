@@ -145,8 +145,7 @@ class ImportMapperActivationConfigTest {
             + active
             + "'");
   }
-}
-  
+
   @Test
   @DisplayName("openaev.tenant.active-tables in application.properties contains tags")
   void prodConfigActivatesTags() throws Exception {

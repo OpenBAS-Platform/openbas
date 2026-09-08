@@ -126,7 +126,8 @@ public class WithMockUserTestExecutionListener extends AbstractTestExecutionList
     PlatformTransactionManager transactionManager = ctx.getBean(PlatformTransactionManager.class);
     new TransactionTemplate(transactionManager)
         .executeWithoutResult(
-            status -> tenantRepository.addUserToTenant(testUser.getId(), Tenant.DEFAULT_TENANT_UUID));
+            status ->
+                tenantRepository.addUserToTenant(testUser.getId(), Tenant.DEFAULT_TENANT_UUID));
     tenantMembershipCacheManager.evict(testUser.getId(), Tenant.DEFAULT_TENANT_UUID);
 
     if (TransactionSynchronizationManager.isActualTransactionActive()) {
