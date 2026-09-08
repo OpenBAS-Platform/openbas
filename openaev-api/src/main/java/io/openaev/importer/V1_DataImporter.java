@@ -3325,11 +3325,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private String sanitizateStepData(
-      TxCtx ctx,
-      JsonNode dataJson,
-      String fallback,
-      Workflow workflow,
-      Map<String, Base> baseIds) {
+      TxCtx ctx, JsonNode dataJson, String fallback, Workflow workflow, Map<String, Base> baseIds) {
     if (!(dataJson instanceof ObjectNode dataObject) || workflow == null) {
       return fallback;
     }
@@ -3627,8 +3623,7 @@ public class V1_DataImporter implements Importer {
     }
     // importAttackPattern resolves both OBJECT entries (baseIds cache, external id, creation) and
     // SCALAR entries (baseIds cache, tenant-scoped existence check) — see its javadoc.
-    List<AttackPattern> resolvedAttackPatterns =
-        importAttackPattern(ctx, node, prefix, baseIds);
+    List<AttackPattern> resolvedAttackPatterns = importAttackPattern(ctx, node, prefix, baseIds);
     LinkedHashSet<String> ids = new LinkedHashSet<>();
     for (AttackPattern attackPattern : resolvedAttackPatterns) {
       if (attackPattern != null && attackPattern.getId() != null) {
