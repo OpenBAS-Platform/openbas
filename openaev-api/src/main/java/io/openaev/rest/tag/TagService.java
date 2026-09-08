@@ -36,7 +36,7 @@ public class TagService {
   // -- CREATE --
 
   public Tag createTag(TagCreateInput input) {
-    return createTag(input, null);
+    return createTag(input, (String) null);
   }
 
   public Tag createTag(TagCreateInput input, String tenantId) {
@@ -65,7 +65,7 @@ public class TagService {
   }
 
   public Tag upsertTag(TagCreateInput input) {
-    return upsertTag(input, null);
+    return upsertTag(input, (String) null);
   }
 
   public Tag upsertTag(TagCreateInput input, String tenantId) {
