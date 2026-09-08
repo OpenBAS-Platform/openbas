@@ -28,6 +28,7 @@ import io.openaev.xtmone.XtmOneConfig;
 import io.openaev.xtmone.XtmOneService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -132,7 +133,7 @@ class AttackPatternServiceTest {
     second.setId("internal-2");
     second.setExternalId("T1059");
 
-    when(attackPatternRepository.findAllByExternalIdInIgnoreCaseAndTenantId(anyList(), anyString()))
+    when(attackPatternRepository.findAllByExternalIdInIgnoreCase(anyList()))
         .thenReturn(List.of(first, second));
 
     // Act
@@ -162,7 +163,7 @@ class AttackPatternServiceTest {
     AttackPattern ap = new AttackPattern();
     ap.setId("internal-xtm-1");
     ap.setExternalId("T1003");
-    when(attackPatternRepository.findAllByExternalIdInIgnoreCaseAndTenantId(anyList(), anyString()))
+    when(attackPatternRepository.findAllByExternalIdInIgnoreCase(anyList()))
         .thenReturn(List.of(ap));
 
     // Act
@@ -193,7 +194,7 @@ class AttackPatternServiceTest {
     AttackPattern ap = new AttackPattern();
     ap.setId("internal-xtm-2");
     ap.setExternalId("T1059");
-    when(attackPatternRepository.findAllByExternalIdInIgnoreCaseAndTenantId(anyList(), anyString()))
+    when(attackPatternRepository.findAllByExternalIdInIgnoreCase(anyList()))
         .thenReturn(List.of(ap));
 
     // Act
@@ -254,7 +255,7 @@ class AttackPatternServiceTest {
     // Arrange
     AttackPattern found = new AttackPattern();
     found.setExternalId("T1003");
-    when(attackPatternRepository.findAllByExternalIdInIgnoreCaseAndTenantId(anyList(), anyString()))
+    when(attackPatternRepository.findAllByExternalIdInIgnoreCase(anyList()))
         .thenReturn(List.of(found));
 
     // Act / Assert
@@ -293,11 +294,11 @@ class AttackPatternServiceTest {
     input.setPlatforms(new String[] {"Windows"});
     input.setPermissionsRequired(new String[] {"Administrator"});
 
-    when(attackPatternRepository.findAllByExternalIdInIgnoreCaseAndTenantId(anyList(), anyString()))
-        .thenReturn(List.of(existing));
+    when(attackPatternRepository.findByExternalIdAndTenantId(anyString(), anyString()))
+        .thenReturn(Optional.of(existing));
 
     // Act
-    AttackPattern result = attackPatternService.findOrCreate(input);
+    AttackPattern result = attackPatternService.findOrCreate(input, "tenant-1");
 
     // Assert
     assertSame(existing, result);
@@ -316,15 +317,15 @@ class AttackPatternServiceTest {
     input.setPlatforms(new String[] {"Linux", "Windows"});
     input.setPermissionsRequired(new String[] {"User"});
 
-    when(attackPatternRepository.findAllByExternalIdInIgnoreCaseAndTenantId(anyList(), anyString()))
-        .thenReturn(new ArrayList<>());
+    when(attackPatternRepository.findByExternalIdAndTenantId(anyString(), anyString()))
+        .thenReturn(Optional.empty());
 
     AttackPattern saved = new AttackPattern();
     saved.setId("saved-id");
     when(attackPatternRepository.save(any(AttackPattern.class))).thenReturn(saved);
 
     // Act
-    AttackPattern result = attackPatternService.findOrCreate(input);
+    AttackPattern result = attackPatternService.findOrCreate(input, "tenant-1");
 
     // Assert
     ArgumentCaptor<AttackPattern> captor = ArgumentCaptor.forClass(AttackPattern.class);
@@ -337,7 +338,7 @@ class AttackPatternServiceTest {
     assertEquals("T1059", captured.getExternalId());
     assertArrayEquals(new String[] {"Linux", "Windows"}, captured.getPlatforms());
     assertArrayEquals(new String[] {"User"}, captured.getPermissionsRequired());
-    assertEquals(Tenant.DEFAULT_TENANT_UUID, captured.getTenant().getId());
+    assertEquals("tenant-1", captured.getTenant().getId());
     assertSame(saved, result);
   }
 }

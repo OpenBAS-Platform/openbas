@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -44,6 +45,20 @@ public class MitigationApi extends RestBehavior {
   private final AttackPatternRepository attackPatternRepository;
   private final TenantWriteScopeResolver writeScopeResolver;
 
+  /**
+   * Forces the LAZY {@code Mitigation#attackPatterns} association to load while the tenant scope
+   * (set from {@link TxCtx} by the transaction aspect) is still active. {@code Mitigation} is
+   * returned to Jackson as the raw entity, and {@code attackPatterns} is serialized through {@code
+   * MultiIdListSerializer}: with open-in-view, an uninitialized association resolves AFTER this
+   * method returns and the scope is gone, so once {@code attack_patterns} is tenant-active the
+   * fail-closed inspector would silently render it empty (the #7026 shape). Create/update/upsert
+   * already set the collection explicitly in memory and are exempt.
+   */
+  private static Mitigation withAttackPatternsInitialized(Mitigation mitigation) {
+    Hibernate.initialize(mitigation.getAttackPatterns());
+    return mitigation;
+  }
+
   // -- READ --
 
   @GetMapping
@@ -53,9 +68,12 @@ public class MitigationApi extends RestBehavior {
           true) // TODO: Mitigation API is not called anywhere yet (by us or opencti), so no RBAC
   // yet
   // TxCtx is resolved from the request and applied by the transaction aspect; it scopes this read
-  // to the caller's tenants. The handler does not use it directly.
+  // to the caller's tenants, and the attackPatterns association load in
+  // withAttackPatternsInitialized.
   public Iterable<Mitigation> mitigations(TxCtx ctx) {
-    return mitigationRepository.findAll();
+    return fromIterable(mitigationRepository.findAll()).stream()
+        .map(MitigationApi::withAttackPatternsInitialized)
+        .toList();
   }
 
   @PostMapping("/search")
@@ -64,14 +82,16 @@ public class MitigationApi extends RestBehavior {
       skipRBAC =
           true) // TODO: Mitigation API is not called anywhere yet (by us or opencti), so no RBAC
   // yet
-  // TxCtx scopes the search to the caller's tenants. The handler does not use it directly.
+  // TxCtx scopes the search to the caller's tenants, and the attackPatterns association load in
+  // withAttackPatternsInitialized.
   public Page<Mitigation> mitigations(
       TxCtx ctx, @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-        (Specification<Mitigation> specification, Pageable pageable) ->
-            this.mitigationRepository.findAll(specification, pageable),
-        searchPaginationInput,
-        Mitigation.class);
+            (Specification<Mitigation> specification, Pageable pageable) ->
+                this.mitigationRepository.findAll(specification, pageable),
+            searchPaginationInput,
+            Mitigation.class)
+        .map(MitigationApi::withAttackPatternsInitialized);
   }
 
   @GetMapping("/{mitigationId}")
@@ -80,9 +100,11 @@ public class MitigationApi extends RestBehavior {
       skipRBAC =
           true) // TODO: Mitigation API is not called anywhere yet (by us or opencti), so no RBAC
   // yet
-  // TxCtx scopes this read to the caller's tenants. The handler does not use it directly.
+  // TxCtx scopes this read to the caller's tenants, and the attackPatterns association load in
+  // withAttackPatternsInitialized.
   public Mitigation mitigation(TxCtx ctx, @PathVariable String mitigationId) {
-    return mitigationRepository.findById(mitigationId).orElseThrow(ElementNotFoundException::new);
+    return withAttackPatternsInitialized(
+        mitigationRepository.findById(mitigationId).orElseThrow(ElementNotFoundException::new));
   }
 
   @GetMapping("/{mitigationId}/attack_patterns")
