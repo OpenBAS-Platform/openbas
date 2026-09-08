@@ -455,6 +455,42 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.challenge.SimulationChallengeApi#exerciseChallenges",
           "io.openaev.rest.challenge.SimulationChallengeApi#observerChallenges",
           "io.openaev.rest.challenge.SimulationChallengeApi#playerChallenges");
+          // asset_groups activation (#6435). Every endpoint the Phase 1 inventory found
+          // reading the table, whether it returns asset groups or merely consumes them.
+          // The wiring itself came with #7781; listing them here is what stops a future
+          // change from removing a TxCtx that the activation depends on.
+          "io.openaev.api.chaining.WorkflowApi#findScopeAssetGroups",
+          "io.openaev.api.chaining.WorkflowApi#getScopeAssetGroups",
+          "io.openaev.rest.asset_group.AssetGroupApi#assetGroup",
+          "io.openaev.rest.asset_group.AssetGroupApi#assetGroups",
+          "io.openaev.rest.asset_group.AssetGroupApi#assetsFromAssetGroup",
+          "io.openaev.rest.asset_group.AssetGroupApi#bulkDeleteAssetGroups",
+          "io.openaev.rest.asset_group.AssetGroupApi#createAssetGroup",
+          "io.openaev.rest.asset_group.AssetGroupApi#deleteAssetGroup",
+          "io.openaev.rest.asset_group.AssetGroupApi#findAssetGroups",
+          "io.openaev.rest.asset_group.AssetGroupApi#optionsById",
+          "io.openaev.rest.asset_group.AssetGroupApi#optionsByName",
+          "io.openaev.rest.asset_group.AssetGroupApi#optionsByNameLinkedToFindings",
+          "io.openaev.rest.asset_group.AssetGroupApi#searchInjectsForAssetGroup",
+          "io.openaev.rest.asset_group.AssetGroupApi#updateAssetGroup",
+          "io.openaev.rest.asset_group.AssetGroupApi#updateAssetsOnAssetGroup",
+          "io.openaev.rest.atomic_testing.AtomicTestingApi#findAllAtomicTestings",
+          "io.openaev.rest.exercise.ExerciseApi#assetGroupsByIds",
+          "io.openaev.rest.finding.FindingApi#findingSummary",
+          "io.openaev.rest.finding.FindingSearchApi#findings",
+          "io.openaev.rest.finding.FindingSearchApi#findingsByEndpoint",
+          "io.openaev.rest.finding.FindingSearchApi#findingsByInject",
+          "io.openaev.rest.finding.FindingSearchApi#findingsByScenario",
+          "io.openaev.rest.finding.FindingSearchApi#findingsBySimulation",
+          "io.openaev.rest.organization.OrganizationApi#searchInjectsForOrganization",
+          "io.openaev.rest.scenario.ScenarioApi#assetGroupsByIds",
+          "io.openaev.rest.tag_rule.TagRuleApi#createTagRule",
+          "io.openaev.rest.tag_rule.TagRuleApi#findTagRule",
+          "io.openaev.rest.tag_rule.TagRuleApi#searchTagRules",
+          "io.openaev.rest.tag_rule.TagRuleApi#tags",
+          "io.openaev.rest.tag_rule.TagRuleApi#updateTagRule",
+          "io.openaev.rest.team.TeamApi#searchInjectsForTeam",
+          "io.openaev.rest.user.PlayerApi#searchInjectsForPlayer");
 
   @ArchTest
   static final ArchRule tx_scoped_entrypoints_must_declare_tx_ctx =

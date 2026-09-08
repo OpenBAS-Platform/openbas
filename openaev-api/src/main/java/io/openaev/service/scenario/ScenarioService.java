@@ -336,7 +336,7 @@ public class ScenarioService {
     joinMap.put("injects", injectsJoin);
     Join<Base, Base> injectorsContractsJoin = injectsJoin.join("injectorContract", JoinType.LEFT);
     joinMap.put("injects.injectorContract", injectorsContractsJoin);
-    Expression<String[]> platformExpression =
+    Expression<String[]> timeBasedPlatformExpression =
         cb.function("array_union_agg", String[].class, injectorsContractsJoin.get("platforms"));
 
     // Subquery for workflow_id
@@ -347,6 +347,14 @@ public class ScenarioService {
         .where(
             cb.equal(workflowRoot.get("scenario").get("id"), scenarioRoot.get("id")),
             cb.equal(workflowRoot.get("status"), WorkflowStatus.TEMPLATE));
+
+    Subquery<String[]> workflowPlatformsSubquery =
+        buildWorkflowPlatformsSubquery(cq, cb, scenarioRoot);
+
+    Expression<String[]> platformExpression =
+        cb.<String[]>selectCase()
+            .when(cb.isNotNull(workflowSubquery), workflowPlatformsSubquery)
+            .otherwise(timeBasedPlatformExpression);
 
     // SELECT
     cq.multiselect(
@@ -405,6 +413,63 @@ public class ScenarioService {
     Long total = countQuery(cb, this.entityManager, Scenario.class, specificationCount);
 
     return new PageImpl<>(scenarios, pageable, total);
+  }
+
+  private Subquery<String[]> buildWorkflowPlatformsSubquery(
+      CriteriaQuery<Tuple> cq, CriteriaBuilder cb, Root<Scenario> scenarioRoot) {
+    // Extract platforms from chained scenario step JSON data.
+    Subquery<String[]> workflowPlatformsSubquery = cq.subquery(String[].class);
+    Root<Workflow> workflowRoot = workflowPlatformsSubquery.from(Workflow.class);
+    Join<Workflow, Step> workflowStepsJoin = workflowRoot.join("steps", JoinType.LEFT);
+
+    Expression<String[]> workflowPlatformExpression =
+        buildWorkflowPlatformExpression(cb, workflowStepsJoin.get("data"));
+
+    workflowPlatformsSubquery
+        .select(cb.function("array_union_agg", String[].class, workflowPlatformExpression))
+        .where(
+            cb.equal(workflowRoot.get("scenario").get("id"), scenarioRoot.get("id")),
+            cb.equal(workflowRoot.get("status"), WorkflowStatus.TEMPLATE),
+            cb.equal(workflowStepsJoin.get("status"), StepStatus.TEMPLATE),
+            cb.isNull(workflowStepsJoin.get("stepTemplate")));
+
+    return workflowPlatformsSubquery;
+  }
+
+  private Expression<String[]> buildWorkflowPlatformExpression(
+      CriteriaBuilder cb, Path<?> stepDataPath) {
+    // Step data stores injector contract platforms as JSON, so normalize the JSON array text and
+    // convert it back into a SQL text[] that array_union_agg can consume.
+    Expression<String> platformsText = extractWorkflowPlatformsText(cb, stepDataPath);
+    Expression<String> normalizedText = normalizeJsonArrayText(cb, platformsText);
+    return commaSeparatedTextToArray(cb, normalizedText);
+  }
+
+  private Expression<String> extractWorkflowPlatformsText(
+      CriteriaBuilder cb, Path<?> stepDataPath) {
+    return cb.function(
+        "jsonb_extract_path_text",
+        String.class,
+        stepDataPath,
+        cb.literal("inject_injector_contract"),
+        cb.literal("injector_contract_platforms"));
+  }
+
+  private Expression<String> normalizeJsonArrayText(
+      CriteriaBuilder cb, Expression<String> jsonArrayText) {
+    Expression<String> withoutQuotes =
+        cb.function("replace", String.class, jsonArrayText, cb.literal("\""), cb.literal(""));
+    Expression<String> withoutOpenBracket =
+        cb.function("replace", String.class, withoutQuotes, cb.literal("["), cb.literal(""));
+    Expression<String> withoutCloseBracket =
+        cb.function("replace", String.class, withoutOpenBracket, cb.literal("]"), cb.literal(""));
+    return cb.function(
+        "replace", String.class, withoutCloseBracket, cb.literal(", "), cb.literal(","));
+  }
+
+  private Expression<String[]> commaSeparatedTextToArray(
+      CriteriaBuilder cb, Expression<String> csvPlatforms) {
+    return cb.function("string_to_array", String[].class, csvPlatforms, cb.literal(","));
   }
 
   public void throwIfScenarioNotLaunchable(Scenario scenario) {
