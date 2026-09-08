@@ -73,6 +73,14 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.mitigation.MitigationApi#updateMitigation",
           "io.openaev.rest.mitigation.MitigationApi#upsertMitigation",
           "io.openaev.rest.mitigation.MitigationApi#deleteMitigation",
+          // tags (v2)
+          "io.openaev.rest.tag.TagApi#createTag",
+          "io.openaev.rest.tag.TagApi#upsertTag",
+          "io.openaev.rest.tag.TagApi#tags",
+          "io.openaev.rest.tag.TagApi#updateTag",
+          "io.openaev.rest.tag.TagApi#deleteTag",
+          "io.openaev.rest.tag.TagApi#optionsByName",
+          "io.openaev.rest.tag.TagApi#optionsById",
           // attackpath_execution / attackpath_finding (v2): every read of the projection, including
           // the delta cursor added with the real-time updates (#6647, spec 002). Losing the TxCtx
           // on

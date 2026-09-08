@@ -78,6 +78,20 @@ class TagHttpIsolationTest extends IntegrationTest {
   }
 
   @Test
+  @DisplayName("header selector on /api/tags returns only rows in the selected tenant")
+  void headerSelectorOnBasePathScopesRead() throws Exception {
+    String response =
+        mvc.perform(get("/api/tags").header("X-Tenant-Ids", tenantA))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    assertTrue(response.contains(tagA), "A's tag must appear when tenant A is selected");
+    assertFalse(response.contains(tagB), "B's tag must not appear when tenant A is selected");
+  }
+
+  @Test
   @DisplayName("a create under tenant A's path is attributed to tenant A")
   void createUnderTenantAIsAttributedToA() throws Exception {
     TagCreateInput input = new TagCreateInput();
