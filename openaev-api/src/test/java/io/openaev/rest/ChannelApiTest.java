@@ -83,6 +83,7 @@ class ChannelApiTest extends IntegrationTest {
 
     Channel channel = new Channel();
     channel.setName("A channel");
+    channel.setTenant(new Tenant(Tenant.DEFAULT_TENANT_UUID));
     channel = this.channelRepository.save(channel);
     CHANNEL_ID = channel.getId();
 
