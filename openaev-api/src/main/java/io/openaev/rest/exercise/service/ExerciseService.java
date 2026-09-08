@@ -4,6 +4,7 @@ import static io.openaev.config.SessionHelper.currentUser;
 import static io.openaev.database.criteria.GenericCriteria.countQuery;
 import static io.openaev.database.model.Grant.GRANT_RESOURCE_TYPE.SIMULATION;
 import static io.openaev.database.specification.ExerciseSpecification.*;
+import static io.openaev.database.specification.TeamSpecification.fromExercise;
 import static io.openaev.database.specification.TeamSpecification.fromIds;
 import static io.openaev.helper.MailHelper.resolveFromName;
 import static io.openaev.helper.StreamHelper.fromIterable;
@@ -60,6 +61,7 @@ import io.openaev.service.attackpath.ingestion.AttackPathExecutionIngestionServi
 import io.openaev.service.chaining.StepService;
 import io.openaev.service.chaining.WorkflowService;
 import io.openaev.service.scenario.ScenarioRecurrenceService;
+import io.openaev.service.scenario.ScenarioService;
 import io.openaev.service.utils.BulkDeleteExecutor;
 import io.openaev.telemetry.metric_collectors.ActionMetricCollector;
 import io.openaev.utils.FilterUtilsJpa;
@@ -120,6 +122,7 @@ public class ExerciseService {
   private final UserService userService;
   private final GrantService grantService;
   private final ExerciseTeamUserService exerciseTeamUserService;
+  private final ScenarioService scenarioService;
 
   private final ExerciseMapper exerciseMapper;
   private final InjectMapper injectMapper;
@@ -246,6 +249,15 @@ public class ExerciseService {
             ? exerciseRepository.rawByExerciseIds(exerciseIds)
             : exerciseRepository.rawGrantedByExerciseIds(currentUser().getId(), exerciseIds);
     return exerciseMapper.getExerciseSimples(exercises);
+  }
+
+  @Transactional(readOnly = true)
+  public List<TeamOutput> getExerciseTeams(@NotBlank final String exerciseId) {
+    if (workflowService.isSimulationChaining(exerciseId)) {
+      return scenarioService.getScenarioTeams(
+          scenarioService.scenarioFromSimulationId(exerciseId).getId());
+    }
+    return teamService.find(fromExercise(exerciseId));
   }
 
   // -- UPDATE --
