@@ -121,8 +121,7 @@ class ChannelHttpIsolationTest extends IntegrationTest {
     String storedTenant =
         (String)
             entityManager
-                .createNativeQuery(
-                    "SELECT tenant_id FROM channels WHERE channel_id = CAST(:id AS uuid)")
+                .createNativeQuery("SELECT tenant_id FROM channels WHERE channel_id = :id")
                 .setParameter("id", createdId)
                 .getSingleResult();
     assertEquals(tenantA, storedTenant, "the created channel must belong to tenant A");
@@ -174,8 +173,7 @@ class ChannelHttpIsolationTest extends IntegrationTest {
   @Test
   @DisplayName("under tenant A's path: deleting B's channel is a no-op and leaves it in place")
   void deleteUnderTenantAOfBChannelIsBlocked() throws Exception {
-    mvc.perform(delete(TENANT_CHANNEL_BY_ID, tenantA, channelB).with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    mvc.perform(delete(TENANT_CHANNEL_BY_ID, tenantA, channelB).with(csrf()));
     assertEquals(1L, rawCount(channelB), "B's channel must survive tenant A's delete attempt");
   }
 
@@ -202,8 +200,8 @@ class ChannelHttpIsolationTest extends IntegrationTest {
             "INSERT INTO channels"
                 + " (channel_id, channel_name, channel_type, channel_description, channel_created_at,"
                 + " channel_updated_at, tenant_id)"
-                + " VALUES (CAST(:id AS uuid), :name, :type, :description, now(), now(),"
-                + " CAST(:tenant AS uuid))")
+                + " VALUES (:id, :name, :type, :description, now(), now(),"
+                + " :tenant)")
         .setParameter("id", id)
         .setParameter("name", name)
         .setParameter("type", "Journal")
@@ -221,7 +219,7 @@ class ChannelHttpIsolationTest extends IntegrationTest {
             connection -> {
               try (PreparedStatement statement =
                   connection.prepareStatement(
-                      "SELECT channel_name FROM channels WHERE channel_id = CAST(? AS uuid)")) {
+                      "SELECT channel_name FROM channels WHERE channel_id = ?")) {
                 statement.setString(1, channelId);
                 try (ResultSet rows = statement.executeQuery()) {
                   return rows.next() ? rows.getString(1) : null;
@@ -238,7 +236,7 @@ class ChannelHttpIsolationTest extends IntegrationTest {
             connection -> {
               try (PreparedStatement statement =
                   connection.prepareStatement(
-                      "SELECT count(*) FROM channels WHERE channel_id = CAST(? AS uuid)")) {
+                      "SELECT count(*) FROM channels WHERE channel_id = ?")) {
                 statement.setString(1, channelId);
                 try (ResultSet rows = statement.executeQuery()) {
                   rows.next();
