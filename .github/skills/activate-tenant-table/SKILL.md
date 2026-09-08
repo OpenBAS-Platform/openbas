@@ -103,13 +103,16 @@ incident. Do not trade them away to make a test pass.
 ## Baseline: controller entrypoints already carry `TxCtx`
 
 Every `@Transactional` method under `io.openaev.api/**` and
-`io.openaev.rest/**` already declares a bare `TxCtx ctx` parameter, added in
-one pass across every already-`@Transactional` controller endpoint in the
-codebase. This is safe by construction — a `TxCtx` parameter is inert until
-the table it touches is added to `active-tables` — and it changes what a
-single-table activation needs to do:
+`io.openaev.rest/**` declares a bare `TxCtx ctx` parameter, added in one pass
+across the codebase, with five deliberate exclusions that carry
+`@NoTenantScope` instead: `UserApi.login`, `UserApi.passwordReset`,
+`UserApi.changePasswordReset` and `UserApi.validatePasswordResetToken`
+(permitAll, pre-auth), and `StreamApi.streamFlux` (`propagation = NEVER`, so
+there is no transaction to scope). That changes what a single-table
+activation needs to do:
 
-- **Phase 1 no longer hunts for missing `TxCtx` on controller entrypoints.**
+- **Phase 1 no longer hunts exhaustively for missing `TxCtx` on controller
+  entrypoints**, though it still spot-checks the ones it needs (see below).
   That search (the biggest source of the regressions cited throughout this
   skill — #6409, #6410, #7026, #7605/#7621) is done, once, for the whole
   codebase. Phase 1 is now scoped to what the blanket wiring does NOT cover:
@@ -117,9 +120,15 @@ single-table activation needs to do:
   shapes, and OSIV/lazy-serialization sinks (Phase 3b) — a `TxCtx` parameter
   on a method signature does not by itself fix a lazy association or computed
   getter resolved by Jackson AFTER the transaction has already closed.
-- **This is a point-in-time fact, not a self-enforcing invariant**, until a
-  codebase-wide ArchUnit rule requires `TxCtx` on every `@Transactional`
-  controller method (tracked as a follow-up). A NEW controller endpoint added
+- **A `TxCtx` parameter is not inert.** It resolves a scope and sets it on the
+  transaction whether or not the table it touches is active, and
+  `TenantScopeTransactionAspect` throws when a nested `@Transactional` method
+  tries to redefine a scope already set in the same transaction. Adding or
+  removing one is a behaviour change, not a signature change: assume it can
+  break a caller, and re-run the suite.
+- **This is a point-in-time fact, not a self-enforcing invariant**, until the
+  default-secure compile rule (`EndpointTxScopeRule`, #7726) is enabled for
+  `openaev-api`; it currently ships disabled. A NEW controller endpoint added
   after this baseline, or one that was not yet `@Transactional` at the time,
   may still be missing it — spot-check the entrypoints this activation
   actually needs (Phase 1) rather than assuming.
