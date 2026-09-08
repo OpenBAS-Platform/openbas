@@ -440,32 +440,36 @@ public class ScenarioService {
       CriteriaBuilder cb, Path<?> stepDataPath) {
     // Step data stores injector contract platforms as JSON, so normalize the JSON array text and
     // convert it back into a SQL text[] that array_union_agg can consume.
+    Expression<String> platformsText = extractWorkflowPlatformsText(cb, stepDataPath);
+    Expression<String> normalizedText = normalizeJsonArrayText(cb, platformsText);
+    return commaSeparatedTextToArray(cb, normalizedText);
+  }
+
+  private Expression<String> extractWorkflowPlatformsText(
+      CriteriaBuilder cb, Path<?> stepDataPath) {
     return cb.function(
-        "string_to_array",
-        String[].class,
-        cb.function(
-            "replace",
-            String.class,
-            cb.function(
-                "replace",
-                String.class,
-                cb.function(
-                    "replace",
-                    String.class,
-                    cb.function(
-                        "jsonb_extract_path_text",
-                        String.class,
-                        stepDataPath,
-                        cb.literal("inject_injector_contract"),
-                        cb.literal("injector_contract_platforms")),
-                    cb.literal("\""),
-                    cb.literal("")),
-                cb.literal("["),
-                cb.literal("")),
-            cb.literal("]"),
-            cb.literal("")),
-        cb.literal(", "),
-        cb.literal(","));
+        "jsonb_extract_path_text",
+        String.class,
+        stepDataPath,
+        cb.literal("inject_injector_contract"),
+        cb.literal("injector_contract_platforms"));
+  }
+
+  private Expression<String> normalizeJsonArrayText(
+      CriteriaBuilder cb, Expression<String> jsonArrayText) {
+    Expression<String> withoutQuotes =
+        cb.function("replace", String.class, jsonArrayText, cb.literal("\""), cb.literal(""));
+    Expression<String> withoutOpenBracket =
+        cb.function("replace", String.class, withoutQuotes, cb.literal("["), cb.literal(""));
+    Expression<String> withoutCloseBracket =
+        cb.function("replace", String.class, withoutOpenBracket, cb.literal("]"), cb.literal(""));
+    return cb.function(
+        "replace", String.class, withoutCloseBracket, cb.literal(", "), cb.literal(","));
+  }
+
+  private Expression<String[]> commaSeparatedTextToArray(
+      CriteriaBuilder cb, Expression<String> csvPlatforms) {
+    return cb.function("string_to_array", String[].class, csvPlatforms, cb.literal(","));
   }
 
   public void throwIfScenarioNotLaunchable(Scenario scenario) {
