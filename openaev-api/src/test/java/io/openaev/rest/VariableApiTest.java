@@ -466,15 +466,28 @@ public class VariableApiTest extends IntegrationTest {
     @DisplayName("Selecting a tenant the caller does not belong to is forbidden")
     @Transactional
     void selectingForeignTenantIsForbidden() throws Exception {
-      String memberTenant = tenantIsolationHelper.createTenantWithCurrentUser("member-tenant").getId();
+      String memberTenant =
+          tenantIsolationHelper.createTenantWithCurrentUser("member-tenant").getId();
       String foreignTenant =
           tenantRepository.save(TenantFixture.getTenant("foreign-" + UUID.randomUUID())).getId();
 
-      mvc.perform(get("/api/tenants/" + foreignTenant + "/scenarios/" + UUID.randomUUID() + "/variables"))
+      mvc.perform(
+              get(
+                  "/api/tenants/"
+                      + foreignTenant
+                      + "/scenarios/"
+                      + UUID.randomUUID()
+                      + "/variables"))
           .andExpect(status().isForbidden())
           .andExpect(content().string(containsString("TENANT_ACCESS_DENIED")));
 
-      mvc.perform(get("/api/tenants/" + memberTenant + "/scenarios/" + UUID.randomUUID() + "/variables"))
+      mvc.perform(
+              get(
+                  "/api/tenants/"
+                      + memberTenant
+                      + "/scenarios/"
+                      + UUID.randomUUID()
+                      + "/variables"))
           .andExpect(content().string(not(containsString("TENANT_ACCESS_DENIED"))));
     }
   }
