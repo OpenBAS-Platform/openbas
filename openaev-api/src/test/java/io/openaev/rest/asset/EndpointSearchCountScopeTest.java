@@ -10,6 +10,7 @@ import com.jayway.jsonpath.JsonPath;
 import io.openaev.IntegrationTest;
 import io.openaev.context.TenantScopedTransaction;
 import io.openaev.context.TxCtx;
+import io.openaev.database.model.Capability;
 import io.openaev.database.model.Endpoint;
 import io.openaev.service.EndpointService;
 import io.openaev.utils.TenantIsolationTestHelper;
@@ -29,21 +30,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * A paginated search issues two queries: the data page and a separate count. Spring Data builds the
- * count itself, and the two do not necessarily present the same shape to {@code
- * TenantStatementInspector}.
+ * A paginated search issues two queries, the data page and a separate count, and both must be
+ * filtered. A filtered page with an unfiltered count is worse than an outright leak: the list looks
+ * correctly empty while the number beside it says another tenant has rows.
  *
- * <p>That matters because {@code totalElements} is what the UI shows and what {@code
- * EndpointApiTest}'s cross-tenant assertion reads. A filtered page with an unfiltered count is
- * worse than an outright leak: the list looks correctly empty while the number next to it says
- * another tenant has rows.
- *
- * <p>Both halves are asserted separately here, on purpose. Asserting only the page would pass
- * through exactly this defect.
+ * <p>Each half is asserted separately, and a third case runs the same SQL with no scope to prove
+ * the inspector is actually firing. Without that third case the two green assertions would also
+ * pass in a context where the table is not active, which is exactly how EndpointApiTest's
+ * cross-tenant tests stayed green while isolating nothing (#6438).
  */
 @Transactional
 @TestPropertySource(properties = "openaev.tenant.active-tables=assets")
-@WithMockUser(isAdmin = true)
+@WithMockUser
 @DisplayName("a paginated endpoint search filters its count, not just its page")
 class EndpointSearchCountScopeTest extends IntegrationTest {
 
@@ -59,19 +57,31 @@ class EndpointSearchCountScopeTest extends IntegrationTest {
 
   @BeforeEach
   void seedOneEndpointInTenantA() throws Exception {
-    tenantA = tenantHelper.createTenantWithCurrentUser("count-a-" + UUID.randomUUID()).getId();
-    tenantB = tenantHelper.createTenantWithCurrentUser("count-b-" + UUID.randomUUID()).getId();
-    String id = UUID.randomUUID().toString();
-    entityManager
-        .createNativeQuery(
-            "INSERT INTO assets (asset_id, asset_name, asset_type, asset_created_at,"
-                + " asset_updated_at, tenant_id, asset_hostname, endpoint_platform, endpoint_arch)"
-                + " VALUES (:id, :name, 'Endpoint', now(), now(), :tenantId, :name, 'Linux',"
-                + " 'x86_64')")
-        .setParameter("id", id)
-        .setParameter("name", NAME)
-        .setParameter("tenantId", tenantA)
-        .executeUpdate();
+    // Tenants built through the capability chain rather than plain membership, so the caller is a
+    // realistic non-admin holding real grants in both.
+    tenantA =
+        tenantHelper
+            .createTenantWithCapabilities(
+                "count-a-" + UUID.randomUUID(),
+                java.util.Set.of(Capability.MANAGE_ASSETS, Capability.ACCESS_ASSETS))
+            .getId();
+    tenantB =
+        tenantHelper
+            .createTenantWithCapabilities(
+                "count-b-" + UUID.randomUUID(), java.util.Set.of(Capability.ACCESS_ASSETS))
+            .getId();
+    // Created through the HTTP tenant path rather than seeded in SQL, so the same route production
+    // uses is what attributes the row.
+    io.openaev.database.model.Endpoint input =
+        io.openaev.utils.fixtures.EndpointFixture.createEndpoint();
+    input.setName(NAME);
+    input.setHostname(NAME);
+    mvc.perform(
+            post("/api/tenants/{tenantId}/endpoints/agentless", tenantA)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(input))
+                .with(csrf()))
+        .andExpect(status().is2xxSuccessful());
     entityManager.flush();
     entityManager.clear();
   }
@@ -99,6 +109,13 @@ class EndpointSearchCountScopeTest extends IntegrationTest {
   @Test
   @DisplayName("through HTTP under tenant B: totalElements must be zero too")
   void httpSearchUnderOtherTenantCountsZero() throws Exception {
+    // Commit the seed and search in a fresh transaction: a scope carried over from the create would
+    // make the assertion pass for the wrong reason.
+    entityManager.flush();
+    entityManager.clear();
+    org.springframework.test.context.transaction.TestTransaction.flagForCommit();
+    org.springframework.test.context.transaction.TestTransaction.end();
+    org.springframework.test.context.transaction.TestTransaction.start();
     // The combination neither existing test covered: the HTTP route AND the count.
     // AssetHttpIsolationTest
     // goes through HTTP but asserts on the body, and the two cases above assert the count but set
@@ -106,7 +123,9 @@ class EndpointSearchCountScopeTest extends IntegrationTest {
     // scope directly. EndpointApiTest fails exactly here.
     String body =
         mvc.perform(
-                post("/api/tenants/{tenantId}/endpoints/search", tenantB)
+                // Concatenated URI, not a template: the tenant selector must come from the
+                // resolved path variable, not from the builder's URI template.
+                post("/api/tenants/" + tenantB + "/endpoints/search")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(asJsonString(PaginationFixture.simpleTextSearch(NAME)))
                     .with(csrf()))

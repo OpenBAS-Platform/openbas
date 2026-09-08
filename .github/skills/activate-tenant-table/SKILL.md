@@ -267,6 +267,40 @@ Classify every hit:
 - background writer → convert to the primitive in Phase 5b. If you are not
   converting it in this run, it is a blocker: stop and report (Phase 0)
 
+#### Removing the v1 `@Filter` silently disarms every isolation test that does not activate the table
+
+The test profile declares no `openaev.tenant.active-tables`, so the inspector never fires in a test
+context unless that context sets it. Every isolation test therefore needs
+`@TestPropertySource(properties = "openaev.tenant.active-tables={table}")`, which the RED phase
+above already tells you to write.
+
+The trap is the other direction, and it is about tests you did NOT write. A suite that asserted this
+table's isolation **before** the activation was relying on the v1 `@Filter`. Removing that filter
+takes its isolation away, and because the inspector is not active in its context either, the
+assertions keep running against nothing. They do not fail loudly: a cross-tenant read simply starts
+returning the other tenant's rows, and only an assertion precise enough to notice will catch it.
+
+That is what happened on the `assets` activation (#6438). `EndpointApiTest`'s `TenantIsolation`
+nested class had four cross-tenant tests and no `@TestPropertySource`. Removing `Asset`'s `@Filter`
+turned one of them red (`given_endpointInTenantX_should_notAppearInTenantYSearch` returned tenant X's
+endpoint to a search under tenant Y) while the other three stayed green **without isolating
+anything**. Attribution was correct throughout; only the read was unprotected.
+
+Find them before go-live:
+
+```bash
+# test classes that assert something about this table's isolation, and whether they activate it
+grep -rln "{Entity}\|{table}" openaev-api/src/test --include="*.java"   | xargs grep -ln "Tenant\|tenant"   | xargs grep -Ln "TestPropertySource"
+```
+
+Read every hit. A class that asserts cross-tenant behaviour and does not set `active-tables` is
+either proving nothing or about to break.
+
+**Put the annotation on the outermost test class, not on a `@Nested` one.** A `@TestPropertySource`
+on a nested class builds a second Spring context, and the mock user provisioned by
+`WithMockUserTestExecutionListener` lives in the parent's `TestUserHolder`; the nested context gets
+an empty one and every test fails on "The given id must not be null" before reaching its assertion.
+
 #### GROUP BY on a wrapped table: valid SQL before activation, a 500 after
 
 The inspector rewrites `FROM {table} t` into
