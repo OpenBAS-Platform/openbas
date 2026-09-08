@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.UuidGenerator;
 
 @Getter
@@ -26,7 +25,10 @@ import org.hibernate.annotations.UuidGenerator;
 @Entity
 @Table(name = "channels")
 @EntityListeners({ModelBaseListener.class, TenantBaseListener.class})
-@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
+// channels is fully on v2 tenant isolation (TenantStatementInspector + can_access_tenant).
+// The v1 @Filter must not come back: it would AND its thread-local predicate with the v2 scope and
+// silently empty header-routed reads. TenantBaseListener stays as an inert fallback because every
+// reviewed write path now sets tenant explicitly before save.
 public class Channel implements TenantBase {
 
   @Id
