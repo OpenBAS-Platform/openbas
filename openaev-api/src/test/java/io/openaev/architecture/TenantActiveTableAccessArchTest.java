@@ -9,6 +9,7 @@ import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 import io.openaev.api.chaining.InjectExecutionStep;
+import io.openaev.database.model.AttackPattern;
 import io.openaev.database.model.CatalogConnector;
 import io.openaev.database.model.Exercise;
 import io.openaev.database.model.Inject;
@@ -20,9 +21,11 @@ import io.openaev.database.model.attackpath.AttackPathExecution;
 import io.openaev.database.repository.CollectorRepository;
 import io.openaev.database.repository.ConnectorInstanceRepository;
 import io.openaev.database.repository.CweRepository;
+import io.openaev.database.repository.DomainRepository;
 import io.openaev.database.repository.ExecutorRepository;
 import io.openaev.database.repository.ImportMapperRepository;
 import io.openaev.database.repository.InjectorRepository;
+import io.openaev.database.repository.KillChainPhaseRepository;
 import io.openaev.database.repository.LessonsTemplateRepository;
 import io.openaev.database.repository.MitigationRepository;
 import io.openaev.database.repository.SecurityCoverageRepository;
@@ -31,6 +34,7 @@ import io.openaev.database.repository.attackpath.AttackPathFindingRepository;
 import io.openaev.database.repository.autonomous.AutonomousDirectiveRepository;
 import io.openaev.database.repository.autonomous.AutonomousEventRepository;
 import io.openaev.database.repository.autonomous.AutonomousRunRepository;
+import io.openaev.engine.model.securitydomain.SecurityDomainHandler;
 import io.openaev.executors.Executor;
 import io.openaev.executors.ExecutorService;
 import io.openaev.executors.caldera.service.CalderaExecutorContextService;
@@ -40,7 +44,10 @@ import io.openaev.executors.openaev.service.OpenAEVExecutorContextService;
 import io.openaev.executors.paloaltocortex.service.PaloAltoCortexExecutorContextService;
 import io.openaev.executors.sentinelone.service.SentinelOneExecutorContextService;
 import io.openaev.executors.tanium.service.TaniumExecutorContextService;
+import io.openaev.export.WorkflowExportInitializer;
 import io.openaev.healthcheck.utils.HealthCheckUtils;
+import io.openaev.helper.InjectHelper;
+import io.openaev.importer.V1_DataImporter;
 import io.openaev.injectors.phishing.service.PhishingLandingPageService;
 import io.openaev.integration.ManagerFactory;
 import io.openaev.integration.migration.ConfigurationMigration;
@@ -49,9 +56,13 @@ import io.openaev.processor.datapack.V20260330_Default_tenant_data;
 import io.openaev.processor.datapack.V20260708_Dynamic_injectors_base_url;
 import io.openaev.rest.asset.security_platforms.SecurityPlatformApi;
 import io.openaev.rest.atomic_testing.AtomicTestingApi;
+import io.openaev.rest.attack_pattern.AttackPatternApi;
+import io.openaev.rest.attack_pattern.service.AttackPatternService;
 import io.openaev.rest.collector.CollectorApi;
 import io.openaev.rest.collector.service.CollectorService;
 import io.openaev.rest.connector_instance.ConnectorInstanceApi;
+import io.openaev.rest.domain.DomainApi;
+import io.openaev.rest.domain.DomainService;
 import io.openaev.rest.executor.ExecutorApi;
 import io.openaev.rest.exercise.ExerciseApi;
 import io.openaev.rest.exercise.ExerciseImportApi;
@@ -66,6 +77,9 @@ import io.openaev.rest.injector.InjectorApi;
 import io.openaev.rest.injector_contract.InjectorContractApi;
 import io.openaev.rest.injector_contract.InjectorContractService;
 import io.openaev.rest.injector_contract.output.InjectorContractFullOutput;
+import io.openaev.rest.kill_chain_phase.KillChainPhaseApi;
+import io.openaev.rest.kill_chain_phase.KillChainPhaseInitializer;
+import io.openaev.rest.kill_chain_phase.service.KillChainPhaseService;
 import io.openaev.rest.lessons.ExerciseLessonsApi;
 import io.openaev.rest.lessons.ScenarioLessonsApi;
 import io.openaev.rest.lessons_template.LessonsTemplateApi;
@@ -73,12 +87,14 @@ import io.openaev.rest.mapper.MapperApi;
 import io.openaev.rest.mitigation.MitigationApi;
 import io.openaev.rest.payload.PayloadApi;
 import io.openaev.rest.payload.service.PayloadService;
+import io.openaev.rest.payload.service.PayloadUpdateService;
 import io.openaev.rest.payload.service.PayloadUpsertService;
 import io.openaev.rest.scenario.ScenarioApi;
 import io.openaev.rest.scenario.ScenarioImportApi;
 import io.openaev.rest.vulnerability.service.VulnerabilityService;
 import io.openaev.scheduler.jobs.ComchecksExecutionJob;
 import io.openaev.service.EndpointService;
+import io.openaev.service.EsAttackPathService;
 import io.openaev.service.InjectExpectationTraceService;
 import io.openaev.service.InjectImportService;
 import io.openaev.service.InjectTestStatusService;
@@ -108,13 +124,18 @@ import io.openaev.telemetry.metric_collectors.InventoryMetricCollector;
 import io.openaev.telemetry.metric_collectors.ProductInventoryMetricCollector;
 import io.openaev.utils.ExpectationUtils;
 import io.openaev.utils.InjectUtils;
+import io.openaev.utils.mapper.InjectMapper;
 import io.openaev.utils.mapper.VulnerabilityMapper;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  * Interim guard for the activation blind spot: once a table is in {@code
@@ -149,6 +170,7 @@ class TenantActiveTableAccessArchTest {
           "collectors",
           "executors",
           "injectors",
+          "domains",
           "attackpath_execution",
           "attackpath_finding",
           "secret_references",
@@ -157,7 +179,9 @@ class TenantActiveTableAccessArchTest {
           "autonomous_runs",
           "autonomous_events",
           "autonomous_directives",
-          "security_coverages");
+          "kill_chain_phases",
+          "security_coverages",
+          "asset_groups");
 
   @ArchTest
   static void every_active_table_is_guarded(JavaClasses classes) throws Exception {
@@ -176,6 +200,40 @@ class TenantActiveTableAccessArchTest {
             + active.stream().filter(t -> !GUARDED_TABLES.contains(t)).collect(Collectors.toSet())
             + ". Extend the repository/accessor rules and the allowlists (see the"
             + " activate-tenant-table skill, go-live phase).");
+  }
+
+  /**
+   * Repositories whose joined {@code @Query} methods have been reviewed for tenant correlation.
+   * Other tenant-active repositories join this set as their queries are reviewed; the known backlog
+   * is {@code AttackPathFindingRepository} (7 joined queries, none correlated).
+   */
+  private static final Set<Class<?>> REPOSITORIES_WITH_REVIEWED_JOINED_QUERIES =
+      Set.of(KillChainPhaseRepository.class);
+
+  @ArchTest
+  static void joined_queries_on_active_tables_correlate_the_tenant(JavaClasses classes) {
+    // A single-table @Query needs no predicate: the inspector's can_access_tenant is the whole
+    // scoping story. A JOIN reaches rows the caller did not name, and the scope can be wider than
+    // the tenant that owns them, so the query must correlate the two itself.
+    List<String> uncorrelated = new ArrayList<>();
+    for (Class<?> repository : REPOSITORIES_WITH_REVIEWED_JOINED_QUERIES) {
+      for (Method method : repository.getDeclaredMethods()) {
+        Query query = method.getAnnotation(Query.class);
+        if (query == null) {
+          continue;
+        }
+        String normalized = query.value().toLowerCase();
+        if (normalized.contains(" join ") && !normalized.contains("tenant")) {
+          uncorrelated.add(repository.getSimpleName() + "#" + method.getName());
+        }
+      }
+    }
+    assertTrue(
+        uncorrelated.isEmpty(),
+        "a joined @Query on a tenant-active table must correlate the tenant with the entity it is"
+            + " filtered by, or the request scope alone decides which tenant's rows it reaches:"
+            + " "
+            + uncorrelated);
   }
 
   @ArchTest
@@ -258,6 +316,29 @@ class TenantActiveTableAccessArchTest {
           .because(
               "mitigations is tenant-active: an accessor without a tenant scope silently reads"
                   + " zero rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule domains_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // TxCtx-carrying entrypoints, pinned by TenantScopedEntrypointsTxCtxArchTest:
+              DomainApi.class,
+              // Domain API/service write tenant attribution and read scope.
+              DomainService.class,
+              // Payload update path uses domainRepository.findAllById and is called only by
+              // TxCtx-carrying handlers (PayloadApi / ThreatArsenalApi) already pinned by
+              // TenantScopedEntrypointsTxCtxArchTest.
+              PayloadUpdateService.class,
+              // Background indexing reader, documented degraded path when no background scope is
+              // set.
+              SecurityDomainHandler.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(DomainRepository.class)
+          .because(
+              "domains is tenant-active: an accessor without a tenant scope silently reads zero"
+                  + " rows. New accessors must carry a scope and be allowlisted here");
 
   @ArchTest
   static final ArchRule collectors_repository_access_is_reviewed =
@@ -387,7 +468,8 @@ class TenantActiveTableAccessArchTest {
   //  - Executor + all 7 *ExecutorContextService (incl. SentinelOneExecutorContextService, which
   //    also reads InjectorContract directly): only reached from
   //    InjectsExecutionJob#executeInject, which runs inside
-  //    executeInTenant(tenantId, work) -> tenantTx.execute(TxCtx.forTenant(tenantId), work).
+  //    tenantScopedJobRunner.runInTenant(tenantId, work) ->
+  //    tenantTx.execute(TxCtx.forTenant(tenantId), work).
   //  - InjectorContractFullOutput#fromInjectorContract: dead code, zero callers anywhere in the
   //    codebase (main or test) — kept referenced here only for documentation, not a live path.
   //  - InjectImportService: every entrypoint (AtomicTestingApi#atomicTestingImport,
@@ -595,7 +677,8 @@ class TenantActiveTableAccessArchTest {
               // from TxCtx-carrying HTTP entrypoints (ExpectationApi#deleteInjectExpectationResult,
               // ChallengeApi#tryChallenge, SimulationChallengeApi#validateChallenge,
               // InjectApi#injectExecutionCallback) and from already-scoped background jobs
-              // (SecurityCoverageJob, InjectsExecutionJob#handleAutoClosingSimulations), all pinned
+              // (SecurityCoverageJob, InjectsFinalizationJob#handleAutoClosingSimulations), all
+              // pinned
               // by SecurityCoverageTenantScopeTest#SendJobCreationGateRequiresScope:
               SecurityCoverageSendJobService.class)
           .should()
@@ -707,6 +790,63 @@ class TenantActiveTableAccessArchTest {
           .because(
               "autonomous_events is tenant-active: an accessor without a tenant scope silently"
                   + " reads zero rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule kill_chain_phases_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // TxCtx-carrying entrypoints, pinned by TenantScopedEntrypointsTxCtxArchTest:
+              KillChainPhaseApi.class,
+              AttackPatternApi.class,
+              ExerciseApi.class,
+              // Sole write path for the table (endpoints and the scenario/simulation import):
+              // resolves the write tenant explicitly and looks rows up by per-tenant predicates:
+              KillChainPhaseService.class,
+              // Reads phases by id for an upserted attack pattern; driven by the TxCtx-carrying
+              // AttackPatternApi#upsertAttackPatterns:
+              AttackPatternService.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(KillChainPhaseRepository.class)
+          .because(
+              "kill_chain_phases is tenant-active: an accessor without a tenant scope silently"
+                  + " reads zero rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule kill_chain_phases_association_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // Hydrate the association inside the TxCtx-scoped transaction, before the
+              // open-in-view JSON rendering (the #7025 blind spot applied to this table):
+              KillChainPhaseInitializer.class,
+              AttackPatternApi.class,
+              // Lombok's @Data toString() on the owning entity reads every getter, including this
+              // one. It never renders a response, so it cannot leak or go dark:
+              AttackPattern.class,
+              // Derived *_kill_chain_phases getters on the aggregates themselves:
+              Exercise.class,
+              Inject.class,
+              InjectorContract.class,
+              Scenario.class,
+              // Map or hydrate phases inside the scoped transactions of wired handlers:
+              InjectMapper.class,
+              InjectHelper.class,
+              InjectService.class,
+              ScenarioService.class,
+              AttackPatternService.class,
+              WorkflowExportInitializer.class,
+              EsAttackPathService.class,
+              V1_DataImporter.class)
+          .should()
+          .callMethod(AttackPattern.class, "getKillChainPhases")
+          .because(
+              "kill_chain_phases is reached through AttackPattern's LAZY @ManyToMany WITHOUT"
+                  + " touching the repository. The tenant scope is transaction-local and"
+                  + " open-in-view renders after the commit, so a lazy load at rendering time"
+                  + " silently serializes an EMPTY phase list. New callers must run inside a scoped"
+                  + " transaction and be allowlisted here");
 
   @ArchTest
   static final ArchRule autonomous_directives_repository_access_is_reviewed =

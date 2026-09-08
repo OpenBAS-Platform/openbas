@@ -73,6 +73,12 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.mitigation.MitigationApi#updateMitigation",
           "io.openaev.rest.mitigation.MitigationApi#upsertMitigation",
           "io.openaev.rest.mitigation.MitigationApi#deleteMitigation",
+          // domains (v2)
+          "io.openaev.rest.domain.DomainApi#domains",
+          "io.openaev.rest.domain.DomainApi#getDomain",
+          "io.openaev.rest.domain.DomainApi#upsertDomain",
+          "io.openaev.rest.domain.DomainApi#findAllAsOptionsByName",
+          "io.openaev.rest.domain.DomainApi#findAllAsOptionsById",
           // attackpath_execution / attackpath_finding (v2): every read of the projection, including
           // the delta cursor added with the real-time updates (#6647, spec 002). Losing the TxCtx
           // on
@@ -375,7 +381,105 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.api.autonomous.AutonomousRunApi#promoteFindingToAsset",
           "io.openaev.api.autonomous.AutonomousRunApi#ensureTargetTeam",
           "io.openaev.rest.scenario.ScenarioApi#deleteScenario",
-          "io.openaev.rest.scenario.ScenarioApi#bulkDeleteScenarios");
+          "io.openaev.rest.scenario.ScenarioApi#bulkDeleteScenarios",
+          // kill_chain_phases (v2, #6402): the table's own API, plus every path that reads it
+          // through AttackPattern's LAZY @ManyToMany or through a native query that JOINs it.
+          // Losing a TxCtx here fails silently: the phase list comes back EMPTY, it is not an
+          // error.
+          "io.openaev.rest.kill_chain_phase.KillChainPhaseApi#killChainPhases",
+          "io.openaev.rest.kill_chain_phase.KillChainPhaseApi#killChainPhase",
+          "io.openaev.rest.kill_chain_phase.KillChainPhaseApi#createKillChainPhase",
+          "io.openaev.rest.kill_chain_phase.KillChainPhaseApi#updateKillChainPhase",
+          "io.openaev.rest.kill_chain_phase.KillChainPhaseApi#upsertKillChainPhases",
+          "io.openaev.rest.kill_chain_phase.KillChainPhaseApi#deleteKillChainPhase",
+          "io.openaev.rest.kill_chain_phase.KillChainPhaseApi#optionsByName",
+          "io.openaev.rest.kill_chain_phase.KillChainPhaseApi#optionsById",
+          // attack patterns: read the phases by id on write, serialize them on read
+          "io.openaev.rest.attack_pattern.AttackPatternApi#attackPatterns",
+          "io.openaev.rest.attack_pattern.AttackPatternApi#attackPattern",
+          "io.openaev.rest.attack_pattern.AttackPatternApi#createAttackPattern",
+          "io.openaev.rest.attack_pattern.AttackPatternApi#updateAttackPattern",
+          "io.openaev.rest.attack_pattern.AttackPatternApi#upsertAttackPatterns",
+          "io.openaev.api.attack_pattern.AttackPatternCoverageApi#attackPatternsCoverage",
+          // scenario: the raw projection JOINs kill_chain_phases; the entity-returning handlers
+          // serialize scenario_kill_chain_phases; import writes phases
+          "io.openaev.rest.scenario.ScenarioApi#scenario",
+          "io.openaev.rest.scenario.ScenarioApi#duplicateScenario",
+          "io.openaev.rest.scenario.ScenarioApi#updateScenario",
+          "io.openaev.rest.scenario.ScenarioApi#updateScenarioTags",
+          "io.openaev.rest.scenario.ScenarioApi#updateScenarioLessons",
+          "io.openaev.rest.scenario.ScenarioApi#enableScenarioTeamPlayers",
+          "io.openaev.rest.scenario.ScenarioApi#disableScenarioTeamPlayers",
+          "io.openaev.rest.scenario.ScenarioApi#addScenarioTeamPlayers",
+          "io.openaev.rest.scenario.ScenarioApi#removeScenarioTeamPlayers",
+          "io.openaev.rest.scenario.ScenarioApi#exportScenario",
+          // simulation: findDistinctByExerciseId, exercise_kill_chain_phases, import/export
+          "io.openaev.rest.exercise.ExerciseApi#exercise",
+          "io.openaev.rest.exercise.ExerciseApi#duplicateExercise",
+          "io.openaev.rest.exercise.ExerciseApi#updateExerciseInformation",
+          "io.openaev.rest.exercise.ExerciseApi#updateExerciseTags",
+          "io.openaev.rest.exercise.ExerciseApi#updateExerciseLogos",
+          "io.openaev.rest.exercise.ExerciseApi#updateExerciseLessons",
+          "io.openaev.rest.exercise.ExerciseApi#enableExerciseTeamPlayers",
+          "io.openaev.rest.exercise.ExerciseApi#disableExerciseTeamPlayers",
+          "io.openaev.rest.exercise.ExerciseApi#addExerciseTeamPlayers",
+          "io.openaev.rest.exercise.ExerciseApi#removeExerciseTeamPlayers",
+          "io.openaev.rest.exercise.ExerciseApi#deleteDocument",
+          "io.openaev.rest.exercise.ExerciseApi#exerciseExport",
+          "io.openaev.rest.exercise.ExerciseApi#scenarioFromSimulation",
+          // injects: inject_kill_chain_phases on the entity-returning handlers
+          "io.openaev.rest.inject.InjectApi#inject",
+          "io.openaev.rest.inject.InjectApi#injectExecutionReception",
+          "io.openaev.rest.inject.InjectApi#nextInjectsToExecute",
+          // atomic testing: InjectMapper maps inject_kill_chain_phases inside the transaction
+          "io.openaev.rest.atomic_testing.AtomicTestingApi#findAtomicTesting",
+          "io.openaev.rest.atomic_testing.AtomicTestingApi#updateAtomicTestingTags",
+          // contract picker facet: INNER JOINs kill_chain_phases to count per phase
+          "io.openaev.rest.injector_contract.InjectorContractApi#getFacetCounts",
+          // dashboards: EsAttackPathService reads each attack pattern's phases
+          "io.openaev.rest.dashboard.DashboardApi#attackPaths",
+          // chaining duplications copy injects, so they serialize the phase lists
+          // Propagation.SUPPORTS handlers: they hold no transaction, so the TxCtx here exists only
+          // to be threaded into the service method that opens one (same shape as
+          // ScenarioApi#bulkDeleteScenarios). Dropping it would silently empty the phase lists.
+          "io.openaev.rest.inject.SimulationInjectApi#bulkUpdateInjectsForSimulation",
+          "io.openaev.rest.inject.ScenarioInjectApi#bulkUpdateInjectsForScenario",
+          // asset_groups activation (#6435). Every endpoint the Phase 1 inventory found
+          // reading the table, whether it returns asset groups or merely consumes them.
+          // The wiring itself came with #7781; listing them here is what stops a future
+          // change from removing a TxCtx that the activation depends on.
+          "io.openaev.api.chaining.WorkflowApi#findScopeAssetGroups",
+          "io.openaev.api.chaining.WorkflowApi#getScopeAssetGroups",
+          "io.openaev.rest.asset_group.AssetGroupApi#assetGroup",
+          "io.openaev.rest.asset_group.AssetGroupApi#assetGroups",
+          "io.openaev.rest.asset_group.AssetGroupApi#assetsFromAssetGroup",
+          "io.openaev.rest.asset_group.AssetGroupApi#bulkDeleteAssetGroups",
+          "io.openaev.rest.asset_group.AssetGroupApi#createAssetGroup",
+          "io.openaev.rest.asset_group.AssetGroupApi#deleteAssetGroup",
+          "io.openaev.rest.asset_group.AssetGroupApi#findAssetGroups",
+          "io.openaev.rest.asset_group.AssetGroupApi#optionsById",
+          "io.openaev.rest.asset_group.AssetGroupApi#optionsByName",
+          "io.openaev.rest.asset_group.AssetGroupApi#optionsByNameLinkedToFindings",
+          "io.openaev.rest.asset_group.AssetGroupApi#searchInjectsForAssetGroup",
+          "io.openaev.rest.asset_group.AssetGroupApi#updateAssetGroup",
+          "io.openaev.rest.asset_group.AssetGroupApi#updateAssetsOnAssetGroup",
+          "io.openaev.rest.atomic_testing.AtomicTestingApi#findAllAtomicTestings",
+          "io.openaev.rest.exercise.ExerciseApi#assetGroupsByIds",
+          "io.openaev.rest.finding.FindingApi#findingSummary",
+          "io.openaev.rest.finding.FindingSearchApi#findings",
+          "io.openaev.rest.finding.FindingSearchApi#findingsByEndpoint",
+          "io.openaev.rest.finding.FindingSearchApi#findingsByInject",
+          "io.openaev.rest.finding.FindingSearchApi#findingsByScenario",
+          "io.openaev.rest.finding.FindingSearchApi#findingsBySimulation",
+          "io.openaev.rest.organization.OrganizationApi#searchInjectsForOrganization",
+          "io.openaev.rest.scenario.ScenarioApi#assetGroupsByIds",
+          "io.openaev.rest.tag_rule.TagRuleApi#createTagRule",
+          "io.openaev.rest.tag_rule.TagRuleApi#findTagRule",
+          "io.openaev.rest.tag_rule.TagRuleApi#searchTagRules",
+          "io.openaev.rest.tag_rule.TagRuleApi#tags",
+          "io.openaev.rest.tag_rule.TagRuleApi#updateTagRule",
+          "io.openaev.rest.team.TeamApi#searchInjectsForTeam",
+          "io.openaev.rest.user.PlayerApi#searchInjectsForPlayer");
 
   @ArchTest
   static final ArchRule tx_scoped_entrypoints_must_declare_tx_ctx =
