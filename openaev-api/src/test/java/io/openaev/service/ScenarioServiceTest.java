@@ -38,6 +38,7 @@ import io.openaev.utils.fixtures.StepFixture;
 import io.openaev.utils.fixtures.WorkflowFixture;
 import io.openaev.utils.fixtures.composers.ExerciseComposer;
 import io.openaev.utils.fixtures.composers.InjectComposer;
+import io.openaev.utils.fixtures.composers.InjectorContractComposer;
 import io.openaev.utils.fixtures.composers.ScenarioComposer;
 import io.openaev.utils.fixtures.composers.SecurityCoverageComposer;
 import io.openaev.utils.fixtures.composers.StepComposer;
@@ -82,6 +83,7 @@ class ScenarioServiceTest extends IntegrationTest {
 
   @Autowired private ScenarioComposer scenarioComposer;
   @Autowired private InjectComposer injectComposer;
+  @Autowired private InjectorContractComposer injectorContractComposer;
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private SecurityCoverageComposer securityCoverageComposer;
   @Autowired private WorkflowComposer workflowComposer;
@@ -193,13 +195,13 @@ class ScenarioServiceTest extends IntegrationTest {
             new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Linux});
     timeBasedContract.clearInjectors();
     timeBasedContract.addInjector(savedInjector);
-    injectorContractRepository.save(timeBasedContract);
+    injectorContractComposer.forInjectorContract(timeBasedContract).persist();
 
     Scenario timeBasedScenario =
         scenarioComposer.forScenario(ScenarioFixture.getScenario()).persist().get();
     Inject timeBasedInject = getInjectForEmailContract(timeBasedContract);
     timeBasedInject.setScenario(timeBasedScenario);
-    injectRepository.save(timeBasedInject);
+    injectComposer.forInject(timeBasedInject).persist();
 
     Scenario chainedScenario =
         scenarioComposer.forScenario(ScenarioFixture.getScenario()).persist().get();
