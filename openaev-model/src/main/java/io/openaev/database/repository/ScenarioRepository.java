@@ -304,6 +304,55 @@ public interface ScenarioRepository
       nativeQuery = true)
   RawScenario getScenarioByIdAndTenantId(@Param("scenarioId") final String scenarioId);
 
+  @Query(
+      value =
+          """
+      WITH direct_platforms AS (
+          SELECT s.scenario_id, unnest(ic.injector_contract_platforms) AS scenario_platform
+          FROM scenarios s
+            JOIN injects i ON i.inject_scenario = s.scenario_id
+            JOIN injectors_contracts ic
+              ON ic.injector_contract_id = i.inject_injector_contract
+             AND ic.tenant_id = i.tenant_id
+          WHERE s.scenario_id IN :scenarioIds
+            AND s.tenant_id = :#{#tenantContext.currentTenant}
+            AND ic.injector_contract_platforms IS NOT NULL
+      ),
+      workflow_platforms AS (
+          SELECT s.scenario_id, unnest(ic.injector_contract_platforms) AS scenario_platform
+          FROM scenarios s
+            JOIN workflows w ON w.workflow_scenario_id = s.scenario_id
+            JOIN steps st ON st.step_workflow_id = w.workflow_id
+            JOIN injectors_contracts ic
+              ON ic.injector_contract_id =
+                CASE
+                  WHEN jsonb_typeof(st.step_data -> 'inject_injector_contract') = 'object'
+                    THEN st.step_data -> 'inject_injector_contract' ->> 'injector_contract_id'
+                  WHEN jsonb_typeof(st.step_data -> 'inject_injector_contract') = 'string'
+                    THEN st.step_data ->> 'inject_injector_contract'
+                  ELSE NULL
+                END
+             AND ic.tenant_id = :#{#tenantContext.currentTenant}
+          WHERE s.scenario_id IN :scenarioIds
+            AND s.tenant_id = :#{#tenantContext.currentTenant}
+            AND w.workflow_status = 'TEMPLATE'
+            AND st.step_status = 'TEMPLATE'
+            AND st.step_template_id IS NULL
+            AND ic.injector_contract_platforms IS NOT NULL
+      ),
+      all_platforms AS (
+          SELECT scenario_id, scenario_platform FROM direct_platforms
+          UNION ALL
+          SELECT scenario_id, scenario_platform FROM workflow_platforms
+      )
+      SELECT scenario_id, array_agg(DISTINCT scenario_platform) AS scenario_platforms
+      FROM all_platforms
+      GROUP BY scenario_id
+      """,
+      nativeQuery = true)
+  List<RawScenarioSimpleIndexing> findScenarioPlatformsByScenarioIds(
+      @Param("scenarioIds") List<String> scenarioIds);
+
   // -- CATEGORY --
 
   @Query(
