@@ -83,7 +83,6 @@ class TagHttpIsolationTest extends IntegrationTest {
     assertFalse(response.contains(tagB), "B's tag must not appear in A's search results");
   }
 
-
   @Test
   @DisplayName("a create under tenant A's path is attributed to tenant A")
   void createUnderTenantAIsAttributedToA() throws Exception {
