@@ -366,7 +366,6 @@ class TenantServiceTest extends IntegrationTest {
   }
 
   @Test
-
   void should_find_tenants_by_user_id() throws Exception {
     // -- ARRANGE --
     String userId = testUserHolder.get().getId();
