@@ -97,7 +97,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.hibernate.Hibernate;
-import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -325,10 +324,9 @@ public class ScenarioService {
     Join<Base, Base> scenarioTagsJoin = scenarioRoot.join("tags", JoinType.LEFT);
     joinMap.put("tags", scenarioTagsJoin);
     Expression<String> nullString = cb.nullLiteral(String.class);
-    Expression<String[]> arr =
-        ((HibernateCriteriaBuilder) cb).arrayAgg(null, scenarioTagsJoin.get("id"));
+    Expression<String[]> arr = cb.function("array_agg", String[].class, scenarioTagsJoin.get("id"));
     Expression<String[]> tagIdsExpression =
-        ((HibernateCriteriaBuilder) cb).arrayRemove(arr, nullString);
+        cb.function("array_remove", String[].class, arr, nullString);
 
     // Join on INJECT and INJECTOR CONTRACT
     Join<Base, Base> injectsJoin = scenarioRoot.join("injects", JoinType.LEFT);
@@ -347,26 +345,8 @@ public class ScenarioService {
             cb.equal(workflowRoot.get("scenario").get("id"), scenarioRoot.get("id")),
             cb.equal(workflowRoot.get("status"), WorkflowStatus.TEMPLATE));
 
-    Subquery<String[]> workflowPlatformsSubquery = cq.subquery(String[].class);
-    Root<Workflow> workflowPlatformsRoot = workflowPlatformsSubquery.from(Workflow.class);
-    Join<Workflow, Step> workflowStepsJoin = workflowPlatformsRoot.join("steps", JoinType.LEFT);
-    Expression<String> workflowPlatformExpression =
-        cb.function(
-            "jsonb_array_elements_text",
-            String.class,
-            cb.function(
-                "jsonb_extract_path",
-                Object.class,
-                workflowStepsJoin.get("data"),
-                cb.literal("inject_injector_contract"),
-                cb.literal("injector_contract_platforms")));
-    workflowPlatformsSubquery
-        .select(((HibernateCriteriaBuilder) cb).arrayAgg(null, workflowPlatformExpression))
-        .where(
-            cb.equal(workflowPlatformsRoot.get("scenario").get("id"), scenarioRoot.get("id")),
-            cb.equal(workflowPlatformsRoot.get("status"), WorkflowStatus.TEMPLATE),
-            cb.equal(workflowStepsJoin.get("status"), StepStatus.TEMPLATE),
-            cb.isNull(workflowStepsJoin.get("stepTemplate")));
+    Subquery<String[]> workflowPlatformsSubquery =
+        buildWorkflowPlatformsSubquery(cq, cb, scenarioRoot);
 
     Expression<String[]> platformExpression =
         cb.<String[]>selectCase()
@@ -430,6 +410,41 @@ public class ScenarioService {
     Long total = countQuery(cb, this.entityManager, Scenario.class, specificationCount);
 
     return new PageImpl<>(scenarios, pageable, total);
+  }
+
+  private Subquery<String[]> buildWorkflowPlatformsSubquery(
+      CriteriaQuery<Tuple> cq, CriteriaBuilder cb, Root<Scenario> scenarioRoot) {
+    Subquery<String[]> workflowPlatformsSubquery = cq.subquery(String[].class);
+    Root<Workflow> workflowRoot = workflowPlatformsSubquery.from(Workflow.class);
+    Join<Workflow, Step> workflowStepsJoin = workflowRoot.join("steps", JoinType.LEFT);
+
+    Expression<String> workflowPlatformExpression =
+        buildWorkflowPlatformExpression(cb, workflowStepsJoin.get("data"));
+
+    workflowPlatformsSubquery
+        .select(cb.function("array_agg", String[].class, workflowPlatformExpression))
+        .where(
+            cb.equal(workflowRoot.get("scenario").get("id"), scenarioRoot.get("id")),
+            cb.equal(workflowRoot.get("status"), WorkflowStatus.TEMPLATE),
+            cb.equal(workflowStepsJoin.get("status"), StepStatus.TEMPLATE),
+            cb.isNull(workflowStepsJoin.get("stepTemplate")));
+
+    return workflowPlatformsSubquery;
+  }
+
+  private Expression<String> buildWorkflowPlatformExpression(
+      CriteriaBuilder cb, Path<?> stepDataPath) {
+    // Step data stores injector contract details as JSON, so we first extract the platform array
+    // and then expand it into individual text values.
+    return cb.function(
+        "jsonb_array_elements_text",
+        String.class,
+        cb.function(
+            "jsonb_extract_path",
+            Object.class,
+            stepDataPath,
+            cb.literal("inject_injector_contract"),
+            cb.literal("injector_contract_platforms")));
   }
 
   public void throwIfScenarioNotLaunchable(Scenario scenario) {

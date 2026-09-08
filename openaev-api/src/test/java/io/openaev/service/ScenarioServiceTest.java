@@ -33,15 +33,15 @@ import io.openaev.service.settings.TenantSettingsService;
 import io.openaev.service.utils.BulkDeleteExecutor;
 import io.openaev.telemetry.metric_collectors.ActionMetricCollector;
 import io.openaev.utils.fixtures.*;
-import io.openaev.utils.fixtures.composers.ExerciseComposer;
-import io.openaev.utils.fixtures.composers.InjectComposer;
-import io.openaev.utils.fixtures.composers.StepComposer;
-import io.openaev.utils.fixtures.composers.WorkflowComposer;
-import io.openaev.utils.fixtures.composers.ScenarioComposer;
-import io.openaev.utils.fixtures.composers.SecurityCoverageComposer;
 import io.openaev.utils.fixtures.PaginationFixture;
 import io.openaev.utils.fixtures.StepFixture;
 import io.openaev.utils.fixtures.WorkflowFixture;
+import io.openaev.utils.fixtures.composers.ExerciseComposer;
+import io.openaev.utils.fixtures.composers.InjectComposer;
+import io.openaev.utils.fixtures.composers.ScenarioComposer;
+import io.openaev.utils.fixtures.composers.SecurityCoverageComposer;
+import io.openaev.utils.fixtures.composers.StepComposer;
+import io.openaev.utils.fixtures.composers.WorkflowComposer;
 import io.openaev.utils.mapper.ExerciseMapper;
 import io.openaev.utils.mapper.ScenarioMapper;
 import io.openaev.utils.mockUser.WithMockUser;
@@ -187,7 +187,8 @@ class ScenarioServiceTest extends IntegrationTest {
   @Transactional
   @WithMockUser(isAdmin = true)
   void given_chained_and_time_based_scenarios_should_show_platforms_in_list_and_detail() {
-    Injector savedInjector = injectorRepository.save(InjectorFixture.createDefaultPayloadInjector());
+    Injector savedInjector =
+        injectorRepository.save(InjectorFixture.createDefaultPayloadInjector());
     InjectorContract timeBasedContract =
         InjectorContractFixture.createInjectorContractWithPlatforms(
             new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Linux});
@@ -233,7 +234,8 @@ class ScenarioServiceTest extends IntegrationTest {
     assertEquals(Set.of("Linux"), platformsByScenarioId.get(timeBasedScenario.getId()));
     assertEquals(Set.of("Windows"), platformsByScenarioId.get(chainedScenario.getId()));
 
-    ScenarioOutput chainedScenarioOutput = scenarioServiceBean.getScenarioById(chainedScenario.getId());
+    ScenarioOutput chainedScenarioOutput =
+        scenarioServiceBean.getScenarioById(chainedScenario.getId());
     ScenarioOutput timeBasedScenarioOutput =
         scenarioServiceBean.getScenarioById(timeBasedScenario.getId());
     assertEquals(Set.of("Windows"), chainedScenarioOutput.getPlatforms());
