@@ -9,10 +9,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import io.openaev.IntegrationTest;
 import io.openaev.database.model.Endpoint;
 import io.openaev.database.model.Tag;
+import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.EndpointRepository;
 import io.openaev.database.repository.TagRepository;
 import io.openaev.helper.StreamHelper;
 import io.openaev.utils.CsvType;
+import io.openaev.utils.TenantIsolationTestHelper;
 import io.openaev.utils.fixtures.EndpointFixture;
 import io.openaev.utils.mockUser.WithMockUser;
 import io.openaev.utils.pagination.SearchPaginationInput;
@@ -21,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -35,8 +38,19 @@ import org.springframework.util.ResourceUtils;
 public class ImportExportMapperApiTest extends IntegrationTest {
 
   @Autowired private MockMvc mvc;
+  @Autowired private TenantIsolationTestHelper tenantIsolationHelper;
   @Autowired private EndpointRepository endpointRepository;
   @Autowired private TagRepository tagRepository;
+
+  @BeforeEach
+  void attachMockUserToDefaultTenant() {
+    // The CSV import creates endpoints, which are rows of the assets table, so it now attributes
+    // them from the request scope. @WithMockUser builds a user with no row in users_tenants, so
+    // the scope would be missing and the import a 400. Production never has that state
+    // (V4_95__Migrate_users_to_default_tenant attaches every user to the default tenant), so the
+    // fixture provisions the membership the platform would already have.
+    tenantIsolationHelper.attachCurrentUserToTenant(Tenant.DEFAULT_TENANT_UUID);
+  }
 
   @DisplayName("Test testing an export csv with endpoints target")
   @Test

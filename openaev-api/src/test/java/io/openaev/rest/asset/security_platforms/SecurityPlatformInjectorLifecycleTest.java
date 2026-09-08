@@ -60,6 +60,11 @@ class SecurityPlatformInjectorLifecycleTest extends IntegrationTest {
 
   @BeforeEach
   void setUp() {
+    // The upsert attributes the platform from the request scope, and @WithMockUser builds a user
+    // with no row in users_tenants, so the scope would be missing and the upsert a 400. Production
+    // never has that state: V4_95__Migrate_users_to_default_tenant attaches every user to the
+    // default tenant.
+    tenantIsolationTestHelper.attachCurrentUserToTenant(Tenant.DEFAULT_TENANT_UUID);
     injector =
         injectorRepository.save(
             InjectorFixture.createInjector(
