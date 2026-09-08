@@ -13,24 +13,20 @@ public abstract class ReferentialResource extends Resource {
   }
 
   public List<ResourceKey> getSubresourceKeys() throws IOException {
-    try {
-      JsonNode contents = read();
+    JsonNode contents = read();
 
-      List<ResourceKey> keys = new ArrayList<>();
-      contents
-          .elements()
-          .forEachRemaining(
-              element -> {
-                ResourceKey resourceKey =
-                    new ResourceKey(
-                        element.get("name").asText(),
-                        element.has("extension") ? element.get("extension").asText() : null,
-                        element.has("uid") ? element.get("uid").asText() : null);
-                keys.add(resourceKey);
-              });
-      return keys;
-    } catch (IOException e) {
-      return List.of();
-    }
+    List<ResourceKey> keys = new ArrayList<>();
+    contents
+        .elements()
+        .forEachRemaining(
+            element -> {
+              ResourceKey resourceKey =
+                  new ResourceKey(
+                      element.get("name").asText(),
+                      element.has("extension") ? element.get("extension").asText() : null,
+                      element.has("uid") ? element.get("uid").asText() : null);
+              keys.add(resourceKey);
+            });
+    return keys;
   }
 }

@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 
 public class ClassFileWriter {
   private String composeFullFilePath(String directory, String className) {
-    return "%s/%s.java".formatted(directory, className);
+    return "%s%s%s.java".formatted(directory, File.separator, className);
   }
 
   private void ensureDirectoryExists(String directory) throws IOException {

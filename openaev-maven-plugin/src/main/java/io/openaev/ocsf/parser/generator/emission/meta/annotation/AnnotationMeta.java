@@ -5,6 +5,7 @@ import java.lang.annotation.Annotation;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.Getter;
 
 public class AnnotationMeta implements Emitter {
@@ -36,11 +37,11 @@ public class AnnotationMeta implements Emitter {
   public String emit() {
     StringBuilder render = new StringBuilder(MessageFormat.format("@{0}", cls.getName()));
     if (!attributes.isEmpty()) {
-      render.append("(");
-      for (AttributeMeta<?> attr : this.attributes) {
-        render.append(attr.emit());
-      }
-      render.append(")");
+      render
+          .append("(")
+          .append(
+              this.attributes.stream().map(AttributeMeta::emit).collect(Collectors.joining(", ")))
+          .append(")");
     }
     return render.toString();
   }

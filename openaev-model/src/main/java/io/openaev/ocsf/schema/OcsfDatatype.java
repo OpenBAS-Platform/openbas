@@ -26,11 +26,14 @@ public abstract class OcsfDatatype<T> implements OcsfSerialisable {
 
   @Override
   public boolean equals(Object o) {
-    if (o.getClass() == this.getClass()) {
-      OcsfDatatype<?> that = (OcsfDatatype<?>) o;
-      return this.value.equals(that.value);
+    if (this == o) {
+      return true;
     }
-    return Objects.equals(value, o);
+    if (o == null || o.getClass() != this.getClass()) {
+      return false;
+    }
+    OcsfDatatype<?> that = (OcsfDatatype<?>) o;
+    return Objects.equals(this.value, that.value);
   }
 
   @Override
