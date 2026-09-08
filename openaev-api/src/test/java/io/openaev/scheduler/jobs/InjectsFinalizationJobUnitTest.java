@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.quality.Strictness.LENIENT;
 
+import io.openaev.context.TenantScopedTransaction;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.ExerciseRepository;
 import io.openaev.helper.InjectHelper;
@@ -45,6 +47,7 @@ class InjectsFinalizationJobUnitTest {
   @Mock private NotificationEventService notificationEventService;
   @Mock private EntityManager entityManager;
   @Mock private TenantScopedJobRunner tenantScopedJobRunner;
+  @Mock private TenantScopedTransaction tenantTx;
 
   @InjectMocks private InjectsFinalizationJob finalizationJob;
 
@@ -350,6 +353,14 @@ class InjectsFinalizationJobUnitTest {
     void setUpCollectStatus() {
       Session session = mock(Session.class, withSettings().strictness(LENIENT));
       when(entityManager.unwrap(Session.class)).thenReturn(session);
+      doAnswer(
+              invocation -> {
+                Runnable work = invocation.getArgument(1);
+                work.run();
+                return null;
+              })
+          .when(tenantTx)
+          .execute(any(TxCtx.class), any(Runnable.class));
       inject = new Inject();
       when(injectService.getExecutedAndNotFinished()).thenReturn(List.of(inject));
     }

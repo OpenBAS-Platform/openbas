@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 
 import io.openaev.IntegrationTest;
 import io.openaev.database.model.*;
+import io.openaev.database.repository.EndpointRepository;
 import io.openaev.database.repository.ExerciseRepository;
 import io.openaev.database.repository.InjectRepository;
 import io.openaev.database.repository.SecurityCoverageRepository;
@@ -36,6 +37,7 @@ class InjectsFinalizationJobTest extends IntegrationTest {
 
   @Autowired private InjectRepository injectRepository;
   @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private EndpointRepository endpointRepository;
   @Autowired private SecurityCoverageSendJobRepository securityCoverageSendJobRepository;
   @Autowired private SecurityCoverageRepository securityCoverageRepository;
   @Autowired private EntityManager entityManager;
@@ -183,153 +185,228 @@ class InjectsFinalizationJobTest extends IntegrationTest {
 
     @Test
     @DisplayName("given pending inject without traces should mark status as error with timeout")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void given_pendingInjectWithoutTraces_should_markStatusAsMaybePrevented() {
       // Arrange
-      InjectStatus statusToSave = InjectStatusFixture.createPendingInjectStatus();
-      statusToSave.setTrackingSentDate(Instant.now().minus(20, ChronoUnit.MINUTES));
-      Inject inject =
-          injectComposer
-              .forInject(InjectFixture.getDefaultInject())
-              .withInjectStatus(injectStatusComposer.forInjectStatus(statusToSave))
-              .persist()
-              .get();
-      entityManager.flush();
+      String[] ids = new String[1]; // injectId
+      try {
+        inTransaction(
+            () -> {
+              InjectStatus statusToSave = InjectStatusFixture.createPendingInjectStatus();
+              statusToSave.setTrackingSentDate(Instant.now().minus(20, ChronoUnit.MINUTES));
+              Inject inject =
+                  injectComposer
+                      .forInject(InjectFixture.getDefaultInject())
+                      .withInjectStatus(injectStatusComposer.forInjectStatus(statusToSave))
+                      .persist()
+                      .get();
+              entityManager.flush();
+              ids[0] = inject.getId();
+            });
 
-      // Act
-      job.handlePendingInject();
-      entityManager.flush();
-      entityManager.clear();
+        // Act
+        job.handlePendingInject();
 
-      // Assert
-      Inject savedInject = injectRepository.findById(inject.getId()).orElseThrow();
-      InjectStatus savedStatus = savedInject.getStatus().orElseThrow();
-      assertEquals(ExecutionStatus.ERROR, savedStatus.getName());
+        // Assert
+        inTransaction(
+            () -> {
+              Inject savedInject = injectRepository.findById(ids[0]).orElseThrow();
+              InjectStatus savedStatus = savedInject.getStatus().orElseThrow();
+              assertEquals(ExecutionStatus.ERROR, savedStatus.getName());
+            });
+      } finally {
+        // Committed rows (the job opens its own transaction via TenantScopedTransaction, which
+        // refuses to run inside the class-level @Transactional): sweep them explicitly.
+        inTransaction(() -> injectRepository.deleteById(ids[0]));
+        injectComposer.reset();
+        injectStatusComposer.reset();
+      }
     }
 
     @Test
     @DisplayName(
         "given agentless pending inject should mark status error with an explicit agentless timeout trace")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void given_agentlessPendingInject_should_addAgentlessTimeoutTrace() {
       // Arrange: an inject with no endpoint/agent (network scanner style, e.g. Nuclei) stuck
       // PENDING past the threshold. getAgentsByInject returns empty, so the per-agent timeout loop
       // records nothing.
-      InjectStatus statusToSave = InjectStatusFixture.createPendingInjectStatus();
-      statusToSave.setTrackingSentDate(Instant.now().minus(20, ChronoUnit.MINUTES));
-      Inject inject =
-          injectComposer
-              .forInject(InjectFixture.getDefaultInject())
-              .withInjectStatus(injectStatusComposer.forInjectStatus(statusToSave))
-              .persist()
-              .get();
-      entityManager.flush();
+      String[] ids = new String[1]; // injectId
+      try {
+        inTransaction(
+            () -> {
+              InjectStatus statusToSave = InjectStatusFixture.createPendingInjectStatus();
+              statusToSave.setTrackingSentDate(Instant.now().minus(20, ChronoUnit.MINUTES));
+              Inject inject =
+                  injectComposer
+                      .forInject(InjectFixture.getDefaultInject())
+                      .withInjectStatus(injectStatusComposer.forInjectStatus(statusToSave))
+                      .persist()
+                      .get();
+              entityManager.flush();
+              ids[0] = inject.getId();
+            });
 
-      // Act
-      job.handlePendingInject();
-      entityManager.flush();
-      entityManager.clear();
+        // Act
+        job.handlePendingInject();
 
-      // Assert: the inject is finalized ERROR, but now carries a clear agentless timeout trace
-      // instead of an empty COMPLETE-trace list.
-      Inject savedInject = injectRepository.findById(inject.getId()).orElseThrow();
-      InjectStatus savedStatus = savedInject.getStatus().orElseThrow();
-      assertEquals(ExecutionStatus.ERROR, savedStatus.getName());
-      assertTrue(
-          savedStatus.getTraces().stream()
-              .anyMatch(
-                  trace ->
-                      ExecutionTraceStatus.TIMEOUT.equals(trace.getStatus())
-                          && ExecutionTraceAction.COMPLETE.equals(trace.getAction())
-                          && trace.getAgent() == null
-                          && trace.getMessage().contains("did not complete within the")));
+        // Assert: the inject is finalized ERROR, but now carries a clear agentless timeout trace
+        // instead of an empty COMPLETE-trace list.
+        inTransaction(
+            () -> {
+              Inject savedInject = injectRepository.findById(ids[0]).orElseThrow();
+              InjectStatus savedStatus = savedInject.getStatus().orElseThrow();
+              assertEquals(ExecutionStatus.ERROR, savedStatus.getName());
+              assertTrue(
+                  savedStatus.getTraces().stream()
+                      .anyMatch(
+                          trace ->
+                              ExecutionTraceStatus.TIMEOUT.equals(trace.getStatus())
+                                  && ExecutionTraceAction.COMPLETE.equals(trace.getAction())
+                                  && trace.getAgent() == null
+                                  && trace.getMessage().contains("did not complete within the")));
+            });
+      } finally {
+        // Committed rows (the job opens its own transaction via TenantScopedTransaction, which
+        // refuses to run inside the class-level @Transactional): sweep them explicitly.
+        inTransaction(() -> injectRepository.deleteById(ids[0]));
+        injectComposer.reset();
+        injectStatusComposer.reset();
+      }
     }
 
     @Test
     @DisplayName(
         "given pending inject without complete traces should mark status as error with timeout")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void given_pendingInjectWithoutCompleteTraces_should_markStatusAsMaybePrevented() {
       // Arrange
-      AgentComposer.Composer agentComposerRef =
-          agentComposer.forAgent(AgentFixture.createDefaultAgentService());
-      InjectStatus statusToSave = InjectStatusFixture.createPendingInjectStatus();
-      statusToSave.setTrackingSentDate(Instant.now().minus(20, ChronoUnit.MINUTES));
-      InjectStatusComposer.Composer statusComposer =
-          injectStatusComposer
-              .forInjectStatus(statusToSave)
-              .withExecutionTrace(
-                  executionTraceComposer
-                      .forExecutionTrace(ExecutionTraceFixture.createDefaultExecutionTraceStart())
-                      .withAgent(agentComposerRef));
+      String[] ids = new String[1]; // injectId
+      try {
+        inTransaction(
+            () -> {
+              AgentComposer.Composer agentComposerRef =
+                  agentComposer.forAgent(AgentFixture.createDefaultAgentService());
+              InjectStatus statusToSave = InjectStatusFixture.createPendingInjectStatus();
+              statusToSave.setTrackingSentDate(Instant.now().minus(20, ChronoUnit.MINUTES));
+              InjectStatusComposer.Composer statusComposer =
+                  injectStatusComposer
+                      .forInjectStatus(statusToSave)
+                      .withExecutionTrace(
+                          executionTraceComposer
+                              .forExecutionTrace(
+                                  ExecutionTraceFixture.createDefaultExecutionTraceStart())
+                              .withAgent(agentComposerRef));
 
-      Inject inject =
-          injectComposer
-              .forInject(InjectFixture.getDefaultInject())
-              .withEndpoint(
-                  endpointComposer
-                      .forEndpoint(EndpointFixture.createEndpoint())
-                      .withAgent(agentComposerRef))
-              .withInjectStatus(statusComposer)
-              .persist()
-              .get();
-      entityManager.flush();
+              Inject inject =
+                  injectComposer
+                      .forInject(InjectFixture.getDefaultInject())
+                      .withEndpoint(
+                          endpointComposer
+                              .forEndpoint(EndpointFixture.createEndpoint())
+                              .withAgent(agentComposerRef))
+                      .withInjectStatus(statusComposer)
+                      .persist()
+                      .get();
+              entityManager.flush();
+              ids[0] = inject.getId();
+            });
 
-      // Act
-      job.handlePendingInject();
-      entityManager.flush();
-      entityManager.clear();
+        // Act
+        job.handlePendingInject();
 
-      // Assert
-      Inject savedInject = injectRepository.findById(inject.getId()).orElseThrow();
-      InjectStatus savedStatus = savedInject.getStatus().orElseThrow();
-      assertEquals(ExecutionStatus.ERROR, savedStatus.getName());
-      assertTrue(
-          savedStatus.getTraces().stream()
-              .anyMatch(
-                  trace ->
-                      ExecutionTraceStatus.TIMEOUT.equals(trace.getStatus())
-                          && trace.getMessage().contains("did not respond within the")));
+        // Assert
+        inTransaction(
+            () -> {
+              Inject savedInject = injectRepository.findById(ids[0]).orElseThrow();
+              InjectStatus savedStatus = savedInject.getStatus().orElseThrow();
+              assertEquals(ExecutionStatus.ERROR, savedStatus.getName());
+              assertTrue(
+                  savedStatus.getTraces().stream()
+                      .anyMatch(
+                          trace ->
+                              ExecutionTraceStatus.TIMEOUT.equals(trace.getStatus())
+                                  && trace.getMessage().contains("did not respond within the")));
+            });
+      } finally {
+        // Committed rows (the job opens its own transaction via TenantScopedTransaction, which
+        // refuses to run inside the class-level @Transactional): sweep them explicitly.
+        inTransaction(
+            () -> {
+              injectRepository.deleteById(ids[0]);
+              endpointRepository.deleteAll(endpointComposer.generatedItems);
+            });
+        injectComposer.reset();
+        injectStatusComposer.reset();
+        endpointComposer.reset();
+        agentComposer.reset();
+        executionTraceComposer.reset();
+      }
     }
 
     @Test
     @DisplayName("given pending inject with complete traces should compute final status")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void given_pendingInjectWithCompleteTraces_should_computeFinalStatus() {
       // Arrange
-      AgentComposer.Composer agentComposerRef =
-          agentComposer.forAgent(AgentFixture.createDefaultAgentService());
-      InjectStatus statusToSave = InjectStatusFixture.createPendingInjectStatus();
-      statusToSave.setTrackingSentDate(Instant.now().minus(20, ChronoUnit.MINUTES));
-      InjectStatusComposer.Composer statusComposer =
-          injectStatusComposer
-              .forInjectStatus(statusToSave)
-              .withExecutionTrace(
-                  executionTraceComposer
-                      .forExecutionTrace(
-                          ExecutionTraceFixture.createDefaultExecutionTraceComplete())
-                      .withAgent(agentComposerRef));
+      String[] ids = new String[1]; // injectId
+      try {
+        inTransaction(
+            () -> {
+              AgentComposer.Composer agentComposerRef =
+                  agentComposer.forAgent(AgentFixture.createDefaultAgentService());
+              InjectStatus statusToSave = InjectStatusFixture.createPendingInjectStatus();
+              statusToSave.setTrackingSentDate(Instant.now().minus(20, ChronoUnit.MINUTES));
+              InjectStatusComposer.Composer statusComposer =
+                  injectStatusComposer
+                      .forInjectStatus(statusToSave)
+                      .withExecutionTrace(
+                          executionTraceComposer
+                              .forExecutionTrace(
+                                  ExecutionTraceFixture.createDefaultExecutionTraceComplete())
+                              .withAgent(agentComposerRef));
 
-      Inject inject =
-          injectComposer
-              .forInject(InjectFixture.getDefaultInject())
-              .withEndpoint(
-                  endpointComposer
-                      .forEndpoint(EndpointFixture.createEndpoint())
-                      .withAgent(agentComposerRef))
-              .withInjectStatus(statusComposer)
-              .persist()
-              .get();
-      entityManager.flush();
+              Inject inject =
+                  injectComposer
+                      .forInject(InjectFixture.getDefaultInject())
+                      .withEndpoint(
+                          endpointComposer
+                              .forEndpoint(EndpointFixture.createEndpoint())
+                              .withAgent(agentComposerRef))
+                      .withInjectStatus(statusComposer)
+                      .persist()
+                      .get();
+              entityManager.flush();
+              ids[0] = inject.getId();
+            });
 
-      // Act
-      job.handlePendingInject();
-      entityManager.flush();
-      entityManager.clear();
+        // Act
+        job.handlePendingInject();
 
-      // Assert
-      Inject savedInject = injectRepository.findById(inject.getId()).orElseThrow();
-      InjectStatus savedStatus = savedInject.getStatus().orElseThrow();
-      assertEquals(ExecutionStatus.EXECUTED, savedStatus.getName());
-      assertTrue(
-          savedStatus.getTraces().stream()
-              .noneMatch(trace -> ExecutionTraceStatus.WARNING.equals(trace.getStatus())));
+        // Assert
+        inTransaction(
+            () -> {
+              Inject savedInject = injectRepository.findById(ids[0]).orElseThrow();
+              InjectStatus savedStatus = savedInject.getStatus().orElseThrow();
+              assertEquals(ExecutionStatus.EXECUTED, savedStatus.getName());
+              assertTrue(
+                  savedStatus.getTraces().stream()
+                      .noneMatch(trace -> ExecutionTraceStatus.WARNING.equals(trace.getStatus())));
+            });
+      } finally {
+        // Committed rows (the job opens its own transaction via TenantScopedTransaction, which
+        // refuses to run inside the class-level @Transactional): sweep them explicitly.
+        inTransaction(
+            () -> {
+              injectRepository.deleteById(ids[0]);
+              endpointRepository.deleteAll(endpointComposer.generatedItems);
+            });
+        injectComposer.reset();
+        injectStatusComposer.reset();
+        endpointComposer.reset();
+        agentComposer.reset();
+        executionTraceComposer.reset();
+      }
     }
   }
 }

@@ -23,6 +23,7 @@ import io.openaev.database.repository.ConnectorInstanceRepository;
 import io.openaev.database.repository.CweRepository;
 import io.openaev.database.repository.ExecutorRepository;
 import io.openaev.database.repository.ImportMapperRepository;
+import io.openaev.database.repository.InjectRepository;
 import io.openaev.database.repository.InjectorRepository;
 import io.openaev.database.repository.KillChainPhaseRepository;
 import io.openaev.database.repository.LessonsTemplateRepository;
@@ -165,6 +166,7 @@ class TenantActiveTableAccessArchTest {
           "collectors",
           "executors",
           "injectors",
+          "injects",
           "attackpath_execution",
           "attackpath_finding",
           "secret_references",
@@ -428,6 +430,60 @@ class TenantActiveTableAccessArchTest {
           .areAssignableTo(InjectorRepository.class)
           .because(
               "injectors is tenant-active: an accessor without a tenant scope silently reads zero"
+                  + " rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule injects_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // TxCtx-carrying HTTP entrypoints and their immediate service layer.
+              InjectApi.class,
+              ScenarioInjectApi.class,
+              SimulationInjectApi.class,
+              AtomicTestingApi.class,
+              ExerciseApi.class,
+              io.openaev.rest.challenge.ScenarioChallengeApi.class,
+              io.openaev.rest.challenge.SimulationChallengeApi.class,
+              io.openaev.rest.channel.ExerciseArticleApi.class,
+              io.openaev.rest.channel.ScenarioArticleApi.class,
+              InjectService.class,
+              ScenarioInjectService.class,
+              io.openaev.rest.inject.service.SimulationInjectService.class,
+              io.openaev.rest.inject.service.InjectStatusService.class,
+              io.openaev.rest.inject.service.InjectExecutionService.class,
+              io.openaev.rest.inject.service.InjectDuplicateService.class,
+              io.openaev.rest.inject.service.InjectIndexCleanupService.class,
+              io.openaev.service.AtomicTestingService.class,
+              io.openaev.service.ChallengeService.class,
+              io.openaev.service.GrantService.class,
+              io.openaev.service.InjectImportService.class,
+              io.openaev.service.InjectTestStatusService.class,
+              io.openaev.service.ScenarioToExerciseService.class,
+              ExerciseService.class,
+              ScenarioService.class,
+              io.openaev.service.stix.SecurityCoverageInjectService.class,
+              io.openaev.service.attackpath.AttackPathGraphService.class,
+              AutonomousRunService.class,
+              io.openaev.api.expectations.ExpectationsDriftService.class,
+              io.openaev.service.inject.BatchingInjectStatusService.class,
+              io.openaev.helper.InjectHelper.class,
+              io.openaev.rest.helper.TeamHelper.class,
+              io.openaev.utils.mapper.ExerciseMapper.class,
+              io.openaev.utils.mapper.InjectExpectationMapper.class,
+              // Background paths and data imports with explicit tenant scope handling.
+              io.openaev.scheduler.jobs.AtomicTestingExecutionJob.class,
+              io.openaev.injectors.email.service.ImapService.class,
+              io.openaev.injectors.phishing.service.PhishingTrackingService.class,
+              V1_DataImporter.class,
+              V20260420_Migrate_rabbitmq_queues.class,
+              // Documented degraded telemetry reader under all-tenants scoped transaction.
+              ProductInventoryMetricCollector.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(InjectRepository.class)
+          .because(
+              "injects is tenant-active: an accessor without a tenant scope silently reads zero"
                   + " rows. New accessors must carry a scope and be allowlisted here");
 
   // Phase 3b (activate-tenant-table skill) finding: InjectorContract#getInjectors /

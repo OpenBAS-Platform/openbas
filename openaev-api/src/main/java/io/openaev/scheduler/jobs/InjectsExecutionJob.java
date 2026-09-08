@@ -10,6 +10,8 @@ import io.openaev.aop.LogExecutionTime;
 import io.openaev.aop.audit_log.AuditEvent;
 import io.openaev.aop.audit_log.AuditEventScope;
 import io.openaev.aop.audit_log.AuditLogger;
+import io.openaev.context.TenantScopedTransaction;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.ExerciseRepository;
 import io.openaev.database.repository.InjectDependenciesRepository;
@@ -82,6 +84,7 @@ public class InjectsExecutionJob implements Job {
   private final ActionMetricCollector actionMetricCollector;
   private final EntityManager entityManager;
   private final TenantScopedJobRunner tenantScopedJobRunner;
+  private final TenantScopedTransaction tenantTx;
 
   private final List<ExecutionStatus> executionStatusesNotReady =
       List.of(
@@ -97,21 +100,28 @@ public class InjectsExecutionJob implements Job {
   private final Optional<AuditLogger> auditLogger;
 
   public void handleAutoStartExercises() {
-    // Disable tenant filter — called from InjectsExecutionJob which runs cross-tenant
-    entityManager.unwrap(Session.class).disableFilter("tenantFilter");
-    List<Exercise> exercises = exerciseRepository.findAllShouldBeInRunningState(now());
-    if (exercises.isEmpty()) {
-      return;
-    }
-    actionMetricCollector.addSimulationPlayedCount(exercises.size());
-    List<Exercise> startedExercises = new ArrayList<>(exercises);
-    startedExercises.forEach(
-        exercise -> {
-          exercise.setStatus(ExerciseStatus.RUNNING);
-          exercise.setUpdatedAt(now());
+    // Bulk update by predicate spanning every tenant: opened through the primitive under the
+    // allTenants() intention, so once exercises/injects activate on v2 the write keeps seeing and
+    // scoping every tenant's rows instead of reading zero, silently.
+    tenantTx.execute(
+        TxCtx.allTenants(),
+        () -> {
+          // Disable tenant filter — this job runs cross-tenant
+          entityManager.unwrap(Session.class).disableFilter("tenantFilter");
+          List<Exercise> exercises = exerciseRepository.findAllShouldBeInRunningState(now());
+          if (exercises.isEmpty()) {
+            return;
+          }
+          actionMetricCollector.addSimulationPlayedCount(exercises.size());
+          List<Exercise> startedExercises = new ArrayList<>(exercises);
+          startedExercises.forEach(
+              exercise -> {
+                exercise.setStatus(ExerciseStatus.RUNNING);
+                exercise.setUpdatedAt(now());
+              });
+          exerciseRepository.saveAll(startedExercises);
+          startedExercises.forEach(this::logScheduledLaunch);
         });
-    exerciseRepository.saveAll(startedExercises);
-    startedExercises.forEach(this::logScheduledLaunch);
   }
 
   @VisibleForTesting

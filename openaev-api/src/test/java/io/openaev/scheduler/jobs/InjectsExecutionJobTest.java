@@ -16,6 +16,7 @@ import io.openaev.database.repository.ComcheckRepository;
 import io.openaev.database.repository.EndpointRepository;
 import io.openaev.database.repository.ExerciseRepository;
 import io.openaev.database.repository.InjectRepository;
+import io.openaev.database.repository.ScenarioRepository;
 import io.openaev.database.repository.UserRepository;
 import io.openaev.execution.ExecutableInject;
 import io.openaev.healthcheck.utils.HealthCheckUtils;
@@ -76,6 +77,7 @@ class InjectsExecutionJobTest extends IntegrationTest {
   @Autowired private UserRepository userRepository;
   @Autowired private InjectorContractFixture injectorContractFixture;
   @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
   @Autowired private EndpointRepository endpointRepository;
   @Autowired private AgentRepository agentRepository;
   @Autowired private PlatformTransactionManager transactionManager;
@@ -261,69 +263,105 @@ class InjectsExecutionJobTest extends IntegrationTest {
     @Test
     @DisplayName(
         "given scheduled simulation from scenario should log SCHEDULED_LAUNCH with scenario context")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void given_scheduledSimulationFromScenario_should_logScheduledLaunchWithScenarioContext() {
       // Arrange
-      Scenario scenario =
-          scenarioComposer
-              .forScenario(ScenarioFixture.createDefaultIncidentResponseScenario())
-              .persist()
-              .get();
-      Exercise exercise =
-          ExerciseFixture.createDefaultIncidentResponseExercise(Instant.now().minusSeconds(60));
-      exercise.setScenario(scenario);
-      exerciseComposer.forExercise(exercise).persist();
-      entityManager.flush();
-      clearInvocations(auditLogger);
+      String[] ids = new String[2]; // exerciseId, scenarioId
+      String[] scenarioName = new String[1];
+      try {
+        inTransaction(
+            () -> {
+              Scenario scenario =
+                  scenarioComposer
+                      .forScenario(ScenarioFixture.createDefaultIncidentResponseScenario())
+                      .persist()
+                      .get();
+              Exercise exercise =
+                  ExerciseFixture.createDefaultIncidentResponseExercise(
+                      Instant.now().minusSeconds(60));
+              exercise.setScenario(scenario);
+              exerciseComposer.forExercise(exercise).persist();
+              entityManager.flush();
+              ids[0] = exercise.getId();
+              ids[1] = scenario.getId();
+              scenarioName[0] = scenario.getName();
+            });
+        clearInvocations(auditLogger);
 
-      // Act
-      job.handleAutoStartExercises();
+        // Act
+        job.handleAutoStartExercises();
 
-      // Assert
-      ArgumentCaptor<AuditEvent> eventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
-      verify(auditLogger, atLeastOnce()).logEvent(eventCaptor.capture());
-      AuditEvent event =
-          eventCaptor.getAllValues().stream()
-              .filter(e -> e.getEventScope() == AuditEventScope.SCHEDULED_LAUNCH)
-              .findFirst()
-              .orElseThrow();
+        // Assert
+        ArgumentCaptor<AuditEvent> eventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
+        verify(auditLogger, atLeastOnce()).logEvent(eventCaptor.capture());
+        AuditEvent event =
+            eventCaptor.getAllValues().stream()
+                .filter(e -> e.getEventScope() == AuditEventScope.SCHEDULED_LAUNCH)
+                .findFirst()
+                .orElseThrow();
 
-      assertThat(event.getEventType()).isEqualTo(EventType.SYSTEM);
-      assertThat(event.getResourceId()).isEqualTo(exercise.getId());
-      assertThat(event.getContextData())
-          .containsEntry("simulation_id", exercise.getId())
-          .containsEntry("initiator", "scheduler")
-          .containsEntry("scenario_id", scenario.getId())
-          .containsEntry("scenario_name", scenario.getName());
+        assertThat(event.getEventType()).isEqualTo(EventType.SYSTEM);
+        assertThat(event.getResourceId()).isEqualTo(ids[0]);
+        assertThat(event.getContextData())
+            .containsEntry("simulation_id", ids[0])
+            .containsEntry("initiator", "scheduler")
+            .containsEntry("scenario_id", ids[1])
+            .containsEntry("scenario_name", scenarioName[0]);
+      } finally {
+        // Committed rows (the job opens its own transaction via TenantScopedTransaction, which
+        // refuses to run inside the class-level @Transactional): sweep them explicitly.
+        inTransaction(
+            () -> {
+              exerciseRepository.deleteById(ids[0]);
+              scenarioRepository.deleteById(ids[1]);
+            });
+        exerciseComposer.reset();
+        scenarioComposer.reset();
+      }
     }
 
     @Test
     @DisplayName(
         "given scheduled simulation without scenario should log SCHEDULED_LAUNCH without scenario context")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void
         given_scheduledSimulationWithoutScenario_should_logScheduledLaunchWithoutScenarioContext() {
       // Arrange
-      Exercise exercise =
-          ExerciseFixture.createDefaultIncidentResponseExercise(Instant.now().minusSeconds(60));
-      exerciseComposer.forExercise(exercise).persist();
-      entityManager.flush();
-      clearInvocations(auditLogger);
+      String[] ids = new String[1]; // exerciseId
+      try {
+        inTransaction(
+            () -> {
+              Exercise exercise =
+                  ExerciseFixture.createDefaultIncidentResponseExercise(
+                      Instant.now().minusSeconds(60));
+              exerciseComposer.forExercise(exercise).persist();
+              entityManager.flush();
+              ids[0] = exercise.getId();
+            });
+        clearInvocations(auditLogger);
 
-      // Act
-      job.handleAutoStartExercises();
+        // Act
+        job.handleAutoStartExercises();
 
-      // Assert
-      ArgumentCaptor<AuditEvent> eventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
-      verify(auditLogger, atLeastOnce()).logEvent(eventCaptor.capture());
-      AuditEvent event =
-          eventCaptor.getAllValues().stream()
-              .filter(e -> e.getEventScope() == AuditEventScope.SCHEDULED_LAUNCH)
-              .findFirst()
-              .orElseThrow();
+        // Assert
+        ArgumentCaptor<AuditEvent> eventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
+        verify(auditLogger, atLeastOnce()).logEvent(eventCaptor.capture());
+        AuditEvent event =
+            eventCaptor.getAllValues().stream()
+                .filter(e -> e.getEventScope() == AuditEventScope.SCHEDULED_LAUNCH)
+                .findFirst()
+                .orElseThrow();
 
-      assertThat(event.getContextData())
-          .containsEntry("simulation_id", exercise.getId())
-          .containsEntry("initiator", "scheduler");
-      assertThat(event.getContextData()).doesNotContainKeys("scenario_id", "scenario_name");
+        assertThat(event.getContextData())
+            .containsEntry("simulation_id", ids[0])
+            .containsEntry("initiator", "scheduler");
+        assertThat(event.getContextData()).doesNotContainKeys("scenario_id", "scenario_name");
+      } finally {
+        // Committed rows (the job opens its own transaction via TenantScopedTransaction, which
+        // refuses to run inside the class-level @Transactional): sweep them explicitly.
+        inTransaction(() -> exerciseRepository.deleteById(ids[0]));
+        exerciseComposer.reset();
+      }
     }
 
     @Test

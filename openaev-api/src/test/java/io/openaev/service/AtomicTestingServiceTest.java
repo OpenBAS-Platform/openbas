@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import io.openaev.context.TenantContext;
 import io.openaev.database.model.AssetGroup;
 import io.openaev.database.model.Inject;
 import io.openaev.database.repository.InjectRepository;
@@ -19,8 +18,6 @@ import io.openaev.utils.mapper.PayloadMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -68,17 +65,6 @@ class AtomicTestingServiceTest {
   @InjectMocks private AtomicTestingService atomicTestingService;
 
   private static final String INJECT_ID = "inject-001";
-  private static final String TENANT_ID = "tenant-001";
-
-  @BeforeEach
-  void setUp() {
-    TenantContext.setCurrentTenant(TENANT_ID);
-  }
-
-  @AfterEach
-  void tearDown() {
-    TenantContext.clearCurrentTenant();
-  }
 
   @Nested
   @DisplayName("findById - must not mutate the managed assetGroups collection")
@@ -96,8 +82,7 @@ class AtomicTestingServiceTest {
       Inject inject = new Inject();
       inject.setAssetGroups(assetGroups);
 
-      when(injectRepository.findByIdAndTenantId(INJECT_ID, TENANT_ID))
-          .thenReturn(Optional.of(inject));
+      when(injectRepository.findWithStatusById(INJECT_ID)).thenReturn(Optional.of(inject));
       when(injectMapper.toInjectResultOverviewOutput(inject))
           .thenReturn(mock(InjectResultOverviewOutput.class));
       when(assetGroupService.computeDynamicAssets(assetGroup)).thenReturn(assetGroup);
@@ -123,8 +108,7 @@ class AtomicTestingServiceTest {
       // -------- Arrange --------
       Inject inject = new Inject();
 
-      when(injectRepository.findByIdAndTenantId(INJECT_ID, TENANT_ID))
-          .thenReturn(Optional.of(inject));
+      when(injectRepository.findWithStatusById(INJECT_ID)).thenReturn(Optional.of(inject));
       when(injectMapper.toInjectResultOverviewOutput(inject))
           .thenReturn(mock(InjectResultOverviewOutput.class));
 
