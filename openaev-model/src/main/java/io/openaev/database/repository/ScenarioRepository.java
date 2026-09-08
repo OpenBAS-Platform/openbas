@@ -319,26 +319,21 @@ public interface ScenarioRepository
             AND ic.injector_contract_platforms IS NOT NULL
       ),
       workflow_platforms AS (
-          SELECT s.scenario_id, unnest(ic.injector_contract_platforms) AS scenario_platform
+          SELECT s.scenario_id, platform.scenario_platform
           FROM scenarios s
             JOIN workflows w ON w.workflow_scenario_id = s.scenario_id
             JOIN steps st ON st.step_workflow_id = w.workflow_id
-            JOIN injectors_contracts ic
-              ON ic.injector_contract_id =
-                CASE
-                  WHEN jsonb_typeof(st.step_data -> 'inject_injector_contract') = 'object'
-                    THEN st.step_data -> 'inject_injector_contract' ->> 'injector_contract_id'
-                  WHEN jsonb_typeof(st.step_data -> 'inject_injector_contract') = 'string'
-                    THEN st.step_data ->> 'inject_injector_contract'
-                  ELSE NULL
-                END
-             AND ic.tenant_id = :#{#tenantContext.currentTenant}
+            CROSS JOIN LATERAL jsonb_array_elements_text(
+              COALESCE(
+                st.step_data -> 'inject_injector_contract' -> 'injector_contract_platforms',
+                '[]'::jsonb
+              )
+            ) AS platform(scenario_platform)
           WHERE s.scenario_id IN :scenarioIds
             AND s.tenant_id = :#{#tenantContext.currentTenant}
             AND w.workflow_status = 'TEMPLATE'
             AND st.step_status = 'TEMPLATE'
             AND st.step_template_id IS NULL
-            AND ic.injector_contract_platforms IS NOT NULL
       ),
       all_platforms AS (
           SELECT scenario_id, scenario_platform FROM direct_platforms
