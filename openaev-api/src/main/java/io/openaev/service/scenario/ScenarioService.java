@@ -439,7 +439,7 @@ public class ScenarioService {
   private Expression<String[]> buildWorkflowPlatformExpression(
       CriteriaBuilder cb, Path<?> stepDataPath) {
     // Step data stores injector contract platforms as JSON, so normalize the JSON array text and
-    // convert it back into a SQL text[] that array_agg can consume.
+    // convert it back into a SQL text[] that array_union_agg can consume.
     return cb.function(
         "string_to_array",
         String[].class,
@@ -464,6 +464,7 @@ public class ScenarioService {
                 cb.literal("")),
             cb.literal("]"),
             cb.literal("")),
+        cb.literal(", "),
         cb.literal(","));
   }
 
