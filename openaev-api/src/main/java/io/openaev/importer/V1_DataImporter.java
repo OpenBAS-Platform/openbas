@@ -221,7 +221,6 @@ public class V1_DataImporter implements Importer {
       AssetGroup assetGroup,
       String suffix) {
     Map<String, Base> baseIds = new HashMap<>();
-    String tenantId = tenantWriteScopeResolver.tenantForWrite(ctx, null);
 
     String prefix = "inject_";
     if (importNode.has("exercise_information")) {
@@ -241,14 +240,14 @@ public class V1_DataImporter implements Importer {
 
     // Should be done after tags & documents
     if (prefix.equals("payload_")) {
-      importPayloadAsMain(tenantId, importNode, baseIds);
+      importPayloadAsMain(ctx, importNode, baseIds);
     }
 
     importOrganizations(importNode, prefix, baseIds);
     importUsers(importNode, prefix, baseIds);
     importTeams(importNode, prefix, savedExercise, savedScenario, baseIds);
     importChallenges(importNode, prefix, baseIds);
-    importChannels(tenantId, importNode, prefix, baseIds);
+    importChannels(ctx, importNode, prefix, baseIds);
     importArticles(importNode, prefix, savedExercise, savedScenario, baseIds);
     importObjectives(importNode, prefix, savedExercise, savedScenario, baseIds);
     importLessons(importNode, prefix, savedExercise, savedScenario, baseIds);
@@ -258,7 +257,7 @@ public class V1_DataImporter implements Importer {
     Map<String, String> resolvedContracts = new HashMap<>();
     if (!hasWorkflowImport(importNode, prefix)) {
       importInjects(
-          tenantId,
+          ctx,
           importNode,
           prefix,
           savedExercise,
@@ -271,7 +270,7 @@ public class V1_DataImporter implements Importer {
     importVariables(importNode, savedExercise, savedScenario, baseIds);
     List<SkippedWorkflowStep> skippedSteps =
         importWorkflow(
-            tenantId, importNode, prefix, savedExercise, savedScenario, baseIds, resolvedContracts);
+            ctx, importNode, prefix, savedExercise, savedScenario, baseIds, resolvedContracts);
     List<MissingImportedAction> missingActions =
         skippedSteps.stream().map(V1_DataImporter::toMissingImportedAction).toList();
     return new ImportResult(new ArrayList<>(missingActions));
@@ -455,8 +454,9 @@ public class V1_DataImporter implements Importer {
    * there is no name/external id to recreate them from.
    */
   private List<AttackPattern> importAttackPattern(
-      String tenantId, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+      TxCtx ctx, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
     ArrayList<AttackPattern> attackPatterns = new ArrayList<>();
+    String tenantId = TenantContext.getCurrentTenant();
     resolveJsonElements(importNode, prefix + "attack_patterns")
         .forEach(
             nodeAttackPattern -> {
@@ -502,7 +502,7 @@ public class V1_DataImporter implements Importer {
                         createAttackPattern(
                             nodeAttackPattern,
                             importKillChainPhase(
-                                tenantId, nodeAttackPattern, "attack_pattern_", baseIds)));
+                                ctx, nodeAttackPattern, "attack_pattern_", baseIds)));
                 baseIds.put(id, attackPatternCreated);
                 attackPatterns.add(attackPatternCreated);
               }
@@ -607,16 +607,16 @@ public class V1_DataImporter implements Importer {
    * @return a deduplicated set of resolved attack patterns
    */
   private Set<AttackPattern> mergeAttackPatterns(
-      String tenantId,
+      TxCtx ctx,
       Map<String, Base> baseIds,
       JsonNode node1,
       String prefix1,
       @Nullable JsonNode node2,
       @Nullable String prefix2) {
     Set<AttackPattern> patterns =
-        new LinkedHashSet<>(importAttackPattern(tenantId, node1, prefix1, baseIds));
+        new LinkedHashSet<>(importAttackPattern(ctx, node1, prefix1, baseIds));
     if (node2 != null) {
-      patterns.addAll(importAttackPattern(tenantId, node2, prefix2, baseIds));
+      patterns.addAll(importAttackPattern(ctx, node2, prefix2, baseIds));
     }
     return patterns;
   }
@@ -633,8 +633,9 @@ public class V1_DataImporter implements Importer {
   }
 
   private List<KillChainPhase> importKillChainPhase(
-      String tenantId, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+      TxCtx ctx, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
     List<KillChainPhase> killChainPhases = new ArrayList<>();
+    String tenantId = tenantWriteScopeResolver.tenantForWrite(ctx, null);
     resolveJsonElements(importNode, prefix + "kill_chain_phases")
         .forEach(
             nodeKillChainPhase -> {
@@ -1131,7 +1132,8 @@ public class V1_DataImporter implements Importer {
   // -- CHANNELS --
 
   private void importChannels(
-      String tenantId, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+      TxCtx ctx, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+    String tenantId = tenantWriteScopeResolver.tenantForWrite(ctx, null);
     resolveJsonElements(importNode, prefix + "channels")
         .forEach(
             nodeChannel -> {
@@ -1314,7 +1316,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private void importInjects(
-      String tenantId,
+      TxCtx ctx,
       JsonNode importNode,
       String prefix,
       Exercise savedExercise,
@@ -1361,7 +1363,7 @@ public class V1_DataImporter implements Importer {
             .filter(jsonNode -> !children.contains(jsonNode.get("inject_id").asText()));
 
     importInjects(
-        tenantId,
+        ctx,
         baseIds,
         savedExercise,
         savedScenario,
@@ -1373,7 +1375,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private void importInjects(
-      String tenantId,
+      TxCtx ctx,
       Map<String, Base> baseIds,
       Exercise exercise,
       Scenario scenario,
@@ -1418,7 +1420,7 @@ public class V1_DataImporter implements Importer {
           if (injectorContract.isPresent()) {
             injectorContractId = injectorContract.get().getId();
           } else {
-            resolvedContract = resolveInjectorContract(tenantId, injectContractNode, baseIds);
+            resolvedContract = resolveInjectorContract(ctx, injectContractNode, baseIds);
             injectorContractId = resolvedContract != null ? resolvedContract.getId() : null;
           }
 
@@ -1445,7 +1447,7 @@ public class V1_DataImporter implements Importer {
                   resolvedContract != null ? resolvedContract.getPayload() : null;
               injectorContractId =
                   importInjectorContractFromStarterPack(
-                          tenantId, injectContractNode, createdPayload, baseIds)
+                          ctx, injectContractNode, createdPayload, baseIds)
                       .getId();
             } else {
               log.warn(
@@ -1601,7 +1603,7 @@ public class V1_DataImporter implements Importer {
             .toList();
     if (!childInjects.isEmpty()) {
       importInjects(
-          tenantId,
+          ctx,
           baseIds,
           exercise,
           scenario,
@@ -1623,13 +1625,13 @@ public class V1_DataImporter implements Importer {
    * @return
    */
   private InjectorContract importInjectorContractFromStarterPack(
-      String tenantId, JsonNode importNode, Payload payload, Map<String, Base> baseIds) {
+      TxCtx ctx, JsonNode importNode, Payload payload, Map<String, Base> baseIds) {
     InjectorContract injectorContract = new InjectorContract();
 
     injectorContract.setId(importNode.get("injector_contract_id").textValue());
     injectorContract.setCustom(false);
     injectorContract.setContent(importNode.get("injector_contract_content").textValue());
-    injectorContract.setTenant(new Tenant(tenantId));
+    injectorContract.setTenant(new Tenant(TenantContext.getCurrentTenant()));
     injectorContract.setConvertedContent((ObjectNode) importNode.get("convertedContent"));
     injectorContract.setExternalId(importNode.get("injector_contract_external_id").textValue());
 
@@ -1655,7 +1657,7 @@ public class V1_DataImporter implements Importer {
     injectorContract.setAttackPatterns(
         new ArrayList<>(
             mergeAttackPatterns(
-                tenantId,
+                ctx,
                 baseIds,
                 importNode,
                 "injector_contract_",
@@ -1740,7 +1742,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private PayloadCreateInput buildPayloadCreateInput(
-      String tenantId,
+      TxCtx ctx,
       Map<String, Base> baseIds,
       JsonNode payloadNode,
       @Nullable JsonNode injectorContractNode) {
@@ -1764,7 +1766,7 @@ public class V1_DataImporter implements Importer {
     // Attack patterns — merge from payload and injector contract nodes
     Set<AttackPattern> attackPatterns =
         mergeAttackPatterns(
-            tenantId, baseIds, payloadNode, "payload_", injectorContractNode, "injector_contract_");
+            ctx, baseIds, payloadNode, "payload_", injectorContractNode, "injector_contract_");
     payloadCreateInput.setAttackPatternsIds(
         attackPatterns.stream().map(AttackPattern::getId).collect(Collectors.toList()));
 
@@ -1772,7 +1774,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private String importPayloadAsMain(
-      String tenantId, @NotNull final JsonNode importNode, Map<String, Base> baseIds) {
+      TxCtx ctx, @NotNull final JsonNode importNode, Map<String, Base> baseIds) {
     JsonNode payloadNode = importNode.get("payload_information");
     if (payloadNode == null) {
       return null;
@@ -1804,7 +1806,7 @@ public class V1_DataImporter implements Importer {
       }
     }
     PayloadCreateInput payloadCreateInput =
-        buildPayloadCreateInput(tenantId, baseIds, payloadNode, null);
+        buildPayloadCreateInput(ctx, baseIds, payloadNode, null);
 
     PayloadCreationService.PayloadInjectorContractCreationResult result =
         this.payloadCreationService.createPayload(payloadCreateInput);
@@ -1834,7 +1836,7 @@ public class V1_DataImporter implements Importer {
    *     if resolution failed
    */
   private InjectorContract resolveInjectorContract(
-      String tenantId, @NotNull JsonNode injectContractNode, Map<String, Base> baseIds) {
+      TxCtx ctx, @NotNull JsonNode injectContractNode, Map<String, Base> baseIds) {
     JsonNode payloadNode = injectContractNode.get("injector_contract_payload");
     if (payloadNode == null || payloadNode.isNull() || payloadNode.isEmpty()) {
       return null;
@@ -1864,7 +1866,7 @@ public class V1_DataImporter implements Importer {
     }
 
     // Not found then create the payload and its contract
-    return importPayload(tenantId, payloadNode, injectContractNode, baseIds);
+    return importPayload(ctx, payloadNode, injectContractNode, baseIds);
   }
 
   /**
@@ -1906,7 +1908,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private InjectorContract importPayload(
-      String tenantId,
+      TxCtx ctx,
       @NotNull final JsonNode payloadNode,
       @NotNull final JsonNode injectContractNode,
       Map<String, Base> baseIds) {
@@ -1934,7 +1936,7 @@ public class V1_DataImporter implements Importer {
     }
 
     PayloadCreateInput payloadCreateInput =
-        buildPayloadCreateInput(tenantId, baseIds, payloadNode, injectContractNode);
+        buildPayloadCreateInput(ctx, baseIds, payloadNode, injectContractNode);
     PayloadCreationService.PayloadInjectorContractCreationResult result =
         this.payloadCreationService.createPayload(payloadCreateInput);
 
@@ -2467,7 +2469,7 @@ public class V1_DataImporter implements Importer {
   // -- WORKFLOW (CHAINING) --
 
   private List<SkippedWorkflowStep> importWorkflow(
-      String tenantId,
+      TxCtx ctx,
       JsonNode importNode,
       String prefix,
       Exercise savedExercise,
@@ -2614,7 +2616,7 @@ public class V1_DataImporter implements Importer {
       if (workflowNode.has("workflow_steps")) {
         skippedSteps =
             importWorkflowSteps(
-                tenantId, workflowNode.get("workflow_steps"), workflow, resolvedContracts, baseIds);
+                ctx, workflowNode.get("workflow_steps"), workflow, resolvedContracts, baseIds);
       }
       if (!skippedSteps.isEmpty()) {
         // Unresolvable steps are surfaced to the caller (importData -> ImportResult) so the API can
@@ -2641,7 +2643,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private List<SkippedWorkflowStep> importWorkflowSteps(
-      String tenantId,
+      TxCtx ctx,
       JsonNode stepsNode,
       Workflow workflow,
       Map<String, String> resolvedContracts,
@@ -2683,7 +2685,7 @@ public class V1_DataImporter implements Importer {
       // surfaced here as a skip, so the step is treated EXACTLY like one rejected upfront by
       // evaluateChainingStepResolvability: no saveStep, no stepIdMap entry, added to skippedSteps.
       StepDataResolution stepDataResolution =
-          resolveStepData(tenantId, stepNode, resolvedContracts, baseIds, workflow);
+          resolveStepData(ctx, stepNode, resolvedContracts, baseIds, workflow);
       if (stepDataResolution.isFailed()) {
         SkippedWorkflowStep skipped = stepDataResolution.skipped();
         skippedSteps.add(skipped);
@@ -3055,7 +3057,7 @@ public class V1_DataImporter implements Importer {
    * injector_contract_id.
    */
   private StepDataResolution resolveStepData(
-      String tenantId,
+      TxCtx ctx,
       JsonNode stepNode,
       Map<String, String> resolvedContracts,
       Map<String, Base> baseIds,
@@ -3094,13 +3096,13 @@ public class V1_DataImporter implements Importer {
     JsonNode injectContractNode = dataJson.get("inject_injector_contract");
     if (injectContractNode == null || injectContractNode.isNull()) {
       return StepDataResolution.resolved(
-          sanitizateStepData(tenantId, dataJson, stepDataRaw, workflow, baseIds));
+          sanitizateStepData(ctx, dataJson, stepDataRaw, workflow, baseIds));
     }
 
     String injectorContractId = extractInjectorContractId(injectContractNode);
     if (!hasText(injectorContractId)) {
       return StepDataResolution.resolved(
-          sanitizateStepData(tenantId, dataJson, stepDataRaw, workflow, baseIds));
+          sanitizateStepData(ctx, dataJson, stepDataRaw, workflow, baseIds));
     }
 
     // Contract already exists in DB (tenant-scoped: the composite PK is (tenant_id, id), so the
@@ -3109,7 +3111,7 @@ public class V1_DataImporter implements Importer {
             injectorContractId, TenantContext.getCurrentTenant())
         && !shouldResolveContractFromStepData(injectContractNode, injectorContractId)) {
       return StepDataResolution.resolved(
-          sanitizateStepData(tenantId, dataJson, stepDataRaw, workflow, baseIds));
+          sanitizateStepData(ctx, dataJson, stepDataRaw, workflow, baseIds));
     }
 
     // Already resolved by a previous step or by importInjects — reuse
@@ -3119,7 +3121,7 @@ public class V1_DataImporter implements Importer {
         return StepDataResolution.resolved(stepDataRaw);
       }
       return StepDataResolution.resolved(
-          sanitizateStepData(tenantId, dataJson, stepDataRaw, workflow, baseIds));
+          sanitizateStepData(ctx, dataJson, stepDataRaw, workflow, baseIds));
     }
 
     if (!(injectContractNode instanceof ObjectNode injectContractObject)) {
@@ -3127,7 +3129,7 @@ public class V1_DataImporter implements Importer {
           "Step data references missing injector contract {} in textual form with no payload to recreate",
           injectorContractId);
       return StepDataResolution.resolved(
-          sanitizateStepData(tenantId, dataJson, stepDataRaw, workflow, baseIds));
+          sanitizateStepData(ctx, dataJson, stepDataRaw, workflow, baseIds));
     }
 
     // Contract is missing then resolve using the same logic as importInjects
@@ -3137,7 +3139,7 @@ public class V1_DataImporter implements Importer {
           "Step data references missing injector contract {} with no payload to recreate",
           injectorContractId);
       return StepDataResolution.resolved(
-          sanitizateStepData(tenantId, dataJson, stepDataRaw, workflow, baseIds));
+          sanitizateStepData(ctx, dataJson, stepDataRaw, workflow, baseIds));
     }
 
     // A partial payload shape (e.g. only a stale payload_id, missing the fields buildPayload()
@@ -3155,7 +3157,7 @@ public class V1_DataImporter implements Importer {
 
     InjectorContract resolvedStepContract;
     try {
-      resolvedStepContract = resolveInjectorContract(tenantId, injectContractObject, baseIds);
+      resolvedStepContract = resolveInjectorContract(ctx, injectContractObject, baseIds);
     } catch (Exception e) {
       // Recreation failed on unexpected embedded data BEFORE any transactional work (e.g. a
       // malformed field slipping past hasEmbeddedPayloadData in buildPayloadCreateInput, which
@@ -3186,7 +3188,7 @@ public class V1_DataImporter implements Importer {
         return StepDataResolution.resolved(stepDataRaw);
       }
       return StepDataResolution.resolved(
-          sanitizateStepData(tenantId, dataJson, stepDataRaw, workflow, baseIds));
+          sanitizateStepData(ctx, dataJson, stepDataRaw, workflow, baseIds));
     }
 
     // Creation was attempted (embedded payload present) but failed silently: importPayload returned
@@ -3207,7 +3209,7 @@ public class V1_DataImporter implements Importer {
     }
 
     return StepDataResolution.resolved(
-        sanitizateStepData(tenantId, dataJson, stepDataRaw, workflow, baseIds));
+        sanitizateStepData(ctx, dataJson, stepDataRaw, workflow, baseIds));
   }
 
   /**
@@ -3323,7 +3325,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private String sanitizateStepData(
-      String tenantId,
+      TxCtx ctx,
       JsonNode dataJson,
       String fallback,
       Workflow workflow,
@@ -3368,7 +3370,7 @@ public class V1_DataImporter implements Importer {
     if (injectContractNode instanceof ObjectNode injectContractObject) {
       rewriteImportedTagIds(injectContractObject, "injector_contract_tags", baseIds);
       rewriteInjectorContractDomains(injectContractObject, baseIds);
-      rewriteInjectorContractAttackPatterns(tenantId, injectContractObject, baseIds);
+      rewriteInjectorContractAttackPatterns(ctx, injectContractObject, baseIds);
     }
     buildStepTtpFromInjectorContract(dataObject);
     if (workflow.getSimulation() != null) {
@@ -3572,11 +3574,11 @@ public class V1_DataImporter implements Importer {
    * the DB right after in getInjectFromDataStep()).
    */
   private void rewriteInjectorContractAttackPatterns(
-      String tenantId, ObjectNode contractNode, Map<String, Base> baseIds) {
-    rewriteAttackPatternArray(tenantId, contractNode, "injector_contract_", baseIds);
+      TxCtx ctx, ObjectNode contractNode, Map<String, Base> baseIds) {
+    rewriteAttackPatternArray(ctx, contractNode, "injector_contract_", baseIds);
     JsonNode payloadNode = contractNode.get("injector_contract_payload");
     if (payloadNode instanceof ObjectNode payloadObject) {
-      rewriteAttackPatternArray(tenantId, payloadObject, "payload_", baseIds);
+      rewriteAttackPatternArray(ctx, payloadObject, "payload_", baseIds);
     }
   }
 
@@ -3618,7 +3620,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private void rewriteAttackPatternArray(
-      String tenantId, ObjectNode node, String prefix, Map<String, Base> baseIds) {
+      TxCtx ctx, ObjectNode node, String prefix, Map<String, Base> baseIds) {
     JsonNode attackPatternsNode = node.get(prefix + "attack_patterns");
     if (attackPatternsNode == null || !attackPatternsNode.isArray()) {
       return;
@@ -3626,7 +3628,7 @@ public class V1_DataImporter implements Importer {
     // importAttackPattern resolves both OBJECT entries (baseIds cache, external id, creation) and
     // SCALAR entries (baseIds cache, tenant-scoped existence check) — see its javadoc.
     List<AttackPattern> resolvedAttackPatterns =
-        importAttackPattern(tenantId, node, prefix, baseIds);
+        importAttackPattern(ctx, node, prefix, baseIds);
     LinkedHashSet<String> ids = new LinkedHashSet<>();
     for (AttackPattern attackPattern : resolvedAttackPatterns) {
       if (attackPattern != null && attackPattern.getId() != null) {
