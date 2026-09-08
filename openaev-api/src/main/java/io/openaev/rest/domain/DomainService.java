@@ -71,7 +71,6 @@ public class DomainService implements DependenciesManager {
     return domainRepository.findAllById(domainIds);
   }
 
-  @Transactional
   public Domain upsert(final DomainBaseInput input, final String tenantId) {
     return this.upsert(input.getName(), input.getColor(), new Tenant(tenantId));
   }
