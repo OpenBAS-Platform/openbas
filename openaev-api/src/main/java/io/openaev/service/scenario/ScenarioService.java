@@ -97,6 +97,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.hibernate.Hibernate;
+import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -280,6 +281,7 @@ public class ScenarioService {
             Specification<Scenario>, Specification<Scenario>, Pageable, Page<RawPaginationScenario>>
         findAll = getFindAllFunction(deepFilterSpecification, joinMap);
 
+    // Compute pagination from find all
     return buildPaginationCriteriaBuilder(findAll, searchPaginationInput, Scenario.class, joinMap);
   }
 
@@ -324,9 +326,10 @@ public class ScenarioService {
     Join<Base, Base> scenarioTagsJoin = scenarioRoot.join("tags", JoinType.LEFT);
     joinMap.put("tags", scenarioTagsJoin);
     Expression<String> nullString = cb.nullLiteral(String.class);
-    Expression<String[]> arr = cb.function("array_agg", String[].class, scenarioTagsJoin.get("id"));
+    Expression<String[]> arr =
+        ((HibernateCriteriaBuilder) cb).arrayAgg(null, scenarioTagsJoin.get("id"));
     Expression<String[]> tagIdsExpression =
-        cb.function("array_remove", String[].class, arr, nullString);
+        ((HibernateCriteriaBuilder) cb).arrayRemove(arr, nullString);
 
     // Join on INJECT and INJECTOR CONTRACT
     Join<Base, Base> injectsJoin = scenarioRoot.join("injects", JoinType.LEFT);
