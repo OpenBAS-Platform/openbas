@@ -40,10 +40,12 @@ class ChannelNonAdminIsolationTest extends IntegrationTest {
   @BeforeEach
   void seedTwoTenantsTheNonAdminBelongsToWithOneChannelEach() throws Exception {
     tenantA =
-        tenantHelper.createTenantWithCapabilities("nonadmin-channel-a", Set.of(Capability.ACCESS_CHANNELS))
+        tenantHelper
+            .createTenantWithCapabilities("nonadmin-channel-a", Set.of(Capability.ACCESS_CHANNELS))
             .getId();
     String tenantB =
-        tenantHelper.createTenantWithCapabilities("nonadmin-channel-b", Set.of(Capability.ACCESS_CHANNELS))
+        tenantHelper
+            .createTenantWithCapabilities("nonadmin-channel-b", Set.of(Capability.ACCESS_CHANNELS))
             .getId();
     channelA = seedChannel(tenantA, "nonadmin-channel-a");
     channelB = seedChannel(tenantB, "nonadmin-channel-b");
@@ -58,7 +60,8 @@ class ChannelNonAdminIsolationTest extends IntegrationTest {
             .andReturn()
             .getResponse()
             .getContentAsString();
-    assertTrue(response.contains(channelA), "A's channel must appear for the non-admin member of A");
+    assertTrue(
+        response.contains(channelA), "A's channel must appear for the non-admin member of A");
     assertFalse(response.contains(channelB), "B's channel must not leak to A's scope");
   }
 

@@ -86,7 +86,8 @@ class ChannelHttpIsolationTest extends IntegrationTest {
             .andReturn()
             .getResponse()
             .getContentAsString();
-    assertTrue(response.contains(channelA), "A's channel must appear when A is selected via header");
+    assertTrue(
+        response.contains(channelA), "A's channel must appear when A is selected via header");
     assertFalse(response.contains(channelB), "B's channel must not appear");
   }
 
@@ -120,7 +121,8 @@ class ChannelHttpIsolationTest extends IntegrationTest {
     String storedTenant =
         (String)
             entityManager
-                .createNativeQuery("SELECT tenant_id FROM channels WHERE channel_id = CAST(:id AS uuid)")
+                .createNativeQuery(
+                    "SELECT tenant_id FROM channels WHERE channel_id = CAST(:id AS uuid)")
                 .setParameter("id", createdId)
                 .getSingleResult();
     assertEquals(tenantA, storedTenant, "the created channel must belong to tenant A");

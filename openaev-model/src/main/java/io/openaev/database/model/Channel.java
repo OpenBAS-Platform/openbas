@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openaev.database.audit.ModelBaseListener;
-import io.openaev.database.audit.TenantBaseListener;
 import io.openaev.helper.MonoIdSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -24,11 +23,8 @@ import org.hibernate.annotations.UuidGenerator;
 @Setter
 @Entity
 @Table(name = "channels")
-@EntityListeners({ModelBaseListener.class, TenantBaseListener.class})
+@EntityListeners(ModelBaseListener.class)
 // channels is fully on v2 tenant isolation (TenantStatementInspector + can_access_tenant).
-// The v1 @Filter must not come back: it would AND its thread-local predicate with the v2 scope and
-// silently empty header-routed reads. TenantBaseListener stays as an inert fallback because every
-// reviewed write path now sets tenant explicitly before save.
 public class Channel implements TenantBase {
 
   @Id
