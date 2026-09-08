@@ -15,6 +15,8 @@ import es8.co.elastic.clients.json.JsonData;
 import es8.co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import es8.co.elastic.clients.transport.ElasticsearchTransport;
 import es8.co.elastic.clients.transport.rest_client.RestClientTransport;
+import es8.org.elasticsearch.client.RestClient;
+import es8.org.elasticsearch.client.RestClientBuilder;
 import io.openaev.config.EngineConfig;
 import io.openaev.database.model.IndexingStatus;
 import io.openaev.database.repository.IndexingStatusRepository;
@@ -39,8 +41,6 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
