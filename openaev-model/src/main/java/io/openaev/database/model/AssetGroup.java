@@ -51,10 +51,9 @@ public class AssetGroup implements TenantBase {
   // TenantWriteScopeResolver, and background callers pass the tenant their own scope was opened
   // for.
   //
-  // Of the eight entities activated before this one, seven still carry a tenant listener; only
-  // security_coverages had already dropped it. Its fixture stamps the tenant itself, and
-  // AssetGroupFixture now does the same, which is what makes the removal a small diff rather than a
-  // rewrite of every call site.
+  // AssetGroupFixture stamps the tenant itself, the way SecurityCoverageFixture already did, which
+  // is what makes the removal a small diff rather than a rewrite of every call site. Eight of the
+  // nineteen active tables still carry a listener; removing those is tracked in #7844.
 
   @Id
   @ControlledUuidGeneration
