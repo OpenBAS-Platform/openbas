@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openaev.aop.lock.Lock;
 import io.openaev.aop.lock.LockResourceType;
-import io.openaev.context.TenantContext;
+import io.openaev.config.TenantWriteScopeResolver;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.raw.RawPayloadRelatedIds;
@@ -89,6 +89,7 @@ public class PayloadService {
   private final InjectIndexCleanupService injectIndexCleanupService;
   private final ChainingStepCleanupService chainingStepCleanupService;
   private final InjectorContractService injectorContractService;
+  private final TenantWriteScopeResolver writeScopeResolver;
 
   private final PayloadMapper payloadMapper;
 
@@ -535,7 +536,7 @@ public class PayloadService {
         List.of(),
         domainService.upserts(
             Set.of(InjectorContractDomainDTO.fromDomain(PresetDomain.getEndpoint())),
-            TenantContext.getCurrentTenant()),
+            writeScopeResolver.tenantForWrite(ctx, null)),
         tagService.findOrCreateTagsFromNames(ctx, new HashSet<>(Set.of(OPENCTI_TAG_NAME))));
     return saved;
   }
@@ -593,7 +594,7 @@ public class PayloadService {
                 PresetDomain.getEndpoint(),
                 PresetDomain.getNetwork(),
                 PresetDomain.getUrlFiltering()),
-            TenantContext.getCurrentTenant()),
+            writeScopeResolver.tenantForWrite(ctx, null)),
         tagService.findOrCreateTagsFromNames(ctx, new HashSet<>(Set.of(OPENCTI_TAG_NAME))));
     return saved;
   }
