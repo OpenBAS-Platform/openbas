@@ -19,9 +19,9 @@ public interface ChallengeRepository
 
   /**
    * Per-tenant business-key lookup for find-or-create paths (e.g. import): looking up by the bare
-   * name under a multi-tenant read scope could match one row per in-scope tenant and silently
-   * reuse another tenant's challenge. Callers must resolve the write tenant first and look up
-   * scoped to it.
+   * name under a multi-tenant read scope could match one row per in-scope tenant and silently reuse
+   * another tenant's challenge. Callers must resolve the write tenant first and look up scoped to
+   * it.
    */
   @NotNull
   List<Challenge> findByNameIgnoreCaseAndTenantId(
