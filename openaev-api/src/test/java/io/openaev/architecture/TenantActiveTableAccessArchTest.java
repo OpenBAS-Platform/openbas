@@ -126,6 +126,7 @@ import io.openaev.service.autonomous.CapabilityResolverService;
 import io.openaev.service.chaining.ScopeSnapshotService;
 import io.openaev.service.connector_instances.ConnectorInstanceService;
 import io.openaev.service.connectors.ConnectorOrchestrationService;
+import io.openaev.service.expectation.ChallengeBehavior;
 import io.openaev.service.scenario.ScenarioService;
 import io.openaev.service.stix.SecurityCoverageService;
 import io.openaev.service.targets.search.AgentTargetSearchAdaptor;
@@ -192,7 +193,7 @@ class TenantActiveTableAccessArchTest {
           "autonomous_directives",
           "kill_chain_phases",
           "security_coverages",
-          "challenges");
+          "challenges",
           "asset_groups");
 
   @ArchTest
@@ -876,6 +877,11 @@ class TenantActiveTableAccessArchTest {
               // opens the tenant transaction InjectsExecutionJob runs every inject execution
               // under, independently of the TxCtx/@Transactional aspect:
               ChallengeExecutor.class,
+              // Expectation expansion: resolves the challenges referenced by the inject content
+              // (findAllById on IDs already scoped to this inject) while building
+              // ChallengeInjectExpectation entries during the same inject-execution flow as
+              // ChallengeExecutor above, so it runs under the same scoped transaction:
+              ChallengeBehavior.class,
               // Import path: resolves the write tenant explicitly and looks rows up by the
               // per-tenant business-key predicate before create:
               V1_DataImporter.class,

@@ -454,7 +454,7 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.challenge.ScenarioChallengeApi#scenarioChallenges",
           "io.openaev.rest.challenge.SimulationChallengeApi#exerciseChallenges",
           "io.openaev.rest.challenge.SimulationChallengeApi#observerChallenges",
-          "io.openaev.rest.challenge.SimulationChallengeApi#playerChallenges");
+          "io.openaev.rest.challenge.SimulationChallengeApi#playerChallenges",
           // asset_groups activation (#6435). Every endpoint the Phase 1 inventory found
           // reading the table, whether it returns asset groups or merely consumes them.
           // The wiring itself came with #7781; listing them here is what stops a future
