@@ -51,6 +51,8 @@ import io.openaev.importer.V1_DataImporter;
 import io.openaev.injectors.challenge.ChallengeExecutor;
 import io.openaev.injectors.phishing.service.PhishingLandingPageService;
 import io.openaev.integration.ManagerFactory;
+import io.openaev.integration.impl.injectors.challenge.ChallengeInjectorIntegration;
+import io.openaev.integration.impl.injectors.challenge.ChallengeInjectorIntegrationFactory;
 import io.openaev.integration.migration.ConfigurationMigration;
 import io.openaev.processor.core.V20260420_Migrate_rabbitmq_queues;
 import io.openaev.processor.datapack.V20260330_Default_tenant_data;
@@ -65,6 +67,7 @@ import io.openaev.rest.challenge.SimulationChallengeApi;
 import io.openaev.rest.collector.CollectorApi;
 import io.openaev.rest.collector.service.CollectorService;
 import io.openaev.rest.connector_instance.ConnectorInstanceApi;
+import io.openaev.rest.document.DocumentService;
 import io.openaev.rest.executor.ExecutorApi;
 import io.openaev.rest.exercise.ExerciseApi;
 import io.openaev.rest.exercise.ExerciseImportApi;
@@ -846,6 +849,12 @@ class TenantActiveTableAccessArchTest {
               // Import path: resolves the write tenant explicitly and looks rows up by the
               // per-tenant business-key predicate before create:
               V1_DataImporter.class,
+              // Wiring-only dependencies: they pass the repository through to ChallengeExecutor,
+              // whose execution path is already scoped (allowlisted above).
+              ChallengeInjectorIntegration.class,
+              ChallengeInjectorIntegrationFactory.class,
+              // Documents path resolves challenge documents under TxCtx-carrying APIs.
+              DocumentService.class,
               // Platform-wide telemetry counter, intentionally unscoped (documented degradation):
               // once challenges is active it counts only the caller's tenant, not the platform
               // total. Tracked as an accepted limitation, not a blocker.

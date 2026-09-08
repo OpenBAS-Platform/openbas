@@ -179,7 +179,7 @@ class ChallengeHttpIsolationTest extends IntegrationTest {
   @DisplayName("under tenant A's path: deleting B's challenge is a no-op and leaves it in place")
   void deleteUnderTenantAOfBChallengeIsBlocked() throws Exception {
     mvc.perform(delete(TENANT_CHALLENGE_BY_ID, tenantA, challengeB).with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+        .andExpect(status().isNotFound());
     assertEquals(1L, rawCount(challengeB), "B's challenge must survive tenant A's delete attempt");
   }
 
