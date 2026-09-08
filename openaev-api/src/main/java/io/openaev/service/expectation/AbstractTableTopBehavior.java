@@ -31,7 +31,7 @@ public abstract class AbstractTableTopBehavior
 
   /**
    * Creates and persists expectations for each team/player target. Results are set on player-level
-   * expectations only via {@link #buildDefaultPlayerResult()}.
+   * expectations only.
    */
   @Override
   public void initializeAndSaveInjectExpectationsFromExecutableInject(
