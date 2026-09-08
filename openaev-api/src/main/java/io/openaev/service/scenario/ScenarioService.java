@@ -288,30 +288,27 @@ public class ScenarioService {
   }
 
   private Page<RawPaginationScenario> enrichScenarioPlatforms(Page<RawPaginationScenario> page) {
-    Map<String, Set<String>> workflowPlatformsByScenarioId =
-        resolveWorkflowPlatforms(
-            page.getContent().stream()
-                .filter(scenario -> hasText(scenario.getScenario_workflow_id()))
-                .map(RawPaginationScenario::getScenario_id)
-                .toList());
+    Map<String, Set<String>> scenarioPlatformsByScenarioId =
+        resolveScenarioPlatforms(
+            page.getContent().stream().map(RawPaginationScenario::getScenario_id).toList());
     return page.map(
         scenario -> {
           Set<String> platforms =
               new LinkedHashSet<>(
                   Optional.ofNullable(scenario.getScenario_platforms()).orElseGet(Set::of));
           platforms.addAll(
-              Optional.ofNullable(workflowPlatformsByScenarioId.get(scenario.getScenario_id()))
+              Optional.ofNullable(scenarioPlatformsByScenarioId.get(scenario.getScenario_id()))
                   .orElseGet(Set::of));
           scenario.setScenario_platforms(platforms);
           return scenario;
         });
   }
 
-  private Map<String, Set<String>> resolveWorkflowPlatforms(List<String> scenarioIds) {
+  private Map<String, Set<String>> resolveScenarioPlatforms(List<String> scenarioIds) {
     if (scenarioIds == null || scenarioIds.isEmpty()) {
       return Map.of();
     }
-    return scenarioRepository.findWorkflowPlatformsByScenarioIds(scenarioIds).stream()
+    return scenarioRepository.findScenarioPlatformsByScenarioIds(scenarioIds).stream()
         .collect(
             Collectors.toMap(
                 RawScenarioSimpleIndexing::getScenario_id,

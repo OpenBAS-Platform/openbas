@@ -307,28 +307,38 @@ public interface ScenarioRepository
   @Query(
       value =
           """
-      WITH scenario_workflows AS (
-          SELECT s.scenario_id, w.workflow_id
+      WITH direct_platforms AS (
+          SELECT s.scenario_id, unnest(ic.injector_contract_platforms) AS scenario_platform
           FROM scenarios s
-            JOIN workflows w ON w.workflow_scenario_id = s.scenario_id
+            JOIN injects i ON i.inject_scenario = s.scenario_id
+            JOIN injectors_contracts ic
+              ON ic.injector_contract_id = i.inject_injector_contract
+             AND ic.tenant_id = i.tenant_id
           WHERE s.scenario_id IN :scenarioIds
             AND s.tenant_id = :#{#tenantContext.currentTenant}
-            AND w.workflow_status = 'TEMPLATE'
+            AND ic.injector_contract_platforms IS NOT NULL
       ),
-      allowed_assets AS (
-          SELECT sw.scenario_id, a.asset_id
-          FROM scenario_workflows sw
-            JOIN workflow_scope_rules r ON r.workflow_id = sw.workflow_id
+      workflow_asset_platforms AS (
+          SELECT s.scenario_id, a.endpoint_platform AS scenario_platform
+          FROM scenarios s
+            JOIN workflows w ON w.workflow_scenario_id = s.scenario_id
+            JOIN workflow_scope_rules r ON r.workflow_id = w.workflow_id
             JOIN assets a
               ON a.asset_id = r.workflow_scope_rule_value
              AND a.tenant_id = :#{#tenantContext.currentTenant}
-          WHERE r.workflow_scope_rule_selected_mode = 'ALLOWLIST'
+          WHERE s.scenario_id IN :scenarioIds
+            AND s.tenant_id = :#{#tenantContext.currentTenant}
+            AND w.workflow_status = 'TEMPLATE'
+            AND r.workflow_scope_rule_selected_mode = 'ALLOWLIST'
             AND r.workflow_scope_rule_value_type = 'ASSET_ID'
             AND a.asset_type = 'Endpoint'
+            AND a.endpoint_platform IS NOT NULL
+            AND a.endpoint_platform <> 'Unknown'
           UNION
-          SELECT sw.scenario_id, a.asset_id
-          FROM scenario_workflows sw
-            JOIN workflow_scope_rules r ON r.workflow_id = sw.workflow_id
+          SELECT s.scenario_id, a.endpoint_platform AS scenario_platform
+          FROM scenarios s
+            JOIN workflows w ON w.workflow_scenario_id = s.scenario_id
+            JOIN workflow_scope_rules r ON r.workflow_id = w.workflow_id
             JOIN asset_groups ag
               ON ag.asset_group_id = r.workflow_scope_rule_value
              AND ag.tenant_id = :#{#tenantContext.currentTenant}
@@ -336,23 +346,26 @@ public interface ScenarioRepository
             JOIN assets a
               ON a.asset_id = aga.asset_id
              AND a.tenant_id = :#{#tenantContext.currentTenant}
-          WHERE r.workflow_scope_rule_selected_mode = 'ALLOWLIST'
+          WHERE s.scenario_id IN :scenarioIds
+            AND s.tenant_id = :#{#tenantContext.currentTenant}
+            AND w.workflow_status = 'TEMPLATE'
+            AND r.workflow_scope_rule_selected_mode = 'ALLOWLIST'
             AND r.workflow_scope_rule_value_type = 'ASSET_GROUP_ID'
             AND a.asset_type = 'Endpoint'
-      ),
-      platform_targets AS (
-          SELECT allowed.scenario_id, array_agg(DISTINCT a.endpoint_platform) AS scenario_platforms
-          FROM allowed_assets allowed
-            JOIN assets a ON a.asset_id = allowed.asset_id
-          WHERE a.endpoint_platform IS NOT NULL
+            AND a.endpoint_platform IS NOT NULL
             AND a.endpoint_platform <> 'Unknown'
-          GROUP BY allowed.scenario_id
+      ),
+      all_platforms AS (
+          SELECT scenario_id, scenario_platform FROM direct_platforms
+          UNION ALL
+          SELECT scenario_id, scenario_platform FROM workflow_asset_platforms
       )
-      SELECT scenario_id, scenario_platforms
-      FROM platform_targets
+      SELECT scenario_id, array_agg(DISTINCT scenario_platform) AS scenario_platforms
+      FROM all_platforms
+      GROUP BY scenario_id
       """,
       nativeQuery = true)
-  List<RawScenarioSimpleIndexing> findWorkflowPlatformsByScenarioIds(
+  List<RawScenarioSimpleIndexing> findScenarioPlatformsByScenarioIds(
       @Param("scenarioIds") List<String> scenarioIds);
 
   // -- CATEGORY --

@@ -268,11 +268,11 @@ class ScenarioServiceUnitTest {
   class EnrichScenarioPlatforms {
 
     @Test
-    void given_chained_scenario_list_item_should_merge_workflow_target_platforms() {
-      RawPaginationScenario scenario =
+    void given_scenario_list_items_should_merge_repo_platforms_for_all_scenarios() {
+      RawPaginationScenario chainedScenario =
           new RawPaginationScenario(
               "scenario-1",
-              "Scenario",
+              "Scenario 1",
               "Description",
               Scenario.SEVERITY.medium,
               "Category",
@@ -281,13 +281,31 @@ class ScenarioServiceUnitTest {
               new String[] {"Linux"},
               new String[] {"Windows"},
               "workflow-1");
-      Page<RawPaginationScenario> page = new PageImpl<>(List.of(scenario));
+      RawPaginationScenario timeBasedScenario =
+          new RawPaginationScenario(
+              "scenario-2",
+              "Scenario 2",
+              "Description",
+              Scenario.SEVERITY.medium,
+              "Category",
+              null,
+              now(),
+              new String[] {"Linux"},
+              new String[] {"Linux"},
+              null);
+      Page<RawPaginationScenario> page =
+          new PageImpl<>(List.of(chainedScenario, timeBasedScenario));
 
-      RawScenarioSimpleIndexing workflowPlatforms = mock(RawScenarioSimpleIndexing.class);
-      when(workflowPlatforms.getScenario_id()).thenReturn("scenario-1");
-      when(workflowPlatforms.getScenario_platforms()).thenReturn(Set.of("MacOS", "Windows"));
-      when(scenarioRepository.findWorkflowPlatformsByScenarioIds(List.of("scenario-1")))
-          .thenReturn(List.of(workflowPlatforms));
+      RawScenarioSimpleIndexing platformsForChainedScenario = mock(RawScenarioSimpleIndexing.class);
+      when(platformsForChainedScenario.getScenario_id()).thenReturn("scenario-1");
+      when(platformsForChainedScenario.getScenario_platforms()).thenReturn(Set.of("MacOS"));
+      RawScenarioSimpleIndexing platformsForTimeBasedScenario =
+          mock(RawScenarioSimpleIndexing.class);
+      when(platformsForTimeBasedScenario.getScenario_id()).thenReturn("scenario-2");
+      when(platformsForTimeBasedScenario.getScenario_platforms()).thenReturn(Set.of("Windows"));
+      when(scenarioRepository.findScenarioPlatformsByScenarioIds(
+              List.of("scenario-1", "scenario-2")))
+          .thenReturn(List.of(platformsForChainedScenario, platformsForTimeBasedScenario));
 
       @SuppressWarnings("unchecked")
       Page<RawPaginationScenario> enriched =
@@ -298,33 +316,10 @@ class ScenarioServiceUnitTest {
       assertEquals(
           Set.of("Linux", "Windows", "MacOS"),
           enriched.getContent().get(0).getScenario_platforms());
-      verify(scenarioRepository).findWorkflowPlatformsByScenarioIds(List.of("scenario-1"));
-    }
-
-    @Test
-    void given_time_based_scenario_list_item_should_not_query_workflow_platforms() {
-      RawPaginationScenario scenario =
-          new RawPaginationScenario(
-              "scenario-2",
-              "Scenario",
-              "Description",
-              Scenario.SEVERITY.medium,
-              "Category",
-              null,
-              now(),
-              new String[] {"Linux"},
-              new String[] {"Linux"},
-              null);
-      Page<RawPaginationScenario> page = new PageImpl<>(List.of(scenario));
-
-      @SuppressWarnings("unchecked")
-      Page<RawPaginationScenario> enriched =
-          (Page<RawPaginationScenario>)
-              ReflectionTestUtils.invokeMethod(scenarioService, "enrichScenarioPlatforms", page);
-
-      assertNotNull(enriched);
-      assertEquals(Set.of("Linux"), enriched.getContent().get(0).getScenario_platforms());
-      verify(scenarioRepository, never()).findWorkflowPlatformsByScenarioIds(anyList());
+      assertEquals(
+          Set.of("Linux", "Windows"), enriched.getContent().get(1).getScenario_platforms());
+      verify(scenarioRepository)
+          .findScenarioPlatformsByScenarioIds(List.of("scenario-1", "scenario-2"));
     }
   }
 
