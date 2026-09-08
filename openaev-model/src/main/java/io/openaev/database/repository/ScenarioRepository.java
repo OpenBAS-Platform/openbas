@@ -340,12 +340,16 @@ public interface ScenarioRepository
             AND r.workflow_scope_rule_value_type = 'ASSET_GROUP_ID'
             AND a.asset_type = 'Endpoint'
       ),
-      SELECT allowed.scenario_id, array_agg(DISTINCT a.endpoint_platform) AS scenario_platforms
-      FROM allowed_assets allowed
-        JOIN assets a ON a.asset_id = allowed.asset_id
-      WHERE a.endpoint_platform IS NOT NULL
-        AND a.endpoint_platform <> 'Unknown'
-      GROUP BY allowed.scenario_id
+      platform_targets AS (
+          SELECT allowed.scenario_id, array_agg(DISTINCT a.endpoint_platform) AS scenario_platforms
+          FROM allowed_assets allowed
+            JOIN assets a ON a.asset_id = allowed.asset_id
+          WHERE a.endpoint_platform IS NOT NULL
+            AND a.endpoint_platform <> 'Unknown'
+          GROUP BY allowed.scenario_id
+      )
+      SELECT scenario_id, scenario_platforms
+      FROM platform_targets
       """,
       nativeQuery = true)
   List<RawScenarioSimpleIndexing> findWorkflowPlatformsByScenarioIds(

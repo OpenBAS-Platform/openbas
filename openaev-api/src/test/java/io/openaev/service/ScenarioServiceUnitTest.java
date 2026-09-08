@@ -8,6 +8,8 @@ import io.openaev.config.OpenAEVConfig;
 import io.openaev.config.cache.LicenseCacheManager;
 import io.openaev.context.TenantContext;
 import io.openaev.database.model.*;
+import io.openaev.database.raw.RawPaginationScenario;
+import io.openaev.database.raw.RawScenarioSimpleIndexing;
 import io.openaev.database.repository.*;
 import io.openaev.ee.EnterpriseEditionService;
 import io.openaev.healthcheck.utils.HealthCheckUtils;
@@ -31,6 +33,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -256,6 +260,71 @@ class ScenarioServiceUnitTest {
 
       // -- ASSERT --
       assertEquals(List.of("reply@mail.com"), scenario.getReplyTos());
+    }
+  }
+
+  @Nested
+  @DisplayName("Enrich scenario platforms")
+  class EnrichScenarioPlatforms {
+
+    @Test
+    void given_chained_scenario_list_item_should_merge_workflow_target_platforms() {
+      RawPaginationScenario scenario =
+          new RawPaginationScenario(
+              "scenario-1",
+              "Scenario",
+              "Description",
+              Scenario.SEVERITY.medium,
+              "Category",
+              null,
+              now(),
+              new String[] {"Linux"},
+              new String[] {"Windows"},
+              "workflow-1");
+      Page<RawPaginationScenario> page = new PageImpl<>(List.of(scenario));
+
+      RawScenarioSimpleIndexing workflowPlatforms = mock(RawScenarioSimpleIndexing.class);
+      when(workflowPlatforms.getScenario_id()).thenReturn("scenario-1");
+      when(workflowPlatforms.getScenario_platforms()).thenReturn(Set.of("MacOS", "Windows"));
+      when(scenarioRepository.findWorkflowPlatformsByScenarioIds(List.of("scenario-1")))
+          .thenReturn(List.of(workflowPlatforms));
+
+      @SuppressWarnings("unchecked")
+      Page<RawPaginationScenario> enriched =
+          (Page<RawPaginationScenario>)
+              ReflectionTestUtils.invokeMethod(scenarioService, "enrichScenarioPlatforms", page);
+
+      assertNotNull(enriched);
+      assertEquals(
+          Set.of("Linux", "Windows", "MacOS"),
+          enriched.getContent().get(0).getScenario_platforms());
+      verify(scenarioRepository).findWorkflowPlatformsByScenarioIds(List.of("scenario-1"));
+    }
+
+    @Test
+    void given_time_based_scenario_list_item_should_not_query_workflow_platforms() {
+      RawPaginationScenario scenario =
+          new RawPaginationScenario(
+              "scenario-2",
+              "Scenario",
+              "Description",
+              Scenario.SEVERITY.medium,
+              "Category",
+              null,
+              now(),
+              new String[] {"Linux"},
+              new String[] {"Linux"},
+              null);
+      Page<RawPaginationScenario> page = new PageImpl<>(List.of(scenario));
+
+      @SuppressWarnings("unchecked")
+      Page<RawPaginationScenario> enriched =
+          (Page<RawPaginationScenario>)
+              ReflectionTestUtils.invokeMethod(scenarioService, "enrichScenarioPlatforms", page);
+
+      assertNotNull(enriched);
+      assertEquals(Set.of("Linux"), enriched.getContent().get(0).getScenario_platforms());
+      verify(scenarioRepository, never()).findWorkflowPlatformsByScenarioIds(anyList());
     }
   }
 
