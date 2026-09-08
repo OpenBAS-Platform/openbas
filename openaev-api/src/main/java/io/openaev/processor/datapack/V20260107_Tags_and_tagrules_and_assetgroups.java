@@ -92,7 +92,8 @@ public class V20260107_Tags_and_tagrules_and_assetgroups extends DataPack {
           assetGroup.setName("All %s %s".formatted(platform.toString(), arch.toString()));
           assetGroup.setDynamicFilter(filterGroup);
 
-          AssetGroup saved = this.assetGroupService.createAssetGroup(assetGroup);
+          // Tenant provisioning: doProcess runs for one tenant, carry it explicitly.
+          AssetGroup saved = this.assetGroupService.createAssetGroup(assetGroup, tenant.getId());
 
           findTagRuleForPlatform(presetRules, platform)
               .ifPresent(
