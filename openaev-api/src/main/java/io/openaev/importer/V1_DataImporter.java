@@ -362,11 +362,9 @@ public class V1_DataImporter implements Importer {
                 return;
               }
 
-              // Tenant-scoped on purpose: the id comes from the import file and a PK load bypasses
-              // the Hibernate tenant filter, so a foreign tenant's domain must never be reused.
-              Optional<Domain> existingDomain =
-                  this.domainService.findOptionalByIdAndTenantId(
-                      id, TenantContext.getCurrentTenant());
+              // Tenant-scoped by the transaction scope (TxCtx): the id comes from the import file,
+              // so a foreign tenant's domain must never be reused.
+              Optional<Domain> existingDomain = this.domainService.findOptionalById(id);
               if (existingDomain.isPresent()) {
                 baseIds.put(id, existingDomain.get());
                 domains.add(existingDomain.get());
@@ -439,7 +437,7 @@ public class V1_DataImporter implements Importer {
               // first, then upsert by name (cross-instance).
               Domain resolved =
                   this.domainService
-                      .findOptionalByIdAndTenantId(id, TenantContext.getCurrentTenant())
+                      .findOptionalById(id)
                       .orElseGet(() -> upsertDomainFromNode(nodeDomain));
               baseIds.put(id, resolved);
             });
@@ -3526,7 +3524,7 @@ public class V1_DataImporter implements Importer {
    * discarded and re-read fresh from the DB a few lines later.
    *
    * <p>Resolution reuses {@link #importDomains} (no duplicated logic): baseIds cache first, then
-   * {@code domainService.findOptionalByIdAndTenantId} (same id present on target), then {@code
+   * {@code domainService.findOptionalById} (same id present on target), then {@code
    * domainService.upsert} (find-by-name or create) for object-shaped entries. Bare source ids that
    * resolve to nothing are dropped rather than kept dangling (degraded but non-blocking; the field
    * is never used at run time after deserialization). The array is then replaced with the resolved

@@ -189,10 +189,10 @@ class AssetGroupHttpIsolationTest extends IntegrationTest {
   @Test
   @DisplayName("a create with no tenant selector is refused, not silently attributed")
   void createWithoutSelectorIsRejected() throws Exception {
-    // An ambiguous create must be refused loudly rather than attributed to whichever tenant the v1
-    // thread-local happens to hold. TenantBaseListener is still on the entity and would happily
-    // stamp one, which is exactly why the refusal has to happen upstream, in
-    // TenantWriteScopeResolver, before the row is ever built.
+    // An unscoped create must be refused loudly rather than attributed to whichever tenant the v1
+    // thread-local happens to hold. The refusal happens upstream, in TenantWriteScopeResolver,
+    // before the row is ever built, so it is a 400 and not a constraint violation on the NOT NULL
+    // tenant column that TenantBaseListener's removal would otherwise surface.
     AssetGroupInput input = new AssetGroupInput();
     input.setName("no-selector-" + UUID.randomUUID());
     mvc.perform(

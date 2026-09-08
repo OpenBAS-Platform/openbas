@@ -10,7 +10,6 @@ import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openaev.annotation.ControlledUuidGeneration;
 import io.openaev.annotation.Queryable;
 import io.openaev.database.audit.ModelBaseListener;
-import io.openaev.database.audit.TenantBaseListener;
 import io.openaev.database.model.Filters.FilterGroup;
 import io.openaev.helper.MultiIdListSerializer;
 import io.openaev.helper.MultiIdSetSerializer;
@@ -29,7 +28,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Data
 @Entity
 @Table(name = "asset_groups")
-@EntityListeners({ModelBaseListener.class, TenantBaseListener.class})
+@EntityListeners({ModelBaseListener.class})
 @NamedEntityGraphs({
   @NamedEntityGraph(
       name = "AssetGroup.tags-assets",
@@ -44,20 +43,17 @@ public class AssetGroup implements TenantBase {
   // rewritten one, silently emptying every result reached without TenantContext, the header route
   // first.
   //
-  // TenantBaseListener is KEPT, deliberately, and this diverges from the activate-tenant-table
-  // runbook, which says to remove it. Of the eight entities activated before this one, seven keep a
-  // tenant listener: collectors, executors and injectors carry TenantIdBaseListener, while
-  // import_mappers, kill_chain_phases, mitigations and cwes carry TenantBaseListener. Only
-  // security_coverages, the most recent, has none, and its fixtures were built to set the tenant
-  // themselves from the start. Removing it here would require fixing every fixture and composer
-  // that relies on it to stamp tenant_id (19 tests failed when it was tried), which is not a
-  // minimal go-live diff and is exactly the "just one more fix" the runbook's Phase 6 warns
-  // against.
+  // TenantBaseListener is REMOVED, as the activate-tenant-table runbook requires at go-live. It
+  // stamped tenant_id from the v1 thread-local on every insert, which is the wrong tenant as often
+  // as the right one on a background or provisioning path, and it made an unattributed write look
+  // successful instead of failing. Every create path now resolves the tenant explicitly:
+  // AssetGroupService.createAssetGroup takes it as a required parameter, HTTP callers get it from
+  // TenantWriteScopeResolver, and background callers pass the tenant their own scope was opened
+  // for.
   //
-  // It is not an isolation risk: the listener only stamps tenant_id on write, it never filters a
-  // read. And it is now redundant rather than load-bearing, because every create path resolves and
-  // sets the tenant explicitly (AssetGroupService.createAssetGroup takes it as a parameter).
-  // Removing the listener platform-wide is its own cleanup, once TenantContext goes.
+  // AssetGroupFixture stamps the tenant itself, the way SecurityCoverageFixture already did, which
+  // is what makes the removal a small diff rather than a rewrite of every call site. Eight of the
+  // nineteen active tables still carry a listener; removing those is tracked in #7844.
 
   @Id
   @ControlledUuidGeneration

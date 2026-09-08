@@ -64,13 +64,12 @@ public class AssetGroupService {
   /**
    * Creates an asset group owned by {@code tenantId}.
    *
-   * <p>The tenant is an explicit parameter and is never inferred, whatever {@code
-   * TenantBaseListener} may still do on the entity. The listener is a fallback that stamps whatever
-   * the v1 thread-local happens to hold, which is the wrong tenant as often as the right one on a
-   * background or provisioning path; this method does not rely on it and must not start to. HTTP
-   * callers resolve the tenant through {@link io.openaev.config.TenantWriteScopeResolver}, which
-   * refuses an ambiguous multi-tenant scope with a 400; background callers pass the tenant their
-   * own scope was opened for.
+   * <p>The tenant is an explicit parameter and is never inferred. {@code TenantBaseListener} was
+   * removed from the entity at go-live, so nothing stamps {@code tenant_id} behind this method's
+   * back: an unattributed write now fails on the NOT NULL column instead of silently landing in
+   * whatever tenant the v1 thread-local happened to hold. HTTP callers resolve the tenant through
+   * {@link io.openaev.config.TenantWriteScopeResolver}, which refuses an unscoped or ambiguous
+   * request with a 400; background callers pass the tenant their own scope was opened for.
    */
   public AssetGroup createAssetGroup(
       @NotNull final AssetGroup assetGroup, @NotBlank final String tenantId) {
