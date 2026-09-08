@@ -39,8 +39,10 @@ class TagRuleNonAdminIsolationTest extends IntegrationTest {
 
   @BeforeEach
   void seed() throws Exception {
-    tenantA = tenantHelper.createTenantWithCapabilities("tag-rule-non-admin-a", TAG_RULE_READ).getId();
-    tenantB = tenantHelper.createTenantWithCapabilities("tag-rule-non-admin-b", TAG_RULE_READ).getId();
+    tenantA =
+        tenantHelper.createTenantWithCapabilities("tag-rule-non-admin-a", TAG_RULE_READ).getId();
+    tenantB =
+        tenantHelper.createTenantWithCapabilities("tag-rule-non-admin-b", TAG_RULE_READ).getId();
     tenantOutsideMembership = tenantHelper.createTenant("tag-rule-non-admin-outside").getId();
     ruleA = seedTagRule(tenantA, "non-admin-tag-a-" + UUID.randomUUID());
     ruleB = seedTagRule(tenantB, "non-admin-tag-b-" + UUID.randomUUID());

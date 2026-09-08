@@ -500,6 +500,7 @@ public class ScenarioApiTest extends IntegrationTest {
     TagRule tagRule = new TagRule();
     tagRule.setTag(tag2);
     tagRule.setAssetGroups(List.of(assetGroup));
+    tagRule.setTenant(new Tenant(TenantContext.getCurrentTenant()));
     this.tagRuleRepository.save(tagRule);
 
     Scenario scenario = this.scenarioRepository.save(ScenarioFixture.getScenario());

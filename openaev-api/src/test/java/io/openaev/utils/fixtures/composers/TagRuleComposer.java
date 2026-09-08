@@ -1,7 +1,9 @@
 package io.openaev.utils.fixtures.composers;
 
+import io.openaev.context.TenantContext;
 import io.openaev.database.model.AssetGroup;
 import io.openaev.database.model.TagRule;
+import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.TagRepository;
 import io.openaev.database.repository.TagRuleRepository;
 import java.util.ArrayList;
@@ -47,6 +49,9 @@ public class TagRuleComposer extends ComposerBase<TagRule> {
     public Composer persist() {
       assetGroupComposers.forEach(AssetGroupComposer.Composer::persist);
       tagComposers.ifPresent(TagComposer.Composer::persist);
+      if (tagRule.getTenant() == null) {
+        tagRule.setTenant(new Tenant(TenantContext.getCurrentTenant()));
+      }
       tagRuleRepository.save(tagRule);
       return this;
     }

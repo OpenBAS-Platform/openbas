@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.jayway.jsonpath.JsonPath;
 import io.openaev.IntegrationTest;
+import io.openaev.context.TenantContext;
 import io.openaev.database.model.AssetGroup;
 import io.openaev.database.model.Tag;
 import io.openaev.database.model.TagRule;
@@ -319,6 +320,7 @@ public class TagRuleApiTest extends IntegrationTest {
     tagRule.setTag(createTag(tagName));
     assetGroupNames.forEach(
         assetGroupName -> tagRule.getAssetGroups().add(createAssetGroup(assetGroupName)));
+    tagRule.setTenant(new Tenant(TenantContext.getCurrentTenant()));
     return tagRuleRepository.save(tagRule);
   }
 
@@ -353,6 +355,7 @@ public class TagRuleApiTest extends IntegrationTest {
       AssetGroup ag = AssetGroupFixture.createDefaultAssetGroup("isolation-ag");
       ag = assetGroupRepository.save(ag);
       tagRule.getAssetGroups().add(ag);
+      tagRule.setTenant(new Tenant(tenantId));
       return tagRuleRepository.save(tagRule);
     }
 

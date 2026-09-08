@@ -79,9 +79,7 @@ public class TagRuleService {
   }
 
   public TagRule updateTagRule(
-      @NotBlank final String tagRuleId,
-      final String tagName,
-      final List<String> assetGroupIds) {
+      @NotBlank final String tagRuleId, final String tagName, final List<String> assetGroupIds) {
     TagRule tagRule =
         tagRuleRepository
             .findById(tagRuleId)

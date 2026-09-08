@@ -192,7 +192,9 @@ class TagRuleServiceTest {
 
     TagRule result =
         tagRuleService.updateTagRule(
-          expected.getId(), expected.getTag().getName(), expected.getAssetGroups().stream().map(AssetGroup::getId).toList());
+            expected.getId(),
+            expected.getTag().getName(),
+            expected.getAssetGroups().stream().map(AssetGroup::getId).toList());
     assertEquals(expected, result);
   }
 
