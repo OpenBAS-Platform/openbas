@@ -58,16 +58,17 @@ import io.openaev.rest.scenario.service.ScenarioStatisticService;
 import io.openaev.rest.team.output.TeamOutput;
 import io.openaev.service.*;
 import io.openaev.service.attackpath.ingestion.AttackPathExecutionIngestionService;
+import io.openaev.service.chaining.ScopeService;
 import io.openaev.service.chaining.StepService;
 import io.openaev.service.chaining.WorkflowService;
 import io.openaev.service.scenario.ScenarioRecurrenceService;
-import io.openaev.service.scenario.ScenarioService;
 import io.openaev.service.utils.BulkDeleteExecutor;
 import io.openaev.telemetry.metric_collectors.ActionMetricCollector;
 import io.openaev.utils.FilterUtilsJpa;
 import io.openaev.utils.InjectExpectationResultUtils.ExpectationResultsByType;
 import io.openaev.utils.ResultUtils;
 import io.openaev.utils.TargetType;
+import io.openaev.utils.TeamOutputVisibilityUtils;
 import io.openaev.utils.mapper.ExerciseMapper;
 import io.openaev.utils.mapper.InjectExpectationMapper;
 import io.openaev.utils.mapper.InjectMapper;
@@ -122,7 +123,7 @@ public class ExerciseService {
   private final UserService userService;
   private final GrantService grantService;
   private final ExerciseTeamUserService exerciseTeamUserService;
-  private final ScenarioService scenarioService;
+  private final ScopeService scopeService;
 
   private final ExerciseMapper exerciseMapper;
   private final InjectMapper injectMapper;
@@ -253,11 +254,22 @@ public class ExerciseService {
 
   @Transactional(readOnly = true)
   public List<TeamOutput> getExerciseTeams(@NotBlank final String exerciseId) {
-    if (workflowService.isSimulationChaining(exerciseId)) {
-      return scenarioService.getScenarioTeams(
-          scenarioService.scenarioFromSimulationId(exerciseId).getId());
-    }
-    return teamService.find(fromExercise(exerciseId));
+    String workflowId = rawSimulation(exerciseId).getExercise_workflow_id();
+    return StringUtils.hasText(workflowId)
+        ? getWorkflowExerciseTeams(exerciseId, workflowId)
+        : getTimeBasedExerciseTeams(exerciseId);
+  }
+
+  private List<TeamOutput> getWorkflowExerciseTeams(
+      final String exerciseId, final String workflowId) {
+    List<TeamOutput> teams =
+        teamService.find(
+            fromIds(scopeService.getValidTeams(workflowId).stream().map(Team::getId).toList()));
+    return TeamOutputVisibilityUtils.markExerciseVisibility(teams, exerciseId);
+  }
+
+  private List<TeamOutput> getTimeBasedExerciseTeams(final String exerciseId) {
+    return this.teamService.find(fromExercise(exerciseId));
   }
 
   // -- UPDATE --

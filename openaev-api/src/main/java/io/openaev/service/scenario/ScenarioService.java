@@ -73,6 +73,7 @@ import io.openaev.service.utils.BulkDeleteExecutor;
 import io.openaev.telemetry.metric_collectors.ActionMetricCollector;
 import io.openaev.utils.FilterUtilsJpa;
 import io.openaev.utils.TargetType;
+import io.openaev.utils.TeamOutputVisibilityUtils;
 import io.openaev.utils.mapper.ExerciseMapper;
 import io.openaev.utils.mapper.ScenarioMapper;
 import io.openaev.utils.pagination.SearchPaginationInput;
@@ -554,20 +555,11 @@ public class ScenarioService {
 
   private List<TeamOutput> getWorkflowScenarioTeams(
       final String scenarioId, final String workflowId) {
-    return this.teamService
-        .find(
-            fromIds(this.scopeService.getValidTeams(workflowId).stream().map(Team::getId).toList()))
-        .stream()
-        .map(team -> markScenarioVisibility(team, scenarioId))
-        .toList();
-  }
-
-  private TeamOutput markScenarioVisibility(final TeamOutput team, final String scenarioId) {
-    Set<String> scenarios =
-        new HashSet<>(team.getScenarios() == null ? Set.of() : team.getScenarios());
-    scenarios.add(scenarioId);
-    team.setScenarios(scenarios);
-    return team;
+    List<TeamOutput> teams =
+        this.teamService.find(
+            fromIds(
+                this.scopeService.getValidTeams(workflowId).stream().map(Team::getId).toList()));
+    return TeamOutputVisibilityUtils.markScenarioVisibility(teams, scenarioId);
   }
 
   private List<TeamOutput> getTimeBasedScenarioTeams(final String scenarioId) {
