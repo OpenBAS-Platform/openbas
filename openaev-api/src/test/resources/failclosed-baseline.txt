@@ -20,6 +20,12 @@ io.openaev.engine.model.injectexpectation.InjectExpectationHandler.fetch
 io.openaev.service.autonomous.AutonomousRunService.require
 io.openaev.service.attackpath.ingestion.AttackPathExecutionIngestionService.persistExecution
 
+# SCOPED-OK - asset_groups activation (#6435). The ES indexing sweep opens
+# TxCtx.allTenants() in EngineSyncExecutionJob before calling this handler; the waived read is
+# AssetGroupBackgroundIsolationTest calling the handler directly, on purpose, to prove the
+# degradation a lost scope would cause. Same shape as InjectExpectationHandler.fetch above.
+io.openaev.engine.model.assetgroup.AssetGroupHandler.fetch
+
 # TEST-ARTIFACT / latent - tags is not active in production; this JSON serializer would fail closed
 # only if tags is ever activated (serialization runs after the request transaction closes).
 io.openaev.helper.MultiIdSetSerializer.serialize
