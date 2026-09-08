@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
@@ -25,6 +26,10 @@ import org.springframework.test.web.servlet.MockMvc;
  * The Prometheus scrape is served on the public API port, so the scrape key is the only thing
  * standing between the internet and the platform internals.
  */
+// @SpringBootTest disables metrics export by default (it forces
+// management.defaults.metrics.export.enabled=false), which would leave the scrape endpoint
+// unmapped and make this class assert a 404 that production never returns.
+@AutoConfigureObservability
 @TestPropertySource(
     properties = {
       "management.endpoints.web.exposure.include=prometheus",

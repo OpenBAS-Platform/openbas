@@ -48,8 +48,9 @@ public class ActuatorSecurityConfig {
   @Bean
   @Order(1)
   public SecurityFilterChain actuatorFilterChain(HttpSecurity http) throws Exception {
+    // CSRF is deliberately left enabled: a scrape is a GET, which Spring Security exempts anyway,
+    // so disabling it would only widen the surface if a writable endpoint were ever exposed here.
     http.securityMatcher(ACTUATOR_URI)
-        .csrf(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .anonymous(AbstractHttpConfigurer::disable)
