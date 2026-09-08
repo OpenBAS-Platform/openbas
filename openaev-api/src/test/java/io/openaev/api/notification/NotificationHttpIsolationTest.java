@@ -95,7 +95,8 @@ class NotificationHttpIsolationTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("under tenant A's path: marking B's notification read is rejected and leaves it unread")
+  @DisplayName(
+      "under tenant A's path: marking B's notification read is rejected and leaves it unread")
   void markReadUnderTenantAOfBNotificationIsBlocked() throws Exception {
     mvc.perform(put(TENANT_READ_BY_ID, tenantA, notificationB).param("read", "true").with(csrf()))
         .andExpect(status().isNotFound());
@@ -103,7 +104,8 @@ class NotificationHttpIsolationTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("under tenant A's path: deleting B's notification is rejected and leaves it in place")
+  @DisplayName(
+      "under tenant A's path: deleting B's notification is rejected and leaves it in place")
   void deleteUnderTenantAOfBNotificationIsBlocked() throws Exception {
     mvc.perform(delete(TENANT_DELETE_BY_ID, tenantA, notificationB).with(csrf()))
         .andExpect(status().isNotFound());

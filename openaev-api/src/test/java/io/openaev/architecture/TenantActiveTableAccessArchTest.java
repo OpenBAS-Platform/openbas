@@ -64,6 +64,7 @@ import io.openaev.notification.engine.NotificationDispatchService;
 import io.openaev.integration.impl.injectors.challenge.ChallengeInjectorIntegration;
 import io.openaev.integration.impl.injectors.challenge.ChallengeInjectorIntegrationFactory;
 import io.openaev.integration.migration.ConfigurationMigration;
+import io.openaev.notification.engine.NotificationDispatchService;
 import io.openaev.processor.core.V20260420_Migrate_rabbitmq_queues;
 import io.openaev.processor.datapack.V20260330_Default_tenant_data;
 import io.openaev.processor.datapack.V20260708_Dynamic_injectors_base_url;
