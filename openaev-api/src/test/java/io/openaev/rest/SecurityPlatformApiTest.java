@@ -15,10 +15,12 @@ import io.openaev.IntegrationTest;
 import io.openaev.database.model.Collector;
 import io.openaev.database.model.SecurityPlatform;
 import io.openaev.database.model.Tag;
+import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.CollectorRepository;
 import io.openaev.database.repository.SecurityPlatformRepository;
 import io.openaev.rest.asset.security_platforms.form.SecurityPlatformInput;
 import io.openaev.rest.asset.security_platforms.form.SecurityPlatformUpsertInput;
+import io.openaev.utils.TenantIsolationTestHelper;
 import io.openaev.utils.fixtures.CollectorFixture;
 import io.openaev.utils.fixtures.SecurityPlatformFixture;
 import io.openaev.utils.fixtures.TagFixture;
@@ -50,6 +52,18 @@ class SecurityPlatformApiTest extends IntegrationTest {
   private static final String SECURITY_PLATFORM_NAME = "My Security Platform ";
 
   @Autowired private MockMvc mvc;
+  @Autowired private TenantIsolationTestHelper tenantIsolationHelper;
+
+  @BeforeEach
+  void attachMockUserToDefaultTenant() {
+    // Creating a security platform now attributes the row from the request scope, and @WithMockUser
+    // builds a user
+    // with no row in users_tenants, so the scope would be missing and the create a 400. Production
+    // never has that state (V4_95__Migrate_users_to_default_tenant attaches every user to the
+    // default tenant), so the fixture provisions the membership the platform would already have.
+    tenantIsolationHelper.attachCurrentUserToTenant(Tenant.DEFAULT_TENANT_UUID);
+  }
+
   @Autowired private SecurityPlatformComposer securityPlatformComposer;
   @Autowired private CollectorComposer collectorComposer;
   @Autowired private TagComposer tagComposer;

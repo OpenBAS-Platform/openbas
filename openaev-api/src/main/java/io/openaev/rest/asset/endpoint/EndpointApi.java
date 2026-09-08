@@ -5,6 +5,7 @@ import static io.openaev.helper.StreamHelper.fromIterable;
 
 import io.openaev.aop.AccessControl;
 import io.openaev.aop.LogExecutionTime;
+import io.openaev.config.RequireTenantSelector;
 import io.openaev.context.TenantContext;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.Action;
@@ -101,7 +102,7 @@ public class EndpointApi extends RestBehavior {
   // ctx is unused directly: the aspect reads it to scope this transaction against the v2-active
   // executors table (the upserted endpoint's agents eager-load their executor).
   public Endpoint upsertAgentLessEndpoint(
-      TxCtx ctx, @Valid @RequestBody final EndpointInput input) {
+      @RequireTenantSelector TxCtx ctx, @Valid @RequestBody final EndpointInput input) {
     String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
     return this.endpointService.upsertEndpoint(input, tenantId);
   }
@@ -109,7 +110,8 @@ public class EndpointApi extends RestBehavior {
   @PostMapping({ENDPOINT_URI + "/register", TENANT_ENDPOINT_URI + "/register"})
   @AccessControl(actionPerformed = Action.CREATE, resourceType = ResourceType.AGENT)
   @Transactional(rollbackFor = Exception.class)
-  public Endpoint upsertEndpoint(TxCtx ctx, @Valid @RequestBody final EndpointRegisterInput input)
+  public Endpoint upsertEndpoint(
+      @RequireTenantSelector TxCtx ctx, @Valid @RequestBody final EndpointRegisterInput input)
       throws IOException {
     input.setSeenIp(HttpReqRespUtils.getClientIpAddressIfServletRequestExist());
     String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
