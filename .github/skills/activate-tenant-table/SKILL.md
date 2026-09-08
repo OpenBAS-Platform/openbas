@@ -249,6 +249,13 @@ blanket wiring cannot fix by construction:
    `@Transactional`, after the mass-wiring PR may still be missing `TxCtx`.
    Spot-check the entrypoints this activation actually needs rather than
    assuming full coverage.
+6. **Query shapes that stop being valid SQL once the table is wrapped.** The
+   inspector rewrites `FROM {table} t` into a derived table. PostgreSQL's
+   functional-dependency rule — selecting ungrouped columns is legal when the
+   `GROUP BY` covers the table's primary key — applies to BASE TABLES only, so
+   any `GROUP BY` relying on it becomes invalid SQL. See the GROUP BY section
+   below; this one is not a `TxCtx` problem at all and no amount of wiring
+   fixes it.
 
 ```bash
 grep -rln "{EntityRepository}" openaev-api/src/main/java openaev-model/src/main/java
@@ -268,6 +275,68 @@ Classify every hit:
   (wrap its read in `tenantTx.execute(scope, …)`) if it must keep seeing rows
 - background writer → convert to the primitive in Phase 5b. If you are not
   converting it in this run, it is a blocker: stop and report (Phase 0)
+
+#### GROUP BY on a wrapped table: valid SQL before activation, a 500 after
+
+The inspector rewrites `FROM {table} t` into
+`FROM (SELECT * FROM {table} t WHERE can_access_tenant(t.tenant_id)) AS t`.
+PostgreSQL lets a query select ungrouped columns when the `GROUP BY` covers the
+table's primary key, but that rule holds for **base tables only**. A derived
+table has no primary key to infer the dependency from, so the same query stops
+being valid:
+
+```sql
+-- base table: accepted
+SELECT ag.asset_group_id, ag.asset_group_name FROM asset_groups ag GROUP BY 1;
+
+-- wrapped exactly as the inspector wraps it: refused
+SELECT ag.asset_group_id, ag.asset_group_name
+FROM (SELECT * FROM asset_groups ag WHERE can_access_tenant(ag.tenant_id, true)) AS ag
+GROUP BY 1;
+ERROR: column "ag.asset_group_name" must appear in the GROUP BY clause
+```
+
+Hibernate's criteria layer emits exactly that shape whenever a query helper
+groups on `root.get("id")` alone and multiselects other columns, which is the
+normal way list and search endpoints are written here.
+
+**This fails in production and passes in CI.** The test profile ships an empty
+`active-tables`, so the inspector never fires and the query keeps its base-table
+form. The symptom is a 500 on a search or list endpoint, after go-live.
+
+Find every site before activating:
+
+```bash
+# every GROUP BY in code that can reach the table, then read each one:
+# does it group on the id alone while multiselecting other columns?
+grep -rn "groupBy(" openaev-api/src/main/java --include="*.java"
+```
+
+Fix by listing every non-aggregated projected column in the `GROUP BY`. It is
+equivalent for the planner and does not depend on the FROM item being a base
+table. Worked example, `AssetGroupQueryHelper` in the `asset_groups`
+activation (#6435):
+
+```java
+cq.groupBy(
+    List.of(
+        assetGroupRoot.get("id"),
+        assetGroupRoot.get("name"),
+        assetGroupRoot.get("description"),
+        dynamicFilterAsJsonb));
+```
+
+A column of a type PostgreSQL cannot group on directly (`json`, for instance)
+needs a groupable expression on both sides: project `to_jsonb(...)` and group on
+that same expression, not on the raw column.
+
+**Do not wait for a fix in the rewriter to skip this step** (tracked in #7843). Making the
+inspector keep the primary FROM item as a base table (moving its predicate into
+the `WHERE`) would only cover columns of that primary table. Joined tables stay
+wrapped, so a query grouping on a joined table's id while selecting its other
+columns breaks the same way as soon as that joined table is activated in turn:
+`UserQueryHelper` selects the organization's name while grouping only on its id.
+Listing the columns is what covers both cases.
 
 **Still walk the transitive closure of callers — but now for background
 paths, association/computed-getter sinks, and other non-controller code, not
