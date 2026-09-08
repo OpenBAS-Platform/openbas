@@ -1,20 +1,23 @@
-package io.openaev.engine.es8;
+package io.openaev.engine.impl.elasticsearch.es9;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.ElasticsearchException;
-import co.elastic.clients.elasticsearch._types.analysis.CustomNormalizer;
-import co.elastic.clients.elasticsearch._types.analysis.Normalizer;
-import co.elastic.clients.elasticsearch._types.mapping.*;
-import co.elastic.clients.elasticsearch.cluster.PutComponentTemplateRequest;
-import co.elastic.clients.elasticsearch.core.InfoResponse;
-import co.elastic.clients.elasticsearch.ilm.*;
-import co.elastic.clients.elasticsearch.indices.*;
-import co.elastic.clients.elasticsearch.indices.put_index_template.IndexTemplateMapping;
-import co.elastic.clients.json.JsonData;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.ElasticsearchTransport;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es9.co.elastic.clients.elasticsearch.ElasticsearchClient;
+import es9.co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import es9.co.elastic.clients.elasticsearch._types.analysis.CustomNormalizer;
+import es9.co.elastic.clients.elasticsearch._types.analysis.Normalizer;
+import es9.co.elastic.clients.elasticsearch._types.mapping.*;
+import es9.co.elastic.clients.elasticsearch.cluster.PutComponentTemplateRequest;
+import es9.co.elastic.clients.elasticsearch.core.InfoResponse;
+import es9.co.elastic.clients.elasticsearch.ilm.*;
+import es9.co.elastic.clients.elasticsearch.indices.*;
+import es9.co.elastic.clients.elasticsearch.indices.put_index_template.IndexTemplateMapping;
+import es9.co.elastic.clients.json.JsonData;
+import es9.co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import es9.co.elastic.clients.transport.ElasticsearchTransport;
+import es9.co.elastic.clients.transport.TransportUtils;
+import es9.co.elastic.clients.transport.rest5_client.Rest5ClientTransport;
+import es9.co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
+import es9.co.elastic.clients.transport.rest5_client.low_level.Rest5ClientBuilder;
 import io.openaev.config.EngineConfig;
 import io.openaev.database.model.IndexingStatus;
 import io.openaev.database.repository.IndexingStatusRepository;
@@ -26,25 +29,22 @@ import io.openaev.engine.model.EsBase;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.security.cert.X509Certificate;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
-import javax.net.ssl.SSLContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.apache.http.ssl.SSLContextBuilder;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
+import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
+import org.apache.hc.client5.http.ssl.HostnameVerificationPolicy;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.util.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component("ES8Driver")
+@Component("ES9Driver")
 @RequiredArgsConstructor
 @Slf4j
 public class ElasticDriver {
@@ -74,45 +74,56 @@ public class ElasticDriver {
   }
 
   private ElasticsearchClient getElasticClient() {
-    RestClientBuilder restClientBuilder = RestClient.builder(HttpHost.create(config.getUrl()));
+    Rest5ClientBuilder restClientBuilder = Rest5Client.builder(URI.create(config.getUrl()));
     // The library defaults (1s connect / 30s socket timeout, 10 connections per route) are too
     // tight for this platform: during bulk indexing (full reindex after a migration) the async
     // client saturates and cancels pending requests, surfacing as "Request execution cancelled"
     // in dashboard queries and engine jobs. Configure explicit limits instead.
+    Timeout socketTimeout = Timeout.ofMilliseconds(config.getSocketTimeoutMs());
+    restClientBuilder.setConnectionConfigCallback(
+        connectionConfig ->
+            connectionConfig
+                .setConnectTimeout(Timeout.ofMilliseconds(config.getConnectTimeoutMs()))
+                .setSocketTimeout(socketTimeout));
+    // HttpClient 5 splits the single socket timeout of HttpClient 4 in two: the wait for the
+    // response, and the wait for a free connection in the pool. Both default to 30s and both must
+    // be raised, otherwise a saturated pool keeps cancelling requests whatever the socket timeout.
     restClientBuilder.setRequestConfigCallback(
         requestConfig ->
             requestConfig
-                .setConnectTimeout(config.getConnectTimeoutMs())
-                .setSocketTimeout(config.getSocketTimeoutMs()));
-    HttpAsyncClientBuilder clientBuilder = HttpAsyncClientBuilder.create();
-    clientBuilder
-        .setMaxConnTotal(config.getMaxConnections())
-        .setMaxConnPerRoute(config.getMaxConnections());
+                .setResponseTimeout(socketTimeout)
+                .setConnectionRequestTimeout(socketTimeout));
+    restClientBuilder.setConnectionManagerCallback(
+        connectionManager -> {
+          connectionManager
+              .setMaxConnTotal(config.getMaxConnections())
+              .setMaxConnPerRoute(config.getMaxConnections());
+          if (!config.isRejectUnauthorized()) {
+            // Trust any server certificate, and any mismatch between it and the requested host.
+            // The hostname verifier only gets a say under the CLIENT policy: the default policy
+            // delegates verification to the SSLEngine, which ignores it entirely.
+            connectionManager.setTlsStrategy(
+                ClientTlsStrategyBuilder.create()
+                    .setSslContext(TransportUtils.insecureSSLContext())
+                    .setHostVerificationPolicy(HostnameVerificationPolicy.CLIENT)
+                    .setHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                    .build());
+          }
+        });
     if (config.getUsername() != null) {
-      BasicCredentialsProvider credsProv = new BasicCredentialsProvider();
-      credsProv.setCredentials(
-          AuthScope.ANY,
-          new UsernamePasswordCredentials(config.getUsername(), config.getPassword()));
-      clientBuilder.setDefaultCredentialsProvider(credsProv);
+      // Preemptive basic auth, as the official Rest5 transport does: the low-level client has no
+      // credentials provider, and a challenge/response round trip per connection buys nothing.
+      String credentials =
+          Base64.getEncoder()
+              .encodeToString(
+                  (config.getUsername() + ":" + config.getPassword())
+                      .getBytes(StandardCharsets.UTF_8));
+      restClientBuilder.setDefaultHeaders(
+          new Header[] {new BasicHeader("Authorization", "Basic " + credentials)});
     }
-    if (!config.isRejectUnauthorized()) {
-      // Create an SSLContext that trusts all certificates
-      try {
-        SSLContext sslContext =
-            SSLContextBuilder.create()
-                .loadTrustMaterial(null, (X509Certificate[] chain, String authType) -> true)
-                .build();
-        clientBuilder
-            .setSSLContext(sslContext)
-            .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    }
-    restClientBuilder.setHttpClientConfigCallback(hc -> clientBuilder);
-    RestClient restClient = restClientBuilder.build();
     JacksonJsonpMapper jsonpMapper = new JacksonJsonpMapper(engineObjectMapper);
-    ElasticsearchTransport transport = new RestClientTransport(restClient, jsonpMapper);
+    ElasticsearchTransport transport =
+        new Rest5ClientTransport(restClientBuilder.build(), jsonpMapper);
     return new ElasticsearchClient(transport);
   }
 
@@ -152,7 +163,7 @@ public class ElasticDriver {
     coreSettings.name(config.getIndexPrefix() + ES_CORE_SETTINGS);
     coreSettings.create(false);
     coreSettings.template(
-        new IndexState.Builder()
+        new IndexTemplateMapping.Builder()
             .settings(
                 new IndexSettings.Builder()
                     .maxResultWindow(config.getMaxResultWindow())

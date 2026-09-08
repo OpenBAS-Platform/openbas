@@ -354,24 +354,6 @@
             <artifactId>jsqlparser</artifactId>
             <version>5.3</version>
         </dependency>
-        <dependency>
-            <groupId>io.openaev</groupId>
-            <artifactId>openaev-es8-client</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.openaev</groupId>
-            <artifactId>openaev-es9-client</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.openaev</groupId>
-            <artifactId>openaev-opensearch-client</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
     <build>

@@ -2,10 +2,11 @@ package io.openaev.engine;
 
 import io.openaev.config.EngineConfig;
 import io.openaev.database.repository.IndexingStatusRepository;
-import io.openaev.engine.es8.ElasticService;
 import io.openaev.engine.facade.EngineService;
-import io.openaev.engine.opensearch.OpenSearchDriver;
-import io.openaev.engine.opensearch.OpenSearchService;
+import io.openaev.engine.impl.elasticsearch.es8.ElasticDriver;
+import io.openaev.engine.impl.elasticsearch.es8.ElasticService;
+import io.openaev.engine.impl.opensearch.os3.OpenSearchDriver;
+import io.openaev.engine.impl.opensearch.os3.OpenSearchService;
 import io.openaev.service.CommonSearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +16,9 @@ import org.springframework.stereotype.Service;
 /**
  * Factory component for creating the appropriate search engine service.
  *
- * <p>This component is responsible for instantiating either an {@link
- * io.openaev.engine.es8.ElasticService} or {@link OpenSearchService} based on the configured engine
- * selector. The created service is registered as a Spring bean.
+ * <p>This component is responsible for instantiating either an {@link ElasticService} or {@link
+ * OpenSearchService} based on the configured engine selector. The created service is registered as
+ * a Spring bean.
  *
  * <p>Supported engine selectors:
  *
@@ -38,8 +39,8 @@ public class EngineComponent {
   private final EngineConfig config;
   private final EngineContext searchEngine;
   private final OpenSearchDriver openSearchDriver;
-  private final io.openaev.engine.es8.ElasticDriver elasticDriver8;
-  private final io.openaev.engine.es9.ElasticDriver elasticDriver9;
+  private final ElasticDriver elasticDriver8;
+  private final io.openaev.engine.impl.elasticsearch.es9.ElasticDriver elasticDriver9;
   private final IndexingStatusRepository indexingStatusRepository;
   private final CommonSearchService commonSearchService;
 
@@ -53,11 +54,11 @@ public class EngineComponent {
   @Bean
   public EngineService engine() throws Exception {
     if (config.getEngineSelector().equalsIgnoreCase("elk")) {
-      return new io.openaev.engine.es8.ElasticService(
+      return new ElasticService(
           searchEngine, elasticDriver8, indexingStatusRepository, config, commonSearchService);
     }
     if (config.getEngineSelector().equalsIgnoreCase("elk9")) {
-      return new io.openaev.engine.es9.ElasticService(
+      return new io.openaev.engine.impl.elasticsearch.es9.ElasticService(
           searchEngine, elasticDriver9, indexingStatusRepository, config, commonSearchService);
     }
     if (config.getEngineSelector().equalsIgnoreCase("opensearch")) {

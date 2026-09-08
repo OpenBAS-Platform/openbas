@@ -1,15 +1,14 @@
 package io.openaev.utilstest;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import io.openaev.engine.impl.opensearch.os3.OpenSearchUtils;
+import io.openaev.engine.impl.elasticsearch.es8.ElasticUtils;
 import io.openaev.exception.InvalidDateRangeException;
 import java.time.Instant;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("OpenSearch Utils tests")
-class OpenSearchUtilsTest {
+@DisplayName("Elastic Utils tests")
+class ES8UtilsTest {
 
   @Test
   @DisplayName("buildDateRangeQuery should accept a valid date range")
@@ -19,7 +18,7 @@ class OpenSearchUtilsTest {
     Instant end = Instant.parse("2025-01-31T00:00:00Z");
 
     // -- EXECUTE & ASSERT --
-    assertDoesNotThrow(() -> OpenSearchUtils.buildDateRangeQuery("created_at", start, end));
+    Assertions.assertDoesNotThrow(() -> ElasticUtils.buildDateRangeQuery("created_at", start, end));
   }
 
   @Test
@@ -31,10 +30,10 @@ class OpenSearchUtilsTest {
 
     // -- EXECUTE & ASSERT --
     InvalidDateRangeException exception =
-        assertThrows(
+        Assertions.assertThrows(
             InvalidDateRangeException.class,
-            () -> OpenSearchUtils.buildDateRangeQuery("created_at", start, end));
-    assertEquals("Start date must be before end date", exception.getMessage());
+            () -> ElasticUtils.buildDateRangeQuery("created_at", start, end));
+    Assertions.assertEquals("Start date must be before end date", exception.getMessage());
   }
 
   @Test
@@ -44,8 +43,8 @@ class OpenSearchUtilsTest {
     Instant date = Instant.parse("2025-01-15T00:00:00Z");
 
     // -- EXECUTE & ASSERT --
-    assertThrows(
+    Assertions.assertThrows(
         InvalidDateRangeException.class,
-        () -> OpenSearchUtils.buildDateRangeQuery("created_at", date, date));
+        () -> ElasticUtils.buildDateRangeQuery("created_at", date, date));
   }
 }
