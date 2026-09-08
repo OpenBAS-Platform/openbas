@@ -132,6 +132,28 @@ class AssetMetricTenantScopeTest extends IntegrationTest {
   }
 
   @Test
+  @DisplayName("the endpoint and platform JPQL, run unscoped, also sees nothing")
+  void theJpqlGaugesAreAlsoFailClosedWithoutAScope() {
+    // The red half for the two JPQL gauges. The native-SQL gauge has its own above; without this
+    // one, their green assertions would pass on a build where the inspector never fires and would
+    // prove nothing about the scope those two now open.
+    assertEquals(
+        0,
+        em.createQuery("select e.platform, count(e) from Endpoint e group by e.platform")
+            .getResultList()
+            .size(),
+        "an unscoped endpoint count must return nothing once assets is active");
+    assertEquals(
+        0,
+        em.createQuery(
+                "select sp.securityPlatformType, count(sp) from SecurityPlatform sp"
+                    + " group by sp.securityPlatformType")
+            .getResultList()
+            .size(),
+        "an unscoped security platform count must return nothing once assets is active");
+  }
+
+  @Test
   @DisplayName("the endpoint and security platform gauges count across tenants too")
   void endpointAndPlatformGaugesCountAcrossTenants() {
     // Both count rows of the same assets table through different queries, so each needs its own
