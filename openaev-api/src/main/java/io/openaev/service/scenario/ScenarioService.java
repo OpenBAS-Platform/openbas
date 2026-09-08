@@ -414,6 +414,7 @@ public class ScenarioService {
 
   private Subquery<String[]> buildWorkflowPlatformsSubquery(
       CriteriaQuery<Tuple> cq, CriteriaBuilder cb, Root<Scenario> scenarioRoot) {
+    // Extract platforms from chained scenario step JSON data.
     Subquery<String[]> workflowPlatformsSubquery = cq.subquery(String[].class);
     Root<Workflow> workflowRoot = workflowPlatformsSubquery.from(Workflow.class);
     Join<Workflow, Step> workflowStepsJoin = workflowRoot.join("steps", JoinType.LEFT);
