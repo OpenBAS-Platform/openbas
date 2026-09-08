@@ -1,6 +1,8 @@
 package io.openaev.utils.fixtures;
 
+import io.openaev.context.TenantContext;
 import io.openaev.database.model.Endpoint;
+import io.openaev.database.model.Tenant;
 import io.openaev.rest.asset.endpoint.form.EndpointInput;
 import io.openaev.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openaev.utils.mapper.EndpointMapper;
@@ -66,6 +68,11 @@ public class EndpointFixture {
     endpoint.setIps(EndpointMapper.setIps(IPS));
     endpoint.setPlatform(platform);
     endpoint.setArch(Endpoint.PLATFORM_ARCH.x86_64);
+    // assets is tenant-active and Asset's TenantBaseListener was removed at go-live: stamp the
+    // tenant explicitly here, the way SecurityCoverageFixture and AssetGroupFixture already do,
+    // instead of leaving every call site to remember it. TenantContext.getCurrentTenant() never
+    // throws (it defaults to Tenant.DEFAULT_TENANT_UUID), so this is safe outside a request too.
+    endpoint.setTenant(new Tenant(TenantContext.getCurrentTenant()));
     return endpoint;
   }
 

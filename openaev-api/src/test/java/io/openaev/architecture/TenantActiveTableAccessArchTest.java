@@ -181,7 +181,8 @@ class TenantActiveTableAccessArchTest {
           "autonomous_directives",
           "kill_chain_phases",
           "security_coverages",
-          "asset_groups");
+          "asset_groups",
+          "assets");
 
   @ArchTest
   static void every_active_table_is_guarded(JavaClasses classes) throws Exception {
