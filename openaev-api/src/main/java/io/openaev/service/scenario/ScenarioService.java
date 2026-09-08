@@ -282,44 +282,7 @@ public class ScenarioService {
         findAll = getFindAllFunction(deepFilterSpecification, joinMap);
 
     // Compute pagination from find all
-    Page<RawPaginationScenario> page =
-        buildPaginationCriteriaBuilder(findAll, searchPaginationInput, Scenario.class, joinMap);
-    return enrichScenarioPlatforms(page);
-  }
-
-  private Page<RawPaginationScenario> enrichScenarioPlatforms(Page<RawPaginationScenario> page) {
-    Map<String, Set<String>> scenarioPlatformsByScenarioId =
-        resolveScenarioPlatforms(
-            page.getContent().stream().map(RawPaginationScenario::getScenario_id).toList());
-    return page.map(
-        scenario -> {
-          Set<String> platforms =
-              new LinkedHashSet<>(
-                  Optional.ofNullable(scenario.getScenario_platforms()).orElseGet(Set::of));
-          platforms.addAll(
-              Optional.ofNullable(scenarioPlatformsByScenarioId.get(scenario.getScenario_id()))
-                  .orElseGet(Set::of));
-          scenario.setScenario_platforms(platforms);
-          return scenario;
-        });
-  }
-
-  private Map<String, Set<String>> resolveScenarioPlatforms(List<String> scenarioIds) {
-    if (scenarioIds == null || scenarioIds.isEmpty()) {
-      return Map.of();
-    }
-    return scenarioRepository.findScenarioPlatformsByScenarioIds(scenarioIds).stream()
-        .collect(
-            Collectors.toMap(
-                RawScenarioSimpleIndexing::getScenario_id,
-                platform ->
-                    new LinkedHashSet<>(
-                        Optional.ofNullable(platform.getScenario_platforms()).orElseGet(Set::of)),
-                (left, right) -> {
-                  left.addAll(right);
-                  return left;
-                },
-                LinkedHashMap::new));
+    return buildPaginationCriteriaBuilder(findAll, searchPaginationInput, Scenario.class, joinMap);
   }
 
   private TriFunction<
@@ -375,6 +338,56 @@ public class ScenarioService {
     joinMap.put("injects.injectorContract", injectorsContractsJoin);
     Expression<String[]> platformExpression =
         cb.function("array_union_agg", String[].class, injectorsContractsJoin.get("platforms"));
+
+    // Join on WORKFLOWS and WORKFLOW_SCOPE_RULES for chained scenarios.
+    Subquery<String[]> workflowAssetPlatformsSubquery = cq.subquery(String[].class);
+    Root<Workflow> workflowAssetRoot = workflowAssetPlatformsSubquery.from(Workflow.class);
+    Join<Workflow, WorkflowScopeRule> workflowAssetRules =
+        workflowAssetRoot.join("workflowScopeRules", JoinType.LEFT);
+    Root<Endpoint> workflowAssetEndpointRoot = workflowAssetPlatformsSubquery.from(Endpoint.class);
+    workflowAssetPlatformsSubquery
+        .select(
+            ((HibernateCriteriaBuilder) cb)
+                .arrayAgg(null, workflowAssetEndpointRoot.get("platform")))
+        .where(
+            cb.equal(workflowAssetRoot.get("scenario").get("id"), scenarioRoot.get("id")),
+            cb.equal(workflowAssetRoot.get("status"), WorkflowStatus.TEMPLATE),
+            cb.equal(workflowAssetRules.get("selectedMode"), ScopeRuleSelectedMode.ALLOWLIST),
+            cb.equal(workflowAssetRules.get("valueType"), ScopeRuleValueType.ASSET_ID),
+            cb.equal(workflowAssetEndpointRoot.get("id"), workflowAssetRules.get("ruleValue")),
+            cb.notEqual(workflowAssetEndpointRoot.get("platform"), Endpoint.PLATFORM_TYPE.Unknown));
+
+    Subquery<String[]> workflowGroupPlatformsSubquery = cq.subquery(String[].class);
+    Root<Workflow> workflowGroupRoot = workflowGroupPlatformsSubquery.from(Workflow.class);
+    Join<Workflow, WorkflowScopeRule> workflowGroupRules =
+        workflowGroupRoot.join("workflowScopeRules", JoinType.LEFT);
+    Root<AssetGroupAsset> workflowGroupMembershipRoot =
+        workflowGroupPlatformsSubquery.from(AssetGroupAsset.class);
+    Root<Endpoint> workflowGroupEndpointRoot = workflowGroupPlatformsSubquery.from(Endpoint.class);
+    workflowGroupPlatformsSubquery
+        .select(
+            ((HibernateCriteriaBuilder) cb)
+                .arrayAgg(null, workflowGroupEndpointRoot.get("platform")))
+        .where(
+            cb.equal(workflowGroupRoot.get("scenario").get("id"), scenarioRoot.get("id")),
+            cb.equal(workflowGroupRoot.get("status"), WorkflowStatus.TEMPLATE),
+            cb.equal(workflowGroupRules.get("selectedMode"), ScopeRuleSelectedMode.ALLOWLIST),
+            cb.equal(workflowGroupRules.get("valueType"), ScopeRuleValueType.ASSET_GROUP_ID),
+            cb.equal(
+                workflowGroupMembershipRoot.get("assetGroupId"),
+                workflowGroupRules.get("ruleValue")),
+            cb.equal(
+                workflowGroupMembershipRoot.get("assetId"), workflowGroupEndpointRoot.get("id")),
+            cb.notEqual(workflowGroupEndpointRoot.get("platform"), Endpoint.PLATFORM_TYPE.Unknown));
+
+    Expression<String[]> workflowPlatformExpression =
+        cb.function(
+            "array_union",
+            String[].class,
+            workflowAssetPlatformsSubquery,
+            workflowGroupPlatformsSubquery);
+    platformExpression =
+        cb.function("array_union", String[].class, platformExpression, workflowPlatformExpression);
 
     // Subquery for workflow_id
     Subquery<String> workflowSubquery = cq.subquery(String.class);

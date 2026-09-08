@@ -8,8 +8,6 @@ import io.openaev.config.OpenAEVConfig;
 import io.openaev.config.cache.LicenseCacheManager;
 import io.openaev.context.TenantContext;
 import io.openaev.database.model.*;
-import io.openaev.database.raw.RawPaginationScenario;
-import io.openaev.database.raw.RawScenarioSimpleIndexing;
 import io.openaev.database.repository.*;
 import io.openaev.ee.EnterpriseEditionService;
 import io.openaev.healthcheck.utils.HealthCheckUtils;
@@ -33,8 +31,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -260,66 +256,6 @@ class ScenarioServiceUnitTest {
 
       // -- ASSERT --
       assertEquals(List.of("reply@mail.com"), scenario.getReplyTos());
-    }
-  }
-
-  @Nested
-  @DisplayName("Enrich scenario platforms")
-  class EnrichScenarioPlatforms {
-
-    @Test
-    void given_scenario_list_items_should_merge_repo_platforms_for_all_scenarios() {
-      RawPaginationScenario chainedScenario =
-          new RawPaginationScenario(
-              "scenario-1",
-              "Scenario 1",
-              "Description",
-              Scenario.SEVERITY.medium,
-              "Category",
-              null,
-              now(),
-              new String[] {"Linux"},
-              new String[] {"Windows"},
-              "workflow-1");
-      RawPaginationScenario timeBasedScenario =
-          new RawPaginationScenario(
-              "scenario-2",
-              "Scenario 2",
-              "Description",
-              Scenario.SEVERITY.medium,
-              "Category",
-              null,
-              now(),
-              new String[] {"Linux"},
-              new String[] {"Linux"},
-              null);
-      Page<RawPaginationScenario> page =
-          new PageImpl<>(List.of(chainedScenario, timeBasedScenario));
-
-      RawScenarioSimpleIndexing platformsForChainedScenario = mock(RawScenarioSimpleIndexing.class);
-      when(platformsForChainedScenario.getScenario_id()).thenReturn("scenario-1");
-      when(platformsForChainedScenario.getScenario_platforms()).thenReturn(Set.of("MacOS"));
-      RawScenarioSimpleIndexing platformsForTimeBasedScenario =
-          mock(RawScenarioSimpleIndexing.class);
-      when(platformsForTimeBasedScenario.getScenario_id()).thenReturn("scenario-2");
-      when(platformsForTimeBasedScenario.getScenario_platforms()).thenReturn(Set.of("Windows"));
-      when(scenarioRepository.findScenarioPlatformsByScenarioIds(
-              List.of("scenario-1", "scenario-2")))
-          .thenReturn(List.of(platformsForChainedScenario, platformsForTimeBasedScenario));
-
-      @SuppressWarnings("unchecked")
-      Page<RawPaginationScenario> enriched =
-          (Page<RawPaginationScenario>)
-              ReflectionTestUtils.invokeMethod(scenarioService, "enrichScenarioPlatforms", page);
-
-      assertNotNull(enriched);
-      assertEquals(
-          Set.of("Linux", "Windows", "MacOS"),
-          enriched.getContent().get(0).getScenario_platforms());
-      assertEquals(
-          Set.of("Linux", "Windows"), enriched.getContent().get(1).getScenario_platforms());
-      verify(scenarioRepository)
-          .findScenarioPlatformsByScenarioIds(List.of("scenario-1", "scenario-2"));
     }
   }
 
