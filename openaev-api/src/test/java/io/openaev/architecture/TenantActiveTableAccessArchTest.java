@@ -10,6 +10,8 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 import io.openaev.api.chaining.InjectExecutionStep;
 import io.openaev.database.model.Article;
+import io.openaev.api.notification.NotificationApi;
+import io.openaev.api.notifier.NotifierApi;
 import io.openaev.database.model.AttackPattern;
 import io.openaev.database.model.CatalogConnector;
 import io.openaev.database.model.Document;
@@ -32,6 +34,7 @@ import io.openaev.database.repository.InjectorRepository;
 import io.openaev.database.repository.KillChainPhaseRepository;
 import io.openaev.database.repository.LessonsTemplateRepository;
 import io.openaev.database.repository.MitigationRepository;
+import io.openaev.database.repository.NotificationRepository;
 import io.openaev.database.repository.SecurityCoverageRepository;
 import io.openaev.database.repository.TagRepository;
 import io.openaev.database.repository.attackpath.AttackPathExecutionRepository;
@@ -57,6 +60,7 @@ import io.openaev.injectors.challenge.ChallengeExecutor;
 import io.openaev.injectors.channel.ChannelExecutor;
 import io.openaev.injectors.phishing.service.PhishingLandingPageService;
 import io.openaev.integration.ManagerFactory;
+import io.openaev.notification.engine.NotificationDispatchService;
 import io.openaev.integration.impl.injectors.challenge.ChallengeInjectorIntegration;
 import io.openaev.integration.impl.injectors.challenge.ChallengeInjectorIntegrationFactory;
 import io.openaev.integration.migration.ConfigurationMigration;
@@ -136,6 +140,7 @@ import io.openaev.service.chaining.ScopeSnapshotService;
 import io.openaev.service.connector_instances.ConnectorInstanceService;
 import io.openaev.service.connectors.ConnectorOrchestrationService;
 import io.openaev.service.expectation.ChallengeBehavior;
+import io.openaev.service.notification.NotificationService;
 import io.openaev.service.scenario.ScenarioService;
 import io.openaev.service.stix.SecurityCoverageService;
 import io.openaev.service.targets.search.AgentTargetSearchAdaptor;
@@ -204,6 +209,7 @@ class TenantActiveTableAccessArchTest {
           "autonomous_directives",
           "kill_chain_phases",
           "security_coverages",
+          "notifications",
           "challenges",
           "asset_groups");
 
@@ -408,6 +414,29 @@ class TenantActiveTableAccessArchTest {
           .because(
               "domains is tenant-active: an accessor without a tenant scope silently reads zero"
                   + " rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule notifications_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // TxCtx-carrying notification self-service handlers.
+              NotificationApi.class,
+              // Service behind NotificationApi; ownership predicates and bulk scopes are resolved
+              // here, then scoped by the entrypoint transaction.
+              NotificationService.class,
+              // Notification writes from the engine and notifier test dispatch path are explicit
+              // INSERTs with tenant attribution before save.
+              NotificationDispatchService.class,
+              // The notifier test endpoint is the API entrypoint to the dispatch path and carries
+              // TxCtx (pinned by TenantScopedEntrypointsTxCtxArchTest).
+              NotifierApi.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(NotificationRepository.class)
+          .because(
+              "notifications is tenant-active: an accessor without a tenant scope silently reads"
+                  + " zero rows. New accessors must carry a scope and be allowlisted here");
 
   @ArchTest
   static final ArchRule channels_repository_access_is_reviewed =
