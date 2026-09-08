@@ -88,8 +88,8 @@ public class EndpointApi extends RestBehavior {
   // ctx is unused directly: the aspect reads it to scope this transaction against the v2-active
   // executors table (the created endpoint's agents eager-load their executor).
   public Endpoint createEndpoint(TxCtx ctx, @Valid @RequestBody final EndpointInput input) {
-    // Resolve the single tenant this write belongs to, and refuse an ambiguous multi-tenant
-    // scope with a 400 rather than letting the v1 thread-local pick one. Same resolution as
+    // Resolve the single tenant this write belongs to, and refuse an unscoped or ambiguous
+    // request with a 400 rather than letting the v1 thread-local pick one. Same resolution as
     // /register below; TenantContext.getCurrentTenant() silently falls back to DEFAULT.
     String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
     return this.endpointService.createEndpoint(input, tenantId);
