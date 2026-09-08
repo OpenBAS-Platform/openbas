@@ -5735,59 +5735,6 @@ export interface FilterGroup {
   mode: "and" | "or";
 }
 
-export interface Finding {
-  /** @uniqueItems true */
-  finding_asset_groups?: AssetGroup[];
-  finding_assets?: string[];
-  /** @format date-time */
-  finding_created_at: string;
-  /** @minLength 1 */
-  finding_field: string;
-  /** @minLength 1 */
-  finding_id: string;
-  finding_inject_id?: string;
-  /** Whether the finding value holds sensitive material and is redacted by API */
-  finding_is_sensitive?: boolean;
-  /** @deprecated */
-  finding_labels?: string[];
-  finding_name?: string;
-  finding_scenario?: Scenario;
-  finding_simulation?: Exercise;
-  finding_tags?: string[];
-  finding_teams?: string[];
-  finding_type:
-    | "text"
-    | "action_output"
-    | "number"
-    | "port"
-    | "portscan"
-    | "ipv4"
-    | "ipv6"
-    | "credentials"
-    | "cve"
-    | "username"
-    | "email"
-    | "share"
-    | "file"
-    | "admin_username"
-    | "group"
-    | "computer"
-    | "password_policy"
-    | "delegation"
-    | "sid"
-    | "vulnerability"
-    | "account_with_password_not_required"
-    | "asreproastable_account"
-    | "kerberoastable_account"
-    | "expectation_signature";
-  /** @format date-time */
-  finding_updated_at: string;
-  finding_users?: string[];
-  /** @minLength 1 */
-  finding_value: string;
-  listened?: boolean;
-}
-
 export interface FindingInput {
   /** @minLength 1 */
   finding_field: string;
@@ -5867,7 +5814,10 @@ export interface FindingOutput {
   finding_tags?: string[];
   /** Team ids linked to the finding */
   finding_teams?: string[];
-  /** Represents the data type being extracted. */
+  /**
+   * Represents the data type being extracted.
+   * @example "text, number, port, portscan, ipv4, ipv6, credentials, cve"
+   */
   finding_type:
     | "text"
     | "action_output"
