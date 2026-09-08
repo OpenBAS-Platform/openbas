@@ -422,11 +422,11 @@ public class ScenarioService {
     Root<Workflow> workflowRoot = workflowPlatformsSubquery.from(Workflow.class);
     Join<Workflow, Step> workflowStepsJoin = workflowRoot.join("steps", JoinType.LEFT);
 
-    Expression<String> workflowPlatformExpression =
+    Expression<String[]> workflowPlatformExpression =
         buildWorkflowPlatformExpression(cb, workflowStepsJoin.get("data"));
 
     workflowPlatformsSubquery
-        .select(cb.function("array_agg", String[].class, workflowPlatformExpression))
+        .select(cb.function("array_union_agg", String[].class, workflowPlatformExpression))
         .where(
             cb.equal(workflowRoot.get("scenario").get("id"), scenarioRoot.get("id")),
             cb.equal(workflowRoot.get("status"), WorkflowStatus.TEMPLATE),
@@ -436,19 +436,35 @@ public class ScenarioService {
     return workflowPlatformsSubquery;
   }
 
-  private Expression<String> buildWorkflowPlatformExpression(
+  private Expression<String[]> buildWorkflowPlatformExpression(
       CriteriaBuilder cb, Path<?> stepDataPath) {
-    // Step data stores injector contract details as JSON, so we first extract the platform array
-    // and then expand it into individual text values.
+    // Step data stores injector contract platforms as JSON, so normalize the JSON array text and
+    // convert it back into a SQL text[] that array_agg can consume.
     return cb.function(
-        "jsonb_array_elements_text",
-        String.class,
+        "string_to_array",
+        String[].class,
         cb.function(
-            "jsonb_extract_path",
-            Object.class,
-            stepDataPath,
-            cb.literal("inject_injector_contract"),
-            cb.literal("injector_contract_platforms")));
+            "replace",
+            String.class,
+            cb.function(
+                "replace",
+                String.class,
+                cb.function(
+                    "replace",
+                    String.class,
+                    cb.function(
+                        "jsonb_extract_path_text",
+                        String.class,
+                        stepDataPath,
+                        cb.literal("inject_injector_contract"),
+                        cb.literal("injector_contract_platforms")),
+                    cb.literal("\""),
+                    cb.literal("")),
+                cb.literal("["),
+                cb.literal("")),
+            cb.literal("]"),
+            cb.literal("")),
+        cb.literal(","));
   }
 
   public void throwIfScenarioNotLaunchable(Scenario scenario) {
