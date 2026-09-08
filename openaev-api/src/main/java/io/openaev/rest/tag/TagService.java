@@ -35,26 +35,12 @@ public class TagService {
 
   // -- CREATE --
 
-  public Tag createTag(TagCreateInput input) {
-    return createTag(input, (String) null);
-  }
-
   public Tag createTag(TagCreateInput input, String tenantId) {
+    tenantId = requireTenantId(tenantId);
     Tag tag = new Tag();
     tag.setUpdateAttributes(input);
     tag.setTenant(new Tenant(tenantId));
     return tagRepository.save(tag);
-  }
-
-  public Tag createTag(TxCtx ctx, TagCreateInput input) {
-    return createTag(input, writeScopeResolver.tenantForWrite(ctx, null));
-  }
-
-  public Tag createTag(String name) {
-    TagCreateInput tagCreateInput = new TagCreateInput();
-    tagCreateInput.setName(name);
-    tagCreateInput.setColor(Tag.WellKnown.getOrDefault(name, generateRandomColor()));
-    return upsertTag(tagCreateInput);
   }
 
   public Tag createTag(TxCtx ctx, String name) {
@@ -64,15 +50,10 @@ public class TagService {
     return upsertTag(ctx, tagCreateInput);
   }
 
-  public Tag upsertTag(TagCreateInput input) {
-    return upsertTag(input, (String) null);
-  }
-
   public Tag upsertTag(TagCreateInput input, String tenantId) {
+    tenantId = requireTenantId(tenantId);
     Optional<Tag> tag =
-        tenantId == null
-            ? tagRepository.findByName(input.getName().toLowerCase())
-            : tagRepository.findByNameAndTenantId(input.getName().toLowerCase(), tenantId);
+        tagRepository.findByNameAndTenantId(input.getName().toLowerCase(), tenantId);
     if (tag.isPresent()) {
       return tag.get();
     } else {
@@ -93,25 +74,6 @@ public class TagService {
    * @param names collection of strings, each representing a requested tag
    * @return set of tags exactly matching the provided set of names
    */
-  public Set<Tag> findOrCreateTagsFromNames(Set<String> names) {
-    Set<Tag> tags = new HashSet<>();
-
-    if (names != null) {
-      for (String label : names) {
-        if (label == null || label.isBlank()) {
-          continue;
-        }
-        TagCreateInput tagCreateInput = new TagCreateInput();
-        tagCreateInput.setName(label);
-        tagCreateInput.setColor(generateRandomColor());
-
-        tags.add(upsertTag(tagCreateInput));
-      }
-    }
-
-    return tags;
-  }
-
   public Set<Tag> findOrCreateTagsFromNames(TxCtx ctx, Set<String> names) {
     String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
     Set<Tag> tags = new HashSet<>();
@@ -137,23 +99,6 @@ public class TagService {
    *
    * @return the complete set of well known tags
    */
-  public Set<Tag> ensureWellKnownTags() {
-    Set<Tag> wellKnownTags = new HashSet<>();
-    for (Map.Entry<String, String> entry : Tag.WellKnown.entrySet()) {
-      wellKnownTags.add(
-          this.tagRepository
-              .findByName(entry.getKey())
-              .orElseGet(
-                  () -> {
-                    Tag tag = new Tag();
-                    tag.setName(entry.getKey());
-                    tag.setColor(entry.getValue());
-                    return tagRepository.save(tag);
-                  }));
-    }
-    return wellKnownTags;
-  }
-
   public Set<Tag> ensureWellKnownTags(TxCtx ctx) {
     String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
     Set<Tag> wellKnownTags = new HashSet<>();
@@ -220,5 +165,12 @@ public class TagService {
     return fromIterable(this.tagRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
+  }
+
+  private String requireTenantId(String tenantId) {
+    if (tenantId == null || tenantId.isBlank()) {
+      throw new IllegalArgumentException("Tag writes require a non-blank tenantId");
+    }
+    return tenantId;
   }
 }

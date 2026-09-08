@@ -219,21 +219,15 @@ public class TagRuleService {
             .collect(Collectors.toList());
   }
 
-  public Set<TagRule> ensurePresetRules() {
-    return ensurePresetRules(null);
-  }
-
   public Set<TagRule> ensurePresetRules(TxCtx ctx) {
     Set<TagRule> tagRules = new HashSet<>();
-    Set<Tag> wellKnownTags = ctx == null ? Set.of() : tagService.ensureWellKnownTags(ctx);
+    Set<Tag> wellKnownTags = tagService.ensureWellKnownTags(ctx);
     for (String tagName : TagRule.RESERVED_TAG_NAMES) {
       Tag tag =
-          ctx == null
-              ? tagRepository.findByName(tagName).orElseGet(() -> tagService.createTag(tagName))
-              : wellKnownTags.stream()
-                  .filter(existingTag -> existingTag.getName().equals(tagName))
-                  .findFirst()
-                  .orElseGet(() -> tagService.createTag(ctx, tagName));
+          wellKnownTags.stream()
+              .filter(existingTag -> existingTag.getName().equals(tagName))
+              .findFirst()
+              .orElseGet(() -> tagService.createTag(ctx, tagName));
       tagRules.add(
           this.findByTagName(tag.getName())
               .orElseGet(() -> this.createTagRule(tag, new ArrayList<>(), true)));
