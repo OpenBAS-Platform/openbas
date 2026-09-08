@@ -21,6 +21,7 @@ import io.openaev.database.model.attackpath.AttackPathExecution;
 import io.openaev.database.repository.CollectorRepository;
 import io.openaev.database.repository.ConnectorInstanceRepository;
 import io.openaev.database.repository.CweRepository;
+import io.openaev.database.repository.DomainRepository;
 import io.openaev.database.repository.ExecutorRepository;
 import io.openaev.database.repository.ImportMapperRepository;
 import io.openaev.database.repository.InjectorRepository;
@@ -34,6 +35,7 @@ import io.openaev.database.repository.attackpath.AttackPathFindingRepository;
 import io.openaev.database.repository.autonomous.AutonomousDirectiveRepository;
 import io.openaev.database.repository.autonomous.AutonomousEventRepository;
 import io.openaev.database.repository.autonomous.AutonomousRunRepository;
+import io.openaev.engine.model.securitydomain.SecurityDomainHandler;
 import io.openaev.executors.Executor;
 import io.openaev.executors.ExecutorService;
 import io.openaev.executors.caldera.service.CalderaExecutorContextService;
@@ -60,6 +62,8 @@ import io.openaev.rest.attack_pattern.service.AttackPatternService;
 import io.openaev.rest.collector.CollectorApi;
 import io.openaev.rest.collector.service.CollectorService;
 import io.openaev.rest.connector_instance.ConnectorInstanceApi;
+import io.openaev.rest.domain.DomainApi;
+import io.openaev.rest.domain.DomainService;
 import io.openaev.rest.executor.ExecutorApi;
 import io.openaev.rest.exercise.ExerciseApi;
 import io.openaev.rest.exercise.ExerciseImportApi;
@@ -84,6 +88,7 @@ import io.openaev.rest.mapper.MapperApi;
 import io.openaev.rest.mitigation.MitigationApi;
 import io.openaev.rest.payload.PayloadApi;
 import io.openaev.rest.payload.service.PayloadService;
+import io.openaev.rest.payload.service.PayloadUpdateService;
 import io.openaev.rest.payload.service.PayloadUpsertService;
 import io.openaev.rest.scenario.ScenarioApi;
 import io.openaev.rest.scenario.ScenarioImportApi;
@@ -167,6 +172,7 @@ class TenantActiveTableAccessArchTest {
           "executors",
           "injectors",
           "tags",
+          "domains",
           "attackpath_execution",
           "attackpath_finding",
           "secret_references",
@@ -356,6 +362,29 @@ class TenantActiveTableAccessArchTest {
           .because(
               "tags is tenant-active: an accessor without a tenant scope silently reads zero rows."
                   + " New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule domains_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // TxCtx-carrying entrypoints, pinned by TenantScopedEntrypointsTxCtxArchTest:
+              DomainApi.class,
+              // Domain API/service write tenant attribution and read scope.
+              DomainService.class,
+              // Payload update path uses domainRepository.findAllById and is called only by
+              // TxCtx-carrying handlers (PayloadApi / ThreatArsenalApi) already pinned by
+              // TenantScopedEntrypointsTxCtxArchTest.
+              PayloadUpdateService.class,
+              // Background indexing reader, documented degraded path when no background scope is
+              // set.
+              SecurityDomainHandler.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(DomainRepository.class)
+          .because(
+              "domains is tenant-active: an accessor without a tenant scope silently reads zero"
+                  + " rows. New accessors must carry a scope and be allowlisted here");
 
   @ArchTest
   static final ArchRule collectors_repository_access_is_reviewed =
