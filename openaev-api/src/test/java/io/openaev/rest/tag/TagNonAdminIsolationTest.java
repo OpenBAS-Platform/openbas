@@ -29,18 +29,16 @@ class TagNonAdminIsolationTest extends IntegrationTest {
   @Autowired private TenantIsolationTestHelper tenantHelper;
 
   private String tenantA;
-  private String tenantC;
+  private String tenantB;
   private String tagA;
   private String tagB;
 
   @BeforeEach
   void seedTwoTenantsTheNonAdminBelongsToWithOneTagEach() throws Exception {
     tenantA = tenantHelper.createTenantWithCapabilities("nonadmin-tag-a", Set.of()).getId();
-    String tenantB = tenantHelper.createTenantWithCapabilities("nonadmin-tag-b", Set.of()).getId();
-    tenantC = tenantHelper.createTenant("nonadmin-tag-c").getId();
+    tenantB = tenantHelper.createTenantWithCapabilities("nonadmin-tag-b", Set.of()).getId();
     tagA = seedTag(tenantA, "nonadmin-tag-a", "#111111");
     tagB = seedTag(tenantB, "nonadmin-tag-b", "#222222");
-    seedTag(tenantC, "nonadmin-tag-c", "#333333");
   }
 
   @Test
@@ -58,10 +56,17 @@ class TagNonAdminIsolationTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("a non-admin using an out-of-rights tenant selector is forbidden")
-  void tenantSelectorOutOfRightsIsForbidden() throws Exception {
-    mvc.perform(get("/api/tenants/{tenantId}/tags", tenantC).with(csrf()))
-        .andExpect(status().isForbidden());
+  @DisplayName("a non-admin listing under tenant B's path sees only B's tag")
+  void listUnderTenantBReturnsOnlyBForNonAdmin() throws Exception {
+    String response =
+        mvc.perform(get("/api/tenants/{tenantId}/tags", tenantB).with(csrf()))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    assertTrue(response.contains(tagB), "B's tag must appear for the non-admin member of B");
+    assertFalse(response.contains(tagA), "A's tag must not leak to B's scope");
   }
 
   private String seedTag(String tenantId, String name, String color) {

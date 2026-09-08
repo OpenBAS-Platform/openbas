@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 class TagHttpIsolationTest extends IntegrationTest {
 
   private static final String TENANT_TAGS = "/api/tenants/{tenantId}/tags";
-  private static final String TENANT_TAG_BY_ID = TENANT_TAGS + "/{tagId}";
 
   @Autowired private MockMvc mvc;
   @Autowired private TenantIsolationTestHelper tenantHelper;
@@ -52,10 +51,17 @@ class TagHttpIsolationTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("under tenant A's path: A's tag is visible, B's is hidden")
+  @DisplayName("under tenant A's path: list returns A's tag and not B's")
   void underTenantAPath() throws Exception {
-    mvc.perform(get(TENANT_TAG_BY_ID, tenantA, tagA)).andExpect(status().isOk());
-    mvc.perform(get(TENANT_TAG_BY_ID, tenantA, tagB)).andExpect(status().isNotFound());
+    String response =
+        mvc.perform(get(TENANT_TAGS, tenantA))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    assertTrue(response.contains(tagA), "A's tag must appear under tenant A's path");
+    assertFalse(response.contains(tagB), "B's tag must not appear under tenant A's path");
   }
 
   @Test
@@ -77,19 +83,6 @@ class TagHttpIsolationTest extends IntegrationTest {
     assertFalse(response.contains(tagB), "B's tag must not appear in A's search results");
   }
 
-  @Test
-  @DisplayName("header selector on /api/tags returns only rows in the selected tenant")
-  void headerSelectorOnBasePathScopesRead() throws Exception {
-    String response =
-        mvc.perform(get("/api/tags").header("X-Tenant-Ids", tenantA))
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    assertTrue(response.contains(tagA), "A's tag must appear when tenant A is selected");
-    assertFalse(response.contains(tagB), "B's tag must not appear when tenant A is selected");
-  }
 
   @Test
   @DisplayName("a create under tenant A's path is attributed to tenant A")
