@@ -3,6 +3,7 @@ package io.openaev.rest.finding;
 import static io.openaev.config.TenantUriUtils.TENANT_PREFIX;
 
 import io.openaev.aop.AccessControl;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.Action;
 import io.openaev.database.model.Finding;
 import io.openaev.database.model.ResourceType;
@@ -36,7 +37,7 @@ public class FindingApi extends RestBehavior {
       resourceId = "#id",
       actionPerformed = Action.READ,
       resourceType = ResourceType.FINDING)
-  public ResponseEntity<FindingOutput> finding(@PathVariable @NotNull final String id) {
+  public ResponseEntity<FindingOutput> finding(TxCtx ctx, @PathVariable @NotNull final String id) {
     return ResponseEntity.ok(this.findingMapper.toFindingOutput(this.findingService.finding(id)));
   }
 
@@ -47,7 +48,7 @@ public class FindingApi extends RestBehavior {
       actionPerformed = Action.READ,
       resourceType = ResourceType.FINDING)
   public ResponseEntity<FindingSummaryOutput> findingSummary(
-      @PathVariable @NotNull final String id) {
+      TxCtx ctx, @PathVariable @NotNull final String id) {
     return ResponseEntity.ok(this.findingService.findingSummary(id));
   }
 
@@ -55,7 +56,7 @@ public class FindingApi extends RestBehavior {
   @Transactional
   @AccessControl(actionPerformed = Action.CREATE, resourceType = ResourceType.FINDING)
   public ResponseEntity<FindingOutput> createFinding(
-      @RequestBody @Valid @NotNull final FindingInput input) {
+      TxCtx ctx, @RequestBody @Valid @NotNull final FindingInput input) {
     return ResponseEntity.ok(
         this.findingMapper.toFindingOutput(
             this.findingService.createFinding(
@@ -69,6 +70,7 @@ public class FindingApi extends RestBehavior {
       actionPerformed = Action.WRITE,
       resourceType = ResourceType.FINDING)
   public ResponseEntity<FindingOutput> updateFinding(
+      TxCtx ctx,
       @PathVariable @NotNull final String id,
       @RequestBody @Valid @NotNull final FindingInput input) {
     Finding existingFinding = this.findingService.finding(id);
@@ -84,7 +86,7 @@ public class FindingApi extends RestBehavior {
       resourceId = "#id",
       actionPerformed = Action.DELETE,
       resourceType = ResourceType.FINDING)
-  public ResponseEntity<Void> deleteFinding(@PathVariable @NotNull final String id) {
+  public ResponseEntity<Void> deleteFinding(TxCtx ctx, @PathVariable @NotNull final String id) {
     this.findingService.deleteFinding(id);
     return ResponseEntity.noContent().build();
   }

@@ -6,6 +6,10 @@ import static io.openaev.utils.pagination.CriteriaBuilderPagination.paginate;
 import static io.openaev.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static java.time.Instant.now;
 
+import io.openaev.aop.audit_log.AuditEvent;
+import io.openaev.aop.audit_log.AuditEventOrigin;
+import io.openaev.aop.audit_log.AuditEventScope;
+import io.openaev.aop.audit_log.AuditLogger;
 import io.openaev.api.users.dto.UserInput;
 import io.openaev.api.users.dto.UserOutput;
 import io.openaev.config.DefaultOpenAEVPrincipal;
@@ -39,13 +43,11 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.map.PassiveExpiringMap;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
@@ -53,6 +55,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -102,6 +105,7 @@ public class UserService {
   private final RandomUtils randomUtils;
   private final TenantMembershipCacheManager tenantMembershipCacheManager;
   private final TenantScopedTransaction tenantTx;
+  private final ObjectProvider<AuditLogger> auditLoggerProvider;
 
   /** Cache for admin users to improve lookup performance. */
   private Cache adminCache;
@@ -124,8 +128,12 @@ public class UserService {
 
   // -- CREATE --
 
+  /**
+   * Creates a user. The {@link UserCreationScope} decides which auto-assign groups are granted, and
+   * whether the tenants carried by the input are honoured.
+   */
   @Transactional(rollbackFor = Exception.class)
-  public User createUser(UserInput input) {
+  public User createUser(UserInput input, UserCreationScope scope) {
     if (!StringUtils.hasLength(input.plainPassword())) {
       throw new IllegalArgumentException("Password is required when creating a user");
     }
@@ -135,24 +143,32 @@ public class UserService {
           "User with email " + input.email() + " already exists");
     }
     PrivilegeEscalationValidator.assertAdminFlagUnchanged(input.admin(), false);
+    // A tenant creator has no authority over other tenants: it never attaches any, the caller
+    // attaches its own right after.
+    List<String> tenantIds = scope == UserCreationScope.PLATFORM ? input.tenantIds() : List.of();
     User user = new User();
     user.setUpdateAttributes(input);
     user.setTags(referenceResolver.resolve(input.tagIds(), Tag.class, tagRepository::countByIdIn));
     user.setOrganization(referenceResolver.resolve(input.organizationId(), Organization.class));
     user.setTenants(
         new ArrayList<>(
-            referenceResolver.resolve(
-                input.tenantIds(), Tenant.class, tenantRepository::countByIdIn)));
+            referenceResolver.resolve(tenantIds, Tenant.class, tenantRepository::countByIdIn)));
     // The user's id is generated on save (UUID generator), not before: evict only after
     // persisting, using the saved user's id, or evictForUser is called with a null key.
-    User createdUser = createUser(user, input.plainPassword(), UUID.randomUUID().toString());
-    if (!CollectionUtils.isEmpty(input.tenantIds())) {
-      tenantMembershipCacheManager.evictForUser(createdUser.getId(), input.tenantIds());
+    User createdUser = createUser(user, input.plainPassword(), UUID.randomUUID().toString(), scope);
+    if (!CollectionUtils.isEmpty(tenantIds)) {
+      tenantMembershipCacheManager.evictForUser(createdUser.getId(), tenantIds);
     }
     return createdUser;
   }
 
-  /** Creates a user for internal/technical purposes (SSO login, connector provisioning). */
+  /**
+   * Creates a user for internal/technical purposes (SSO login, connector provisioning, service
+   * accounts). Such a user always lands in a tenant, attached by the caller right after: the
+   * platform auto-assign groups are therefore never granted. Callers own the group assignment —
+   * either explicitly (technical accounts) or through {@link #assignAutoAssignGroups(String,
+   * Collection)} once the tenant is attached (SSO).
+   */
   @Transactional(rollbackFor = Exception.class)
   public User createInternalUser(
       String email, String firstname, String lastname, boolean isAdmin, String token) {
@@ -164,16 +180,19 @@ public class UserService {
     user.setFirstname(firstname);
     user.setLastname(lastname);
     user.setAdmin(isAdmin);
-    return createUser(user, null, token);
+    return createUser(user, null, token, UserCreationScope.TENANT);
   }
 
-  private User createUser(User user, String password, String token) {
+  private User createUser(User user, String password, String token, UserCreationScope scope) {
     if (StringUtils.hasLength(password)) {
       user.setPassword(this.encodeUserPassword(password));
     }
-    List<Group> assignableGroups =
-        groupRepository.findAll(GroupSpecification.defaultUserAssignablePlatform());
-    user.setGroups(assignableGroups);
+    // Creation enters every scope at once: the platform when created from the platform screen,
+    // plus each tenant attached in the input.
+    assignAutoAssignGroups(
+        user,
+        user.getTenants().stream().map(Tenant::getId).toList(),
+        scope == UserCreationScope.PLATFORM);
     User savedUser = userRepository.save(user);
     this.createUserToken(savedUser, token);
     return savedUser;
@@ -242,6 +261,16 @@ public class UserService {
         new ArrayList<>(
             referenceResolver.resolve(
                 input.tenantIds(), Tenant.class, tenantRepository::countByIdIn)));
+    // Only tenants the user just joined trigger auto-assignment: re-applying it to tenants he
+    // already belonged to would restore groups deliberately removed from within those tenants.
+    List<String> currentTenantIds = existing.getTenants().stream().map(Tenant::getId).toList();
+    List<String> attachedTenantIds =
+        currentTenantIds.stream().filter(tenantId -> !oldTenantIds.contains(tenantId)).toList();
+    assignAutoAssignGroups(existing, attachedTenantIds, false);
+    // Symmetrically, a membership must not outlive the tenant attachment that granted it.
+    List<String> detachedTenantIds =
+        oldTenantIds.stream().filter(tenantId -> !currentTenantIds.contains(tenantId)).toList();
+    revokeTenantGroups(existing, detachedTenantIds);
     User savedUser = userRepository.save(existing);
     // Evict cache for old tenants (removed memberships) and new tenants (added memberships)
     List<String> newTenantIds = input.tenantIds() != null ? input.tenantIds() : List.of();
@@ -465,7 +494,91 @@ public class UserService {
     token.setUser(user);
     token.setCreated(now());
     token.setValue(discreteToken);
-    return tokenRepository.save(token);
+    Token createdToken = tokenRepository.save(token);
+    logTokenCreated(createdToken);
+    return createdToken;
+  }
+
+  /** Delete an existing API token */
+  public void deleteUserToken(Token token) {
+    tokenRepository.delete(token);
+    logTokenDeleted(token);
+  }
+
+  public Token renewUserToken(String tokenId) {
+    User user =
+        userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
+    Token token = tokenRepository.findById(tokenId).orElseThrow(ElementNotFoundException::new);
+    if (!user.equals(token.getUser())) {
+      throw new AccessDeniedException("You are not allowed to renew this token");
+    }
+    deleteUserToken(token);
+
+    return createUserToken(user, UUID.randomUUID().toString());
+  }
+
+  /**
+   * Emits an audit event for a token creation.
+   *
+   * @param createdToken the token that was created
+   */
+  private void logTokenCreated(Token createdToken) {
+    AuditLogger auditLogger = auditLoggerProvider.getIfAvailable();
+    if (auditLogger == null) {
+      return;
+    }
+    User actor = currentUserOrNull();
+    String tokenUserId = createdToken.getUser() != null ? createdToken.getUser().getId() : null;
+    Map<String, Object> contextData = new LinkedHashMap<>();
+    contextData.put("token_id", createdToken.getId());
+    contextData.put("token_user_id", tokenUserId);
+    contextData.put("actor_user_id", actor != null ? actor.getId() : null);
+    contextData.put("token_created_at", createdToken.getCreated());
+
+    auditLogger.logEvent(
+        AuditEvent.builder()
+            .eventType(EventType.MUTATION)
+            .eventScope(AuditEventScope.CREATE)
+            .eventStatus(EventStatus.SUCCESS)
+            .resourceType(ResourceType.TOKEN)
+            .resourceId(createdToken.getId())
+            .contextData(contextData)
+            .message("User token created")
+            .origin(actor != null ? AuditEventOrigin.REQUEST : AuditEventOrigin.SYSTEM)
+            .build());
+  }
+
+  /**
+   * Emits an audit event for a token deleted.
+   *
+   * @param token the token that was deleted
+   */
+  private void logTokenDeleted(Token token) {
+    AuditLogger auditLogger = auditLoggerProvider.getIfAvailable();
+    if (auditLogger == null) {
+      return;
+    }
+    User actor = currentUserOrNull();
+    String tokenUserId = token.getUser() != null ? token.getUser().getId() : null;
+    Map<String, Object> contextData = new LinkedHashMap<>();
+    contextData.put("token_id", token.getId());
+    contextData.put("token_user_id", tokenUserId);
+    contextData.put("actor_user_id", actor != null ? actor.getId() : null);
+    contextData.put("token_deleted_at", Instant.now());
+
+    auditLogger.logEvent(
+        AuditEvent.builder()
+            .eventType(EventType.MUTATION)
+            .eventScope(AuditEventScope.DELETE)
+            .eventStatus(EventStatus.SUCCESS)
+            .resourceType(ResourceType.TOKEN)
+            .resourceId(token.getId())
+            .contextData(contextData)
+            .message("User token deleted")
+            .origin(actor != null ? AuditEventOrigin.REQUEST : AuditEventOrigin.SYSTEM)
+            .build());
   }
 
   public Optional<User> findByTokenAndTenantId(
@@ -547,5 +660,81 @@ public class UserService {
 
   public Optional<User> findByEmailIgnoreCase(String email) {
     return userRepository.findByEmailIgnoreCase(email);
+  }
+
+  /**
+   * Grants the auto-assign groups of the given tenants to an already persisted user. Used when a
+   * user joins a tenant outside of the create/update flows, i.e. when attached from a tenant
+   * screen.
+   */
+  @Transactional(rollbackFor = Exception.class)
+  public void assignAutoAssignGroups(
+      @NotBlank final String userId, @NotNull final Collection<String> tenantIds) {
+    if (tenantIds.isEmpty()) {
+      return;
+    }
+    User user = user(userId);
+    assignAutoAssignGroups(user, tenantIds, false);
+    userRepository.save(user);
+  }
+
+  /**
+   * Grants the default-assign groups of the scopes the user just entered: the platform scope at
+   * creation, plus every tenant freshly attached. Scopes the user already belonged to are skipped,
+   * so a group deliberately removed from a user is never re-granted by a later update. Never
+   * removes an existing group membership.
+   */
+  private void assignAutoAssignGroups(
+      User user, Collection<String> tenantIds, boolean includePlatformScope) {
+    if (!includePlatformScope && tenantIds.isEmpty()) {
+      return;
+    }
+    Specification<Group> spec =
+        includePlatformScope ? GroupSpecification.defaultUserAssignablePlatform() : null;
+    for (String tenantId : tenantIds) {
+      Specification<Group> tenantSpec = GroupSpecification.defaultUserAssignableTenant(tenantId);
+      spec = spec == null ? tenantSpec : spec.or(tenantSpec);
+    }
+    List<Group> applicableGroups = groupRepository.findAll(spec);
+    if (applicableGroups.isEmpty()) {
+      return;
+    }
+    List<Group> current = new ArrayList<>(user.getUnscopedGroups());
+    for (Group group : applicableGroups) {
+      if (!current.contains(group)) {
+        current.add(group);
+      }
+    }
+    user.setGroups(current);
+  }
+
+  /**
+   * Revokes the groups of the given tenants from an already persisted user. Used when a user leaves
+   * a tenant outside of the update flow, i.e. when detached from a tenant screen.
+   */
+  @Transactional(rollbackFor = Exception.class)
+  public void revokeTenantGroups(
+      @NotBlank final String userId, @NotNull final Collection<String> tenantIds) {
+    if (tenantIds.isEmpty()) {
+      return;
+    }
+    User user = user(userId);
+    revokeTenantGroups(user, tenantIds);
+    User savedUser = userRepository.save(user);
+    sessionManager.refreshUserSessions(savedUser);
+  }
+
+  /**
+   * Drops every group scoped to a tenant the user just left: a group grants capabilities inside its
+   * own tenant only, so keeping it would leave access to a tenant the user no longer belongs to.
+   * Platform groups and the groups of the remaining tenants are untouched.
+   */
+  private void revokeTenantGroups(User user, Collection<String> tenantIds) {
+    if (tenantIds.isEmpty()) {
+      return;
+    }
+    user.getUnscopedGroups()
+        .removeIf(
+            group -> group.getTenant() != null && tenantIds.contains(group.getTenant().getId()));
   }
 }
