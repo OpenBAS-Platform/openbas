@@ -455,7 +455,9 @@ class InjectImportTest extends IntegrationTest {
   }
 
   @Nested
-  @WithMockUser(withCapabilities = {Capability.MANAGE_ASSESSMENT}, autoJoinDefaultTenant = true)
+  @WithMockUser(
+      withCapabilities = {Capability.MANAGE_ASSESSMENT},
+      autoJoinDefaultTenant = true)
   @DisplayName("When imported objects don't already exist on the destination")
   public class WhenImportedObjectsDontAlreadyExistOnDestination {
 
