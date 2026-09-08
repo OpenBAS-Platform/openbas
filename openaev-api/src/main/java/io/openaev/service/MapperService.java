@@ -23,6 +23,7 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.EndpointRepository;
 import io.openaev.database.repository.ImportMapperRepository;
@@ -557,7 +558,7 @@ public class MapperService {
    * @param csvType entity to know which columns format we use for the import
    * @throws Exception exception if problem during the import
    */
-  public void importMappersCsv(MultipartFile file, CsvType csvType) throws Exception {
+  public void importMappersCsv(MultipartFile file, CsvType csvType, TxCtx ctx) throws Exception {
     File tempFile = createTempFile("openaev-import-" + now().getEpochSecond(), ".csv");
     FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
 
@@ -577,7 +578,7 @@ public class MapperService {
       switch (csvType) {
         case ENDPOINTS:
           try {
-            importEndpointsCsv(setEndpointsColumnMapping(), csvReader);
+            importEndpointsCsv(setEndpointsColumnMapping(), csvReader, ctx);
           } catch (Exception e) {
             throw new RuntimeException("Error during export CSV", e);
           }
@@ -592,7 +593,7 @@ public class MapperService {
   }
 
   private void importEndpointsCsv(
-      ColumnPositionMappingStrategy columnPositionMappingStrategy, CSVReader csvReader)
+      ColumnPositionMappingStrategy columnPositionMappingStrategy, CSVReader csvReader, TxCtx ctx)
       throws JsonProcessingException {
 
     CsvToBean csv = new CsvToBean();
@@ -625,7 +626,7 @@ public class MapperService {
         TagCreateInput tagCreateInput = new TagCreateInput();
         tagCreateInput.setName(tag.getName());
         tagCreateInput.setColor(tag.getColor());
-        tagsForCreation.add(this.tagService.upsertTag(tagCreateInput));
+        tagsForCreation.add(this.tagService.upsertTag(tagCreateInput, ctx));
       }
       endpoint.setTags(iterableToSet(tagsForCreation));
       endpoint.setEoL(endpointExportImport.isEol());

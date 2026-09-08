@@ -106,8 +106,9 @@ public class V20260101_Starter_pack extends DataPack {
     enableV1TenantFilter(tenant);
 
     // unconditionally run this code
-    Set<Tag> tags = tagService.ensureWellKnownTags();
-    Set<TagRule> tagRules = tagRuleService.ensurePresetRules();
+    TxCtx ctx = TxCtx.forTenant(tenant.getId());
+    Set<Tag> tags = tagService.ensureWellKnownTags(ctx);
+    Set<TagRule> tagRules = tagRuleService.ensurePresetRules(ctx);
 
     try {
       Endpoint honeyScanMeEndpoint =

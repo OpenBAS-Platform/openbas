@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openaev.aop.lock.Lock;
 import io.openaev.aop.lock.LockResourceType;
 import io.openaev.config.OpenAEVConfig;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.ScenarioRepository;
 import io.openaev.database.repository.SecurityCoverageRepository;
@@ -104,7 +105,11 @@ public class SecurityCoverageService {
   @Lock(type = LockResourceType.SECURITY_COVERAGE, key = "#securityCoverageStixId")
   @Transactional(rollbackFor = Exception.class)
   public Scenario handleSecurityCoverageProcessing(
-      String securityCoverageStixId, ObjectBase securityCoverageObj, Bundle bundle, String tenantId)
+      String securityCoverageStixId,
+      ObjectBase securityCoverageObj,
+      Bundle bundle,
+      TxCtx ctx,
+      String tenantId)
       throws ParsingException, BundleValidationError, ConnectorError, IOException {
     Objects.requireNonNull(tenantId, "security coverage processing requires transaction scope");
     // Telemetry: one CTI security coverage bundle processed (attempts semantics).
@@ -114,7 +119,7 @@ public class SecurityCoverageService {
     SecurityCoverage securityCoverage =
         buildSecurityCoverageFromStix(
             securityCoverageObj, bundle, securityCoverageStixId, bundleHash, tenantId);
-    Scenario scenario = buildScenarioFromSecurityCoverage(securityCoverage);
+    Scenario scenario = buildScenarioFromSecurityCoverage(securityCoverage, ctx);
     // Telemetry: a scenario was generated from the coverage.
     resultsMetricCollector.recordCoverageScenarioGenerated();
 
@@ -358,12 +363,12 @@ public class SecurityCoverageService {
    * @param securityCoverage the source coverage
    * @return the created or updated {@link Scenario}
    */
-  public Scenario buildScenarioFromSecurityCoverage(SecurityCoverage securityCoverage) {
-    Scenario scenario = updateOrCreateScenarioFromSecurityCoverage(securityCoverage);
+  public Scenario buildScenarioFromSecurityCoverage(SecurityCoverage securityCoverage, TxCtx ctx) {
+    Scenario scenario = updateOrCreateScenarioFromSecurityCoverage(securityCoverage, ctx);
     securityCoverage.setScenario(scenario);
     Set<Inject> injects =
         securityCoverageInjectService.createdInjectsForScenarioAndSecurityCoverage(
-            scenario, securityCoverage);
+            scenario, securityCoverage, ctx);
     scenario.setInjects(injects);
     log.info(
         "Creating or Updating Scenario with ID: {} from Security coverage with external ID: {}",
@@ -423,29 +428,31 @@ public class SecurityCoverageService {
    * @param securityCoverage the {@link SecurityCoverage}
    * @return the updated or newly created {@link Scenario}
    */
-  public Scenario updateOrCreateScenarioFromSecurityCoverage(SecurityCoverage securityCoverage) {
+  public Scenario updateOrCreateScenarioFromSecurityCoverage(
+      SecurityCoverage securityCoverage, TxCtx ctx) {
     if (securityCoverage.getScenario() != null) {
       return scenarioRepository
           .findById(securityCoverage.getScenario().getId())
-          .map(existing -> updateScenarioFromSecurityCoverage(existing, securityCoverage))
-          .orElseGet(() -> createAndInitializeScenario(securityCoverage));
+          .map(existing -> updateScenarioFromSecurityCoverage(existing, securityCoverage, ctx))
+          .orElseGet(() -> createAndInitializeScenario(securityCoverage, ctx));
     }
-    return createAndInitializeScenario(securityCoverage);
+    return createAndInitializeScenario(securityCoverage, ctx);
   }
 
-  private Scenario createAndInitializeScenario(SecurityCoverage securityCoverage) {
+  private Scenario createAndInitializeScenario(SecurityCoverage securityCoverage, TxCtx ctx) {
     Scenario scenario = new Scenario();
-    updatePropertiesFromSecurityCoverage(scenario, securityCoverage);
+    updatePropertiesFromSecurityCoverage(scenario, securityCoverage, ctx);
     return scenarioService.createScenario(scenario);
   }
 
   private Scenario updateScenarioFromSecurityCoverage(
-      Scenario scenario, SecurityCoverage securityCoverage) {
-    updatePropertiesFromSecurityCoverage(scenario, securityCoverage);
+      Scenario scenario, SecurityCoverage securityCoverage, TxCtx ctx) {
+    updatePropertiesFromSecurityCoverage(scenario, securityCoverage, ctx);
     return scenarioService.updateScenario(scenario);
   }
 
-  private void updatePropertiesFromSecurityCoverage(Scenario scenario, SecurityCoverage sa) {
+  private void updatePropertiesFromSecurityCoverage(
+      Scenario scenario, SecurityCoverage sa, TxCtx ctx) {
     scenario.setSecurityCoverage(sa);
     scenario.setName(sa.getName());
     scenario.setDescription(sa.getDescription());
@@ -459,7 +466,8 @@ public class SecurityCoverageService {
         tagService.findOrCreateTagsFromNames(
             sa.getPlatformsAffinity().stream()
                 .map("security coverage: %s"::formatted)
-                .collect(Collectors.toSet())));
+                .collect(Collectors.toSet()),
+            ctx));
   }
 
   /**

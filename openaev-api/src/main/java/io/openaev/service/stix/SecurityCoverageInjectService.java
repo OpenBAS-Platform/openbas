@@ -5,6 +5,7 @@ import static io.openaev.rest.payload.service.PayloadService.DYNAMIC_DNS_RESOLUT
 import static io.openaev.rest.payload.service.PayloadService.DYNAMIC_DNS_RESOLUTION_HOSTNAME_VARIABLE;
 import static io.openaev.utils.AssetUtils.extractPlatformArchPairs;
 
+import io.openaev.context.TxCtx;
 import io.openaev.database.audit.IndexEvent;
 import io.openaev.database.audit.ModelBaseListener;
 import io.openaev.database.model.*;
@@ -80,7 +81,7 @@ public class SecurityCoverageInjectService {
    * @return list injects related to this scenario
    */
   public Set<Inject> createdInjectsForScenarioAndSecurityCoverage(
-      Scenario scenario, SecurityCoverage securityCoverage) {
+      Scenario scenario, SecurityCoverage securityCoverage, TxCtx ctx) {
 
     // 1. Remove all inject placeholders
     cleanInjectPlaceholders(scenario.getId());
@@ -112,14 +113,15 @@ public class SecurityCoverageInjectService {
 
     // 7. Build injects from Indicators
     createInjectsByIndicators(
-        scenario, securityCoverage.getIndicatorsRefs(), requiredAssetGroupMap);
+        scenario, securityCoverage.getIndicatorsRefs(), requiredAssetGroupMap, ctx);
 
     // 8. Build injects from Artifacts
     createInjectsByArtifacts(
         scenario,
         securityCoverage.getArtifactsRefs(),
         requiredAssetGroupMap,
-        contractForInjectPlaceholders);
+        contractForInjectPlaceholders,
+        ctx);
 
     return injectRepository.findByScenarioId(scenario.getId());
   }
@@ -157,7 +159,8 @@ public class SecurityCoverageInjectService {
       Scenario scenario,
       Set<StixRefToExternalRef> artifactsRefs,
       Map<AssetGroup, List<Endpoint>> assetsFromGroupMap,
-      InjectorContract contractForPlaceholder) {
+      InjectorContract contractForPlaceholder,
+      TxCtx ctx) {
     Set<StixRefToExternalRef> fileDropRefs =
         artifactsRefs.stream()
             .filter(
@@ -225,10 +228,10 @@ public class SecurityCoverageInjectService {
 
                     // 7. Fetch existing or created FileDrop Payload by document id
                     FileDrop fileDrop =
-                        payloadService.getFileDropPayloadByDocument(documentId, scenario);
+                        payloadService.getFileDropPayloadByDocument(documentId, scenario, ctx);
 
                     // 8. Create an inject, linked to the scenario for each contract
-                    createInjectsByInjectorContracts(fileDrop, assetsFromGroupMap, scenario);
+                    createInjectsByInjectorContracts(fileDrop, assetsFromGroupMap, scenario, ctx);
                   });
         });
 
@@ -324,7 +327,8 @@ public class SecurityCoverageInjectService {
   private void createInjectsByIndicators(
       Scenario scenario,
       Set<StixRefToExternalRef> indicatorsRefs,
-      Map<AssetGroup, List<Endpoint>> assetsFromGroupMap) {
+      Map<AssetGroup, List<Endpoint>> assetsFromGroupMap,
+      TxCtx ctx) {
     Set<StixRefToExternalRef> dnsResolutionRefs =
         indicatorsRefs.stream()
             .filter(
@@ -365,14 +369,15 @@ public class SecurityCoverageInjectService {
 
           // 5. Fetch Dynamic DNS Resolution Payload
           DnsResolution dynamicDnsResolutionPayload =
-              payloadService.getDynamicDnsResolutionPayload();
+              payloadService.getDynamicDnsResolutionPayload(ctx);
 
           // 6. Create an inject, linked to the scenario for each contract
           createInjectsByInjectorContracts(
               indicator.getExternalRefs().getFirst(),
               dynamicDnsResolutionPayload,
               assetsFromGroupMap,
-              scenario);
+              scenario,
+              ctx);
         });
 
     // 7. Delete all previous injects non existing anymore on the OpenCTI report
@@ -903,7 +908,8 @@ public class SecurityCoverageInjectService {
       String hostname,
       Payload payload,
       Map<AssetGroup, List<Endpoint>> assetsFromGroupMap,
-      Scenario scenario) {
+      Scenario scenario,
+      TxCtx ctx) {
     Optional<InjectorContract> injectorContract =
         injectorContractRepository.findInjectorContractByPayload(payload);
 
@@ -911,7 +917,8 @@ public class SecurityCoverageInjectService {
       return;
     }
 
-    Set<Tag> tags = tagService.findOrCreateTagsFromNames(new HashSet<>(Set.of(OPENCTI_TAG_NAME)));
+    Set<Tag> tags =
+        tagService.findOrCreateTagsFromNames(new HashSet<>(Set.of(OPENCTI_TAG_NAME)), ctx);
     Inject injectToCreate =
         createInjectAndAssociateToScenario(
             hostname,
@@ -958,14 +965,18 @@ public class SecurityCoverageInjectService {
    * @param scenario to link injects on
    */
   private void createInjectsByInjectorContracts(
-      Payload payload, Map<AssetGroup, List<Endpoint>> assetsFromGroupMap, Scenario scenario) {
+      Payload payload,
+      Map<AssetGroup, List<Endpoint>> assetsFromGroupMap,
+      Scenario scenario,
+      TxCtx ctx) {
     Optional<InjectorContract> injectorContract =
         injectorContractRepository.findInjectorContractByPayload(payload);
     if (injectorContract.isEmpty()) {
       return;
     }
 
-    Set<Tag> tags = tagService.findOrCreateTagsFromNames(new HashSet<>(Set.of(OPENCTI_TAG_NAME)));
+    Set<Tag> tags =
+        tagService.findOrCreateTagsFromNames(new HashSet<>(Set.of(OPENCTI_TAG_NAME)), ctx);
 
     Inject injectToCreate =
         createInjectAndAssociateToScenario(

@@ -7,7 +7,8 @@ import static io.openaev.utils.StringUtils.generateRandomColor;
 import static io.openaev.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
-import io.openaev.context.TenantContext;
+import io.openaev.config.TenantWriteScopeResolver;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.Tag;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.TagRepository;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 public class TagService {
 
   private final TagRepository tagRepository;
+  private final TenantWriteScopeResolver writeScopeResolver;
 
   // -- CREATE --
 
@@ -40,8 +42,12 @@ public class TagService {
   public Tag createTag(TagCreateInput input, String tenantId) {
     Tag tag = new Tag();
     tag.setUpdateAttributes(input);
-    tag.setTenant(new Tenant(resolveWriteTenant(tenantId)));
+    tag.setTenant(new Tenant(tenantId));
     return tagRepository.save(tag);
+  }
+
+  public Tag createTag(TagCreateInput input, TxCtx ctx) {
+    return createTag(input, writeScopeResolver.tenantForWrite(ctx, null));
   }
 
   public Tag createTag(String name) {
@@ -49,6 +55,13 @@ public class TagService {
     tagCreateInput.setName(name);
     tagCreateInput.setColor(Tag.WellKnown.getOrDefault(name, generateRandomColor()));
     return upsertTag(tagCreateInput);
+  }
+
+  public Tag createTag(String name, TxCtx ctx) {
+    TagCreateInput tagCreateInput = new TagCreateInput();
+    tagCreateInput.setName(name);
+    tagCreateInput.setColor(Tag.WellKnown.getOrDefault(name, generateRandomColor()));
+    return upsertTag(tagCreateInput, ctx);
   }
 
   public Tag upsertTag(TagCreateInput input) {
@@ -65,9 +78,13 @@ public class TagService {
     } else {
       Tag newTag = new Tag();
       newTag.setUpdateAttributes(input);
-      newTag.setTenant(new Tenant(resolveWriteTenant(tenantId)));
+      newTag.setTenant(new Tenant(tenantId));
       return tagRepository.save(newTag);
     }
+  }
+
+  public Tag upsertTag(TagCreateInput input, TxCtx ctx) {
+    return upsertTag(input, writeScopeResolver.tenantForWrite(ctx, null));
   }
 
   /**
@@ -95,6 +112,26 @@ public class TagService {
     return tags;
   }
 
+  public Set<Tag> findOrCreateTagsFromNames(Set<String> names, TxCtx ctx) {
+    String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
+    Set<Tag> tags = new HashSet<>();
+
+    if (names != null) {
+      for (String label : names) {
+        if (label == null || label.isBlank()) {
+          continue;
+        }
+        TagCreateInput tagCreateInput = new TagCreateInput();
+        tagCreateInput.setName(label);
+        tagCreateInput.setColor(generateRandomColor());
+
+        tags.add(upsertTag(tagCreateInput, tenantId));
+      }
+    }
+
+    return tags;
+  }
+
   /**
    * Ensures a collection of well known tags is created.
    *
@@ -111,6 +148,25 @@ public class TagService {
                     Tag tag = new Tag();
                     tag.setName(entry.getKey());
                     tag.setColor(entry.getValue());
+                    return tagRepository.save(tag);
+                  }));
+    }
+    return wellKnownTags;
+  }
+
+  public Set<Tag> ensureWellKnownTags(TxCtx ctx) {
+    String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
+    Set<Tag> wellKnownTags = new HashSet<>();
+    for (Map.Entry<String, String> entry : Tag.WellKnown.entrySet()) {
+      wellKnownTags.add(
+          this.tagRepository
+              .findByNameAndTenantId(entry.getKey(), tenantId)
+              .orElseGet(
+                  () -> {
+                    Tag tag = new Tag();
+                    tag.setName(entry.getKey());
+                    tag.setColor(entry.getValue());
+                    tag.setTenant(new Tenant(tenantId));
                     return tagRepository.save(tag);
                   }));
     }
@@ -164,9 +220,5 @@ public class TagService {
     return fromIterable(this.tagRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
-  }
-
-  private String resolveWriteTenant(String tenantId) {
-    return tenantId != null ? tenantId : TenantContext.getCurrentTenant();
   }
 }
