@@ -350,10 +350,10 @@ public class ScenarioService {
     Subquery<String[]> workflowPlatformsSubquery = cq.subquery(String[].class);
     Root<Workflow> workflowPlatformsRoot = workflowPlatformsSubquery.from(Workflow.class);
     Join<Workflow, Step> workflowStepsJoin = workflowPlatformsRoot.join("steps", JoinType.LEFT);
-    Expression<String[]> workflowStepPlatformsExpression =
+    Expression<String> workflowPlatformExpression =
         cb.function(
-            "jsonb_text_array",
-            String[].class,
+            "jsonb_array_elements_text",
+            String.class,
             cb.function(
                 "jsonb_extract_path",
                 Object.class,
@@ -361,16 +361,17 @@ public class ScenarioService {
                 cb.literal("inject_injector_contract"),
                 cb.literal("injector_contract_platforms")));
     workflowPlatformsSubquery
-        .select(cb.function("array_union_agg", String[].class, workflowStepPlatformsExpression))
+        .select(((HibernateCriteriaBuilder) cb).arrayAgg(null, workflowPlatformExpression))
         .where(
             cb.equal(workflowPlatformsRoot.get("scenario").get("id"), scenarioRoot.get("id")),
             cb.equal(workflowPlatformsRoot.get("status"), WorkflowStatus.TEMPLATE),
             cb.equal(workflowStepsJoin.get("status"), StepStatus.TEMPLATE),
             cb.isNull(workflowStepsJoin.get("stepTemplate")));
 
-    CriteriaBuilder.Coalesce<String[]> platformExpression = cb.coalesce();
-    platformExpression.value(timeBasedPlatformExpression);
-    platformExpression.value(workflowPlatformsSubquery);
+    Expression<String[]> platformExpression =
+        cb.<String[]>selectCase()
+            .when(cb.isNotNull(workflowSubquery), workflowPlatformsSubquery)
+            .otherwise(timeBasedPlatformExpression);
 
     // SELECT
     cq.multiselect(

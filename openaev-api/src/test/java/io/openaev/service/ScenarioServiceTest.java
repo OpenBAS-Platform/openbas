@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import io.openaev.IntegrationTest;
 import io.openaev.config.cache.LicenseCacheManager;
 import io.openaev.database.model.*;
+import io.openaev.database.raw.RawPaginationScenario;
 import io.openaev.database.repository.*;
 import io.openaev.ee.EnterpriseEditionService;
 import io.openaev.export.WorkflowExportInitializer;
@@ -24,6 +25,7 @@ import io.openaev.rest.custom_dashboard.CustomDashboardService;
 import io.openaev.rest.exception.ElementNotFoundException;
 import io.openaev.rest.inject.service.InjectDuplicateService;
 import io.openaev.rest.inject.service.InjectService;
+import io.openaev.rest.scenario.response.ScenarioOutput;
 import io.openaev.service.autonomous.AutonomousRunService;
 import io.openaev.service.chaining.WorkflowService;
 import io.openaev.service.scenario.ScenarioService;
@@ -33,8 +35,13 @@ import io.openaev.telemetry.metric_collectors.ActionMetricCollector;
 import io.openaev.utils.fixtures.*;
 import io.openaev.utils.fixtures.composers.ExerciseComposer;
 import io.openaev.utils.fixtures.composers.InjectComposer;
+import io.openaev.utils.fixtures.composers.StepComposer;
+import io.openaev.utils.fixtures.composers.WorkflowComposer;
 import io.openaev.utils.fixtures.composers.ScenarioComposer;
 import io.openaev.utils.fixtures.composers.SecurityCoverageComposer;
+import io.openaev.utils.fixtures.PaginationFixture;
+import io.openaev.utils.fixtures.StepFixture;
+import io.openaev.utils.fixtures.WorkflowFixture;
 import io.openaev.utils.mapper.ExerciseMapper;
 import io.openaev.utils.mapper.ScenarioMapper;
 import io.openaev.utils.mockUser.WithMockUser;
@@ -65,6 +72,8 @@ class ScenarioServiceTest extends IntegrationTest {
   @Autowired private ScenarioTeamUserRepository scenarioTeamUserRepository;
   @Autowired private ArticleRepository articleRepository;
   @Autowired InjectRepository injectRepository;
+  @Autowired private InjectorRepository injectorRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private InjectDependenciesRepository injectDependenciesRepository;
   @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
   @Autowired private TagRepository tagRepository;
@@ -74,6 +83,8 @@ class ScenarioServiceTest extends IntegrationTest {
   @Autowired private InjectComposer injectComposer;
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private SecurityCoverageComposer securityCoverageComposer;
+  @Autowired private WorkflowComposer workflowComposer;
+  @Autowired private StepComposer stepComposer;
 
   @Mock EnterpriseEditionService enterpriseEditionService;
   @Mock VariableService variableService;
@@ -170,6 +181,63 @@ class ScenarioServiceTest extends IntegrationTest {
     assertThat(injectRepository.findById(injectWrapper.get().getId())).isEmpty();
     assertThatThrownBy(() -> scenarioService.getScenarioById(scenarioId))
         .isInstanceOf(ElementNotFoundException.class);
+  }
+
+  @Test
+  @Transactional
+  @WithMockUser(isAdmin = true)
+  void given_chained_and_time_based_scenarios_should_show_platforms_in_list_and_detail() {
+    Injector savedInjector = injectorRepository.save(InjectorFixture.createDefaultPayloadInjector());
+    InjectorContract timeBasedContract =
+        InjectorContractFixture.createInjectorContractWithPlatforms(
+            new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Linux});
+    timeBasedContract.clearInjectors();
+    timeBasedContract.addInjector(savedInjector);
+    injectorContractRepository.save(timeBasedContract);
+
+    Scenario timeBasedScenario =
+        scenarioComposer.forScenario(ScenarioFixture.getScenario()).persist().get();
+    Inject timeBasedInject = getInjectForEmailContract(timeBasedContract);
+    timeBasedInject.setScenario(timeBasedScenario);
+    injectRepository.save(timeBasedInject);
+
+    Scenario chainedScenario =
+        scenarioComposer.forScenario(ScenarioFixture.getScenario()).persist().get();
+    Step chainedStep = StepFixture.getDefaultStepTemplate();
+    chainedStep.setData(
+        """
+        {"inject_injector_contract":{"injector_contract_platforms":["Windows"]}}
+        """);
+    Workflow chainedWorkflow = WorkflowFixture.getDefaultWorkflowTemplate();
+    chainedWorkflow.setScenario(chainedScenario);
+    workflowComposer
+        .forWorkflow(chainedWorkflow)
+        .withScenario(scenarioComposer.forScenario(chainedScenario))
+        .withStep(stepComposer.forStep(chainedStep))
+        .persist();
+
+    entityManager.flush();
+    entityManager.clear();
+
+    Map<String, Set<String>> platformsByScenarioId =
+        scenarioServiceBean.scenarios(PaginationFixture.getDefault().build()).getContent().stream()
+            .filter(
+                scenario ->
+                    scenario.getScenario_id().equals(timeBasedScenario.getId())
+                        || scenario.getScenario_id().equals(chainedScenario.getId()))
+            .collect(
+                java.util.stream.Collectors.toMap(
+                    RawPaginationScenario::getScenario_id,
+                    RawPaginationScenario::getScenario_platforms));
+
+    assertEquals(Set.of("Linux"), platformsByScenarioId.get(timeBasedScenario.getId()));
+    assertEquals(Set.of("Windows"), platformsByScenarioId.get(chainedScenario.getId()));
+
+    ScenarioOutput chainedScenarioOutput = scenarioServiceBean.getScenarioById(chainedScenario.getId());
+    ScenarioOutput timeBasedScenarioOutput =
+        scenarioServiceBean.getScenarioById(timeBasedScenario.getId());
+    assertEquals(Set.of("Windows"), chainedScenarioOutput.getPlatforms());
+    assertEquals(Set.of("Linux"), timeBasedScenarioOutput.getPlatforms());
   }
 
   @DisplayName(
