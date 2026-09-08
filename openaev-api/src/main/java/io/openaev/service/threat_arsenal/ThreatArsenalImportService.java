@@ -37,11 +37,11 @@ public class ThreatArsenalImportService {
   private final InjectorRepository injectorRepository;
 
   public ThreatArsenalAction importThreatArsenalAction(
-      @NotNull MultipartFile file, @NotNull String tenantId, @NotNull TxCtx ctx) throws Exception {
+      @NotNull TxCtx ctx, @NotNull MultipartFile file, @NotNull String tenantId) throws Exception {
     if (isInjectorContractExport(file)) {
       return importFromInjectorContract(file, tenantId);
     }
-    return importFromPayload(file, ctx);
+    return importFromPayload(ctx, file);
   }
 
   private ThreatArsenalAction importFromInjectorContract(MultipartFile file, String tenantId)
@@ -83,8 +83,8 @@ public class ThreatArsenalImportService {
    * format handled by {@link #importFromInjectorContract(MultipartFile)}. This path will be removed
    * soon.
    */
-  private ThreatArsenalAction importFromPayload(MultipartFile file, TxCtx ctx) throws Exception {
-    PayloadImportService.PayloadImportResult result = payloadImportService.importPayload(file, ctx);
+  private ThreatArsenalAction importFromPayload(TxCtx ctx, MultipartFile file) throws Exception {
+    PayloadImportService.PayloadImportResult result = payloadImportService.importPayload(ctx, file);
     return threatArsenalMapper.toThreatArsenalAction(result.injectorContract());
   }
 

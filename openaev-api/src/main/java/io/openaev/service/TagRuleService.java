@@ -233,7 +233,7 @@ public class TagRuleService {
               : wellKnownTags.stream()
                   .filter(existingTag -> existingTag.getName().equals(tagName))
                   .findFirst()
-                  .orElseGet(() -> tagService.createTag(tagName, ctx));
+                  .orElseGet(() -> tagService.createTag(ctx, tagName));
       tagRules.add(
           this.findByTagName(tag.getName())
               .orElseGet(() -> this.createTagRule(tag, new ArrayList<>(), true)));

@@ -36,7 +36,7 @@ public class TagService {
   // -- CREATE --
 
   public Tag createTag(TagCreateInput input) {
-    return createTag(input, null);
+    return createTag(input, (String) null);
   }
 
   public Tag createTag(TagCreateInput input, String tenantId) {
@@ -46,7 +46,7 @@ public class TagService {
     return tagRepository.save(tag);
   }
 
-  public Tag createTag(TagCreateInput input, TxCtx ctx) {
+  public Tag createTag(TxCtx ctx, TagCreateInput input) {
     return createTag(input, writeScopeResolver.tenantForWrite(ctx, null));
   }
 
@@ -57,15 +57,15 @@ public class TagService {
     return upsertTag(tagCreateInput);
   }
 
-  public Tag createTag(String name, TxCtx ctx) {
+  public Tag createTag(TxCtx ctx, String name) {
     TagCreateInput tagCreateInput = new TagCreateInput();
     tagCreateInput.setName(name);
     tagCreateInput.setColor(Tag.WellKnown.getOrDefault(name, generateRandomColor()));
-    return upsertTag(tagCreateInput, ctx);
+    return upsertTag(ctx, tagCreateInput);
   }
 
   public Tag upsertTag(TagCreateInput input) {
-    return upsertTag(input, null);
+    return upsertTag(input, (String) null);
   }
 
   public Tag upsertTag(TagCreateInput input, String tenantId) {
@@ -83,7 +83,7 @@ public class TagService {
     }
   }
 
-  public Tag upsertTag(TagCreateInput input, TxCtx ctx) {
+  public Tag upsertTag(TxCtx ctx, TagCreateInput input) {
     return upsertTag(input, writeScopeResolver.tenantForWrite(ctx, null));
   }
 
@@ -112,7 +112,7 @@ public class TagService {
     return tags;
   }
 
-  public Set<Tag> findOrCreateTagsFromNames(Set<String> names, TxCtx ctx) {
+  public Set<Tag> findOrCreateTagsFromNames(TxCtx ctx, Set<String> names) {
     String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
     Set<Tag> tags = new HashSet<>();
 

@@ -256,7 +256,7 @@ public class MapperApi extends RestBehavior {
   public void importEndpoints(
       TxCtx ctx, @RequestParam CsvType csvType, @RequestPart("file") @NotNull MultipartFile file)
       throws Exception {
-    mapperService.importMappersCsv(file, csvType, ctx);
+    mapperService.importMappersCsv(ctx, file, csvType);
   }
 
   private void validateUploadedFile(MultipartFile file) {

@@ -327,7 +327,7 @@ public class OpenCTIService {
   private Tag getOpenCTITag(String tenantId) {
     TagCreateInput tagCreateInput = new TagCreateInput();
     tagCreateInput.setName(Tag.OPENCTI_TAG_NAME);
-    return tagService.upsertTag(tagCreateInput, TxCtx.forTenant(tenantId));
+    return tagService.upsertTag(TxCtx.forTenant(tenantId), tagCreateInput);
   }
 
   private OpenCTIConfig resolveConfig(final String tenantId) throws ConnectorError {

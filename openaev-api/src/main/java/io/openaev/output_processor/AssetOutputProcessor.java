@@ -132,7 +132,7 @@ public class AssetOutputProcessor extends AbstractOutputProcessor {
       tagNames.add(tag.asText());
     }
     input.setTagIds(
-        tagService.findOrCreateTagsFromNames(tagNames, TxCtx.forTenant(tenantId)).stream()
+        tagService.findOrCreateTagsFromNames(TxCtx.forTenant(tenantId), tagNames).stream()
             .map(Tag::getId)
             .toList());
 

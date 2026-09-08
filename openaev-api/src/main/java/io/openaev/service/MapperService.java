@@ -558,7 +558,7 @@ public class MapperService {
    * @param csvType entity to know which columns format we use for the import
    * @throws Exception exception if problem during the import
    */
-  public void importMappersCsv(MultipartFile file, CsvType csvType, TxCtx ctx) throws Exception {
+  public void importMappersCsv(TxCtx ctx, MultipartFile file, CsvType csvType) throws Exception {
     File tempFile = createTempFile("openaev-import-" + now().getEpochSecond(), ".csv");
     FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
 
@@ -578,7 +578,7 @@ public class MapperService {
       switch (csvType) {
         case ENDPOINTS:
           try {
-            importEndpointsCsv(setEndpointsColumnMapping(), csvReader, ctx);
+            importEndpointsCsv(ctx, setEndpointsColumnMapping(), csvReader);
           } catch (Exception e) {
             throw new RuntimeException("Error during export CSV", e);
           }
@@ -593,7 +593,7 @@ public class MapperService {
   }
 
   private void importEndpointsCsv(
-      ColumnPositionMappingStrategy columnPositionMappingStrategy, CSVReader csvReader, TxCtx ctx)
+      TxCtx ctx, ColumnPositionMappingStrategy columnPositionMappingStrategy, CSVReader csvReader)
       throws JsonProcessingException {
 
     CsvToBean csv = new CsvToBean();
@@ -626,7 +626,7 @@ public class MapperService {
         TagCreateInput tagCreateInput = new TagCreateInput();
         tagCreateInput.setName(tag.getName());
         tagCreateInput.setColor(tag.getColor());
-        tagsForCreation.add(this.tagService.upsertTag(tagCreateInput, ctx));
+        tagsForCreation.add(this.tagService.upsertTag(ctx, tagCreateInput));
       }
       endpoint.setTags(iterableToSet(tagsForCreation));
       endpoint.setEoL(endpointExportImport.isEol());

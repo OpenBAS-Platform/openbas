@@ -494,11 +494,11 @@ public class PayloadService {
    * @param scenario to add to document if file drop is created
    * @return retrieved or created FileDrop
    */
-  public FileDrop getFileDropPayloadByDocument(String documentId, Scenario scenario, TxCtx ctx) {
+  public FileDrop getFileDropPayloadByDocument(TxCtx ctx, String documentId, Scenario scenario) {
     FileDrop fileDrop =
         payloadRepository
             .findByDocumentId(documentId)
-            .orElseGet(() -> this.createFileDropPayload(documentId, ctx));
+            .orElseGet(() -> this.createFileDropPayload(ctx, documentId));
     fileDrop.getFileDropFile().getScenarios().add(scenario);
     this.documentService.save(fileDrop.getFileDropFile());
     return fileDrop;
@@ -510,7 +510,7 @@ public class PayloadService {
    * @param documentId to link to FileDrop Payload
    * @return created file drop payload
    */
-  public FileDrop createFileDropPayload(String documentId, TxCtx ctx) {
+  public FileDrop createFileDropPayload(TxCtx ctx, String documentId) {
     Document document = this.documentService.document(documentId);
 
     FileDrop fileDrop = new FileDrop();
@@ -536,7 +536,7 @@ public class PayloadService {
         domainService.upserts(
             Set.of(InjectorContractDomainDTO.fromDomain(PresetDomain.getEndpoint())),
             TenantContext.getCurrentTenant()),
-        tagService.findOrCreateTagsFromNames(new HashSet<>(Set.of(OPENCTI_TAG_NAME)), ctx));
+        tagService.findOrCreateTagsFromNames(ctx, new HashSet<>(Set.of(OPENCTI_TAG_NAME))));
     return saved;
   }
 
@@ -594,7 +594,7 @@ public class PayloadService {
                 PresetDomain.getNetwork(),
                 PresetDomain.getUrlFiltering()),
             TenantContext.getCurrentTenant()),
-        tagService.findOrCreateTagsFromNames(new HashSet<>(Set.of(OPENCTI_TAG_NAME)), ctx));
+        tagService.findOrCreateTagsFromNames(ctx, new HashSet<>(Set.of(OPENCTI_TAG_NAME))));
     return saved;
   }
 

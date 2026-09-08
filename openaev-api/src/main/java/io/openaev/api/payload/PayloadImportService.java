@@ -63,7 +63,7 @@ public class PayloadImportService {
    * @return the import result containing the persisted payload and the synchronised injector
    *     contract
    */
-  public PayloadImportResult importPayload(MultipartFile file, TxCtx ctx) throws Exception {
+  public PayloadImportResult importPayload(TxCtx ctx, MultipartFile file) throws Exception {
     ZipJsonService.ImportOutput<Payload> response =
         zipJsonApi.handleImport(file, "payload_name", IMPORT_OPTIONS, null);
 
@@ -74,7 +74,7 @@ public class PayloadImportService {
         extractRelationshipObjects("domains", this::handleDomainImport, response.sourceDocument());
     List<Tag> tags =
         extractRelationshipObjects(
-            "tags", object -> handleTagImport(object, ctx), response.sourceDocument());
+            "tags", object -> handleTagImport(ctx, object), response.sourceDocument());
 
     InjectorContract injectorContract =
         payloadService.synchroniseInjectorContractBasedOnPayload(
@@ -114,11 +114,11 @@ public class PayloadImportService {
     return domainService.upsert(input);
   }
 
-  private Tag handleTagImport(ResourceObject object, TxCtx ctx) {
+  private Tag handleTagImport(TxCtx ctx, ResourceObject object) {
     TagCreateInput input = new TagCreateInput();
     input.setName(object.attributes().get("tag_name").toString());
     input.setColor(object.attributes().get("tag_color").toString());
-    return tagService.upsertTag(input, ctx);
+    return tagService.upsertTag(ctx, input);
   }
 
   private <T> List<T> extractRelationshipObjects(

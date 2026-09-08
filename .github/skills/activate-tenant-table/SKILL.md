@@ -91,6 +91,14 @@ incident. Do not trade them away to make a test pass.
    does not exist anymore, stop and find its successor
    (`git log --oneline --follow --all -- <path>`). Never substitute an
    invented pattern for a missing reference.
+10. **`TxCtx` position is fixed.** In every new or modified method signature
+    that carries `TxCtx`, it must be the FIRST parameter (annotations allowed,
+    e.g. `@RequireTenantSelector TxCtx ctx`). Keep this order through service
+    call chains too, so wiring remains grep-auditable and consistent.
+11. **No v1 tenant context in v2/integration tests.** For API v2 activation
+    tests and integration tests, do not add `TenantContext.getCurrentTenant()`,
+    `TenantContext.setCurrentTenant(...)`, or `enableFilter("tenantFilter")`.
+    Use explicit tenant ids + `TxCtx`/`TenantScopedTransaction` helpers.
 
 ## Baseline: controller entrypoints already carry `TxCtx`
 
@@ -217,6 +225,18 @@ The evidence rule (hard rule 8) applies here too: quote the actual grep
 output or file lines behind each gate verdict, do not paraphrase them.
 
 ### Phase 1 — Inventory what the mass `TxCtx` wiring does NOT already cover
+
+Quick hygiene checks on changed files before deeper inventory:
+
+```bash
+# Any signature carrying TxCtx with non-first position must be fixed
+grep -rn "(.*,[[:space:]]*[@A-Za-z0-9_ ]*TxCtx[[:space:]]+[a-zA-Z_][a-zA-Z0-9_]*" \
+  openaev-api/src/main/java openaev-model/src/main/java --include="*.java"
+
+# In API v2 / integration tests, block v1 tenant-context/filter idioms
+grep -rn "TenantContext.getCurrentTenant\|TenantContext.setCurrentTenant\|enableFilter(\"tenantFilter\")" \
+  openaev-api/src/test/java --include="*.java"
+```
 
 Because of the baseline above, Phase 1 no longer hunts for missing `TxCtx` on
 controller entrypoints. It is still fully required for everything the
@@ -1212,6 +1232,9 @@ Before marking the issue done, write down:
       `InjectorContractService` search/association code already wired for
       `InjectorContractApi#injectorContracts`, missed because the shared
       service method was never re-grepped once one caller looked done)
+- [ ] every new/changed method signature carrying `TxCtx` has `TxCtx` in first
+      parameter position (annotation allowed), and callsites follow the same
+      order consistently
 - [ ] association-accessor scan run for every entity holding a reference to
       the activated entity, regardless of whether the activated table has its
       own API (eager/lazy loads bypass the repository grep either way)
@@ -1255,6 +1278,10 @@ Before marking the issue done, write down:
       table-function FROM item (`jsonb_array_elements`, `unnest`, ...) carries
       `LATERAL`; a regression test pins the real production SQL (#7007)
 - [ ] non-admin variant green
+- [ ] API v2/integration tests added or modified in this activation do not use
+      `TenantContext.getCurrentTenant()`, `TenantContext.setCurrentTenant(...)`,
+      or `enableFilter("tenantFilter")`; tenant scope is expressed via explicit
+      tenant ids and `TxCtx`/`TenantScopedTransaction`
 - [ ] arch tests updated and green
 - [ ] go-live is one commit: @Filter removed + allowlist entry + re-enabled test + config guard
 - [ ] v1 remnant audit complete: no `TenantContext`/`findByIdAndTenantId`/`TenantBaseListener`
