@@ -7,6 +7,7 @@ import static io.openaev.utils.StringUtils.generateRandomColor;
 import static io.openaev.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
+import io.openaev.context.TenantContext;
 import io.openaev.database.model.Tag;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.TagRepository;
@@ -39,9 +40,7 @@ public class TagService {
   public Tag createTag(TagCreateInput input, String tenantId) {
     Tag tag = new Tag();
     tag.setUpdateAttributes(input);
-    if (tenantId != null) {
-      tag.setTenant(new Tenant(tenantId));
-    }
+    tag.setTenant(new Tenant(resolveWriteTenant(tenantId)));
     return tagRepository.save(tag);
   }
 
@@ -66,9 +65,7 @@ public class TagService {
     } else {
       Tag newTag = new Tag();
       newTag.setUpdateAttributes(input);
-      if (tenantId != null) {
-        newTag.setTenant(new Tenant(tenantId));
-      }
+      newTag.setTenant(new Tenant(resolveWriteTenant(tenantId)));
       return tagRepository.save(newTag);
     }
   }
@@ -167,5 +164,9 @@ public class TagService {
     return fromIterable(this.tagRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
+  }
+
+  private String resolveWriteTenant(String tenantId) {
+    return tenantId != null ? tenantId : TenantContext.getCurrentTenant();
   }
 }
