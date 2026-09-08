@@ -268,7 +268,7 @@ class ScenarioServiceUnitTest {
   class EnrichScenarioPlatforms {
 
     @Test
-    void given_scenario_list_items_should_merge_repo_platforms_for_all_scenarios() {
+    void given_scenario_list_items_should_replace_platforms_with_repo_results() {
       RawPaginationScenario chainedScenario =
           new RawPaginationScenario(
               "scenario-1",
@@ -279,7 +279,7 @@ class ScenarioServiceUnitTest {
               null,
               now(),
               new String[] {"Linux"},
-              new String[] {"Windows"},
+              null,
               "workflow-1");
       RawPaginationScenario timeBasedScenario =
           new RawPaginationScenario(
@@ -302,7 +302,7 @@ class ScenarioServiceUnitTest {
       RawScenarioSimpleIndexing platformsForTimeBasedScenario =
           mock(RawScenarioSimpleIndexing.class);
       when(platformsForTimeBasedScenario.getScenario_id()).thenReturn("scenario-2");
-      when(platformsForTimeBasedScenario.getScenario_platforms()).thenReturn(Set.of("Windows"));
+      when(platformsForTimeBasedScenario.getScenario_platforms()).thenReturn(Set.of("Linux"));
       when(scenarioRepository.findScenarioPlatformsByScenarioIds(
               List.of("scenario-1", "scenario-2")))
           .thenReturn(List.of(platformsForChainedScenario, platformsForTimeBasedScenario));
@@ -313,11 +313,8 @@ class ScenarioServiceUnitTest {
               ReflectionTestUtils.invokeMethod(scenarioService, "enrichScenarioPlatforms", page);
 
       assertNotNull(enriched);
-      assertEquals(
-          Set.of("Linux", "Windows", "MacOS"),
-          enriched.getContent().get(0).getScenario_platforms());
-      assertEquals(
-          Set.of("Linux", "Windows"), enriched.getContent().get(1).getScenario_platforms());
+      assertEquals(Set.of("MacOS"), enriched.getContent().get(0).getScenario_platforms());
+      assertEquals(Set.of("Linux"), enriched.getContent().get(1).getScenario_platforms());
       verify(scenarioRepository)
           .findScenarioPlatformsByScenarioIds(List.of("scenario-1", "scenario-2"));
     }

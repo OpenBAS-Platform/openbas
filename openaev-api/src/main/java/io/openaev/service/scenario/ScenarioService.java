@@ -293,13 +293,10 @@ public class ScenarioService {
             page.getContent().stream().map(RawPaginationScenario::getScenario_id).toList());
     return page.map(
         scenario -> {
-          Set<String> platforms =
-              new LinkedHashSet<>(
-                  Optional.ofNullable(scenario.getScenario_platforms()).orElseGet(Set::of));
-          platforms.addAll(
-              Optional.ofNullable(scenarioPlatformsByScenarioId.get(scenario.getScenario_id()))
-                  .orElseGet(Set::of));
-          scenario.setScenario_platforms(platforms);
+          Set<String> platforms = scenarioPlatformsByScenarioId.get(scenario.getScenario_id());
+          if (platforms != null) {
+            scenario.setScenario_platforms(new LinkedHashSet<>(platforms));
+          }
           return scenario;
         });
   }
