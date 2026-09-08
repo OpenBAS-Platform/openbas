@@ -24,6 +24,7 @@ import io.openaev.database.model.InjectorContract;
 import io.openaev.database.model.InjectorContractId;
 import io.openaev.database.model.Payload;
 import io.openaev.database.model.Tag;
+import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.EndpointRepository;
 import io.openaev.database.repository.ImportMapperRepository;
 import io.openaev.database.repository.InjectorContractRepository;
@@ -375,7 +376,8 @@ public class MapperServiceTest extends IntegrationTest {
 
     // Act / Assert
     assertThrows(
-        BadRequestException.class, () -> mapperService.importMappersCsv(csvFile, CsvType.AGENT));
+        BadRequestException.class,
+        () -> mapperService.importMappersCsv(csvFile, CsvType.AGENT, Tenant.DEFAULT_TENANT_UUID));
   }
 
   @DisplayName("given_mappersInput_should_appendImportedSuffix_whenImportMappers")

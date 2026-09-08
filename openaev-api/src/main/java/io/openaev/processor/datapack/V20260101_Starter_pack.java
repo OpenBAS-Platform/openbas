@@ -112,6 +112,7 @@ public class V20260101_Starter_pack extends DataPack {
     try {
       Endpoint honeyScanMeEndpoint =
           this.createHoneyScanMeAgentlessEndpoint(
+              tenant.getId(),
               new ArrayList<>(
                   tags.stream()
                       .filter(
@@ -142,7 +143,7 @@ public class V20260101_Starter_pack extends DataPack {
     }
   }
 
-  private Endpoint createHoneyScanMeAgentlessEndpoint(List<String> tags) {
+  private Endpoint createHoneyScanMeAgentlessEndpoint(String tenantId, List<String> tags) {
     EndpointInput endpointInput = new EndpointInput();
     endpointInput.setName(HoneyScanMeEndpoint.HOSTNAME);
     endpointInput.setHostname(HoneyScanMeEndpoint.HOSTNAME);
@@ -151,7 +152,8 @@ public class V20260101_Starter_pack extends DataPack {
     endpointInput.setPlatform(HoneyScanMeEndpoint.PLATFORM);
     endpointInput.setEol(HoneyScanMeEndpoint.END_OF_LIFE);
     endpointInput.setTagIds(tags);
-    return this.endpointService.createEndpoint(endpointInput);
+    // Tenant provisioning: the pack runs for one tenant, so the write carries it.
+    return this.endpointService.createEndpoint(endpointInput, tenantId);
   }
 
   private AssetGroup createAllEndpointsAssetGroup(String tenantId) {

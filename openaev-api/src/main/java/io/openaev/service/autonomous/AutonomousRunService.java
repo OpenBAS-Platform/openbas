@@ -3555,7 +3555,8 @@ public class AutonomousRunService {
     } else {
       input.setHostname(finding.getValue());
     }
-    Endpoint endpoint = endpointService.createEndpoint(input);
+    // Promotion happens inside the run's own tenant; the run row carries it.
+    Endpoint endpoint = endpointService.createEndpoint(input, run.getTenant().getId());
     // Keep the original finding; just link the promoted asset onto it (promotion, not replacement).
     findingRepository.insertFindingAsset(findingId, endpoint.getId());
     eventService.append(

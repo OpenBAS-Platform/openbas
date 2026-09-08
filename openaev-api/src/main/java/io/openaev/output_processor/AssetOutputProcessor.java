@@ -104,7 +104,7 @@ public class AssetOutputProcessor extends AbstractOutputProcessor {
       log.info("Endpoint already exists: {} (id={})", input.getName(), existing.get().getId());
       return;
     }
-    Endpoint created = endpointService.createEndpoint(input);
+    Endpoint created = endpointService.createEndpoint(input, tenantId);
     log.info("Created endpoint: {} (id={})", input.getName(), created.getId());
   }
 

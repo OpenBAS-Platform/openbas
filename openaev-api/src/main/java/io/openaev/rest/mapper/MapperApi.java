@@ -256,7 +256,10 @@ public class MapperApi extends RestBehavior {
   public void importEndpoints(
       TxCtx ctx, @RequestParam CsvType csvType, @RequestPart("file") @NotNull MultipartFile file)
       throws Exception {
-    mapperService.importMappersCsv(file, csvType);
+    // Same resolution as the other create paths on this controller: an ambiguous multi-tenant
+    // scope is refused with a 400 rather than resolved by the v1 thread-local.
+    String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
+    mapperService.importMappersCsv(file, csvType, tenantId);
   }
 
   private void validateUploadedFile(MultipartFile file) {
