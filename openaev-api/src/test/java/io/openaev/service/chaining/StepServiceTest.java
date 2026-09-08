@@ -1,5 +1,6 @@
 package io.openaev.service.chaining;
 
+import static io.openaev.service.chaining.StepService.ACTIVE_STEP_STATUS;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -931,15 +932,16 @@ class StepServiceTest {
       String injectId = UUID.randomUUID().toString();
       String stepId = UUID.randomUUID().toString();
 
-      when(stepRepository.findStepIdByInjectId(injectId)).thenReturn(Optional.of(stepId));
+      when(stepRepository.findStepIdActiveByInjectId(injectId, ACTIVE_STEP_STATUS))
+          .thenReturn(Optional.of(stepId));
 
       // Act
-      Optional<String> result = stepService.findStepIdByInjectId(injectId);
+      Optional<String> result = stepService.findStepIdActiveByInjectId(injectId);
 
       // Assert
       assertTrue(result.isPresent());
       assertEquals(stepId, result.get());
-      verify(stepRepository).findStepIdByInjectId(injectId);
+      verify(stepRepository).findStepIdActiveByInjectId(injectId, ACTIVE_STEP_STATUS);
       verifyNoMoreInteractions(stepRepository);
     }
 
@@ -948,14 +950,15 @@ class StepServiceTest {
       // Arrange
       String injectId = UUID.randomUUID().toString();
 
-      when(stepRepository.findStepIdByInjectId(injectId)).thenReturn(Optional.empty());
+      when(stepRepository.findStepIdActiveByInjectId(injectId, ACTIVE_STEP_STATUS))
+          .thenReturn(Optional.empty());
 
       // Act
-      Optional<String> result = stepService.findStepIdByInjectId(injectId);
+      Optional<String> result = stepService.findStepIdActiveByInjectId(injectId);
 
       // Assert
       assertTrue(result.isEmpty());
-      verify(stepRepository).findStepIdByInjectId(injectId);
+      verify(stepRepository).findStepIdActiveByInjectId(injectId, ACTIVE_STEP_STATUS);
       verifyNoMoreInteractions(stepRepository);
     }
   }

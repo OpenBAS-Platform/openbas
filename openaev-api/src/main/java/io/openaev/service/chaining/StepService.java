@@ -39,7 +39,8 @@ public class StepService {
 
   private final StepRepository stepRepository;
 
-  static final List<StepStatus> ACTIVE_STEP_STATUS = List.of(StepStatus.READY, StepStatus.RUN);
+  public static final List<StepStatus> ACTIVE_STEP_STATUS =
+      List.of(StepStatus.READY, StepStatus.RUN);
 
   /**
    * Create a single step template.
@@ -1064,8 +1065,8 @@ public class StepService {
    * @param injectId inject id to find step id
    * @return optional step id
    */
-  public Optional<String> findStepIdByInjectId(final String injectId) {
-    return stepRepository.findStepIdByInjectId(injectId);
+  public Optional<String> findStepIdActiveByInjectId(final String injectId) {
+    return stepRepository.findStepIdActiveByInjectId(injectId, ACTIVE_STEP_STATUS);
   }
 
   /**
@@ -1074,15 +1075,15 @@ public class StepService {
    * @param expectationIds expectation ids to find associated step ids
    * @return Corresponding step IDs
    */
-  public Set<String> findStepIdsByExpectationIds(final Set<String> expectationIds) {
-    return stepRepository.findStepIdsByExpectationIds(expectationIds);
+  public Set<String> findStepIdsActiveByExpectationIds(final Set<String> expectationIds) {
+    return stepRepository.findStepIdsActiveByExpectationIds(expectationIds, ACTIVE_STEP_STATUS);
   }
 
-  public Set<String> findStepIdsByInjectIds(final Set<String> injectIds) {
+  public Set<String> findStepIdsActiveByInjectIds(final Set<String> injectIds) {
     if (injectIds == null || injectIds.isEmpty()) {
       return Set.of();
     }
-    return stepRepository.findStepIdsByInjectIds(injectIds);
+    return stepRepository.findStepIdsActiveByInjectIds(injectIds, ACTIVE_STEP_STATUS);
   }
 
   /**
