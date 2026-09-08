@@ -299,7 +299,8 @@ public class V1_DataImporter implements Importer {
 
   // -- TAGS --
 
-  private void importTags(TxCtx ctx, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+  private void importTags(
+      TxCtx ctx, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
     String writeTenant = tenantWriteScopeResolver.tenantForWrite(ctx, null);
     resolveJsonElements(importNode, prefix + "tags")
         .forEach(
