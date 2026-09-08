@@ -281,42 +281,7 @@ public class ScenarioService {
             Specification<Scenario>, Specification<Scenario>, Pageable, Page<RawPaginationScenario>>
         findAll = getFindAllFunction(deepFilterSpecification, joinMap);
 
-    // Compute pagination from find all
-    Page<RawPaginationScenario> page =
-        buildPaginationCriteriaBuilder(findAll, searchPaginationInput, Scenario.class, joinMap);
-    return enrichScenarioPlatforms(page);
-  }
-
-  private Page<RawPaginationScenario> enrichScenarioPlatforms(Page<RawPaginationScenario> page) {
-    Map<String, Set<String>> scenarioPlatformsByScenarioId =
-        resolveScenarioPlatforms(
-            page.getContent().stream().map(RawPaginationScenario::getScenario_id).toList());
-    return page.map(
-        scenario -> {
-          Set<String> platforms = scenarioPlatformsByScenarioId.get(scenario.getScenario_id());
-          if (platforms != null) {
-            scenario.setScenario_platforms(new LinkedHashSet<>(platforms));
-          }
-          return scenario;
-        });
-  }
-
-  private Map<String, Set<String>> resolveScenarioPlatforms(List<String> scenarioIds) {
-    if (scenarioIds == null || scenarioIds.isEmpty()) {
-      return Map.of();
-    }
-    return scenarioRepository.findScenarioPlatformsByScenarioIds(scenarioIds).stream()
-        .collect(
-            Collectors.toMap(
-                RawScenarioSimpleIndexing::getScenario_id,
-                platform ->
-                    new LinkedHashSet<>(
-                        Optional.ofNullable(platform.getScenario_platforms()).orElseGet(Set::of)),
-                (left, right) -> {
-                  left.addAll(right);
-                  return left;
-                },
-                LinkedHashMap::new));
+    return buildPaginationCriteriaBuilder(findAll, searchPaginationInput, Scenario.class, joinMap);
   }
 
   private TriFunction<
@@ -370,7 +335,7 @@ public class ScenarioService {
     joinMap.put("injects", injectsJoin);
     Join<Base, Base> injectorsContractsJoin = injectsJoin.join("injectorContract", JoinType.LEFT);
     joinMap.put("injects.injectorContract", injectorsContractsJoin);
-    Expression<String[]> platformExpression =
+    Expression<String[]> timeBasedPlatformExpression =
         cb.function("array_union_agg", String[].class, injectorsContractsJoin.get("platforms"));
 
     // Subquery for workflow_id
@@ -381,6 +346,31 @@ public class ScenarioService {
         .where(
             cb.equal(workflowRoot.get("scenario").get("id"), scenarioRoot.get("id")),
             cb.equal(workflowRoot.get("status"), WorkflowStatus.TEMPLATE));
+
+    Subquery<String[]> workflowPlatformsSubquery = cq.subquery(String[].class);
+    Root<Workflow> workflowPlatformsRoot = workflowPlatformsSubquery.from(Workflow.class);
+    Join<Workflow, Step> workflowStepsJoin = workflowPlatformsRoot.join("steps", JoinType.LEFT);
+    Expression<String[]> workflowStepPlatformsExpression =
+        cb.function(
+            "jsonb_text_array",
+            String[].class,
+            cb.function(
+                "jsonb_extract_path",
+                Object.class,
+                workflowStepsJoin.get("data"),
+                cb.literal("inject_injector_contract"),
+                cb.literal("injector_contract_platforms")));
+    workflowPlatformsSubquery
+        .select(cb.function("array_union_agg", String[].class, workflowStepPlatformsExpression))
+        .where(
+            cb.equal(workflowPlatformsRoot.get("scenario").get("id"), scenarioRoot.get("id")),
+            cb.equal(workflowPlatformsRoot.get("status"), WorkflowStatus.TEMPLATE),
+            cb.equal(workflowStepsJoin.get("status"), StepStatus.TEMPLATE),
+            cb.isNull(workflowStepsJoin.get("stepTemplate")));
+
+    CriteriaBuilder.Coalesce<String[]> platformExpression = cb.coalesce();
+    platformExpression.value(timeBasedPlatformExpression);
+    platformExpression.value(workflowPlatformsSubquery);
 
     // SELECT
     cq.multiselect(

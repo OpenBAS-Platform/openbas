@@ -266,6 +266,19 @@ public interface ScenarioRepository
               + "  WHERE i.inject_scenario = :scenarioId "
               + "  GROUP BY i.inject_scenario "
               + "), "
+              + "workflow_platforms AS ( "
+              + "  SELECT w.workflow_scenario_id AS scenario_id, "
+              + "         array_union_agg(jsonb_text_array(jsonb_extract_path(st.step_data, "
+              + "'inject_injector_contract', 'injector_contract_platforms'))) "
+              + "           AS scenario_platforms "
+              + "  FROM workflows w "
+              + "  JOIN steps st ON st.step_workflow_id = w.workflow_id "
+              + "  WHERE w.workflow_scenario_id = :scenarioId "
+              + "    AND w.workflow_status = 'TEMPLATE' "
+              + "    AND st.step_status = 'TEMPLATE' "
+              + "    AND st.step_template_id IS NULL "
+              + "  GROUP BY w.workflow_scenario_id "
+              + "), "
               + "tags AS ( "
               + "  SELECT scenario_id, "
               + "         array_agg(DISTINCT tag_id) FILTER (WHERE tag_id IS NOT NULL) AS scenario_tags "
@@ -286,7 +299,8 @@ public interface ScenarioRepository
               + "       su.scenario_users_number, "
               + "       ex.scenario_exercises, "
               + "       kc.scenario_kill_chain_phases, "
-              + "       pf.scenario_platforms, "
+              + "       COALESCE(pf.scenario_platforms, wpf.scenario_platforms) "
+              + "         AS scenario_platforms, "
               + "       tg.scenario_tags, "
               + "       rt.scenario_reply_to, "
               + "       su.scenario_teams_users, "
@@ -297,56 +311,13 @@ public interface ScenarioRepository
               + "LEFT JOIN exercises ex ON ex.scenario_id = s.scenario_id "
               + "LEFT JOIN kill_chain kc ON kc.scenario_id = s.scenario_id "
               + "LEFT JOIN platforms pf ON pf.scenario_id = s.scenario_id "
+              + "LEFT JOIN workflow_platforms wpf ON wpf.scenario_id = s.scenario_id "
               + "LEFT JOIN tags tg ON tg.scenario_id = s.scenario_id "
               + "LEFT JOIN reply_to rt ON rt.scenario_id = s.scenario_id "
               + "LEFT JOIN workflows w ON w.workflow_scenario_id = s.scenario_id "
               + "WHERE s.scenario_id = :scenarioId AND s.tenant_id = :#{#tenantContext.currentTenant}",
       nativeQuery = true)
   RawScenario getScenarioByIdAndTenantId(@Param("scenarioId") final String scenarioId);
-
-  @Query(
-      value =
-          """
-      WITH direct_platforms AS (
-          SELECT s.scenario_id, unnest(ic.injector_contract_platforms) AS scenario_platform
-          FROM scenarios s
-            JOIN injects i ON i.inject_scenario = s.scenario_id
-            JOIN injectors_contracts ic
-              ON ic.injector_contract_id = i.inject_injector_contract
-             AND ic.tenant_id = i.tenant_id
-          WHERE s.scenario_id IN :scenarioIds
-            AND s.tenant_id = :#{#tenantContext.currentTenant}
-            AND ic.injector_contract_platforms IS NOT NULL
-      ),
-      workflow_platforms AS (
-          SELECT s.scenario_id, platform.scenario_platform
-          FROM scenarios s
-            JOIN workflows w ON w.workflow_scenario_id = s.scenario_id
-            JOIN steps st ON st.step_workflow_id = w.workflow_id
-            CROSS JOIN LATERAL jsonb_array_elements_text(
-              COALESCE(
-                st.step_data -> 'inject_injector_contract' -> 'injector_contract_platforms',
-                '[]'::jsonb
-              )
-            ) AS platform(scenario_platform)
-          WHERE s.scenario_id IN :scenarioIds
-            AND s.tenant_id = :#{#tenantContext.currentTenant}
-            AND w.workflow_status = 'TEMPLATE'
-            AND st.step_status = 'TEMPLATE'
-            AND st.step_template_id IS NULL
-      ),
-      all_platforms AS (
-          SELECT scenario_id, scenario_platform FROM direct_platforms
-          UNION ALL
-          SELECT scenario_id, scenario_platform FROM workflow_platforms
-      )
-      SELECT scenario_id, array_agg(DISTINCT scenario_platform) AS scenario_platforms
-      FROM all_platforms
-      GROUP BY scenario_id
-      """,
-      nativeQuery = true)
-  List<RawScenarioSimpleIndexing> findScenarioPlatformsByScenarioIds(
-      @Param("scenarioIds") List<String> scenarioIds);
 
   // -- CATEGORY --
 
