@@ -18,6 +18,7 @@ import io.openaev.api.expectations.dto.ExpectationsDriftDismissInput;
 import io.openaev.api.expectations.dto.ExpectationsDriftOutput;
 import io.openaev.api.expectations.dto.ExpectationsRealignOutput;
 import io.openaev.config.cache.LicenseCacheManager;
+import io.openaev.config.RequireTenantSelector;
 import io.openaev.context.TenantContext;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
@@ -1039,7 +1040,8 @@ public class ExerciseApi extends RestBehavior {
   @PostMapping({EXERCISE_URI + "/import", TENANT_EXERCISE_URI + "/import"})
   @Transactional
   @AccessControl(actionPerformed = Action.CREATE, resourceType = ResourceType.SIMULATION)
-  public ImportResult exerciseImport(TxCtx ctx, @RequestPart("file") MultipartFile file)
+  public ImportResult exerciseImport(
+      @RequireTenantSelector TxCtx ctx, @RequestPart("file") MultipartFile file)
       throws Exception {
     return importService.handleFileImport(ctx, file, null, null);
   }
