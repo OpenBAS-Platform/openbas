@@ -42,7 +42,7 @@ class AssetOutputProcessorTest {
     when(inject.getTenant()).thenReturn(tenant);
     when(tenant.getId()).thenReturn("tenant-id");
     when(executionContext.inject()).thenReturn(inject);
-    when(tagService.findOrCreateTagsFromNames(any())).thenReturn(Set.of());
+    when(tagService.findOrCreateTagsFromNames(any(), any())).thenReturn(Set.of());
   }
 
   @Test
@@ -191,11 +191,11 @@ class AssetOutputProcessorTest {
     when(created.getId()).thenReturn("endpoint-id");
     when(endpointService.findExistingEndpoint(any(), any())).thenReturn(Optional.empty());
     when(endpointService.createEndpoint(any(EndpointInput.class))).thenReturn(created);
-    when(tagService.findOrCreateTagsFromNames(any())).thenReturn(Set.of());
+    when(tagService.findOrCreateTagsFromNames(any(), any())).thenReturn(Set.of());
 
     processor.process(executionContext, contractOutputContext, node);
 
-    verify(tagService).findOrCreateTagsFromNames(any());
+    verify(tagService).findOrCreateTagsFromNames(any(), any());
     verify(endpointService).createEndpoint(any(EndpointInput.class));
   }
 

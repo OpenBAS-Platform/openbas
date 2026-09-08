@@ -550,6 +550,17 @@ Notes that make or break the test:
 - `@TestPropertySource` activates the table for this test only. The test
   classpath keeps the allowlist empty on purpose; never add your table to the
   test-wide properties.
+- **Leave `@WithMockUser` at its default (`autoJoinDefaultTenant` stays
+  `false`) on this class.** The class-level mock user must resolve to exactly
+  the tenants `tenantHelper.createTenantWithCurrentUser(...)` granted it —
+  nothing more. Setting `autoJoinDefaultTenant = true` here silently adds a
+  second tenant membership, which (a) defeats the "create with no
+  selector → 400" assertion below (the fallback selector now sees an
+  unambiguous default tenant instead of an ambiguous multi-tenant scope) and
+  (b) can trip `TenantScopeTransactionAspect`'s "scope already set for this
+  transaction" guard the moment a second `mvc.perform` call in the same test
+  method resolves a wider scope than the first. See
+  `WithMockUser.autoJoinDefaultTenant()` javadoc for the full rationale.
 - Seed with a native `INSERT ... VALUES` including `tenant_id`, like the
   pilot's `seedMapper`. The inspector does not block VALUES inserts.
 - Ground-truth assertions (prove a row was NOT touched) use raw JDBC on the
@@ -825,6 +836,19 @@ carries no explicit selector, see
 The pilot does not use it: the resolver's single-tenant rule already refuses
 ambiguous writes. Do not add it unless the endpoint must refuse even an
 implicit single-tenant scope.
+
+**Testing the plain (non-isolation) create path.** Outside the two-tenant
+`{Entity}HttpIsolationTest` suite above, an ordinary create/import test (e.g.
+`{Entity}ApiCapabilityTest`, a permissions test) that hits the same
+`@RequireTenantSelector`-gated endpoint needs the mock user to resolve to
+exactly ONE authorized tenant, or `tenantForWrite` refuses it with 400 (empty
+authorized set is not a single tenant either). If that test doesn't already
+grant the mock user a tenant of its own, add
+`@WithMockUser(autoJoinDefaultTenant = true)` on that ONE test method — never
+at the class level, and never on a test in the isolation suite above, which
+must keep the default `false` (see Phase 2's note on this same flag). Models:
+`TagApiCapabilityTest#given_manageTags_should_createTag`,
+`ImportExportMapperApiTest#testImportCsvWithEndpointsCsvType`.
 
 Do NOT keep `TenantBaseListener` / `TenantIdBaseListener` on the entity. It is
 a v1 pattern that reads from `TenantContext` — which is no longer the source of
