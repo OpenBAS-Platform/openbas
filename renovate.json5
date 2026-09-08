@@ -16,9 +16,9 @@
     // The concurrency ceiling is a blast-radius guard, not a volume lever. Over the 90 days to
     // 2026-09-08 the peak was 53 simultaneously open Renovate PRs and the median 33, so 100 was never
     // reached and never throttled anything. 60 keeps headroom over that measured peak while capping a
-    // runaway. It is deliberately not lower: 16 of the 26 PRs open today are majors older than 30
-    // days that occupy the pool permanently, and a ceiling under about 55 would silently stop
-    // Renovate opening anything new. Revisit once majors move off the PR list.
+    // runaway. It is deliberately not lower: the long-lived major PRs occupy part of the pool
+    // permanently, and a ceiling below the measured peak would silently stop Renovate opening
+    // anything new. Revisit once majors move off the PR list.
     prConcurrentLimit: 60,
     branchConcurrentLimit: 60,
     timezone: 'Europe/Paris',
@@ -174,11 +174,13 @@
         // batches come first, then the rules that pull a dependency back out of a batch. Anything no
         // batch matches keeps its own PR, which is the safe default.
         //
-        // Measured over the 90 days to 2026-09-08: 219 Renovate PRs, 17.0 a week. The batches here
-        // and the devDependencies batch above cover 155 of them and collapse those to 37, because a
-        // weekly batch cannot produce more PRs than there are weeks with an update in it.
+        // The invariant a batch buys is one PR per batch per week at most, whatever the upstream
+        // release cadence. The measured before and after volumes live in the ADR and the pull request
+        // that introduced this, not here: a count written into a config file is a count nobody
+        // updates.
+
         // GitHub Actions only ever run in CI, so a bad version fails the workflow that uses it on the
-        // same push. 13 PRs over the window. OpenCTI already batches actions weekly.
+        // same push. OpenCTI already batches actions weekly.
         {
             groupName: 'ci tooling (non-major)',
             groupSlug: 'ci-tooling-non-major',
@@ -200,7 +202,6 @@
         // Maven build, test and provided scopes never reach a shipped artifact. Matching on depType
         // rather than on an artifact list means a new test dependency joins the batch on its own.
         // depType for the maven manager is the declared scope, and 'build' for plugins and extensions.
-        // 14 PRs over the window.
         {
             groupName: 'build and test tooling (non-major)',
             groupSlug: 'build-test-tooling-non-major',
@@ -224,10 +225,10 @@
             ],
             rebaseWhen: 'auto',
         },
-        // Production dependencies, one PR at a time before this change: 117 of the 219. Batched
-        // because reviewing the AWS SDK eighteen times in a quarter is what stops the Jackson bump
-        // from being read. The cost is that one bad member holds the whole batch, and the exit is a
-        // rule placed after this one with groupName: null for that dependency.
+        // Production dependencies, one PR at a time before this change and the bulk of the volume.
+        // Batched because reviewing the same SDK over and over in a quarter is what stops the Jackson
+        // bump from being read. The cost is that one bad member holds the whole batch, and the exit is
+        // a rule placed after this one with groupName: null for that dependency.
         {
             groupName: 'front-end production dependencies (non-major)',
             groupSlug: 'front-prod-non-major',
@@ -244,6 +245,8 @@
             matchUpdateTypes: [
                 'minor',
                 'patch',
+                'pin',
+                'digest',
             ],
             rebaseWhen: 'auto',
         },
@@ -266,6 +269,8 @@
             matchUpdateTypes: [
                 'minor',
                 'patch',
+                'pin',
+                'digest',
             ],
             rebaseWhen: 'auto',
         },
@@ -289,6 +294,12 @@
         // A yarn patch can stop applying, or keep applying against changed code, with no error. This
         // rule also has to sit after the batches for a second reason: a batched PR takes its title
         // from groupName, so the [DANGER] prefix set above would stop appearing.
+        //
+        // This list is the patches that actually exist: `ls openaev-front/patches/` returns
+        // react-apexcharts.patch and nothing else, and the resolutions block in
+        // openaev-front/package.json references only that one. html-to-image is not here because it
+        // carries no patch, despite the [DANGER] rule still on main saying it does. That rule is
+        // wrong and is removed separately.
         {
             description: 'Patched dependencies keep their own PR',
             matchDepNames: [
@@ -341,6 +352,13 @@
                 // wraps the DataSource in main code (io.openaev.debug.DataSourceProxyBeanPostProcessor),
                 // so it sits on the path of every SQL statement the platform issues
                 'net.ttddyy:datasource-proxy',
+                // The group prefixes above also match Maven plugins that share the coordinate, for
+                // instance org.springframework.boot:spring-boot-maven-plugin. A plugin ships nothing,
+                // so it belongs in the build and test batch. Negating the suffix rather than adding
+                // matchDepTypes here is deliberate: the nine dependencies the customManagers track
+                // carry no depType, so a depType filter would drop them out of this rule and they are
+                // the ones that most need to be seen.
+                '!/-maven-plugin$/',
             ],
             groupName: null,
             addLabels: [
@@ -375,9 +393,9 @@
             ],
             groupName: null,
         },
-        // Lock file maintenance rewrites transitive versions with no diff a human can read, and it has
-        // the worst record of any group here: 3 of the last 6 failed CI on the first attempt and 4 of
-        // the 5 merged ones needed a commit Renovate did not write.
+        // Lock file maintenance rewrites transitive versions with no diff a human can read, and over
+        // the 90 days to 2026-09-08 it had both the worst first-attempt CI record and the most
+        // human commits of any class here.
         {
             description: 'Lock file maintenance keeps its own PR',
             matchUpdateTypes: [
