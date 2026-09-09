@@ -62,11 +62,13 @@ class ScenarioExecutionJobTest extends IntegrationTest {
   static String EXERCISE_ID;
 
   @AfterEach
-  void after() {
-    workflowRepository.deleteAll();
-    exerciseRepository.deleteAll();
-    scenarioRepository.deleteAll();
-  }
+void after() {
+  entityManager.unwrap(org.hibernate.Session.class).disableFilter("tenantFilter");
+  entityManager.clear();
+  workflowRepository.deleteAll();
+  exerciseRepository.deleteAll();
+  scenarioRepository.deleteAll();
+}
 
   @Nested
   @DisplayName("When using cron-based recurrence")
