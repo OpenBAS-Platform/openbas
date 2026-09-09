@@ -513,25 +513,6 @@ public class WorkflowService {
     return saveWorkflowRun(run);
   }
 
-  /**
-   * Launches a workflow for a scenario by creating a simulation-level template and a run from it.
-   *
-   * @param workflowTemplateScenario the scenario's workflow template
-   * @param simulation the simulation to attach the run to
-   * @return the created workflow run
-   */
-  public Workflow launchWorkflowScenario(Workflow workflowTemplateScenario, Exercise simulation) {
-    // Copy workflow TEMPLATE (scenario) to a new workflow TEMPLATE (simulation)
-    Workflow workflowTemplateSimulation =
-        copyWorkflowTemplateToSimulation(workflowTemplateScenario, simulation);
-    workflowTemplateSimulation = saveWorkflowRun(workflowTemplateSimulation);
-
-    // Copy workflow TEMPLATE (simulation) to a new workflow execution RUN (simulation)
-    Workflow run = copyWorkflowTemplateToRun(workflowTemplateSimulation);
-
-    return saveWorkflowRun(run);
-  }
-
   /** Increments the version and clears the edited flag when the template has pending runs. */
   private Workflow updateEditedWorkflow(Workflow workflowTemplate) {
     if (workflowTemplate.isEdited() && !workflowTemplate.getWorkflowsExecuted().isEmpty()) {
