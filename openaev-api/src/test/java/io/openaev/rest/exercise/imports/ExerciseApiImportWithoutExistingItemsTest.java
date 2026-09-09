@@ -197,8 +197,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -232,8 +231,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -268,8 +266,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -295,8 +292,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -338,8 +334,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -369,8 +364,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -405,8 +399,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -441,8 +434,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -486,8 +478,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -514,8 +505,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -556,8 +546,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -586,8 +575,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -621,8 +609,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -650,8 +637,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -688,8 +674,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -719,8 +704,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -758,8 +742,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -786,8 +769,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -823,8 +805,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -851,8 +832,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -898,8 +878,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -926,8 +905,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -968,8 +946,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -996,8 +973,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -1044,8 +1020,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    doImport(mmf)
-         .andExpect(status().is2xxSuccessful());
+    doImport(mmf).andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers

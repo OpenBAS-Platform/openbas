@@ -65,7 +65,8 @@ class ChallengeApiTest extends IntegrationTest {
     Scenario scenario = createDefaultCrisisScenario();
     Scenario scenarioCreated = this.scenarioService.createScenario(scenario);
     assertNotNull(scenarioCreated, "Scenario should be successfully created");
-    challengeInjectorIntegrationFactory.registerConnectorForTenant(scenarioCreated.getTenant().getId());
+    challengeInjectorIntegrationFactory.registerConnectorForTenant(
+        scenarioCreated.getTenant().getId());
     String SCENARIO_ID = scenarioCreated.getId();
 
     Challenge challenge = createDefaultChallenge();
