@@ -194,6 +194,9 @@ STOP conditions, report instead of continuing:
   A background READ-only hit (e.g. a telemetry counter) is not a blocker but
   must be listed in the report as a documented degradation: once the table is
   active it reads zero rows unless that reader also carries a scope.
+  `ProductInventoryMetricCollector` (below) is the single, always-present
+  instance of this shape — check it on every activation, not only when Phase 1
+  happens to surface it.
 - 0.3 finds a unique index on a business key that does not include
   `tenant_id` → the schema needs a prep migration first (model: the existing
   `__Update_unique_constraints_for_tenants` migration in
@@ -295,6 +298,51 @@ Classify every hit:
   (wrap its read in `tenantTx.execute(scope, …)`) if it must keep seeing rows
 - background writer → convert to the primitive in Phase 5b. If you are not
   converting it in this run, it is a blocker: stop and report (Phase 0)
+
+#### Telemetry gauge check: `ProductInventoryMetricCollector`
+
+`openaev-api/src/main/java/io/openaev/telemetry/metric_collectors/ProductInventoryMetricCollector.java`
+registers a platform-wide `{table}_total` gauge for most entities, evaluated by
+a `Supplier` lambda OUTSIDE any HTTP request — no `TxCtx` from the mass wiring
+ever reaches it, so it is always a background reader in the Phase 1 sense
+above, and it is the single, recurring, always-present instance of that shape:
+check it on every activation regardless of whether the earlier greps surfaced
+it. Its own javadoc documents the exact failure mode: with no scope open,
+`TenantStatementInspector` fails closed and the gauge silently reports 0, not
+an error.
+
+```bash
+grep -n "{table}\|{entity}Repository" \
+  openaev-api/src/main/java/io/openaev/telemetry/metric_collectors/ProductInventoryMetricCollector.java
+```
+
+- No hit at all → nothing to do, the table has no gauge.
+- A hit using `safeCount({entity}Repository::count)` directly (the plain,
+  un-scoped form) → this is a go-live blocker for that one gauge line, not
+  the whole activation: it must be converted to the scoped form BEFORE
+  go-live, following the pattern already used for three other v2-active
+  tables in the same file, `countAssetGroups()` / `countChannels()` /
+  `countImportMappers()` (model fix for `challenges`, #6416):
+
+  ```java
+  // registration: this::count{Entities} instead of {entity}Repository::count
+  metricRegistry.registerGauge(
+      "{table}_total", "Number of {entities}", () -> safeCount(this::count{Entities}));
+
+  /** Counts {entities} across the whole platform ({table} is v2-active, #<issue>). */
+  long count{Entities}() {
+    return countAcrossAllTenants({entity}Repository::count);
+  }
+  ```
+- A hit already wrapped in `countAcrossAllTenants(...)` → already correct,
+  nothing to do; note it in the Phase 9 report as verified, not skipped.
+
+There is no test in CI that would catch a regression here on its own: the
+gauge only degrades silently in a real deployment (no assertion fails, no
+exception is thrown). Treat this grep as mandatory evidence for the Phase 9
+report even when the answer is "no hit" — a claimed activation with no note
+on this file is unverified, not verified-empty.
+
 
 #### GROUP BY on a wrapped table: valid SQL before activation, a 500 after
 
@@ -690,16 +738,45 @@ Classify each call site:
   like `MultiIdListSerializer`, a DTO mapper invoked by Jackson, a
   `@JsonSerialize` field) → **the dangerous case**. With open-in-view or any
   serialization step that runs after the controller method returns, the
-  association resolves OUTSIDE the transaction the aspect scoped. Fix per the
-  #7026 pattern: force-initialize the association INSIDE the scoped
-  transaction, before the method returns, with a documented helper
-  (`Hibernate.initialize(owning.get{Entities}())`, or eager-fetch it in the
-  query that loaded `{OwningEntity}`), and make sure that controller method
-  itself carries `TxCtx` — a lazy association resolved eagerly under no scope
-  still reads zero rows. Model: `SecurityPlatformApi`'s
-  `withCollectorsInitialized` helper (PR #7026).
+  association resolves OUTSIDE the transaction the aspect scoped. Force-initialize
+  the association INSIDE the scoped transaction, before the method returns —
+  and make sure that controller method itself carries `TxCtx`, since a lazy
+  association resolved eagerly under no scope still reads zero rows. The
+  CORRECT helper depends on the association's cardinality, not on which one
+  happens to compile. Read 3b.2a below before picking one; treating
+  `Hibernate.initialize(...)` and `JOIN FETCH` as interchangeable is what makes
+  this step easy to get wrong.
 - no controller ever serializes it, only used inside a background job → treat
   as Phase 5b (background reader), not this phase.
+
+**3b.2a — which fix, by cardinality.** Both patterns run the SAME rewritten,
+tenant-scoped SQL (the inspector inspects every statement a session issues,
+regardless of which helper triggered it) — the difference is what happens when
+the target row is invisible under the caller's scope, and that difference is
+driven entirely by the association's cardinality:
+
+| Cardinality | What an invisible target does | Safe pattern | Model |
+|---|---|---|---|
+| `@OneToMany` / `@ManyToMany` (a collection) | The collection query is naturally a `WHERE fk = ?`-style list; an out-of-scope child row is just excluded from the list. Degrades to an empty collection, never throws. | `Hibernate.initialize(owning.get{Entities}())` inside the scoped transaction, right where the association is needed, before the method returns. | `SecurityPlatformApi`'s `withCollectorsInitialized` (`Hibernate.initialize(securityPlatform.getCollectors())`, PR #7026); `InjectHelper` (`Hibernate.initialize(inject.getTags())`, `.getTeams()`, …) |
+| `@ManyToOne` / `@OneToOne` (a single required reference), **no** `@NotFound` on the field | Hibernate assumes referential integrity: initializing a proxy whose target row fails `can_access_tenant(...)` returns zero rows for a lookup-by-id, and Hibernate throws `ObjectNotFoundException`/`EntityNotFoundException` — an unhandled 500 at the point of initialization, not an empty result. `Hibernate.initialize()` is NOT safe here by default. | `JOIN FETCH owner.association` in the SAME query that loads the owning row (or an `@EntityGraph`), not a separate `Hibernate.initialize()` call. JPQL's default `JOIN FETCH` is an INNER join: if the referenced row fails the tenant predicate, the join condition fails and the OWNING row itself is silently dropped from the result set — no exception, no null to handle, and it matches "nothing visible" semantics for the caller for free. | `InjectExpectationRepository#findChallengeExpectationsByExerciseAndUser` / `#findByUserAndExerciseAndChallenge`, `JOIN FETCH i.challenge` added when `challenges` went v2-active (#6416) |
+| `@ManyToOne` / `@OneToOne`, association ALREADY carries `@NotFound(action = NotFoundAction.IGNORE)` for unrelated referential-integrity reasons (model: `Inject.java`, `InjectorInjectorContract.java`) | `null` is already the documented, handled outcome for a missing target — an invisible-under-tenant-scope target degrades the exact same way a genuinely-deleted one already does. | `Hibernate.initialize()` is fine to reuse as-is; verify the annotation is already there before assuming it, and confirm every existing caller already null-checks the getter. | n/a — check the field's existing annotations first |
+| A required `@ManyToOne`/`@OneToOne` where you *want* a null instead of a dropped owning row (rare — usually only right at the association's own aggregate boundary, not through an unrelated join) | Adding `@NotFound(action = NotFoundAction.IGNORE)` specifically to unlock this makes the association **permanently EAGER for every caller**, not just this one — it cannot stay lazy once Hibernate must silently swallow a missing target. Treat this as a deliberate, wider mapping change, not a query-local fix, and audit every other caller of that getter before adding it. | Prefer `JOIN FETCH` (row above) unless you have a specific reason this is insufficient; if you do add `@NotFound`, you must also add the null-handling code downstream yourself — nothing does that for you. | — |
+
+Quick check before picking a row — confirm the cardinality and any existing `@NotFound` on the field:
+
+```bash
+grep -n -B3 "{fieldName}" openaev-model/src/main/java/io/openaev/database/model/{OwningEntity}.java \
+  | grep -E "@OneToMany|@ManyToMany|@ManyToOne|@OneToOne|@NotFound"
+```
+
+Getting this wrong ships one of two ways: pick `Hibernate.initialize()` on a
+`*ToOne` with no `@NotFound` and the association throws at initialization time
+instead of degrading — a 500 on whatever request happens to first touch an
+invisible target, appearing later and further from the original access than
+the read that triggered it; pick `JOIN FETCH` on a `*ToMany` and you likely
+don't crash, but you lose the chance to reuse an already-loaded owning row
+across multiple associations the way `Hibernate.initialize()` naturally allows
+— it isn't wrong, just needlessly more invasive than the one-liner.
 
 **3b.3 — pin every fixed accessor with an ArchUnit rule and a scoped test:**
 
@@ -1312,6 +1389,8 @@ Before marking the issue done, write down:
   owning entity, whether it was lazy-loaded outside the transaction (the #7026
   shape) or already safe, the fix applied, and its scoped test
 - background readers left degraded (from Phase 0/1), each with a one-line impact
+- the `ProductInventoryMetricCollector` check (Phase 1): hit or no-hit, and if
+  hit, whether it was already scoped or converted to `countAcrossAllTenants()`
 - child tables and how they are covered
 - client impact: writes now require a single-tenant scope. Calls using the tenant path
   (`/api/tenants/{tenantId}/...`) already satisfy this; callers using the header route or no selector
@@ -1373,9 +1452,21 @@ Before marking the issue done, write down:
       reached through serialization (custom serializer, DTO mapper) force-
       initialized inside a scoped transaction; each fixed entrypoint pinned in
       both arch tests and covered by a production-like scoped test
+- [ ] every force-initialization fix from Phase 3b/3b.2a chose its pattern by
+      the association's cardinality, not by whichever compiled: `*ToMany` used
+      `Hibernate.initialize()` on the collection, a `*ToOne` with no existing
+      `@NotFound` used `JOIN FETCH`/`@EntityGraph` in the loading query instead
+      of `Hibernate.initialize()` (which throws on an invisible target for a
+      required reference), and any NEW `@NotFound(IGNORE)` added to unlock
+      `Hibernate.initialize()` on a `*ToOne` came with an audit of every other
+      caller of that getter plus explicit null-handling downstream
 - [ ] background writers converted to the primitive (no `@Transactional`, no raw
       plumbing), each with a per-tenant or `allTenants` scope and a green
       background isolation test (Phase 5b)
+- [ ] `ProductInventoryMetricCollector` checked for a gauge on this table
+      (Phase 1): no hit, or a hit already/now wrapped in
+      `countAcrossAllTenants()` — never left as a plain
+      `safeCount({entity}Repository::count)`
 - [ ] native queries on the table (`@Query(nativeQuery=true)`,
       `createNativeQuery`) are exercised by a test so a fail-closed rewrite
       refusal surfaces in CI, not production; any raw JDBC on the table converted
