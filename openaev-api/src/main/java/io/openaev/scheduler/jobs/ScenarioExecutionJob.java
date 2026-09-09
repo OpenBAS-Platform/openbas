@@ -110,7 +110,7 @@ public class ScenarioExecutionJob implements Job {
                         scenarioRecurrenceService.getNextExecutionTime(scenario, now).orElse(now);
                     boolean isChaining = this.workflowService.isScenarioChaining(scenario.getId());
                     Exercise exercise =
-                        this.scenarioToExerciseService.toExercise(scenario, start, isChaining);
+                        this.scenarioToExerciseService.toExercise(scenario, start, false);
                     try {
                       this.workflowService.provisionSimulationTemplateWorkflowIfChained(
                           scenario.getId(), exercise);
