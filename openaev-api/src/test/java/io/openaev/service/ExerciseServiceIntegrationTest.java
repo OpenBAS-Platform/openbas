@@ -24,6 +24,7 @@ import io.openaev.rest.exercise.service.PauseExerciseService;
 import io.openaev.rest.inject.service.InjectDuplicateService;
 import io.openaev.rest.inject.service.InjectService;
 import io.openaev.service.attackpath.ingestion.AttackPathExecutionIngestionService;
+import io.openaev.service.chaining.ScopeService;
 import io.openaev.service.chaining.StepService;
 import io.openaev.service.chaining.WorkflowService;
 import io.openaev.service.scenario.ScenarioRecurrenceService;
@@ -65,6 +66,7 @@ class ExerciseServiceIntegrationTest extends IntegrationTest {
   @Autowired private DocumentService documentService;
   @Autowired private InjectService injectService;
   @Autowired private UserService userService;
+  @Autowired private ScopeService scopeService;
   @Autowired private GrantService grantService;
   @Autowired private ExerciseTeamUserService exerciseTeamUserService;
 
@@ -126,6 +128,7 @@ class ExerciseServiceIntegrationTest extends IntegrationTest {
             userService,
             grantService,
             exerciseTeamUserService,
+            scopeService,
             exerciseMapper,
             injectMapper,
             resultUtils,
