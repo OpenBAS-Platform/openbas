@@ -118,6 +118,7 @@ public class InjectsExecutionJob implements Job {
           exercise.setUpdatedAt(now());
         });
     exerciseRepository.saveAll(startedExercises);
+    startedExercises.forEach(this::logScheduledLaunch);
     return startedExercises;
   }
 
@@ -346,7 +347,6 @@ public class InjectsExecutionJob implements Job {
             throw new IllegalStateException(
                 "Could not start workflow for scheduled simulation " + exercise.getId(), e);
           }
-          logScheduledLaunch(exercise);
         });
   }
 
