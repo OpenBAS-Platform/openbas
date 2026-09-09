@@ -45,10 +45,11 @@ public class EndpointComposer extends ComposerBase<Endpoint> {
 
     @Override
     public Composer persist() {
-      // assets is tenant-active and Asset carries no TenantBaseListener any more, so an entity a
-      // test built by hand has no tenant and the insert fails on the NOT NULL column. Stamp the
-      // ambient tenant here, and only when the caller left it unset, so a test that attributes
-      // deliberately (isolation tests, cross-tenant fixtures) keeps full control.
+      // assets is tenant-active, and Asset deliberately KEEPS TenantBaseListener for now (see the
+      // note on Asset itself; #7844 removes it), so an entity a test built by hand is still stamped
+      // today and the insert does not fail. Stamping the ambient tenant here anyway, and only when
+      // the caller left it unset, means #7844 will not have to touch tests, while a test that
+      // attributes deliberately (isolation tests, cross-tenant fixtures) keeps full control.
       //
       // This sits in the composer rather than the fixture, unlike SecurityCoverage and AssetGroup:
       // sixty-three tests build assets directly and never reach the fixture. The composer is the
