@@ -29,7 +29,6 @@ import io.openaev.database.repository.UserRepository;
 import io.openaev.database.specification.GroupSpecification;
 import io.openaev.rest.exception.ElementNotFoundException;
 import io.openaev.rest.exception.InputValidationException;
-import io.openaev.rest.user.form.login.ResetUserInput;
 import io.openaev.rest.user.form.user.ChangePasswordInput;
 import io.openaev.service.account.PrivilegeEscalationValidator;
 import io.openaev.service.account.ReservedKeyValidator;
@@ -161,7 +160,7 @@ public class UserService {
       tenantMembershipCacheManager.evictForUser(createdUser.getId(), tenantIds);
     }
     if (!StringUtils.hasText(password)) {
-      eventPublisher.publishEvent(new UserPasswordSetupRequestedEvent(createdUser.getEmail()));
+      requestPasswordSetup(createdUser.getEmail(), createdUser.getLang());
     }
     return createdUser;
   }
@@ -330,23 +329,24 @@ public class UserService {
 
   // -- AUTH --
 
-  /**
-   * Creates a reset token for the specified user; also sends an email with the created token
-   *
-   * @param input input object for the specific user account to reset
-   */
-  @Async
-  public void requestPasswordReset(ResetUserInput input) {
-    requestPasswordReset(input.getLogin(), input.getLang());
+  /** Publishes a password setup/reset request so the email is sent asynchronously after commit. */
+  public void requestPasswordSetup(String login, String lang) {
+    eventPublisher.publishEvent(new UserPasswordSetupRequestedEvent(login, lang));
   }
 
+  /**
+   * Handles password setup/reset requests after commit by generating a token and sending the
+   * localized email asynchronously.
+   *
+   * @param event event carrying the login email and requested language
+   */
   @Async
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
   public void onUserPasswordSetupRequested(UserPasswordSetupRequestedEvent event) {
-    requestPasswordReset(event.email(), null);
+    sendPasswordResetEmail(event.email(), event.lang());
   }
 
-  private void requestPasswordReset(String login, String lang) {
+  private void sendPasswordResetEmail(String login, String lang) {
     Optional<User> optionalUser = userRepository.findByEmailIgnoreCase(login);
     // always compute a random value to reduce gap in time
     // spent between user found and user not found branches
