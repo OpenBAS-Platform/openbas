@@ -73,19 +73,17 @@ class StepServiceTest {
 
   @BeforeEach
   void setUp() {
-    transactionTemplate = mock(TransactionTemplate.class);
+    tenantTx = mock(TenantScopedTransaction.class);
     lenient()
         .doAnswer(
             invocation -> {
-              ((java.util.function.Consumer<Object>) invocation.getArgument(0)).accept(null);
+              ((Runnable) invocation.getArgument(1)).run();
               return null;
             })
-        .when(transactionTemplate)
-        .executeWithoutResult(any());
-    tenantTx = mock(TenantScopedTransaction.class);
+        .when(tenantTx)
+        .execute(any(TxCtx.class), any(Runnable.class));
     queueChainingJob =
-        new QueueChainingJob(
-            stepDelayQueueService, stepService, workflowService, transactionTemplate, tenantTx);
+        new QueueChainingJob(stepDelayQueueService, stepService, workflowService, tenantTx);
     workflow = mock(Workflow.class);
   }
 

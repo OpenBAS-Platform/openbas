@@ -17,7 +17,6 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.support.TransactionTemplate;
 
 @Component
 @RequiredArgsConstructor
@@ -27,16 +26,19 @@ public class QueueChainingJob implements Job {
   private final StepDelayQueueService stepDelayQueueService;
   private final StepService stepService;
   private final WorkflowService workflowService;
-  private final TransactionTemplate transactionTemplate;
   private final TenantScopedTransaction tenantTx;
 
   /** Periodically processes the next eligible step from the delay queue. */
   @Override
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-    // Pop and process inside the same transaction so that if processing fails,
-    // the DELETE is rolled back and the entry is not lost.
-    transactionTemplate.executeWithoutResult(
-        status -> {
+    // Pop and process inside the same transaction so that if processing fails, the DELETE is
+    // rolled back and the entry is not lost. The transaction is opened through the tenant-aware
+    // primitive rather than a raw TransactionTemplate, which is what background jobs are required
+    // to use, and it starts at allTenants() because popNextPerWorkflowRun legitimately spans
+    // tenants. Each entry then narrows the scope to its own tenant below.
+    tenantTx.execute(
+        TxCtx.allTenants(),
+        () -> {
           List<StepDelayQueue> stepsDelayQueue = stepDelayQueueService.popNextToProcess();
           if (stepsDelayQueue.isEmpty()) return;
 
