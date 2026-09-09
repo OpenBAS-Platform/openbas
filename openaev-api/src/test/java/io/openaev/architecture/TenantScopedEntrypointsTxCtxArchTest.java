@@ -87,6 +87,16 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.domain.DomainApi#upsertDomain",
           "io.openaev.rest.domain.DomainApi#findAllAsOptionsByName",
           "io.openaev.rest.domain.DomainApi#findAllAsOptionsById",
+          // notifications (v2)
+          "io.openaev.api.notification.NotificationApi#searchMyNotifications",
+          "io.openaev.api.notification.NotificationApi#unreadNotificationsCount",
+          "io.openaev.api.notification.NotificationApi#markNotificationRead",
+          "io.openaev.api.notification.NotificationApi#markAllNotificationsRead",
+          "io.openaev.api.notification.NotificationApi#bulkDeleteNotifications",
+          "io.openaev.api.notification.NotificationApi#bulkMarkNotificationsRead",
+          "io.openaev.api.notification.NotificationApi#deleteNotification",
+          // notifications write-through from the notifier test endpoint
+          "io.openaev.api.notifier.NotifierApi#testNotifier",
           // channels (v2)
           "io.openaev.rest.channel.ChannelApi#channels",
           "io.openaev.rest.channel.ChannelApi#channel",
