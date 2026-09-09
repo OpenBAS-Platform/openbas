@@ -230,7 +230,7 @@ public class V1_DataImporter implements Importer {
     } else if (importNode.has("payload_information")) {
       prefix = "payload_";
     }
-    importTags(importNode, prefix, baseIds);
+    importTags(ctx, importNode, prefix, baseIds);
     Exercise savedExercise =
         Optional.ofNullable(importExercise(importNode, baseIds, suffix)).orElse(exercise);
     Scenario savedScenario =
@@ -299,7 +299,9 @@ public class V1_DataImporter implements Importer {
 
   // -- TAGS --
 
-  private void importTags(JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+  private void importTags(
+      TxCtx ctx, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+    String writeTenant = tenantWriteScopeResolver.tenantForWrite(ctx, null);
     resolveJsonElements(importNode, prefix + "tags")
         .forEach(
             nodeTag -> {
@@ -310,19 +312,21 @@ public class V1_DataImporter implements Importer {
               }
               String name = nodeTag.get("tag_name").textValue();
 
-              List<Tag> existingTags = this.tagRepository.findByNameIgnoreCase(name);
-              if (!existingTags.isEmpty()) {
-                baseIds.put(id, existingTags.getFirst());
+              Optional<Tag> existingTag =
+                  this.tagRepository.findByNameAndTenantId(name.toLowerCase(), writeTenant);
+              if (existingTag.isPresent()) {
+                baseIds.put(id, existingTag.get());
               } else {
-                baseIds.put(id, this.tagRepository.save(createTag(nodeTag)));
+                baseIds.put(id, this.tagRepository.save(createTag(nodeTag, writeTenant)));
               }
             });
   }
 
-  private Tag createTag(JsonNode jsonNode) {
+  private Tag createTag(JsonNode jsonNode, String tenantId) {
     Tag tag = new Tag();
     tag.setName(jsonNode.get("tag_name").textValue());
     tag.setColor(jsonNode.get("tag_color").textValue());
+    tag.setTenant(new Tenant(tenantId));
     return tag;
   }
 
@@ -1711,7 +1715,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private ContractOutputElementInput buildOuputElementFromJsonNode(
-      JsonNode node, Map<String, Base> baseIds) {
+      TxCtx ctx, JsonNode node, Map<String, Base> baseIds) {
     ContractOutputElementInput outputElement = new ContractOutputElementInput();
     outputElement.setFinding(node.get("contract_output_element_is_finding").asBoolean());
     outputElement.setRule(node.get("contract_output_element_rule").textValue());
@@ -1719,7 +1723,7 @@ public class V1_DataImporter implements Importer {
     outputElement.setKey(node.get("contract_output_element_key").textValue());
     outputElement.setType(
         formatStringToContractOutputType(node.get("contract_output_element_type").textValue()));
-    importTags(node, "contract_output_element_", baseIds);
+    importTags(ctx, node, "contract_output_element_", baseIds);
     outputElement.setTagIds(
         resolveJsonIds(node, "contract_output_element_tags").stream()
             .filter(baseIds::containsKey)
@@ -1736,7 +1740,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private OutputParserInput buildOutputParserFromJsonNode(
-      JsonNode node, Map<String, Base> baseIds) {
+      TxCtx ctx, JsonNode node, Map<String, Base> baseIds) {
     OutputParserInput parser = new OutputParserInput();
     parser.setType(ParserType.valueOf(node.get("output_parser_type").textValue()));
     parser.setMode(ParserMode.valueOf(node.get("output_parser_mode").textValue()));
@@ -1744,13 +1748,13 @@ public class V1_DataImporter implements Importer {
     for (JsonNode outputElementNode : outputElementNodes) {
       parser
           .getContractOutputElements()
-          .add(buildOuputElementFromJsonNode(outputElementNode, baseIds));
+          .add(buildOuputElementFromJsonNode(ctx, outputElementNode, baseIds));
     }
     return parser;
   }
 
   private Set<OutputParserInput> buildOutputParsersFromPayloadJsonNode(
-      JsonNode payloadNode, Map<String, Base> baseIds) {
+      TxCtx ctx, JsonNode payloadNode, Map<String, Base> baseIds) {
     Set<OutputParserInput> outputParserInputs = new HashSet<>();
     if (!payloadNode.has("payload_output_parsers")) {
       return outputParserInputs;
@@ -1758,7 +1762,7 @@ public class V1_DataImporter implements Importer {
 
     ArrayNode outputParserNodes = (ArrayNode) payloadNode.get("payload_output_parsers");
     for (JsonNode outputParserNode : outputParserNodes) {
-      outputParserInputs.add(buildOutputParserFromJsonNode(outputParserNode, baseIds));
+      outputParserInputs.add(buildOutputParserFromJsonNode(ctx, outputParserNode, baseIds));
     }
     return outputParserInputs;
   }
@@ -1770,7 +1774,7 @@ public class V1_DataImporter implements Importer {
       @Nullable JsonNode injectorContractNode) {
     PayloadCreateInput payloadCreateInput = buildPayload(payloadNode);
     payloadCreateInput.setOutputParsers(
-        buildOutputParsersFromPayloadJsonNode(payloadNode, baseIds));
+        buildOutputParsersFromPayloadJsonNode(ctx, payloadNode, baseIds));
     payloadCreateInput.setDetectionRemediations(buildDetectionRemediationsJsonNode(payloadNode));
 
     // Tags — merge from payload and injector contract nodes

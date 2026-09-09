@@ -73,6 +73,14 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.mitigation.MitigationApi#updateMitigation",
           "io.openaev.rest.mitigation.MitigationApi#upsertMitigation",
           "io.openaev.rest.mitigation.MitigationApi#deleteMitigation",
+          // tags (v2)
+          "io.openaev.rest.tag.TagApi#createTag",
+          "io.openaev.rest.tag.TagApi#upsertTag",
+          "io.openaev.rest.tag.TagApi#tags",
+          "io.openaev.rest.tag.TagApi#updateTag",
+          "io.openaev.rest.tag.TagApi#deleteTag",
+          "io.openaev.rest.tag.TagApi#optionsByName",
+          "io.openaev.rest.tag.TagApi#optionsById",
           // domains (v2)
           "io.openaev.rest.domain.DomainApi#domains",
           "io.openaev.rest.domain.DomainApi#getDomain",
