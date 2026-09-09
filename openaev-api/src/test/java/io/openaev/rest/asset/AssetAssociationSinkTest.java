@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The #7026 shape, in the direction this activation creates.
@@ -32,17 +31,26 @@ import org.springframework.transaction.annotation.Transactional;
  * families, with the activation switched on the way production has it, and asserts the association
  * is NON-EMPTY, because an empty-array assertion is exactly what the regression satisfies.
  *
+ * <p>The class is deliberately NOT {@code @Transactional}, and an earlier version of it was, which
+ * made it prove nothing. With the test holding the transaction open, the controller joins it and
+ * Jackson serializes inside it, where the scope still exists; open-in-view is only exercised once
+ * the request's own transaction has closed. That means committing the seed and sweeping it by hand.
+ * The same mistake, caught on FindingApi, turned a passing test into a real defect once corrected.
+ *
  * <p>{@code AssetGroupApi} is pinned first on purpose: it belongs to the previous activation and
  * nothing in it changes here, yet {@code AssetGroup.assets} points at the table being activated
  * now, so this lot can break the previous lot's endpoint without touching a line of its code.
  */
-@Transactional
 @TestPropertySource(properties = "openaev.tenant.active-tables=asset_groups,assets")
 @WithMockUser(isAdmin = true)
 @DisplayName("lazy associations onto assets still resolve when the endpoint serializes them")
 class AssetAssociationSinkTest extends IntegrationTest {
 
   @Autowired private MockMvc mvc;
+  @Autowired private javax.sql.DataSource dataSource;
+  @Autowired private org.springframework.transaction.PlatformTransactionManager transactionManager;
+
+  private org.springframework.jdbc.core.JdbcTemplate jdbc;
   @Autowired private TenantIsolationTestHelper tenantHelper;
   @Autowired private EntityManager entityManager;
 
@@ -50,19 +58,38 @@ class AssetAssociationSinkTest extends IntegrationTest {
   private String assetId;
   private String groupId;
 
+  @org.junit.jupiter.api.AfterEach
+  void sweep() {
+    jdbc.update("DELETE FROM asset_groups_assets WHERE asset_id = ?", assetId);
+    jdbc.update("DELETE FROM asset_groups WHERE tenant_id = ?", tenantA);
+    jdbc.update("DELETE FROM assets WHERE tenant_id = ?", tenantA);
+  }
+
   @BeforeEach
-  void seedAGroupHoldingAnAsset() throws Exception {
-    tenantA = tenantHelper.createTenantWithCurrentUser("sink-" + UUID.randomUUID()).getId();
-    assetId = seedEndpoint(tenantA, "sink-endpoint");
-    groupId = seedAssetGroup(tenantA, "sink-group");
-    entityManager
-        .createNativeQuery(
-            "INSERT INTO asset_groups_assets (asset_group_id, asset_id) VALUES (:g, :a)")
-        .setParameter("g", groupId)
-        .setParameter("a", assetId)
-        .executeUpdate();
-    entityManager.flush();
-    entityManager.clear();
+  void seedAGroupHoldingAnAsset() {
+    jdbc = new org.springframework.jdbc.core.JdbcTemplate(dataSource);
+    // Its own short transaction, committed: the request under test must run against committed rows
+    // so that its transaction is the one closing before Jackson serializes.
+    new org.springframework.transaction.support.TransactionTemplate(transactionManager)
+        .executeWithoutResult(
+            status -> {
+              try {
+                tenantA =
+                    tenantHelper.createTenantWithCurrentUser("sink-" + UUID.randomUUID()).getId();
+              } catch (Exception e) {
+                throw new IllegalStateException(e);
+              }
+              assetId = seedEndpoint(tenantA, "sink-endpoint");
+              groupId = seedAssetGroup(tenantA, "sink-group");
+              entityManager
+                  .createNativeQuery(
+                      "INSERT INTO asset_groups_assets (asset_group_id, asset_id)"
+                          + " VALUES (:g, :a)")
+                  .setParameter("g", groupId)
+                  .setParameter("a", assetId)
+                  .executeUpdate();
+              entityManager.flush();
+            });
   }
 
   @Test
