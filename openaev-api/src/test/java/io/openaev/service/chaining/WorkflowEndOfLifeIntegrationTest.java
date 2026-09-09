@@ -117,7 +117,7 @@ class WorkflowEndOfLifeIntegrationTest extends IntegrationTest {
     @DisplayName(
         "given_runningWorkflowWithActiveStepsDelayQueueAndWorkflowState_should_forceCompleteAndLogEveryStage")
     void
-    given_runningWorkflowWithActiveStepsDelayQueueAndWorkflowState_should_forceCompleteAndLogEveryStage() {
+        given_runningWorkflowWithActiveStepsDelayQueueAndWorkflowState_should_forceCompleteAndLogEveryStage() {
       // Arrange
       Workflow workflowRun = createPersistedRunWorkflow();
       Step stepReady = createPersistedStep(workflowRun, StepStatus.READY);
@@ -175,7 +175,7 @@ class WorkflowEndOfLifeIntegrationTest extends IntegrationTest {
     @DisplayName(
         "given_runningWorkflowWithActiveStepsDelayQueueAndActiveInject_should_forceCompleteWithoutFinishingSimulation")
     void
-    given_runningWorkflowWithActiveStepsDelayQueueAndActiveInject_should_forceCompleteWithoutFinishingSimulation() {
+        given_runningWorkflowWithActiveStepsDelayQueueAndActiveInject_should_forceCompleteWithoutFinishingSimulation() {
       // Arrange - the exercise is already CANCELED by the user before this cleanup runs (real
       // production sequencing documented in ADR-007: ExerciseService.changeExerciseStatus sets
       // the exercise to CANCELED first, then calls WorkflowService.cancelSimulationEndWorkflowRun)
@@ -252,8 +252,8 @@ class WorkflowEndOfLifeIntegrationTest extends IntegrationTest {
     @DisplayName(
         "given_runningWorkflowWithNoStepTemplateLeftAndNoActiveWork_should_endNaturallyWithoutStepOrDelayQueueLogs")
     void
-    given_runningWorkflowWithNoStepTemplateLeftAndNoActiveWork_should_endNaturallyWithoutStepOrDelayQueueLogs()
-        throws Exception {
+        given_runningWorkflowWithNoStepTemplateLeftAndNoActiveWork_should_endNaturallyWithoutStepOrDelayQueueLogs()
+            throws Exception {
       // Arrange - a workflow template with zero step templates is the simplest, still-realistic
       // way to reach the "natural end" branch of evaluateWorkflowProgress (empty stepsTemplate),
       // exactly like the last step of a real chain finishing with no follow-up defined.
@@ -294,7 +294,7 @@ class WorkflowEndOfLifeIntegrationTest extends IntegrationTest {
       assertFalse(
           anyLogContains("active step(s)"),
           "No active-step log line expected: zero active steps means the guarded branch never"
-          + " logs");
+              + " logs");
       assertFalse(
           anyLogContains("step delay queue entries"),
           "No delay-queue log line expected: an empty queue returns before logging");
