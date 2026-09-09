@@ -777,6 +777,21 @@ Rules for this sub-phase:
   asserting the computed field is NON-NULL on a representative endpoint per
   controller family, not just on the table's own API. A null-valued scalar is
   the failure mode; an empty-array assertion will not catch it.
+- **That pin must NOT be `@Transactional`, and this is not a style detail.** The
+  defect is a lazy association resolved by Jackson AFTER the handler's
+  transaction closed. A `@Transactional` test class keeps that transaction open:
+  the handler joins it, serialization happens inside it, the scope is still set,
+  and the assertion passes. The test then looks like a pin and is not one. Seed
+  through a committed `TransactionTemplate` and sweep the rows in an
+  `@AfterEach`, so the request's own transaction is the one that closes before
+  serialization.
+
+  Three defects of this family have shipped or nearly shipped:
+  `SecurityPlatform#collectors` (#7026, found in production months after
+  go-live), `Finding.getAssetGroups()` and `Finding.assets` (#6420), and
+  `AssetGroup.assets` (#6438). The last two were each covered by a sink test
+  that **passed** while the endpoint returned an empty array, because both tests
+  were transactional. Correcting the test is what turned them red.
 
 ### Phase 4 — RED then GREEN: write attribution
 
