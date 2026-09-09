@@ -8,13 +8,16 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CustomDashboardRepository
     extends CrudRepository<CustomDashboard, String>, JpaSpecificationExecutor<CustomDashboard> {
+
+  @Query("SELECT cd FROM CustomDashboard cd WHERE cd.id = :id")
+  Optional<CustomDashboard> findById(@Param("id") String id);
 
   Optional<CustomDashboard> findByName(@NotBlank final String name);
 
@@ -27,8 +30,7 @@ public interface CustomDashboardRepository
       value =
           " SELECT cd.custom_dashboard_id, "
               + "cd.custom_dashboard_name "
-              + "FROM custom_dashboards cd "
-              + "WHERE cd.tenant_id = :#{#tenantContext.currentTenant};",
+              + "FROM custom_dashboards cd",
       nativeQuery = true)
   List<RawCustomDashboard> rawAll();
 
@@ -38,12 +40,12 @@ public interface CustomDashboardRepository
       select cd.* from custom_dashboards cd
       join scenarios s on s.scenario_custom_dashboard = cd.custom_dashboard_id
       where s.scenario_id = :resourceId
-      and s.tenant_id = :#{#tenantContext.currentTenant}
+      and s.tenant_id = cd.tenant_id
       union
       select cd.* from custom_dashboards cd
       join exercises e on e.exercise_custom_dashboard = cd.custom_dashboard_id
       where e.exercise_id = :resourceId
-      and e.tenant_id = :#{#tenantContext.currentTenant}
+      and e.tenant_id = cd.tenant_id
       """,
       nativeQuery = true)
   Optional<CustomDashboard> findByResourceId(String resourceId);

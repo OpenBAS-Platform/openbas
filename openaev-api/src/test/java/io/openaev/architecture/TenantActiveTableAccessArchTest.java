@@ -8,6 +8,8 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
+import io.openaev.api.custom_dashboard.CustomDashboardApiExporter;
+import io.openaev.api.custom_dashboard.CustomDashboardApiImporter;
 import io.openaev.api.chaining.InjectExecutionStep;
 import io.openaev.api.notification.NotificationApi;
 import io.openaev.api.notifier.NotifierApi;
@@ -15,6 +17,7 @@ import io.openaev.api.xtmhub.XtmHubApi;
 import io.openaev.database.model.Article;
 import io.openaev.database.model.AttackPattern;
 import io.openaev.database.model.CatalogConnector;
+import io.openaev.database.model.CustomDashboard;
 import io.openaev.database.model.Document;
 import io.openaev.database.model.Exercise;
 import io.openaev.database.model.Inject;
@@ -22,11 +25,13 @@ import io.openaev.database.model.InjectorContract;
 import io.openaev.database.model.Scenario;
 import io.openaev.database.model.SecurityPlatform;
 import io.openaev.database.model.Vulnerability;
+import io.openaev.database.model.Widget;
 import io.openaev.database.model.attackpath.AttackPathExecution;
 import io.openaev.database.repository.ChallengeRepository;
 import io.openaev.database.repository.ChannelRepository;
 import io.openaev.database.repository.CollectorRepository;
 import io.openaev.database.repository.ConnectorInstanceRepository;
+import io.openaev.database.repository.CustomDashboardRepository;
 import io.openaev.database.repository.CweRepository;
 import io.openaev.database.repository.DomainRepository;
 import io.openaev.database.repository.ExecutorRepository;
@@ -38,6 +43,7 @@ import io.openaev.database.repository.LessonsTemplateRepository;
 import io.openaev.database.repository.MitigationRepository;
 import io.openaev.database.repository.NotificationRepository;
 import io.openaev.database.repository.SecurityCoverageRepository;
+import io.openaev.database.repository.WidgetRepository;
 import io.openaev.database.repository.TagRepository;
 import io.openaev.database.repository.TagRuleRepository;
 import io.openaev.database.repository.TenantXtmHubRegistrationRepository;
@@ -72,6 +78,7 @@ import io.openaev.integration.migration.ConfigurationMigration;
 import io.openaev.notification.engine.NotificationDispatchService;
 import io.openaev.processor.core.V20260420_Migrate_rabbitmq_queues;
 import io.openaev.processor.datapack.V20260330_Default_tenant_data;
+import io.openaev.processor.datapack.V20260101_Starter_pack;
 import io.openaev.processor.datapack.V20260708_Dynamic_injectors_base_url;
 import io.openaev.rest.asset.security_platforms.SecurityPlatformApi;
 import io.openaev.rest.atomic_testing.AtomicTestingApi;
@@ -85,11 +92,19 @@ import io.openaev.rest.channel.output.ArticleOutput;
 import io.openaev.rest.collector.CollectorApi;
 import io.openaev.rest.collector.service.CollectorService;
 import io.openaev.rest.connector_instance.ConnectorInstanceApi;
+import io.openaev.rest.custom_dashboard.CustomDashboardApi;
+import io.openaev.rest.custom_dashboard.CustomDashboardService;
+import io.openaev.rest.custom_dashboard.CustomDashboardTenantService;
+import io.openaev.rest.custom_dashboard.CustomDashboardWidgetApi;
+import io.openaev.rest.custom_dashboard.WidgetService;
+import io.openaev.rest.dashboard.DashboardApi;
+import io.openaev.rest.dashboard.DashboardService;
 import io.openaev.rest.document.DocumentService;
 import io.openaev.rest.domain.DomainApi;
 import io.openaev.rest.domain.DomainService;
 import io.openaev.rest.executor.ExecutorApi;
 import io.openaev.rest.exercise.ExerciseApi;
+import io.openaev.rest.exercise.ExerciseDashboardApi;
 import io.openaev.rest.exercise.ExerciseImportApi;
 import io.openaev.rest.exercise.exports.ExerciseFileExport;
 import io.openaev.rest.exercise.service.ExerciseService;
@@ -121,7 +136,9 @@ import io.openaev.rest.payload.service.PayloadService;
 import io.openaev.rest.payload.service.PayloadUpdateService;
 import io.openaev.rest.payload.service.PayloadUpsertService;
 import io.openaev.rest.scenario.ScenarioApi;
+import io.openaev.rest.scenario.ScenarioDashboardApi;
 import io.openaev.rest.scenario.ScenarioImportApi;
+import io.openaev.rest.settings.TenantSettingsApi;
 import io.openaev.rest.vulnerability.service.VulnerabilityService;
 import io.openaev.scheduler.jobs.ComchecksExecutionJob;
 import io.openaev.service.ChallengeService;
@@ -204,6 +221,7 @@ class TenantActiveTableAccessArchTest {
       Set.of(
           "import_mappers",
           "lessons_templates",
+          "custom_dashboards",
           "cwes",
           "mitigations",
           "collectors",
@@ -223,6 +241,7 @@ class TenantActiveTableAccessArchTest {
           "autonomous_directives",
           "kill_chain_phases",
           "security_coverages",
+          "widgets",
           "tenant_xtmhub_registrations",
           "notifications",
           "challenges",
@@ -297,7 +316,7 @@ class TenantActiveTableAccessArchTest {
    * is {@code AttackPathFindingRepository} (7 joined queries, none correlated).
    */
   private static final Set<Class<?>> REPOSITORIES_WITH_REVIEWED_JOINED_QUERIES =
-      Set.of(KillChainPhaseRepository.class, TenantXtmHubRegistrationRepository.class);
+      Set.of(CustomDashboardRepository.class, KillChainPhaseRepository.class, TenantXtmHubRegistrationRepository.class);
 
   @ArchTest
   static void joined_queries_on_active_tables_correlate_the_tenant(JavaClasses classes) {
@@ -840,6 +859,92 @@ class TenantActiveTableAccessArchTest {
                   + " repository: a lazy getCollectors() in an unscoped context silently loads zero"
                   + " rows, which unlocks collector-managed platforms in the UI. New callers must"
                   + " run inside a scoped transaction and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule custom_dashboards_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // CRUD, option lookups and import/export are driven by TxCtx-carrying dashboard
+              // endpoints (pinned by TenantScopedEntrypointsTxCtxArchTest and the custom
+              // dashboard/widget isolation tests):
+              CustomDashboardApi.class,
+              CustomDashboardWidgetApi.class,
+              CustomDashboardApiImporter.class,
+              CustomDashboardApiExporter.class,
+              CustomDashboardService.class,
+              WidgetService.class,
+              // Home-dashboard reads resolve and initialize the widget list inside TxCtx-scoped
+              // transactions (pinned by TenantScopedEntrypointsTxCtxArchTest):
+              CustomDashboardTenantService.class,
+              TenantSettingsApi.class,
+              ExerciseDashboardApi.class,
+              ScenarioDashboardApi.class,
+              // Startup datapack import explicitly attributes rows to the tenant before save.
+              V20260101_Starter_pack.class,
+              // Background telemetry must read all tenants explicitly once the table is active.
+              ProductInventoryMetricCollector.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(CustomDashboardRepository.class)
+          .because(
+              "custom_dashboards is tenant-active: an accessor without a tenant scope silently"
+                  + " reads zero rows. New accessors must run inside a reviewed scope and be"
+                  + " allowlisted here");
+
+  @ArchTest
+  static final ArchRule widgets_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // CRUD endpoints carry TxCtx and delegate through the service (pinned by
+              // TenantScopedEntrypointsTxCtxArchTest and CustomDashboardWidgetHttpIsolationTest):
+              CustomDashboardWidgetApi.class,
+              WidgetService.class,
+              // Dashboard widgets dereference the owning custom dashboard inside TxCtx-scoped
+              // requests (pinned by DashboardApiTenantScopeTest):
+              DashboardApi.class,
+              DashboardService.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(WidgetRepository.class)
+          .because(
+              "widgets is tenant-active: an accessor without a tenant scope silently reads zero"
+                  + " rows. New accessors must run inside a reviewed scope and be allowlisted"
+                  + " here");
+
+  @ArchTest
+  static final ArchRule custom_dashboards_widgets_association_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // These services initialize the LAZY widget collection inside the request-scoped
+              // transaction before open-in-view serialization (pinned by the custom dashboard
+              // isolation tests and TenantScopedEntrypointsTxCtxArchTest):
+              CustomDashboardService.class,
+              CustomDashboardTenantService.class)
+          .should()
+          .callMethod(CustomDashboard.class, "getWidgets")
+          .because(
+              "custom_dashboards serializes its widget list through a LAZY association. New"
+                  + " callers must initialize it inside a tenant-scoped transaction and be"
+                  + " allowlisted here so open-in-view cannot silently return an empty list");
+
+  @ArchTest
+  static final ArchRule widgets_dashboard_association_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // DashboardService resolves the widget and then dereferences its owning dashboard
+              // inside TxCtx-scoped endpoints (pinned by DashboardApiTenantScopeTest and
+              // TenantScopedEntrypointsTxCtxArchTest):
+              DashboardService.class)
+          .should()
+          .callMethod(Widget.class, "getCustomDashboard")
+          .because(
+              "widgets is tenant-active and DashboardService reaches custom_dashboards through"
+                  + " Widget#getCustomDashboard. New callers must run inside a tenant-scoped"
+                  + " transaction and be allowlisted here");
 
   @ArchTest
   static final ArchRule injectors_association_access_is_reviewed =
