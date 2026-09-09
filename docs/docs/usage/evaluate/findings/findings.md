@@ -33,6 +33,35 @@ Each Finding is deduplicated by its combination of value, type, and field. If th
 
 Additional types exist for Active Directory findings (SID, delegation, Kerberoastable accounts, ASREPRoastable accounts, etc.).
 
+## Sensitive Findings
+
+Some Finding types carry secret material: their value is masked everywhere the platform returns it
+(list, detail, Simulation, Scenario, Endpoint and Inject views).
+
+| Sensitive type | Value shape | Masked as |
+| --- | --- | --- |
+| Credentials | `admin:motdepasse` | `ad******:mo******` |
+| ASREPRoastable account | `svc_account:$krb5asrep$...` | `sv******:$k******` |
+| Kerberoastable account | `svc_account:$krb5tgs$...` | `sv******:$k******` |
+
+Sensitivity is **derived from the Finding type**, not stored: a type is sensitive as soon as it is
+made of a password, a hash or a key. The roastable accounts are included because the hash they
+expose can be cracked offline.
+
+Every part of the value - the parts being separated by `:` - is masked the same way: only a two
+character fragment is kept, so you can still tell which Finding is which when you already know the
+value, without the platform ever disclosing it. A part too short to keep a fragment safely is masked
+entirely, and the mask has a fixed width so the length of the secret is not leaked either.
+
+Password policy Findings are an explicit exception: their `key` is the name of a policy setting
+(`MinimumPasswordLength`...), not a secret, so they are never masked.
+
+!!! warning "The secret is not deleted"
+
+    The full value is still stored in the database, because deduplication, correlation and attack
+    path computation rely on it. Only its API representation is masked: it is not possible to
+    retrieve the cleartext value of a sensitive Finding through the REST API.
+
 ## Findings list
 
 Navigate to **Findings** in the left menu to see all Findings in an aggregated view. The list groups Findings by unique value and type, merging Assets from all occurrences into a single row.
@@ -42,7 +71,7 @@ Each row displays:
 | Column | Description |
 |---|---|
 | Type | The Finding category (CVE, Port, Credentials, etc.) |
-| Value | The technical value (monospace display) |
+| Value | The technical value (monospace display), masked for sensitive Findings |
 | Assets | Endpoints where the Finding was detected |
 | Asset groups | Asset groups containing affected endpoints |
 | First seen | When the Finding was first detected |

@@ -2,8 +2,10 @@ package io.openaev.utils.mapper;
 
 import io.openaev.database.model.*;
 import io.openaev.database.repository.FindingRepository;
+import io.openaev.helper.SensitiveValueMaskingUtils;
 import io.openaev.rest.atomic_testing.form.TargetSimple;
 import io.openaev.rest.finding.form.AggregatedFindingOutput;
+import io.openaev.rest.finding.form.FindingOutput;
 import io.openaev.rest.finding.form.RelatedFindingOutput;
 import io.openaev.utils.TargetType;
 import java.time.Instant;
@@ -26,6 +28,41 @@ public class FindingMapper {
   private final ScenarioMapper scenarioMapper;
   private final InjectMapper injectMapper;
 
+  /**
+   * Single finding output for the CRUD endpoints. This is the only representation of a finding the
+   * API returns, so the masking applied here is what guarantees a secret value never leaves the
+   * platform in cleartext.
+   */
+  public FindingOutput toFindingOutput(Finding finding) {
+    return FindingOutput.builder()
+        .id(finding.getId())
+        .field(finding.getField())
+        .type(finding.getType())
+        .value(SensitiveValueMaskingUtils.maskIfNeeded(finding.getType(), finding.getValue()))
+        .labels(finding.getLabels())
+        .name(finding.getName())
+        .tags(finding.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
+        .injectId(Optional.ofNullable(finding.getInject()).map(Inject::getId).orElse(null))
+        .creationDate(finding.getCreationDate())
+        .updateDate(finding.getUpdateDate())
+        .assets(finding.getAssets().stream().map(Asset::getId).toList())
+        .teams(finding.getTeams().stream().map(Team::getId).toList())
+        .users(finding.getUsers().stream().map(User::getId).toList())
+        .simulation(
+            Optional.ofNullable(finding.getSimulation())
+                .map(exerciseMapper::toExerciseSimple)
+                .orElse(null))
+        .scenario(
+            Optional.ofNullable(finding.getScenario())
+                .map(scenarioMapper::toScenarioSimple)
+                .orElse(null))
+        .assetGroups(
+            finding.getAssetGroups().stream()
+                .map(assetGroupMapper::toAssetGroupSimple)
+                .collect(Collectors.toSet()))
+        .build();
+  }
+
   public AggregatedFindingOutput toAggregatedFindingOutput(
       Finding finding, List<Asset> relatedAssets) {
     return toAggregatedFindingOutput(
@@ -43,7 +80,7 @@ public class FindingMapper {
       Finding finding, List<Asset> relatedAssets, Instant firstSeen, Instant lastSeen) {
     return AggregatedFindingOutput.builder()
         .id(finding.getId())
-        .value(finding.getValue())
+        .value(SensitiveValueMaskingUtils.maskIfNeeded(finding.getType(), finding.getValue()))
         .type(finding.getType())
         .creationDate(firstSeen)
         .updateDate(lastSeen)
@@ -59,7 +96,7 @@ public class FindingMapper {
   public RelatedFindingOutput toRelatedFindingOutput(Finding finding) {
     return RelatedFindingOutput.builder()
         .id(finding.getId())
-        .value(finding.getValue())
+        .value(SensitiveValueMaskingUtils.maskIfNeeded(finding.getType(), finding.getValue()))
         .type(finding.getType())
         .updateDate(finding.getUpdateDate())
         .assets(

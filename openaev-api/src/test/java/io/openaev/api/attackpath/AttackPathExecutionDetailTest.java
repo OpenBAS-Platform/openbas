@@ -340,7 +340,7 @@ class AttackPathExecutionDetailTest extends IntegrationTest {
         ReflectionTestUtils.invokeMethod(
             graphService, "unmaskCommandLine", "netexec smb 10.0.0.1 -u *** -p ***", content);
 
-    assertThat(result).isEqualTo("netexec smb 10.0.0.1 -u admin -p s*******3");
+    assertThat(result).isEqualTo("netexec smb 10.0.0.1 -u admin -p se******");
     assertThat(result).doesNotContain("secret123");
   }
 

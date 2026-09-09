@@ -9,6 +9,7 @@ import io.openaev.database.repository.AssetRepository;
 import io.openaev.database.repository.FindingRepository;
 import io.openaev.database.repository.TeamRepository;
 import io.openaev.database.repository.UserRepository;
+import io.openaev.helper.SensitiveValueMaskingUtils;
 import io.openaev.rest.finding.form.FindingSummaryOutput;
 import io.openaev.rest.inject.service.ContractOutputContext;
 import io.openaev.rest.inject.service.ExecutionProcessingContext;
@@ -69,7 +70,7 @@ public class FindingService {
     return FindingSummaryOutput.builder()
         .id(finding.getId())
         .type(type)
-        .value(value)
+        .value(SensitiveValueMaskingUtils.maskIfNeeded(type, value))
         .firstSeen(seen != null ? seen.getFirstSeen() : finding.getCreationDate())
         .lastSeen(seen != null ? seen.getLastSeen() : finding.getUpdateDate())
         .occurrences(seen != null ? seen.getOccurrences() : 1)

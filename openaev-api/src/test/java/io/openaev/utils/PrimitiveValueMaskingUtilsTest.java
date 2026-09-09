@@ -10,15 +10,14 @@ import org.junit.jupiter.api.Test;
 class PrimitiveValueMaskingUtilsTest {
 
   @Test
-  @DisplayName("should mask password/hash/key with expected visible edges")
+  @DisplayName("should mask password/hash/key with a fixed width mask keeping a short fragment")
   void shouldMaskSensitiveValues() {
     assertEquals(
-        "S******3", PrimitiveValueMaskingUtils.maskForDisplay(PrimitiveType.Password, "Secret13"));
+        "Se******", PrimitiveValueMaskingUtils.maskForDisplay(PrimitiveType.Password, "Secret13"));
     assertEquals(
-        "ABC***XYZ", PrimitiveValueMaskingUtils.maskForDisplay(PrimitiveType.Hash, "ABC123XYZ"));
+        "AB******", PrimitiveValueMaskingUtils.maskForDisplay(PrimitiveType.Hash, "ABC123XYZ"));
     assertEquals(
-        "KEY******890",
-        PrimitiveValueMaskingUtils.maskForDisplay(PrimitiveType.Key, "KEY123456890"));
+        "KE******", PrimitiveValueMaskingUtils.maskForDisplay(PrimitiveType.Key, "KEY123456890"));
   }
 
   @Test
@@ -32,7 +31,7 @@ class PrimitiveValueMaskingUtilsTest {
   void shouldDetectMaskedEchoes() {
     assertTrue(
         PrimitiveValueMaskingUtils.isMaskedRepresentationOfCurrentValue(
-            PrimitiveType.Password, "TopSecret", "T*******t"));
+            PrimitiveType.Password, "TopSecret", "To******"));
     assertFalse(
         PrimitiveValueMaskingUtils.isMaskedRepresentationOfCurrentValue(
             PrimitiveType.Password, "TopSecret", "TopSecret"));
