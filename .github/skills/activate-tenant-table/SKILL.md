@@ -194,6 +194,9 @@ STOP conditions, report instead of continuing:
   A background READ-only hit (e.g. a telemetry counter) is not a blocker but
   must be listed in the report as a documented degradation: once the table is
   active it reads zero rows unless that reader also carries a scope.
+  `ProductInventoryMetricCollector` (below) is the single, always-present
+  instance of this shape — check it on every activation, not only when Phase 1
+  happens to surface it.
 - 0.3 finds a unique index on a business key that does not include
   `tenant_id` → the schema needs a prep migration first (model: the existing
   `__Update_unique_constraints_for_tenants` migration in
@@ -295,6 +298,51 @@ Classify every hit:
   (wrap its read in `tenantTx.execute(scope, …)`) if it must keep seeing rows
 - background writer → convert to the primitive in Phase 5b. If you are not
   converting it in this run, it is a blocker: stop and report (Phase 0)
+
+#### Telemetry gauge check: `ProductInventoryMetricCollector`
+
+`openaev-api/src/main/java/io/openaev/telemetry/metric_collectors/ProductInventoryMetricCollector.java`
+registers a platform-wide `{table}_total` gauge for most entities, evaluated by
+a `Supplier` lambda OUTSIDE any HTTP request — no `TxCtx` from the mass wiring
+ever reaches it, so it is always a background reader in the Phase 1 sense
+above, and it is the single, recurring, always-present instance of that shape:
+check it on every activation regardless of whether the earlier greps surfaced
+it. Its own javadoc documents the exact failure mode: with no scope open,
+`TenantStatementInspector` fails closed and the gauge silently reports 0, not
+an error.
+
+```bash
+grep -n "{table}\|{entity}Repository" \
+  openaev-api/src/main/java/io/openaev/telemetry/metric_collectors/ProductInventoryMetricCollector.java
+```
+
+- No hit at all → nothing to do, the table has no gauge.
+- A hit using `safeCount({entity}Repository::count)` directly (the plain,
+  un-scoped form) → this is a go-live blocker for that one gauge line, not
+  the whole activation: it must be converted to the scoped form BEFORE
+  go-live, following the pattern already used for three other v2-active
+  tables in the same file, `countAssetGroups()` / `countChannels()` /
+  `countImportMappers()` (model fix for `challenges`, #6416):
+
+  ```java
+  // registration: this::count{Entities} instead of {entity}Repository::count
+  metricRegistry.registerGauge(
+      "{table}_total", "Number of {entities}", () -> safeCount(this::count{Entities}));
+
+  /** Counts {entities} across the whole platform ({table} is v2-active, #<issue>). */
+  long count{Entities}() {
+    return countAcrossAllTenants({entity}Repository::count);
+  }
+  ```
+- A hit already wrapped in `countAcrossAllTenants(...)` → already correct,
+  nothing to do; note it in the Phase 9 report as verified, not skipped.
+
+There is no test in CI that would catch a regression here on its own: the
+gauge only degrades silently in a real deployment (no assertion fails, no
+exception is thrown). Treat this grep as mandatory evidence for the Phase 9
+report even when the answer is "no hit" — a claimed activation with no note
+on this file is unverified, not verified-empty.
+
 
 #### GROUP BY on a wrapped table: valid SQL before activation, a 500 after
 
@@ -1312,6 +1360,8 @@ Before marking the issue done, write down:
   owning entity, whether it was lazy-loaded outside the transaction (the #7026
   shape) or already safe, the fix applied, and its scoped test
 - background readers left degraded (from Phase 0/1), each with a one-line impact
+- the `ProductInventoryMetricCollector` check (Phase 1): hit or no-hit, and if
+  hit, whether it was already scoped or converted to `countAcrossAllTenants()`
 - child tables and how they are covered
 - client impact: writes now require a single-tenant scope. Calls using the tenant path
   (`/api/tenants/{tenantId}/...`) already satisfy this; callers using the header route or no selector
@@ -1376,6 +1426,10 @@ Before marking the issue done, write down:
 - [ ] background writers converted to the primitive (no `@Transactional`, no raw
       plumbing), each with a per-tenant or `allTenants` scope and a green
       background isolation test (Phase 5b)
+- [ ] `ProductInventoryMetricCollector` checked for a gauge on this table
+      (Phase 1): no hit, or a hit already/now wrapped in
+      `countAcrossAllTenants()` — never left as a plain
+      `safeCount({entity}Repository::count)`
 - [ ] native queries on the table (`@Query(nativeQuery=true)`,
       `createNativeQuery`) are exercised by a test so a fail-closed rewrite
       refusal surfaces in CI, not production; any raw JDBC on the table converted
