@@ -738,16 +738,45 @@ Classify each call site:
   like `MultiIdListSerializer`, a DTO mapper invoked by Jackson, a
   `@JsonSerialize` field) → **the dangerous case**. With open-in-view or any
   serialization step that runs after the controller method returns, the
-  association resolves OUTSIDE the transaction the aspect scoped. Fix per the
-  #7026 pattern: force-initialize the association INSIDE the scoped
-  transaction, before the method returns, with a documented helper
-  (`Hibernate.initialize(owning.get{Entities}())`, or eager-fetch it in the
-  query that loaded `{OwningEntity}`), and make sure that controller method
-  itself carries `TxCtx` — a lazy association resolved eagerly under no scope
-  still reads zero rows. Model: `SecurityPlatformApi`'s
-  `withCollectorsInitialized` helper (PR #7026).
+  association resolves OUTSIDE the transaction the aspect scoped. Force-initialize
+  the association INSIDE the scoped transaction, before the method returns —
+  and make sure that controller method itself carries `TxCtx`, since a lazy
+  association resolved eagerly under no scope still reads zero rows. The
+  CORRECT helper depends on the association's cardinality, not on which one
+  happens to compile. Read 3b.2a below before picking one; treating
+  `Hibernate.initialize(...)` and `JOIN FETCH` as interchangeable is what makes
+  this step easy to get wrong.
 - no controller ever serializes it, only used inside a background job → treat
   as Phase 5b (background reader), not this phase.
+
+**3b.2a — which fix, by cardinality.** Both patterns run the SAME rewritten,
+tenant-scoped SQL (the inspector inspects every statement a session issues,
+regardless of which helper triggered it) — the difference is what happens when
+the target row is invisible under the caller's scope, and that difference is
+driven entirely by the association's cardinality:
+
+| Cardinality | What an invisible target does | Safe pattern | Model |
+|---|---|---|---|
+| `@OneToMany` / `@ManyToMany` (a collection) | The collection query is naturally a `WHERE fk = ?`-style list; an out-of-scope child row is just excluded from the list. Degrades to an empty collection, never throws. | `Hibernate.initialize(owning.get{Entities}())` inside the scoped transaction, right where the association is needed, before the method returns. | `SecurityPlatformApi`'s `withCollectorsInitialized` (`Hibernate.initialize(securityPlatform.getCollectors())`, PR #7026); `InjectHelper` (`Hibernate.initialize(inject.getTags())`, `.getTeams()`, …) |
+| `@ManyToOne` / `@OneToOne` (a single required reference), **no** `@NotFound` on the field | Hibernate assumes referential integrity: initializing a proxy whose target row fails `can_access_tenant(...)` returns zero rows for a lookup-by-id, and Hibernate throws `ObjectNotFoundException`/`EntityNotFoundException` — an unhandled 500 at the point of initialization, not an empty result. `Hibernate.initialize()` is NOT safe here by default. | `JOIN FETCH owner.association` in the SAME query that loads the owning row (or an `@EntityGraph`), not a separate `Hibernate.initialize()` call. JPQL's default `JOIN FETCH` is an INNER join: if the referenced row fails the tenant predicate, the join condition fails and the OWNING row itself is silently dropped from the result set — no exception, no null to handle, and it matches "nothing visible" semantics for the caller for free. | `InjectExpectationRepository#findChallengeExpectationsByExerciseAndUser` / `#findByUserAndExerciseAndChallenge`, `JOIN FETCH i.challenge` added when `challenges` went v2-active (#6416) |
+| `@ManyToOne` / `@OneToOne`, association ALREADY carries `@NotFound(action = NotFoundAction.IGNORE)` for unrelated referential-integrity reasons (model: `Inject.java`, `InjectorInjectorContract.java`) | `null` is already the documented, handled outcome for a missing target — an invisible-under-tenant-scope target degrades the exact same way a genuinely-deleted one already does. | `Hibernate.initialize()` is fine to reuse as-is; verify the annotation is already there before assuming it, and confirm every existing caller already null-checks the getter. | n/a — check the field's existing annotations first |
+| A required `@ManyToOne`/`@OneToOne` where you *want* a null instead of a dropped owning row (rare — usually only right at the association's own aggregate boundary, not through an unrelated join) | Adding `@NotFound(action = NotFoundAction.IGNORE)` specifically to unlock this makes the association **permanently EAGER for every caller**, not just this one — it cannot stay lazy once Hibernate must silently swallow a missing target. Treat this as a deliberate, wider mapping change, not a query-local fix, and audit every other caller of that getter before adding it. | Prefer `JOIN FETCH` (row above) unless you have a specific reason this is insufficient; if you do add `@NotFound`, you must also add the null-handling code downstream yourself — nothing does that for you. | — |
+
+Quick check before picking a row — confirm the cardinality and any existing `@NotFound` on the field:
+
+```bash
+grep -n -B3 "{fieldName}" openaev-model/src/main/java/io/openaev/database/model/{OwningEntity}.java \
+  | grep -E "@OneToMany|@ManyToMany|@ManyToOne|@OneToOne|@NotFound"
+```
+
+Getting this wrong ships one of two ways: pick `Hibernate.initialize()` on a
+`*ToOne` with no `@NotFound` and the association throws at initialization time
+instead of degrading — a 500 on whatever request happens to first touch an
+invisible target, appearing later and further from the original access than
+the read that triggered it; pick `JOIN FETCH` on a `*ToMany` and you likely
+don't crash, but you lose the chance to reuse an already-loaded owning row
+across multiple associations the way `Hibernate.initialize()` naturally allows
+— it isn't wrong, just needlessly more invasive than the one-liner.
 
 **3b.3 — pin every fixed accessor with an ArchUnit rule and a scoped test:**
 
@@ -1423,6 +1452,14 @@ Before marking the issue done, write down:
       reached through serialization (custom serializer, DTO mapper) force-
       initialized inside a scoped transaction; each fixed entrypoint pinned in
       both arch tests and covered by a production-like scoped test
+- [ ] every force-initialization fix from Phase 3b/3b.2a chose its pattern by
+      the association's cardinality, not by whichever compiled: `*ToMany` used
+      `Hibernate.initialize()` on the collection, a `*ToOne` with no existing
+      `@NotFound` used `JOIN FETCH`/`@EntityGraph` in the loading query instead
+      of `Hibernate.initialize()` (which throws on an invisible target for a
+      required reference), and any NEW `@NotFound(IGNORE)` added to unlock
+      `Hibernate.initialize()` on a `*ToOne` came with an audit of every other
+      caller of that getter plus explicit null-handling downstream
 - [ ] background writers converted to the primitive (no `@Transactional`, no raw
       plumbing), each with a per-tenant or `allTenants` scope and a green
       background isolation test (Phase 5b)
