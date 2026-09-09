@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.openaev</groupId>
         <artifactId>openaev-platform</artifactId>
-        <version>3.260831.0</version>
+        <version>3.260904.0</version>
     </parent>
 
     <artifactId>openaev-api</artifactId>
@@ -29,7 +29,7 @@
         <!-- Azure credential status validation. Aligned with openaev-model's azure-core-management. MIT. -->
         <azure-identity.version>1.18.5</azure-identity.version>
         <!-- AWS STS client for temporary credential handling. Apache-2.0. -->
-        <aws-sts.version>2.54.7</aws-sts.version>
+        <aws-sts.version>2.54.9</aws-sts.version>
     </properties>
 
     <profiles>
@@ -70,7 +70,7 @@
         <dependency>
             <groupId>io.openaev</groupId>
             <artifactId>openaev-framework</artifactId>
-            <version>3.260831.0</version>
+            <version>3.260904.0</version>
         </dependency>
         <dependency>
             <groupId>co.elastic.clients</groupId>
@@ -385,6 +385,7 @@
                         <arg>-Aio.openaev.annotation.processor.NoRepositoryRule=true</arg>
                         <arg>-Aio.openaev.annotation.processor.NoJakartaTransactionalRule=true</arg>
                         <arg>-Aio.openaev.annotation.processor.EndpointTransactionalRule=true</arg>
+                        <arg>-Aio.openaev.annotation.processor.EndpointTxScopeRule=true</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>

@@ -72,8 +72,8 @@ const SimulationShell: FunctionComponent<{
         ['', t('Overview')],
         ['/scope', t('Scope')],
         ['/logic', t('Logic')],
-        ['/execution', t('Execution')],
         ['/attack-path', t('Attack Path')],
+        ['/execution', t('Execution')],
         ['/findings', t('Findings')],
         ['/statistics', t('Statistics')],
       ];

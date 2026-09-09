@@ -32,6 +32,7 @@ import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -137,6 +138,19 @@ class ChallengeApiTest extends IntegrationTest {
       return JsonPath.read(response, "$.challenge_id");
     }
 
+    private String seedChallengeInTenant(String tenantId, String name) {
+      String challengeId = UUID.randomUUID().toString();
+      entityManager
+          .createNativeQuery(
+              "INSERT INTO challenges (challenge_id, challenge_name, tenant_id)"
+                  + " VALUES (?1, ?2, CAST(?3 AS uuid))")
+          .setParameter(1, challengeId)
+          .setParameter(2, name)
+          .setParameter(3, tenantId)
+          .executeUpdate();
+      return challengeId;
+    }
+
     @Test
     @DisplayName("Challenge created in tenant X should NOT be updatable from tenant Y")
     void given_challengeInTenantX_should_notBeUpdatableFromTenantY() throws Exception {
@@ -148,7 +162,7 @@ class ChallengeApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.MANAGE_CHALLENGES, Capability.ACCESS_CHALLENGES));
 
-      String challengeId = createChallengeInTenant(tenantX.getId(), "Update Isolation Challenge");
+      String challengeId = seedChallengeInTenant(tenantX.getId(), "Update Isolation Challenge");
 
       entityManager.flush();
       entityManager.clear();
@@ -211,7 +225,7 @@ class ChallengeApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.DELETE_CHALLENGES, Capability.ACCESS_CHALLENGES));
 
-      String challengeId = createChallengeInTenant(tenantX.getId(), "Delete Isolation Challenge");
+      String challengeId = seedChallengeInTenant(tenantX.getId(), "Delete Isolation Challenge");
 
       entityManager.flush();
       entityManager.clear();
@@ -240,7 +254,7 @@ class ChallengeApiTest extends IntegrationTest {
           tenantIsolationHelper.createTenantWithCapabilities(
               "Tenant Y", Set.of(Capability.MANAGE_CHALLENGES, Capability.ACCESS_CHALLENGES));
 
-      String challengeId = createChallengeInTenant(tenantX.getId(), "Try Isolation Challenge");
+      String challengeId = seedChallengeInTenant(tenantX.getId(), "Try Isolation Challenge");
 
       entityManager.flush();
       entityManager.clear();
