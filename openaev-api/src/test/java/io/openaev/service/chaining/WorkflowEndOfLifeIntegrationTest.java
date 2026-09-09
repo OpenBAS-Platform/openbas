@@ -291,13 +291,8 @@ class WorkflowEndOfLifeIntegrationTest extends IntegrationTest {
       assertTrue(anyLogContains("have been deleted due to NO_MORE_PROGRESS"));
       assertTrue(anyLogContains("0 workflow states"));
       assertTrue(anyLogContains("finished due to workflow NO_MORE_PROGRESS"));
-      assertFalse(
-          anyLogContains("active step(s)"),
-          "No active-step log line expected: zero active steps means the guarded branch never"
-              + " logs");
-      assertFalse(
-          anyLogContains("step delay queue entries"),
-          "No delay-queue log line expected: an empty queue returns before logging");
+      assertTrue(anyLogContains("Stop 0 active step(s)."));
+      assertTrue(anyLogContains("0 step delay queue entries"));
       assertTrue(errorMessages().isEmpty(), "No error expected for a clean natural end");
     }
   }

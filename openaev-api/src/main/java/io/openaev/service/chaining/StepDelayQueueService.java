@@ -84,16 +84,16 @@ public class StepDelayQueueService {
   @Transactional
   public void deleteAllByWorkflowRun(
       Workflow workflowRun, WorkflowEndService.WORKFLOW_END_CAUSE cause) {
-    if (WorkflowEndService.WORKFLOW_END_CAUSE.NO_MORE_PROGRESS.equals(cause)) {
-      List<StepDelayQueue> stepDelayQueues = findAllByWorkflowRun(workflowRun);
-      if (stepDelayQueues.isEmpty()) return;
+    int count = stepDelayQueueRepository.deleteAllByWorkflowRun(workflowRun);
+
+    if (count != 0 && WorkflowEndService.WORKFLOW_END_CAUSE.NO_MORE_PROGRESS.equals(cause)) {
       log.error(
           "[Chaining] Workflow {} ended due to {}. But {} step(s) are still in the delay queue.",
           workflowRun.getId(),
           cause.name(),
-          stepDelayQueues.size());
+          count);
+      return;
     }
-    int count = stepDelayQueueRepository.deleteAllByWorkflowRun(workflowRun);
     log.info(
         "[Chaining] {} step delay queue entries of workflow {} have been deleted due to {}.",
         count,

@@ -1109,20 +1109,19 @@ public class StepService {
       step.setStatus(StepStatus.END);
     }
     stepRepository.saveAll(activeSteps);
-    if (cause == WorkflowEndService.WORKFLOW_END_CAUSE.NO_MORE_PROGRESS) {
-      if (!activeSteps.isEmpty())
-        log.error(
-            "[Chaining] Workflow {} ended due to {}. But {} active step(s) are still running.",
-            workflowId,
-            cause.name(),
-            activeSteps.size());
-    } else {
-      log.info(
-          "[Chaining] Stop {} active step(s). Workflow run {} force-completed due to {}.",
-          activeSteps.size(),
+    if (cause == WorkflowEndService.WORKFLOW_END_CAUSE.NO_MORE_PROGRESS && !activeSteps.isEmpty()) {
+      log.error(
+          "[Chaining] Workflow {} ended due to {}. But {} active step(s) are still running.",
           workflowId,
-          cause.name());
+          cause.name(),
+          activeSteps.size());
+      return;
     }
+    log.info(
+        "[Chaining] Stop {} active step(s). Workflow run {} force-completed due to {}.",
+        activeSteps.size(),
+        workflowId,
+        cause.name());
   }
 
   private Step findStepFromCondition(String stepFromId) {
