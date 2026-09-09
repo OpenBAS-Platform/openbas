@@ -246,7 +246,7 @@ public class V1_DataImporter implements Importer {
     importOrganizations(importNode, prefix, baseIds);
     importUsers(importNode, prefix, baseIds);
     importTeams(importNode, prefix, savedExercise, savedScenario, baseIds);
-    importChallenges(importNode, prefix, baseIds);
+    importChallenges(ctx, importNode, prefix, baseIds);
     importChannels(ctx, importNode, prefix, baseIds);
     importArticles(importNode, prefix, savedExercise, savedScenario, baseIds);
     importObjectives(importNode, prefix, savedExercise, savedScenario, baseIds);
@@ -1094,7 +1094,9 @@ public class V1_DataImporter implements Importer {
 
   // -- CHALLENGES --
 
-  private void importChallenges(JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+  private void importChallenges(
+      TxCtx ctx, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+    String writeTenant = tenantWriteScopeResolver.tenantForWrite(ctx, null);
     resolveJsonElements(importNode, prefix + "challenges")
         .forEach(
             nodeChallenge -> {
@@ -1106,18 +1108,22 @@ public class V1_DataImporter implements Importer {
               String name = nodeChallenge.get("challenge_name").textValue();
 
               List<Challenge> existingChallenges =
-                  this.challengeRepository.findByNameIgnoreCase(name);
+                  this.challengeRepository.findByNameIgnoreCaseAndTenantId(name, writeTenant);
               if (!existingChallenges.isEmpty()) {
                 baseIds.put(id, existingChallenges.getFirst());
               } else {
                 baseIds.put(
-                    id, this.challengeRepository.save(createChallenge(nodeChallenge, baseIds)));
+                    id,
+                    this.challengeRepository.save(
+                        createChallenge(nodeChallenge, baseIds, writeTenant)));
               }
             });
   }
 
-  private Challenge createChallenge(JsonNode nodeChallenge, Map<String, Base> baseIds) {
+  private Challenge createChallenge(
+      JsonNode nodeChallenge, Map<String, Base> baseIds, String tenantId) {
     Challenge challenge = new Challenge();
+    challenge.setTenant(new Tenant(tenantId));
     challenge.setName(nodeChallenge.get("challenge_name").textValue());
     challenge.setCategory(nodeChallenge.get("challenge_category").textValue());
     challenge.setContent(nodeChallenge.get("challenge_content").textValue());
