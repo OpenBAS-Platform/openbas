@@ -1394,7 +1394,13 @@ public class WorkflowService {
    */
   @Transactional(rollbackFor = Exception.class)
   public void startWorkflowBySimulationId(String simulationId) throws ChainingException {
-    doStartWorkflowBySimulationId(simulationId);
+    Workflow workflowTemplate =
+        findWorkflowTemplateBySimulationId(simulationId)
+            .orElseThrow(
+                () ->
+                    new ElementNotFoundException(
+                        "Workflow (TEMPLATE) not found. Simulation ID: " + simulationId));
+    doStartWorkflowBySimulationId(workflowTemplate);
   }
 
   /**
@@ -1408,10 +1414,10 @@ public class WorkflowService {
    */
   @Transactional(rollbackFor = Exception.class)
   public void startWorkflowBySimulationIdIfPresent(String simulationId) throws ChainingException {
-    if (findWorkflowTemplateBySimulationId(simulationId).isEmpty()) {
-      return;
+    Optional<Workflow> workflowTemplate = findWorkflowTemplateBySimulationId(simulationId);
+    if (workflowTemplate.isPresent()) {
+      doStartWorkflowBySimulationId(workflowTemplate.get());
     }
-    doStartWorkflowBySimulationId(simulationId);
   }
 
   /**
@@ -1422,17 +1428,20 @@ public class WorkflowService {
   @Transactional(rollbackFor = Exception.class)
   public void startWorkflowByScenarioIdAndSimulation(String scenarioId, Exercise simulation)
       throws ChainingException {
-    provisionSimulationTemplateWorkflow(scenarioId, simulation);
-    doStartWorkflowBySimulationId(simulation.getId());
-  }
-
-  private void doStartWorkflowBySimulationId(String simulationId) throws ChainingException {
-    Workflow workflowTemplate =
-        findWorkflowTemplateBySimulationId(simulationId)
+    Workflow workflowTemplateScenario =
+        findWorkflowTemplateByScenarioId(scenarioId)
             .orElseThrow(
                 () ->
                     new ElementNotFoundException(
-                        "Workflow (TEMPLATE) not found. Simulation ID: " + simulationId));
+                        "Workflow (TEMPLATE) not found. Scenario ID: " + scenarioId));
+    Workflow workflowTemplateSimulation =
+        saveWorkflowRun(copyWorkflowTemplateToSimulation(workflowTemplateScenario, simulation));
+    stepService.copyStepTemplate(workflowTemplateScenario, workflowTemplateSimulation);
+
+    doStartWorkflowBySimulationId(workflowTemplateSimulation);
+  }
+
+  private void doStartWorkflowBySimulationId(Workflow workflowTemplate) throws ChainingException {
     Workflow workflowRun = launchWorkflowSimulation(workflowTemplate);
     startWorkflow(workflowRun);
   }

@@ -575,9 +575,7 @@ class WorkflowServiceTest {
     @DisplayName("should copy scenario step templates then delegate start to orchestrator")
     void shouldCopyScenarioStepTemplatesThenDelegateStart() throws Exception {
       String scenarioId = UUID.randomUUID().toString();
-      String simulationId = UUID.randomUUID().toString();
       Exercise simulation = mock(Exercise.class);
-      when(simulation.getId()).thenReturn(simulationId);
 
       Workflow scenarioTemplate =
           Workflow.builder().id("scenario-template").status(WorkflowStatus.TEMPLATE).build();
@@ -596,8 +594,6 @@ class WorkflowServiceTest {
 
       when(workflowRepository.findByScenario_IdAndStatus(scenarioId, WorkflowStatus.TEMPLATE))
           .thenReturn(List.of(scenarioTemplate));
-      when(workflowRepository.findBySimulation_IdAndStatus(simulationId, WorkflowStatus.TEMPLATE))
-          .thenReturn(simulationTemplate);
       when(workflowScopeRuleRepository.findAllByWorkflowId("scenario-template"))
           .thenReturn(Collections.emptyList());
       when(workflowScopeRuleRepository.findAllByWorkflowId("simulation-template"))
