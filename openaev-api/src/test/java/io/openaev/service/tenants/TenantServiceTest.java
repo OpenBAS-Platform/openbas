@@ -104,11 +104,12 @@ class TenantServiceTest extends IntegrationTest {
     boolean pathExists = results.iterator().hasNext();
     assertThat(pathExists).isTrue();
 
-    // Verify the 10 domains from PresetDomain are created for this tenant
+    // domains and vulnerabilities are on v2 isolation: assert by explicit tenant attribution.
+    assertThat(domainRepository.findAll())
+        .filteredOn(domain -> created.getId().equals(domain.getTenant().getId()))
+        .hasSize(10);
     Session session = entityManager.unwrap(Session.class);
     session.enableFilter("tenantFilter").setParameter("tenantId", created.getId());
-    assertThat(domainRepository.findAll()).hasSize(10);
-    // Verify datapack
     assertThat(vulnerabilityRepository.findAll()).hasSize(7);
     // cwes is on v2 isolation (no v1 @Filter anymore): assert by explicit tenant attribution.
     assertThat(cweRepository.findAll())
@@ -343,11 +344,12 @@ class TenantServiceTest extends IntegrationTest {
     assertThat(tenantRepository.findById(tenantExpired.getId())).isEmpty();
     assertThat(tenantRepository.findById(tenantRecent.getId())).isPresent();
 
-    // Verify no domain anymore for the deleted tenant
+    // domains and vulnerabilities are on v2 isolation: assert by explicit tenant attribution.
+    assertThat(domainRepository.findAll())
+        .filteredOn(domain -> tenantExpired.getId().equals(domain.getTenant().getId()))
+        .isEmpty();
     Session session = entityManager.unwrap(Session.class);
     session.enableFilter("tenantFilter").setParameter("tenantId", tenantExpired.getId());
-    assertThat(domainRepository.findAll()).isEmpty();
-    // Verify datapack
     assertThat(vulnerabilityRepository.findAll()).isEmpty();
     // cwes is on v2 isolation (no v1 @Filter anymore): assert by explicit tenant attribution.
     assertThat(cweRepository.findAll())
