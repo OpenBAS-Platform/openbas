@@ -13,6 +13,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.jayway.jsonpath.JsonPath;
 import io.openaev.IntegrationTest;
+import io.openaev.context.TenantContext;
+import io.openaev.context.TenantScopedTransaction;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.AttackPatternRepository;
 import io.openaev.database.repository.EndpointRepository;
@@ -43,16 +46,24 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @WithMockUser(isAdmin = true)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+// The test profile declares no active tables, so this suite ran the whole dashboard and indexing
+// pipeline with the inspector inert. It names the three tables the widgets and their ES indexing
+// reach, not only findings: @TestPropertySource REPLACES the property, so naming findings alone
+// would deactivate tables that ARE active in production and test less than production while
+// looking stricter.
+@TestPropertySource(properties = "openaev.tenant.active-tables=findings,assets,asset_groups")
 @DisplayName("Dashboard API tests")
 class DashboardApiTest extends IntegrationTest {
 
   @Autowired private EngineService engineService;
+  @Autowired private TenantScopedTransaction tenantTx;
   @Autowired private EngineContext engineContext;
   @Autowired private EndpointComposer endpointComposer;
   @Autowired private WidgetComposer widgetComposer;
@@ -70,6 +81,41 @@ class DashboardApiTest extends IntegrationTest {
   @Autowired private AttackPatternRepository attackPatternRepository;
   @Autowired private EndpointRepository endpointRepository;
   @Autowired private TenantIsolationTestHelper tenantIsolationHelper;
+
+  /**
+   * Scopes the test's own transaction, for the tests that write through a repository instead of
+   * going through HTTP. The inspector adds a tenant predicate to an UPDATE as well as to a SELECT,
+   * so the test-only date setters below silently update zero rows without a scope, the entities
+   * keep {@code now()} as their creation date and every date-range assertion counts all of them.
+   *
+   * <p>Deliberately not a {@code @BeforeEach}: the Tenant Isolation tests in this class issue HTTP
+   * requests that address another tenant, and a class-wide pin makes the aspect refuse the scope
+   * those requests need.
+   */
+  private void scopeToAmbientTenant() {
+    tenantTx.setScopeOnCurrentTransaction(TxCtx.forTenant(TenantContext.getCurrentTenant()));
+  }
+
+  /**
+   * Indexes the way production does. {@code EngineSyncExecutionJob} runs the sweep under {@code
+   * TxCtx.allTenants()}; calling {@code bulkProcessing} straight from a test runs one layer below
+   * that, with no scope, so every {@code findForIndexing} query on an activated table reads nothing
+   * and the index stays empty. The scope is released again afterwards because the HTTP request that
+   * follows must set its own, and the aspect refuses to redefine one that is already set.
+   */
+  private void indexEveryTenant() {
+    tenantTx.setScopeOnCurrentTransaction(TxCtx.allTenants());
+    try {
+      engineService.bulkProcessing(engineContext.getModels().stream());
+    } finally {
+      // Released with the raw setting rather than the primitive: TxCtx.missing() is an intention
+      // the resolver rejects on purpose, and what is needed here is the neutral starting state a
+      // fresh transaction has, so the HTTP request that follows sets its own scope normally.
+      entityManager
+          .createNativeQuery("SELECT set_config('app.current_tenants', '', true)")
+          .getSingleResult();
+    }
+  }
 
   @BeforeEach
   void setup() throws IOException {
@@ -104,7 +150,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(engineContext.getModels().stream());
+      indexEveryTenant();
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -157,7 +203,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(engineContext.getModels().stream());
+      indexEveryTenant();
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -261,7 +307,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(engineContext.getModels().stream());
+      indexEveryTenant();
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -319,7 +365,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(engineContext.getModels().stream());
+      indexEveryTenant();
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -372,7 +418,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(engineContext.getModels().stream());
+      indexEveryTenant();
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -419,7 +465,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(engineContext.getModels().stream());
+      indexEveryTenant();
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -474,7 +520,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(engineContext.getModels().stream());
+      indexEveryTenant();
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -509,6 +555,7 @@ class DashboardApiTest extends IntegrationTest {
     @Test
     @DisplayName("Count entities with date range filter.")
     void countEntitiesWithDateRangeFilter() throws Exception {
+      scopeToAmbientTenant();
       Endpoint endpoint1 =
           endpointComposer
               .forEndpoint(
@@ -568,7 +615,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(engineContext.getModels().stream());
+      indexEveryTenant();
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -594,6 +641,7 @@ class DashboardApiTest extends IntegrationTest {
         "Count entities with DEFAULT widget and dashboard parameter ALL_TIME should count all"
             + " entities regardless of age")
     void countEntitiesWithDefaultWidgetAndDashboardParameterAllTime() throws Exception {
+      scopeToAmbientTenant();
       // -- ARRANGE --
       Endpoint endpoint1 =
           endpointComposer
@@ -650,7 +698,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(engineContext.getModels().stream());
+      indexEveryTenant();
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -682,6 +730,7 @@ class DashboardApiTest extends IntegrationTest {
     @Test
     @DisplayName("Fetch series for temporal widgets.")
     void fetchSeriesForTemporalWidgets() throws Exception {
+      scopeToAmbientTenant();
       Endpoint endpoint1 =
           endpointComposer
               .forEndpoint(
@@ -750,7 +799,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(engineContext.getModels().stream());
+      indexEveryTenant();
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -773,6 +822,7 @@ class DashboardApiTest extends IntegrationTest {
     @Test
     @DisplayName("Fetch series for structural widgets.")
     void fetchSeriesForStructuralWidgets() throws Exception {
+      scopeToAmbientTenant();
       Endpoint endpoint1 =
           endpointComposer
               .forEndpoint(
@@ -830,7 +880,7 @@ class DashboardApiTest extends IntegrationTest {
       // force persistence
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(engineContext.getModels().stream());
+      indexEveryTenant();
       // elastic needs to process the data; it does so async, so the method above
       // completes before the data is available in the system
       Thread.sleep(1000);
@@ -869,7 +919,7 @@ class DashboardApiTest extends IntegrationTest {
     private void flushAndProcessElastic() throws InterruptedException {
       entityManager.flush();
       entityManager.clear();
-      engineService.bulkProcessing(engineContext.getModels().stream());
+      indexEveryTenant();
       // elastic needs to process the data; it does so async
       Thread.sleep(1000);
     }

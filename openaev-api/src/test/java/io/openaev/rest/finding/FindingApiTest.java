@@ -14,6 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openaev.IntegrationTest;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TenantScopedTransaction;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.FindingRepository;
 import io.openaev.database.specification.FindingSpecification;
@@ -40,6 +42,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +50,12 @@ import org.springframework.transaction.annotation.Transactional;
 @TestInstance(PER_CLASS)
 @Transactional
 @WithMockUser(isAdmin = true)
+// The test profile declares no active tables, so removing the v1 @Filter would leave this suite
+// asserting an isolation nothing enforces. The list is not limited to findings because
+// @TestPropertySource REPLACES the property rather than adding to it: naming findings alone would
+// deactivate assets and asset_groups, which ARE active in production, and the suite would test less
+// than production while looking stricter.
+@TestPropertySource(properties = "openaev.tenant.active-tables=findings,assets,asset_groups")
 @DisplayName("Findings search tests")
 class FindingApiTest extends IntegrationTest {
 
@@ -70,9 +79,27 @@ class FindingApiTest extends IntegrationTest {
   @Autowired private FindingDistinctSearchService findingDistinctSearchService;
   @Autowired private EntityManager entityManager;
   @Autowired private TenantIsolationTestHelper tenantIsolationHelper;
+  @Autowired private TenantScopedTransaction tenantTx;
+
+  /**
+   * Scopes the test's own transaction, for the tests that query the repository directly instead of
+   * going through HTTP. Production reaches those queries through a scoped handler; without this the
+   * read is denied and the test sees an empty result. It is deliberately NOT a {@code @BeforeEach}:
+   * an HTTP test whose request addresses another tenant must let the handler set the scope, and a
+   * class-wide pin makes the aspect refuse that as a redefinition.
+   */
+  private void scopeToAmbientTenant() {
+    tenantTx.setScopeOnCurrentTransaction(TxCtx.forTenant(TenantContext.getCurrentTenant()));
+  }
 
   @BeforeEach
   void setUp() {
+    // @WithMockUser builds a user with no users_tenants row, so every scope its requests resolve is
+    // TxCtx.missing() and every read of an activated table is denied. Production never has that
+    // state (V4_95__Migrate_users_to_default_tenant attaches every user to the default tenant), so
+    // without this the suite asserts against an empty result on both sides and passes for the wrong
+    // reason.
+    tenantIsolationHelper.attachCurrentUserToTenant(TenantContext.getCurrentTenant());
     scenarioComposer.reset();
     simulationComposer.reset();
     injectComposer.reset();
@@ -1021,6 +1048,7 @@ class FindingApiTest extends IntegrationTest {
 
     @Test
     void distinctTypeValueWithFilter_returnsDistinctFindings() {
+      scopeToAmbientTenant();
       // Create two findings with the same type and value (duplicates)
       Finding f1 =
           findingComposer
@@ -1071,6 +1099,7 @@ class FindingApiTest extends IntegrationTest {
     @Test
     @DisplayName("Distinct list uses the most recent occurrence as representative (issue #7273)")
     void distinctList_usesMostRecentOccurrenceAsRepresentative() {
+      scopeToAmbientTenant();
       // Group A: the SAME (type, value) reported by two injects, i.e. two runs. finding_updated_at
       // is set via native SQL because the JPA listeners overwrite it on persist.
       Finding olderA =
@@ -1136,6 +1165,7 @@ class FindingApiTest extends IntegrationTest {
     @Test
     @DisplayName("A group does not vanish when a filter matches only an older occurrence (#7273)")
     void distinctList_groupSurvivesFilterMatchingOnlyOlderOccurrence() {
+      scopeToAmbientTenant();
       Finding olderA =
           findingComposer
               .forFinding(FindingFixture.createDefaultTextFinding())

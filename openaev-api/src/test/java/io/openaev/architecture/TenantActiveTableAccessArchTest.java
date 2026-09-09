@@ -182,6 +182,7 @@ class TenantActiveTableAccessArchTest {
           "kill_chain_phases",
           "security_coverages",
           "asset_groups",
+          "findings",
           "assets");
 
   @ArchTest
