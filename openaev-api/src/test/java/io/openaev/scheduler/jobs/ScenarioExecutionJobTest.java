@@ -45,6 +45,7 @@ import org.springframework.test.context.TestExecutionListeners;
 class ScenarioExecutionJobTest extends IntegrationTest {
 
   @Autowired private ScenarioExecutionJob job;
+  @Autowired private InjectsExecutionJob injectsExecutionJob;
   @Autowired private ScenarioComposer scenarioComposer;
 
   @Autowired private ScenarioService scenarioService;
@@ -169,6 +170,56 @@ class ScenarioExecutionJobTest extends IntegrationTest {
           .isEmpty();
       assertNotNull(
           exerciseRepository.rawDetailsById(createdExercise.getId()).getExercise_workflow_id());
+    }
+
+    @DisplayName("Create chained workflow run when scheduled chained simulation auto-starts")
+    @Test
+    void given_chained_cron_in_one_minute_should_create_run_when_auto_start_runs()
+        throws Exception {
+      // -- PREPARE --
+      ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
+      int minuteToStart = (zonedDateTime.getMinute() + 1) % 60;
+      int hourToStart = zonedDateTime.getHour() + ((zonedDateTime.getMinute() + 1) / 60);
+      hourToStart = hourToStart % 24;
+
+      Scenario scenario = ScenarioFixture.getScenario();
+      scenario.setRecurrence(
+          "0 " + minuteToStart + " " + hourToStart + " * * *"); // Every day now + 1 minute
+      Scenario scenarioSaved = scenarioService.createScenario(scenario);
+      scenarioSaved = scenarioService.createScenarioChaining(scenarioSaved);
+      SCENARIO_ID_3 = scenarioSaved.getId();
+
+      // -- EXECUTE --
+      job.execute(null);
+
+      // -- ASSERT --
+      List<Exercise> createdExercises =
+          fromIterable(exerciseRepository.findAll()).stream()
+              .filter(exercise -> exercise.getScenario() != null)
+              .filter(exercise -> SCENARIO_ID_3.equals(exercise.getScenario().getId()))
+              .toList();
+      assertEquals(1, createdExercises.size());
+      Exercise createdExercise = createdExercises.getFirst();
+      assertNotNull(createdExercise.getStart());
+      assertEquals(ExerciseStatus.SCHEDULED, createdExercise.getStatus());
+      assertThat(workflowRepository.existsBySimulationId(createdExercise.getId())).isTrue();
+      assertThat(
+              workflowRepository.findAllBySimulation_IdAndStatus(
+                  createdExercise.getId(), WorkflowStatus.RUN))
+          .isEmpty();
+
+      createdExercise.setStart(Instant.now().minusSeconds(60));
+      exerciseRepository.save(createdExercise);
+
+      injectsExecutionJob.handleAutoStartExercises();
+
+      Exercise startedExercise = exerciseRepository.findById(createdExercise.getId()).orElseThrow();
+      assertThat(startedExercise.getStatus()).isEqualTo(ExerciseStatus.RUNNING);
+      assertThat(
+              workflowRepository.findAllBySimulation_IdAndStatus(
+                  createdExercise.getId(), WorkflowStatus.RUN))
+          .singleElement()
+          .satisfies(workflow -> assertThat(workflow.getStatus()).isEqualTo(WorkflowStatus.RUN));
     }
 
     @DisplayName("Already created simulation based on recurring scenario")

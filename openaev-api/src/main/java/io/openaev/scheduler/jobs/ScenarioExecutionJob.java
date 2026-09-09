@@ -108,6 +108,8 @@ public class ScenarioExecutionJob implements Job {
                   scenario -> {
                     Instant start =
                         scenarioRecurrenceService.getNextExecutionTime(scenario, now).orElse(now);
+                    // Keep scheduled chained simulations non-running here; the run is created on
+                    // auto-start so the workflow lifecycle stays aligned with manual launches.
                     Exercise exercise =
                         this.scenarioToExerciseService.toExercise(scenario, start, false);
                     try {
