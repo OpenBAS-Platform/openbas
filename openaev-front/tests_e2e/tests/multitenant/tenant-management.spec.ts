@@ -4,7 +4,7 @@ import TenantApiHelpers from '../../api-helpers/TenantApiHelpers';
 import { test } from '../../fixtures';
 import TenantSwitcherComponent from '../../model/nav/TenantSwitcherComponent';
 import TenantsPage from '../../model/platform/TenantsPage';
-import { TENANT_ONBOARDING_TIMEOUT, TIMEOUT } from '../../utils/constants';
+import { TIMEOUT } from '../../utils/constants';
 import { DEFAULT_TENANT_UUID, tenantUrl } from '../../utils/url';
 
 /**
@@ -57,7 +57,7 @@ test.describe('Multi-tenancy — tenant management', () => {
         response => response.url().includes('/api/me/tenants')
           && response.request().method() === 'GET'
           && response.ok(),
-        { timeout: TENANT_ONBOARDING_TIMEOUT },
+        { timeout: 3*TIMEOUT },
       ),
       tenantsPage.submitCreate(),
     ]);
