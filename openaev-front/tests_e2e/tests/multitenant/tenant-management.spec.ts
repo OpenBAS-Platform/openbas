@@ -4,7 +4,7 @@ import TenantApiHelpers from '../../api-helpers/TenantApiHelpers';
 import { test } from '../../fixtures';
 import TenantSwitcherComponent from '../../model/nav/TenantSwitcherComponent';
 import TenantsPage from '../../model/platform/TenantsPage';
-import { TIMEOUT } from '../../utils/constants';
+import { TENANT_ONBOARDING_TIMEOUT, TIMEOUT } from '../../utils/constants';
 import { DEFAULT_TENANT_UUID, tenantUrl } from '../../utils/url';
 
 /**
@@ -46,7 +46,21 @@ test.describe('Multi-tenancy — tenant management', () => {
     // Act: open the drawer, fill the name, submit
     await tenantsPage.openCreateDrawer();
     await tenantsPage.fillTenantName(tenantName);
-    await tenantsPage.submitCreate();
+
+    // Tenant creation cascades through every onboarding DependenciesManager (queue
+    // provisioning, per-tenant migrations/datapacks, ...) before GET /api/me/tenants reflects
+    // the new tenant. Wait for that refresh explicitly (listener attached before the click, so
+    // the response can't be missed) instead of racing the tenant-switcher's fixed visibility
+    // TIMEOUT below, which flakes/fails deterministically once onboarding is slower than it.
+    await Promise.all([
+      page.waitForResponse(
+        response => response.url().includes('/api/me/tenants')
+          && response.request().method() === 'GET'
+          && response.ok(),
+        { timeout: TENANT_ONBOARDING_TIMEOUT },
+      ),
+      tenantsPage.submitCreate(),
+    ]);
 
     // ─────────────────────────────────────────────────
     // Step 3 — Switch to the new tenant from the tenant switcher
