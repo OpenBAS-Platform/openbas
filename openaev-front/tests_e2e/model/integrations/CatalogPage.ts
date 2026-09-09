@@ -1,12 +1,15 @@
-import { type Locator, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
+
+import { TIMEOUT } from '../../utils/constants';
 class CatalogPage {
   constructor(private page: Page) {}
   async waitForLoad(): Promise<void> {
     await this.page.waitForURL('**/integrations/available**');
+    await expect(this.searchInput).toBeVisible({ timeout: TIMEOUT });
   }
 
   get searchInput(): Locator {
-    return this.page.getByPlaceholder('Search the catalog...');
+    return this.page.locator('input[name="keyword"]').and(this.page.getByPlaceholder(/Search the catalog/i));
   }
 
   getConnectorCard(namePattern: string | RegExp): Locator {
@@ -14,7 +17,8 @@ class CatalogPage {
   }
 
   async searchConnector(text: string): Promise<void> {
-    await this.searchInput.fill(text);
+    await expect(this.searchInput).toBeVisible({ timeout: TIMEOUT });
+    await this.searchInput.fill(text, { timeout: TIMEOUT });
   }
 
   /**

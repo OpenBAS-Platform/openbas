@@ -1,4 +1,4 @@
-import { type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 
 import { TIMEOUT } from '../../utils/constants';
 
@@ -14,6 +14,10 @@ class TenantSwitcherComponent {
     return this.page.getByTestId('tenant-switcher');
   }
 
+  get popoverMenu(): Locator {
+    return this.page.getByRole('menu').last();
+  }
+
   /**
    * Opens the tenant-switcher popover by clicking the icon-based menu item.
    * Works regardless of whether the left bar is expanded or collapsed.
@@ -21,16 +25,10 @@ class TenantSwitcherComponent {
   async openSwitcher(_currentTenantName?: string): Promise<void> {
     const switcher = this.switcher;
 
-    await switcher.waitFor({
-      state: 'visible',
-      timeout: TIMEOUT,
-    });
-    await switcher.click();
-
-    await this.page.locator('.MuiPopover-root').last().waitFor({
-      state: 'visible',
-      timeout: TIMEOUT,
-    });
+    await expect(switcher).toBeVisible({ timeout: TIMEOUT });
+    await expect(switcher).toBeEnabled({ timeout: TIMEOUT });
+    await switcher.click({ timeout: TIMEOUT });
+    await expect(this.popoverMenu).toBeVisible({ timeout: TIMEOUT });
   }
 
   /**
@@ -38,16 +36,15 @@ class TenantSwitcherComponent {
    * Call {@link openSwitcher} first to open the popover.
    */
   get popoverTenantItems() {
-    return this.page.locator('.MuiPopover-root').last().getByRole('menuitem');
+    return this.popoverMenu.getByRole('menuitem');
   }
 
   /**
    * Clicks a specific tenant by name from the open switcher popover.
    */
   async selectTenantByName(tenantName: string): Promise<void> {
-    const popover = this.page.locator('.MuiPopover-root').last();
-    await popover.waitFor({ state: 'visible' });
-    await popover.getByRole('menuitem').filter({ hasText: tenantName }).click();
+    await expect(this.popoverMenu).toBeVisible({ timeout: TIMEOUT });
+    await this.popoverMenu.getByRole('menuitem').filter({ hasText: tenantName }).click({ timeout: TIMEOUT });
   }
 }
 export default TenantSwitcherComponent;
