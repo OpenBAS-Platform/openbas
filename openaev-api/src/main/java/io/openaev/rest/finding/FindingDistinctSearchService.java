@@ -456,8 +456,8 @@ public class FindingDistinctSearchService {
 
   /**
    * Triforce Phase 1: a Finding's grouping identity is (type, value, location) - see {@code
-   * FindingSpecification#distinctTypeValueWithFilter}. {@code locationAsset} is nullable
-   * (unlocated findings still group by (type, value) alone, same as before Phase 1).
+   * FindingSpecification#distinctTypeValueWithFilter}. {@code locationAsset} is nullable (unlocated
+   * findings still group by (type, value) alone, same as before Phase 1).
    */
   private static TypeValueKey keyOf(Finding finding) {
     Asset location = finding.getLocationAsset();
@@ -476,9 +476,14 @@ public class FindingDistinctSearchService {
    */
   public Page<FindingSiblingOutput> findAlsoDetectedOn(
       String findingId, SearchPaginationInput searchPaginationInput) {
+    // findByIdAndTenantId (not plain findById): Hibernate's tenantFilter does not apply to
+    // EntityManager#find()/CrudRepository#findById(), so a bare findById would let a caller
+    // fetch ANY tenant's Finding by guessing/enumerating its id - every other by-id Finding
+    // lookup in this feature (FindingCommentService, FindingTriageService, FindingArchiveService)
+    // already scopes this way, this call must match.
     Finding referenceFinding =
         findingRepository
-            .findById(findingId)
+            .findByIdAndTenantId(findingId, TenantContext.getCurrentTenant())
             .orElseThrow(() -> new ElementNotFoundException("Finding not found"));
 
     Page<Finding> page =

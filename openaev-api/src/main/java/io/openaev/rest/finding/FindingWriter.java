@@ -35,7 +35,13 @@ public class FindingWriter {
     // the new identity key - no separate parameter needed.
     String findingId =
         findingRepository.upsertFinding(
-            findingField, findingType, findingValue, findingLabels, injectId, assetId, name,
+            findingField,
+            findingType,
+            findingValue,
+            findingLabels,
+            injectId,
+            assetId,
+            name,
             tenantId);
     findingRepository.insertFindingAsset(findingId, assetId);
     findingRepository.insertFindingTags(findingId, tagIds);

@@ -42,9 +42,9 @@ public class FindingMapper {
   }
 
   /**
-   * Convenience overload for callers with bulk-fetched triage statuses but no group-wide
-   * first/last seen computed yet (e.g. single-finding lookups) - defaults first/last seen to the
-   * given finding's own dates.
+   * Convenience overload for callers with bulk-fetched triage statuses but no group-wide first/last
+   * seen computed yet (e.g. single-finding lookups) - defaults first/last seen to the given
+   * finding's own dates.
    */
   public AggregatedFindingOutput toAggregatedFindingOutput(
       Finding finding,

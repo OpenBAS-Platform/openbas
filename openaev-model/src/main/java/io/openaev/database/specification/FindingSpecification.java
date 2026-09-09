@@ -114,8 +114,8 @@ public class FindingSpecification {
    * referenceFinding} itself. Meant to be wrapped in {@link #distinctTypeValueWithFilter} so
    * exactly one representative row (the most recently updated occurrence) comes back per sibling
    * Location, exactly like the main list's own de-duplication. Archived siblings are deliberately
-   * NOT excluded here (Decision #10: always included, flagged instead) - callers still apply
-   * {@link #withoutSoftDeleted()} as usual.
+   * NOT excluded here (Decision #10: always included, flagged instead) - callers still apply {@link
+   * #withoutSoftDeleted()} as usual.
    *
    * <p>Phase 1 scope: if {@code referenceFinding} itself has no Location (multi-asset or a finding
    * type not yet covered by the backfill migration - see {@code Finding#locationAsset}), siblings
@@ -160,10 +160,10 @@ public class FindingSpecification {
   }
 
   /**
-   * Same "effective archived" computation as {@link #withArchived}, evaluated in plain Java
-   * against an already-fetched {@link Finding} instead of in SQL - for callers (like the "Also
-   * Detected On" panel) that need a per-row boolean flag on results that were not themselves
-   * filtered by archived status (Decision #10: archived siblings are included, not excluded).
+   * Same "effective archived" computation as {@link #withArchived}, evaluated in plain Java against
+   * an already-fetched {@link Finding} instead of in SQL - for callers (like the "Also Detected On"
+   * panel) that need a per-row boolean flag on results that were not themselves filtered by
+   * archived status (Decision #10: archived siblings are included, not excluded).
    */
   public static boolean isArchived(Finding finding, int archiveDays) {
     if (finding.getArchivedAt() != null) {
@@ -172,7 +172,6 @@ public class FindingSpecification {
     Instant cutoff = Instant.now().minus(archiveDays, ChronoUnit.DAYS);
     return finding.getUpdateDate().isBefore(cutoff);
   }
-
 
   /**
    * Excludes findings soft-deleted by FindingSoftDeleteJob (manually archived for longer than its
