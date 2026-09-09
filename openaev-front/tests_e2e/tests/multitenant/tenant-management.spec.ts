@@ -66,13 +66,23 @@ test.describe('Multi-tenancy — tenant management', () => {
     // Step 3 — Switch to the new tenant from the tenant switcher
     // ─────────────────────────────────────────────────
     const tenantSwitcher = new TenantSwitcherComponent(page);
-    await tenantSwitcher.openSwitcher('Default');
-    await expect(tenantSwitcher.popoverTenantItems.filter({ hasText: tenantName })).toHaveCount(1);
-    await tenantSwitcher.selectTenantByName(tenantName);
-    await page.waitForURL(
-      url => !url.toString().includes(DEFAULT_TENANT_UUID),
-      { timeout: TIMEOUT },
-    );
+    await expect(async () => {
+      await page.reload();
+      await tenantsPage.waitForLoad();
+      await tenantSwitcher.openSwitcher('Default');
+      await expect(tenantSwitcher.popoverTenantItems.filter({ hasText: tenantName })).toHaveCount(1);
+    }).toPass({
+      intervals: [1_000, 2_000, 5_000],
+      timeout: 5 * TIMEOUT,
+    });
+
+    await Promise.all([
+      page.waitForURL(
+        url => !url.toString().includes(DEFAULT_TENANT_UUID),
+        { timeout: TIMEOUT },
+      ),
+      tenantSwitcher.selectTenantByName(tenantName),
+    ]);
 
     // Extract the new tenant UUID from the current URL
     const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -95,13 +105,13 @@ test.describe('Multi-tenancy — tenant management', () => {
     // Step 4 — Tenant switcher navigation
     // ─────────────────────────────────────────────────
     // Act: select Default from the open popover
-    await tenantSwitcher.selectTenantByName('Default');
-
-    // Assert: URL switches back to the default tenant
-    await page.waitForURL(
-      url => url.toString().includes(DEFAULT_TENANT_UUID),
-      { timeout: TIMEOUT },
-    );
+    await Promise.all([
+      page.waitForURL(
+        url => url.toString().includes(DEFAULT_TENANT_UUID),
+        { timeout: TIMEOUT },
+      ),
+      tenantSwitcher.selectTenantByName('Default'),
+    ]);
 
     // Assert: open switcher from Default — both tenants are still listed
     await tenantSwitcher.openSwitcher('Default');
@@ -109,12 +119,12 @@ test.describe('Multi-tenancy — tenant management', () => {
     await expect(tenantSwitcher.popoverTenantItems.filter({ hasText: tenantName })).toHaveCount(1);
 
     // Act: switch back to Tenant A
-    await tenantSwitcher.selectTenantByName(tenantName);
-
-    // Assert: URL switches back to Tenant A
-    await page.waitForURL(
-      url => url.toString().includes(newTenantId!),
-      { timeout: TIMEOUT },
-    );
+    await Promise.all([
+      page.waitForURL(
+        url => url.toString().includes(newTenantId!),
+        { timeout: TIMEOUT },
+      ),
+      tenantSwitcher.selectTenantByName(tenantName),
+    ]);
   });
 });

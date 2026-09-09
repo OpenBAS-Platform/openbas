@@ -5,14 +5,20 @@ class CatalogPage {
   constructor(private page: Page) {}
   async waitForLoad(): Promise<void> {
     await this.page.waitForURL('**/integrations/available**');
-    await this.page
-      .getByTestId('marketplace-view-cards')
-      .or(this.page.getByTestId('marketplace-view-list'))
-      .first()
-      .waitFor({
+    await this.searchInput.waitFor({
+      state: 'visible',
+      timeout: TIMEOUT,
+    });
+    await Promise.any([
+      this.page.getByTestId('marketplace-view-cards').first().waitFor({
         state: 'visible',
         timeout: TIMEOUT,
-      });
+      }),
+      this.page.getByTestId('marketplace-view-list').first().waitFor({
+        state: 'visible',
+        timeout: TIMEOUT,
+      }),
+    ]);
   }
 
   get searchInput(): Locator {

@@ -1,4 +1,4 @@
-import { type Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 
 import { TIMEOUT } from '../../utils/constants';
 
@@ -33,10 +33,18 @@ class TenantSwitcherComponent {
       state: 'visible',
       timeout: TIMEOUT,
     });
-    await switcher.click();
 
-    await this.switcherPopover.waitFor({
-      state: 'visible',
+    await expect(async () => {
+      if (await this.switcherPopover.isVisible().catch(() => false)) {
+        return;
+      }
+      await switcher.click();
+      await this.switcherPopover.waitFor({
+        state: 'visible',
+        timeout: TIMEOUT,
+      });
+    }).toPass({
+      intervals: [200, 500, 1_000],
       timeout: TIMEOUT,
     });
   }

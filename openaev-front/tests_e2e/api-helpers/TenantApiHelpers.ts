@@ -10,12 +10,17 @@ class TenantApiHelpers {
 
   constructor(private request: APIRequestContext) {}
 
-  async createTenant(
-    tenantName?: string,
-  ): Promise<TenantApiOutput> {
+  async createTenant(tenantName?: string): Promise<TenantApiOutput> {
     const data = { tenant_name: tenantName ?? `Tenant E2E ${Date.now()}` };
     const response = await this.request.post(this.tenantUri, { data });
-    return response.json();
+
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to create tenant (POST ${this.tenantUri}): ${response.status()} ${response.statusText()} - ${await response.text()}`,
+      );
+    }
+
+    return (await response.json()) as TenantApiOutput;
   }
 
   async softDeleteTenant(tenantId: string): Promise<void> {

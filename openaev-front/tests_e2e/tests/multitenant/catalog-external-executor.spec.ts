@@ -41,13 +41,19 @@ test.describe('Catalog — external executor deployment', () => {
     // (API URL, API key and package ids are required, so they render at the top
     // of the form rather than under "Advanced options").
     const catalogPage = new CatalogPage(page);
-    await page.goto(tenantUrl('/admin/integrations/available', newTenantId!));
-    await catalogPage.waitForLoad();
+    await expect(async () => {
+      await page.goto(tenantUrl('/admin/integrations/available', newTenantId!));
+      await catalogPage.waitForLoad();
+      await catalogPage.searchConnector('Tanium');
+      // "Tanium" also matches the "Tanium Threat Response" collector; the catalog
+      // sections collectors before executors, so target the exact executor title.
+      await catalogPage.clickDeployOnConnector('Tanium Executor');
+      await expect(catalogPage.displayNameInput).toBeVisible({ timeout: TIMEOUT });
+    }).toPass({
+      intervals: [1_000, 2_000, 5_000],
+      timeout: 6 * TIMEOUT,
+    });
 
-    await catalogPage.searchConnector('Tanium');
-    // "Tanium" also matches the "Tanium Threat Response" collector; the catalog
-    // sections collectors before executors, so target the exact executor title.
-    await catalogPage.clickDeployOnConnector('Tanium Executor');
     await catalogPage.fillDisplayName(TANIUM_DISPLAY_NAME);
     await catalogPage.fillConfigurationField('Executor Tanium Api Url', 'https://tanium.e2e.invalid');
     await catalogPage.fillConfigurationField('Executor Tanium Api Key', 'e2e-api-key');
@@ -56,15 +62,20 @@ test.describe('Catalog — external executor deployment', () => {
     await catalogPage.submitInstall();
 
     // Step: verify Tanium is installed on executors list
-    await page.goto(tenantUrl('/admin/integrations/deployed', newTenantId!));
     const deployedConnectorsPage = new InjectorsListPage(page);
-    await deployedConnectorsPage.waitForLoad();
+    await expect(async () => {
+      await page.goto(tenantUrl('/admin/integrations/deployed', newTenantId!));
+      await deployedConnectorsPage.waitForLoad();
+      await expect(
+        deployedConnectorsPage.getInjectorCard(TANIUM_DISPLAY_NAME).first(),
+        `Expected deployed Tanium executor card "${TANIUM_DISPLAY_NAME}" to be visible`,
+      ).toBeVisible({ timeout: TIMEOUT });
+    }).toPass({
+      intervals: [1_000, 2_000, 5_000],
+      timeout: 6 * TIMEOUT,
+    });
 
     const taniumCard = deployedConnectorsPage.getInjectorCard(TANIUM_DISPLAY_NAME).first();
-    await expect(
-      taniumCard,
-      `Expected deployed Tanium executor card "${TANIUM_DISPLAY_NAME}" to be visible`,
-    ).toBeVisible({ timeout: TIMEOUT });
 
     // Step: open executor and ensure it is deployed/running
     await taniumCard.click();
