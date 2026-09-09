@@ -3,7 +3,6 @@ package io.openaev.rest.exercise;
 import static io.openaev.config.SessionHelper.currentUser;
 import static io.openaev.config.TenantUriUtils.TENANT_PREFIX;
 import static io.openaev.database.specification.ExerciseSpecification.findGrantedFor;
-import static io.openaev.database.specification.TeamSpecification.fromExercise;
 import static io.openaev.helper.StreamHelper.fromIterable;
 import static io.openaev.helper.StreamHelper.iterableToSet;
 import static io.openaev.rest.exercise.form.SimulationDetails.fromRawExercise;
@@ -339,7 +338,7 @@ public class ExerciseApi extends RestBehavior {
       actionPerformed = Action.READ,
       resourceType = ResourceType.SIMULATION)
   public List<TeamOutput> getExerciseTeams(TxCtx ctx, @PathVariable String exerciseId) {
-    return this.teamService.find(fromExercise(exerciseId));
+    return this.exerciseService.getExerciseTeams(exerciseId);
   }
 
   @Transactional(rollbackFor = Exception.class)
