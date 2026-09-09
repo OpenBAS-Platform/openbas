@@ -113,7 +113,7 @@ public class ProductInventoryMetricCollector {
     metricRegistry.registerGauge(
         "documents_total", "Number of documents", () -> safeCount(documentRepository::count));
     metricRegistry.registerGauge(
-        "channels_total", "Number of media channels", () -> safeCount(channelRepository::count));
+        "channels_total", "Number of media channels", () -> safeCount(this::countChannels));
     metricRegistry.registerGauge(
         "articles_total", "Number of media articles", () -> safeCount(articleRepository::count));
     metricRegistry.registerGauge(
@@ -123,9 +123,7 @@ public class ProductInventoryMetricCollector {
     metricRegistry.registerGauge(
         "reports_total", "Number of reports", () -> safeCount(reportingRepository::count));
     metricRegistry.registerGauge(
-        "mappers_total",
-        "Number of XLS import mappers",
-        () -> safeCount(importMapperRepository::count));
+        "mappers_total", "Number of XLS import mappers", () -> safeCount(this::countImportMappers));
     metricRegistry.registerGauge(
         "notification_triggers_total",
         "Number of notification triggers",
@@ -249,9 +247,23 @@ public class ProductInventoryMetricCollector {
    * telemetry), and it is resolved into an explicit list of live tenants, never a wildcard.
    */
   long countAssetGroups() {
+    return countAcrossAllTenants(assetGroupRepository::count);
+  }
+
+  /** Counts channels across the whole platform (channels is v2-active). */
+  long countChannels() {
+    return countAcrossAllTenants(channelRepository::count);
+  }
+
+  /** Counts XLS import mappers across the whole platform (import_mappers is v2-active). */
+  long countImportMappers() {
+    return countAcrossAllTenants(importMapperRepository::count);
+  }
+
+  private long countAcrossAllTenants(Supplier<Long> counter) {
     // Explicit type witness: TenantScopedTransaction overloads execute() on Supplier and
     // Runnable, so a value-returning method reference is ambiguous without it.
-    return tenantTx.<Long>execute(TxCtx.allTenants(), () -> assetGroupRepository.count());
+    return tenantTx.<Long>execute(TxCtx.allTenants(), counter);
   }
 
   private long safeCount(Supplier<Long> counter) {

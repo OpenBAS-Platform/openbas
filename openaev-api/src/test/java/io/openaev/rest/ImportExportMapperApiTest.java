@@ -84,7 +84,7 @@ public class ImportExportMapperApiTest extends IntegrationTest {
 
   @DisplayName("Test testing an import csv with endpoints csv type")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   void testImportCsvWithEndpointsCsvType() throws Exception {
     // -- PREPARE --
     endpointRepository.deleteAll();

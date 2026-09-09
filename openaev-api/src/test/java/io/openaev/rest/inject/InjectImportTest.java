@@ -1,9 +1,9 @@
 package io.openaev.rest.inject;
 
 import static io.openaev.helper.StreamHelper.fromIterable;
-import static io.openaev.rest.atomic_testing.AtomicTestingApi.ATOMIC_TESTING_URI;
-import static io.openaev.rest.exercise.ExerciseApi.EXERCISE_URI;
-import static io.openaev.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openaev.rest.atomic_testing.AtomicTestingApi.TENANT_ATOMIC_TESTING_URI;
+import static io.openaev.rest.exercise.ExerciseApi.TENANT_EXERCISE_URI;
+import static io.openaev.rest.scenario.ScenarioApi.TENANT_SCENARIO_URI;
 import static io.openaev.utils.fixtures.PayloadFixture.createDetectionRemediation;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
@@ -51,9 +51,9 @@ import org.springframework.transaction.annotation.Transactional;
 @DisplayName("Importing injects tests")
 class InjectImportTest extends IntegrationTest {
 
-  String SCENARIO_IMPORT_URI = SCENARIO_URI + "/%s/injects/import";
-  String SIMULATION_IMPORT_URI = EXERCISE_URI + "/%s/injects/import";
-  String ATOMIC_TESTING_IMPORT_URI = ATOMIC_TESTING_URI + "/import";
+  String SCENARIO_IMPORT_URI = TENANT_SCENARIO_URI + "/%s/injects/import";
+  String SIMULATION_IMPORT_URI = TENANT_EXERCISE_URI + "/%s/injects/import";
+  String ATOMIC_TESTING_IMPORT_URI = TENANT_ATOMIC_TESTING_URI + "/import";
   private final Map<String, ArticleComposer.Composer> staticArticleWrappers = new HashMap<>();
   private final String KNOWN_ARTICLE_WRAPPER_KEY = "known article key";
 
@@ -287,17 +287,17 @@ class InjectImportTest extends IntegrationTest {
   private ResultActions doImportForScenario(String scenarioId, byte[] importZipData)
       throws Exception {
     String uri = String.format(SCENARIO_IMPORT_URI, scenarioId);
-    return doImportStringInput(uri, importZipData);
+    return doImportStringInput(tenantUri(uri), importZipData);
   }
 
   private ResultActions doImportForSimulation(String simulationId, byte[] importZipData)
       throws Exception {
     String uri = String.format(SIMULATION_IMPORT_URI, simulationId);
-    return doImportStringInput(uri, importZipData);
+    return doImportStringInput(tenantUri(uri), importZipData);
   }
 
   private ResultActions doImportForAtomicTestings(byte[] importZipData) throws Exception {
-    return doImportStringInput(ATOMIC_TESTING_IMPORT_URI, importZipData);
+    return doImportStringInput(tenantUri(ATOMIC_TESTING_IMPORT_URI), importZipData);
   }
 
   private ResultActions doImportStringInput(String uri, byte[] importZipData) throws Exception {
@@ -455,7 +455,9 @@ class InjectImportTest extends IntegrationTest {
   }
 
   @Nested
-  @WithMockUser(withCapabilities = {Capability.MANAGE_ASSESSMENT})
+  @WithMockUser(
+      withCapabilities = {Capability.MANAGE_ASSESSMENT},
+      autoJoinDefaultTenant = true)
   @DisplayName("When imported objects don't already exist on the destination")
   public class WhenImportedObjectsDontAlreadyExistOnDestination {
 
@@ -1215,7 +1217,7 @@ class InjectImportTest extends IntegrationTest {
     }
 
     @Nested
-    @WithMockUser(isAdmin = true)
+    @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
     @DisplayName("When targeting atomic testing")
     public class WhenTargetingAtomicTesting {
 
@@ -1476,7 +1478,9 @@ class InjectImportTest extends IntegrationTest {
   }
 
   @Nested
-  @WithMockUser(withCapabilities = {Capability.ACCESS_ASSESSMENT, Capability.MANAGE_ASSESSMENT})
+  @WithMockUser(
+      withCapabilities = {Capability.ACCESS_ASSESSMENT, Capability.MANAGE_ASSESSMENT},
+      autoJoinDefaultTenant = true)
   @DisplayName("When imported objects already exist on the destination")
   public class WhenImportedObjectsAlreadyExistOnDestination {
 
@@ -2065,7 +2069,7 @@ class InjectImportTest extends IntegrationTest {
     }
 
     @Nested
-    @WithMockUser(isAdmin = true)
+    @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
     @DisplayName("When targeting atomic testing")
     public class WhenTargetingAtomicTesting {
 

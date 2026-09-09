@@ -326,6 +326,7 @@ public class TagRuleApiTest extends IntegrationTest {
     Tag tag = new Tag();
     tag.setName(tagName + System.currentTimeMillis());
     tag.setColor("#0000");
+    tag.setTenant(new Tenant(Tenant.DEFAULT_TENANT_UUID));
     return tagRepository.save(tag);
   }
 
@@ -348,6 +349,7 @@ public class TagRuleApiTest extends IntegrationTest {
       Tag tag = new Tag();
       tag.setName("isolation-tag-" + System.currentTimeMillis());
       tag.setColor("#0000");
+      tag.setTenant(new Tenant(tenantId));
       tag = tagRepository.save(tag);
       tagRule.setTag(tag);
       AssetGroup ag = AssetGroupFixture.createDefaultAssetGroup("isolation-ag");
@@ -422,6 +424,7 @@ public class TagRuleApiTest extends IntegrationTest {
       Tag tagY = new Tag();
       tagY.setName("tag-y-" + System.currentTimeMillis());
       tagY.setColor("#1111");
+      tagY.setTenant(new Tenant(tenantY.getId()));
       tagY = tagRepository.save(tagY);
 
       entityManager.flush();

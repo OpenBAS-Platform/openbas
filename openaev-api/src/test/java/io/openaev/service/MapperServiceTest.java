@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReaderBuilder;
 import io.openaev.IntegrationTest;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.AttackPattern;
 import io.openaev.database.model.Domain;
 import io.openaev.database.model.ImportMapper;
@@ -375,7 +376,9 @@ public class MapperServiceTest extends IntegrationTest {
 
     // Act / Assert
     assertThrows(
-        BadRequestException.class, () -> mapperService.importMappersCsv(csvFile, CsvType.AGENT));
+        BadRequestException.class,
+        () ->
+            mapperService.importMappersCsv(TxCtx.forTenant("tenant-test"), csvFile, CsvType.AGENT));
   }
 
   @DisplayName("given_mappersInput_should_appendImportedSuffix_whenImportMappers")
