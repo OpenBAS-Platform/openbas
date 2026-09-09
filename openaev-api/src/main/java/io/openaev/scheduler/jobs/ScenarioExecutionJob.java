@@ -11,8 +11,8 @@ import io.openaev.database.model.Scenario;
 import io.openaev.database.repository.ExerciseRepository;
 import io.openaev.database.repository.TenantRepository;
 import io.openaev.rest.exception.ChainingException;
-import io.openaev.service.chaining.WorkflowService;
 import io.openaev.service.ScenarioToExerciseService;
+import io.openaev.service.chaining.WorkflowService;
 import io.openaev.service.scenario.ScenarioRecurrenceService;
 import io.openaev.service.scenario.ScenarioService;
 import jakarta.persistence.EntityManager;
@@ -102,8 +102,8 @@ public class ScenarioExecutionJob implements Job {
           validScenarios.stream()
               .filter(scenario -> !alreadyExistIds.contains(scenario.getId()))
               // Time-based scenarios stay scheduled and are auto-started later.
-              // Chained scenarios must be launched immediately so the workflow run exists and
-              // starts on the scheduled tick, matching the manual chained launch flow.
+              // Chained scenarios only provision their simulation template here; the workflow run
+              // is created when the scheduled simulation is auto-started.
               .forEach(
                   scenario -> {
                     Instant start =
@@ -113,11 +113,11 @@ public class ScenarioExecutionJob implements Job {
                         this.scenarioToExerciseService.toExercise(scenario, start, isChaining);
                     if (isChaining) {
                       try {
-                        this.workflowService.startWorkflowByScenarioIdAndSimulation(
+                        this.workflowService.provisionSimulationTemplateWorkflow(
                             scenario.getId(), exercise);
                       } catch (ChainingException e) {
                         throw new IllegalStateException(
-                            "Could not start chained scenario " + scenario.getId(), e);
+                            "Could not provision chained scenario " + scenario.getId(), e);
                       }
                     }
                   });

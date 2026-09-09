@@ -12,6 +12,7 @@ import io.openaev.database.model.Exercise;
 import io.openaev.database.model.ExerciseStatus;
 import io.openaev.database.model.Scenario;
 import io.openaev.database.model.Tenant;
+import io.openaev.database.model.WorkflowStatus;
 import io.openaev.database.repository.ExerciseRepository;
 import io.openaev.database.repository.ScenarioRepository;
 import io.openaev.database.repository.WorkflowRepository;
@@ -126,14 +127,14 @@ class ScenarioExecutionJobTest extends IntegrationTest {
       assertEquals(1, createdExercises.size());
       Exercise createdExercise = createdExercises.getFirst();
       assertNotNull(createdExercise.getStart());
-      assertFalse(workflowRepository.existsBySimulationId(createdExercise.getId()));
+      assertThat(workflowRepository.existsBySimulationId(createdExercise.getId())).isFalse();
 
       EXERCISE_ID = createdExercise.getId();
     }
 
-    @DisplayName("Create chained simulation based on recurring scenario now")
+    @DisplayName("Create chained simulation template based on recurring scenario now")
     @Test
-    void given_chained_cron_in_one_minute_should_create_and_start_simulation() throws Exception {
+    void given_chained_cron_in_one_minute_should_create_template_and_delay_run() throws Exception {
       // -- PREPARE --
       ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
 
@@ -159,9 +160,13 @@ class ScenarioExecutionJobTest extends IntegrationTest {
               .toList();
       assertEquals(1, createdExercises.size());
       Exercise createdExercise = createdExercises.getFirst();
-      assertEquals(ExerciseStatus.RUNNING, createdExercise.getStatus());
       assertNotNull(createdExercise.getStart());
-      assertTrue(workflowRepository.existsBySimulationId(createdExercise.getId()));
+      assertEquals(ExerciseStatus.SCHEDULED, createdExercise.getStatus());
+      assertThat(workflowRepository.existsBySimulationId(createdExercise.getId())).isTrue();
+      assertThat(
+              workflowRepository.findAllBySimulation_IdAndStatus(
+                  createdExercise.getId(), WorkflowStatus.RUN))
+          .isEmpty();
       assertNotNull(
           exerciseRepository.rawDetailsById(createdExercise.getId()).getExercise_workflow_id());
     }

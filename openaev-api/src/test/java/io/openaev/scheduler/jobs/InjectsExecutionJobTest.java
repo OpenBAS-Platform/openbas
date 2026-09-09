@@ -16,13 +16,18 @@ import io.openaev.database.repository.ComcheckRepository;
 import io.openaev.database.repository.EndpointRepository;
 import io.openaev.database.repository.ExerciseRepository;
 import io.openaev.database.repository.InjectRepository;
+import io.openaev.database.repository.ScenarioRepository;
 import io.openaev.database.repository.UserRepository;
+import io.openaev.database.repository.WorkflowRepository;
 import io.openaev.execution.ExecutableInject;
 import io.openaev.healthcheck.utils.HealthCheckUtils;
 import io.openaev.helper.InjectHelper;
 import io.openaev.integration.Manager;
 import io.openaev.integration.ManagerFactory;
+import io.openaev.rest.exception.ChainingException;
 import io.openaev.rest.exercise.service.ExerciseService;
+import io.openaev.service.ScenarioService;
+import io.openaev.service.chaining.WorkflowService;
 import io.openaev.utils.fixtures.*;
 import io.openaev.utils.fixtures.composers.*;
 import jakarta.persistence.EntityManager;
@@ -60,6 +65,8 @@ class InjectsExecutionJobTest extends IntegrationTest {
   @Autowired private ExerciseService exerciseService;
   @Autowired private InjectRepository injectRepository;
   @Autowired private InjectHelper injectHelper;
+  @Autowired private ScenarioService scenarioService;
+  @Autowired private WorkflowService workflowService;
 
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private ScenarioComposer scenarioComposer;
@@ -76,6 +83,8 @@ class InjectsExecutionJobTest extends IntegrationTest {
   @Autowired private UserRepository userRepository;
   @Autowired private InjectorContractFixture injectorContractFixture;
   @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
+  @Autowired private WorkflowRepository workflowRepository;
   @Autowired private EndpointRepository endpointRepository;
   @Autowired private AgentRepository agentRepository;
   @Autowired private PlatformTransactionManager transactionManager;
@@ -92,6 +101,59 @@ class InjectsExecutionJobTest extends IntegrationTest {
   @AfterEach
   void resetMocks() {
     Mockito.reset(managerFactory, auditLogger, healthCheckUtils);
+  }
+
+  @Test
+  @DisplayName("given scheduled chained simulation should start workflow run when auto-start runs")
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
+  void given_scheduledChainedSimulation_should_startWorkflowRunOnAutoStart() {
+    String[] ids = new String[2]; // scenarioId, exerciseId
+    try {
+      inTransaction(
+          () -> {
+            try {
+              Scenario scenario =
+                  scenarioService.createScenarioChaining(ScenarioFixture.getScenario());
+              Exercise exercise =
+                  ExerciseFixture.createDefaultIncidentResponseExercise(
+                      Instant.now().minusSeconds(60));
+              exercise.setScenario(scenario);
+              Exercise savedExercise = exerciseComposer.forExercise(exercise).persist().get();
+              workflowService.provisionSimulationTemplateWorkflow(scenario.getId(), savedExercise);
+              entityManager.flush();
+
+              ids[0] = scenario.getId();
+              ids[1] = savedExercise.getId();
+            } catch (ChainingException e) {
+              throw new IllegalStateException("Could not provision chained simulation", e);
+            }
+          });
+
+      assertThat(workflowRepository.findAllBySimulation_IdAndStatus(ids[1], WorkflowStatus.RUN))
+          .isEmpty();
+
+      job.handleAutoStartExercises();
+
+      inTransaction(
+          () -> {
+            Exercise startedExercise = exerciseRepository.findById(ids[1]).orElseThrow();
+            assertThat(startedExercise.getStatus()).isEqualTo(ExerciseStatus.RUNNING);
+            assertThat(
+                    workflowRepository.findAllBySimulation_IdAndStatus(ids[1], WorkflowStatus.RUN))
+                .singleElement()
+                .satisfies(
+                    workflow -> assertThat(workflow.getStatus()).isEqualTo(WorkflowStatus.RUN));
+          });
+    } finally {
+      inTransaction(
+          () -> {
+            workflowRepository.deleteAll();
+            exerciseRepository.deleteAll();
+            scenarioRepository.deleteAll();
+          });
+      scenarioComposer.reset();
+      exerciseComposer.reset();
+    }
   }
 
   /**

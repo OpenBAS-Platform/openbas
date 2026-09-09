@@ -21,11 +21,13 @@ import io.openaev.healthcheck.dto.HealthCheck;
 import io.openaev.healthcheck.utils.HealthCheckUtils;
 import io.openaev.helper.InjectHelper;
 import io.openaev.injector_contract.variables.contract.UserContract;
+import io.openaev.rest.exception.ChainingException;
 import io.openaev.rest.inject.service.AssetToExecute;
 import io.openaev.rest.inject.service.InjectService;
 import io.openaev.rest.inject.service.InjectStatusService;
 import io.openaev.scheduler.TenantScopedJobRunner;
 import io.openaev.scheduler.jobs.exception.ErrorMessagesPreExecutionException;
+import io.openaev.service.chaining.WorkflowService;
 import io.openaev.telemetry.metric_collectors.ActionMetricCollector;
 import io.openaev.utils.AgentUtils;
 import jakarta.persistence.EntityManager;
@@ -80,6 +82,7 @@ public class InjectsExecutionJob implements Job {
   private final InjectStatusService injectStatusService;
   private final io.openaev.executors.Executor executor;
   private final ActionMetricCollector actionMetricCollector;
+  private final WorkflowService workflowService;
   private final EntityManager entityManager;
   private final TenantScopedJobRunner tenantScopedJobRunner;
 
@@ -111,6 +114,15 @@ public class InjectsExecutionJob implements Job {
           exercise.setUpdatedAt(now());
         });
     exerciseRepository.saveAll(startedExercises);
+    startedExercises.forEach(
+        exercise -> {
+          try {
+            workflowService.startWorkflowBySimulationIdIfPresent(exercise.getId());
+          } catch (ChainingException e) {
+            throw new IllegalStateException(
+                "Could not start workflow for scheduled simulation " + exercise.getId(), e);
+          }
+        });
     startedExercises.forEach(this::logScheduledLaunch);
   }
 

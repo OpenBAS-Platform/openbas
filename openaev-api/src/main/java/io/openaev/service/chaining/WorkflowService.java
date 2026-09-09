@@ -1413,14 +1413,24 @@ public class WorkflowService {
    */
   @Transactional(rollbackFor = Exception.class)
   public void startWorkflowBySimulationId(String simulationId) throws ChainingException {
-    Workflow workflowTemplate =
-        findWorkflowTemplateBySimulationId(simulationId)
-            .orElseThrow(
-                () ->
-                    new ElementNotFoundException(
-                        "Workflow (TEMPLATE) not found. Simulation ID: " + simulationId));
-    Workflow workflowRun = launchWorkflowSimulation(workflowTemplate);
-    startWorkflow(workflowRun);
+    doStartWorkflowBySimulationId(simulationId);
+  }
+
+  /**
+   * Starts a workflow run for a simulation only when a simulation TEMPLATE workflow exists.
+   *
+   * <p>This is the scheduled-execution counterpart of the manual start flow: manual launches always
+   * create the simulation TEMPLATE first, while scheduled chained simulations create that template
+   * earlier and only need the run started once the simulation becomes runnable.
+   *
+   * @param simulationId id of the simulation to start if chained
+   */
+  @Transactional(rollbackFor = Exception.class)
+  public void startWorkflowBySimulationIdIfPresent(String simulationId) throws ChainingException {
+    if (findWorkflowTemplateBySimulationId(simulationId).isEmpty()) {
+      return;
+    }
+    doStartWorkflowBySimulationId(simulationId);
   }
 
   /**
@@ -1431,17 +1441,18 @@ public class WorkflowService {
   @Transactional(rollbackFor = Exception.class)
   public void startWorkflowByScenarioIdAndSimulation(String scenarioId, Exercise simulation)
       throws ChainingException {
-    Workflow workflowTemplateScenario =
-        findWorkflowTemplateByScenarioId(scenarioId)
+    provisionSimulationTemplateWorkflow(scenarioId, simulation);
+    doStartWorkflowBySimulationId(simulation.getId());
+  }
+
+  private void doStartWorkflowBySimulationId(String simulationId) throws ChainingException {
+    Workflow workflowTemplate =
+        findWorkflowTemplateBySimulationId(simulationId)
             .orElseThrow(
                 () ->
                     new ElementNotFoundException(
-                        "Workflow (TEMPLATE) not found. Scenario ID: " + scenarioId));
-
-    Workflow workflowRun = launchWorkflowScenario(workflowTemplateScenario, simulation);
-    Workflow workflowTemplateSimulation = workflowRun.getWorkflowTemplate();
-    stepService.copyStepTemplate(workflowTemplateScenario, workflowTemplateSimulation);
-
+                        "Workflow (TEMPLATE) not found. Simulation ID: " + simulationId));
+    Workflow workflowRun = launchWorkflowSimulation(workflowTemplate);
     startWorkflow(workflowRun);
   }
 
