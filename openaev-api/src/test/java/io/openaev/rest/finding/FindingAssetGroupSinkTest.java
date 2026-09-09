@@ -1,0 +1,164 @@
+package io.openaev.rest.finding;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import io.openaev.IntegrationTest;
+import io.openaev.database.model.ContractOutputType;
+import io.openaev.database.model.Finding;
+import io.openaev.database.model.Inject;
+import io.openaev.database.model.Tenant;
+import io.openaev.utils.TenantIsolationTestHelper;
+import io.openaev.utils.fixtures.InjectFixture;
+import io.openaev.utils.mockUser.WithMockUser;
+import jakarta.persistence.EntityManager;
+import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
+
+/**
+ * {@code Finding.getAssetGroups()} is a computed {@code @JsonProperty} that walks {@code
+ * inject.getAssetGroups()}, a lazy collection on the v2-active {@code asset_groups} table. Jackson
+ * resolves it AFTER the controller's {@code @Transactional} method returns, through open-in-view,
+ * by which point the transaction's tenant scope is gone.
+ *
+ * <p>That is the #7026 shape: the endpoint keeps returning 200 with an empty array rather than
+ * failing, and the caller cannot tell "this finding has no asset group" from "the scope was lost".
+ * Carrying a {@code TxCtx} is necessary but not sufficient; the association has to be resolved
+ * inside the scoped transaction.
+ *
+ * <p>The assertion is NON-EMPTY on purpose. An empty-array assertion is exactly what the regression
+ * satisfies.
+ *
+ * <p>The class is deliberately NOT {@code @Transactional}. An earlier version was, and it proved
+ * less than it claimed: with the test holding the transaction open, the controller joins it and
+ * Jackson serializes inside it, where the scope still exists. Open-in-view is only exercised when
+ * the request's own transaction has closed, which means committing the seed and sweeping it by
+ * hand.
+ */
+@TestPropertySource(properties = "openaev.tenant.active-tables=asset_groups,assets")
+@WithMockUser(isAdmin = true)
+@DisplayName("a finding still carries its inject's asset groups when serialized")
+class FindingAssetGroupSinkTest extends IntegrationTest {
+
+  @Autowired private MockMvc mvc;
+  @Autowired private FindingService findingService;
+  @Autowired private TenantIsolationTestHelper tenantHelper;
+  @Autowired private EntityManager entityManager;
+
+  @Autowired private javax.sql.DataSource dataSource;
+  @Autowired private org.springframework.transaction.PlatformTransactionManager transactionManager;
+
+  private org.springframework.jdbc.core.JdbcTemplate jdbc;
+  private String tenantId;
+  private String findingId;
+  private String assetGroupId;
+  private String assetId;
+
+  @org.junit.jupiter.api.AfterEach
+  void sweep() {
+    jdbc.update("DELETE FROM findings_assets WHERE asset_id = ?", assetId);
+    jdbc.update("DELETE FROM findings WHERE tenant_id = ?", tenantId);
+    jdbc.update("DELETE FROM assets WHERE tenant_id = ?", tenantId);
+    jdbc.update("DELETE FROM injects_asset_groups WHERE asset_group_id = ?", assetGroupId);
+    jdbc.update("DELETE FROM asset_groups WHERE tenant_id = ?", tenantId);
+    jdbc.update("DELETE FROM injects WHERE tenant_id = ?", tenantId);
+  }
+
+  @BeforeEach
+  void seedAFindingOnAnInjectThatTargetsAnAssetGroup() {
+    jdbc = new org.springframework.jdbc.core.JdbcTemplate(dataSource);
+    // The seed needs its own short transaction and has to COMMIT, so that the request under test
+    // runs against committed rows and its own transaction is the one that closes before Jackson
+    // serializes.
+    new org.springframework.transaction.support.TransactionTemplate(transactionManager)
+        .executeWithoutResult(
+            status -> {
+              try {
+                tenantId =
+                    tenantHelper.createTenantWithCurrentUser("fag-" + UUID.randomUUID()).getId();
+              } catch (Exception e) {
+                throw new IllegalStateException(e);
+              }
+              tenantHelper.switchToTenant(tenantId, entityManager);
+
+              Inject inject = InjectFixture.getDefaultInject();
+              inject.setTenant(new Tenant(tenantId));
+              entityManager.persist(inject);
+              entityManager.flush();
+
+              assetGroupId = UUID.randomUUID().toString();
+              entityManager
+                  .createNativeQuery(
+                      "INSERT INTO asset_groups (asset_group_id, asset_group_name,"
+                          + " asset_group_dynamic_filter, asset_group_created_at,"
+                          + " asset_group_updated_at, tenant_id)"
+                          + " VALUES (:id, :name, CAST('{}' AS json), now(), now(), :tenantId)")
+                  .setParameter("id", assetGroupId)
+                  .setParameter("name", "sink-group")
+                  .setParameter("tenantId", tenantId)
+                  .executeUpdate();
+              entityManager
+                  .createNativeQuery(
+                      "INSERT INTO injects_asset_groups (inject_id, asset_group_id)"
+                          + " VALUES (:i, :g)")
+                  .setParameter("i", inject.getId())
+                  .setParameter("g", assetGroupId)
+                  .executeUpdate();
+
+              Finding finding = new Finding();
+              finding.setValue("sink-" + UUID.randomUUID());
+              finding.setType(ContractOutputType.Text);
+              finding.setField("hostname");
+              finding.setName("sink probe");
+              findingId = findingService.createFinding(finding, inject.getId()).getId();
+              entityManager.flush();
+
+              // A linked asset too: finding_assets is a lazy @ManyToMany on the assets table, the
+              // other association this endpoint serializes after its transaction has closed.
+              assetId = UUID.randomUUID().toString();
+              entityManager
+                  .createNativeQuery(
+                      "INSERT INTO assets (asset_id, asset_name, asset_type, asset_created_at,"
+                          + " asset_updated_at, tenant_id, asset_hostname, endpoint_platform,"
+                          + " endpoint_arch) VALUES (:id, 'sink-asset', 'Endpoint', now(), now(),"
+                          + " :tenantId, 'sink-asset', 'Linux', 'x86_64')")
+                  .setParameter("id", assetId)
+                  .setParameter("tenantId", tenantId)
+                  .executeUpdate();
+              entityManager
+                  .createNativeQuery(
+                      "INSERT INTO findings_assets (finding_id, asset_id) VALUES (:f, :a)")
+                  .setParameter("f", findingId)
+                  .setParameter("a", assetId)
+                  .executeUpdate();
+              entityManager.flush();
+            });
+  }
+
+  @Test
+  @DisplayName("GET a finding: finding_asset_groups is not silently empty")
+  void findingCarriesItsAssetGroups() throws Exception {
+    String body =
+        mvc.perform(get("/api/tenants/{tenantId}/findings/{id}", tenantId, findingId))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+    assertTrue(
+        body.contains(assetGroupId),
+        "finding_asset_groups must still hold the inject's asset group; an empty array here is the"
+            + " #7026 regression, not a data problem: "
+            + body);
+    assertTrue(
+        body.contains(assetId),
+        "finding_assets must still hold the linked asset, for the same reason and on the other"
+            + " activated table: "
+            + body);
+  }
+}
