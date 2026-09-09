@@ -180,7 +180,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, assign existing teams to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_assign_existing_teams_to_imported_exercise()
           throws Exception {
@@ -212,7 +212,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, assign existing users to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_assign_existing_users_to_imported_exercise()
           throws Exception {
@@ -246,7 +246,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, assign existing organisations to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_assign_existing_organisations_to_imported_exercise()
           throws Exception {
@@ -286,7 +286,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
 
   @DisplayName("Given a valid export zip file, given existing objects, create new article anyway")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void given_a_valid_export_zip_file_given_existing_objects_create_new_article_anyway()
       throws Exception {
     ExerciseComposer.Composer exerciseWrapper = getExercise();
@@ -335,7 +335,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, new articles attached to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_new_articles_attached_to_imported_exercise()
           throws Exception {
@@ -368,7 +368,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, assign existing channels to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_assign_existing_channels_to_imported_exercise()
           throws Exception {
@@ -403,7 +403,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, assign existing tags to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_assign_existing_tags_to_imported_exercise()
           throws Exception {
@@ -439,7 +439,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, create new objectives anyway")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void given_a_valid_export_zip_file_given_existing_objects_create_new_objectives_anyway()
       throws Exception {
     ExerciseComposer.Composer exerciseWrapper = getExercise();
@@ -487,7 +487,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, new objectives attached to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_new_objectives_attached_to_imported_exercise()
           throws Exception {
@@ -521,7 +521,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, create new lessons categories anyway")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_create_new_lessons_categories_anyway()
           throws Exception {
@@ -571,7 +571,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, new lessons categories attached to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_new_lessons_categories_attached_to_imported_exercise()
           throws Exception {
@@ -604,7 +604,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, assign existing documents to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_assign_existing_documents_to_imported_exercise()
           throws Exception {
@@ -636,7 +636,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
 
   @DisplayName("Given a valid export zip file, given existing objects, create new injects anyway")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void given_a_valid_export_zip_file_given_existing_objects_create_new_injects_anyway()
       throws Exception {
     ExerciseComposer.Composer exerciseWrapper = getExercise();
@@ -687,7 +687,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, new injects attached to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_new_injects_attached_to_imported_exercise()
           throws Exception {
@@ -719,7 +719,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
 
   @DisplayName("Given a valid export zip file, given existing objects, create new variables anyway")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void given_a_valid_export_zip_file_given_existing_objects_create_new_variables_anyway()
       throws Exception {
     ExerciseComposer.Composer exerciseWrapper = getExercise();
@@ -767,7 +767,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, new variables attached to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_new_variables_attached_to_imported_exercise()
           throws Exception {
@@ -800,7 +800,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, assign existing challenges to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_assign_existing_challenges_to_imported_exercise()
           throws Exception {

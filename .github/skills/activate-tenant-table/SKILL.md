@@ -91,6 +91,14 @@ incident. Do not trade them away to make a test pass.
    does not exist anymore, stop and find its successor
    (`git log --oneline --follow --all -- <path>`). Never substitute an
    invented pattern for a missing reference.
+10. **`TxCtx` position is fixed.** In every new or modified method signature
+    that carries `TxCtx`, it must be the FIRST parameter (annotations allowed,
+    e.g. `@RequireTenantSelector TxCtx ctx`). Keep this order through service
+    call chains too, so wiring remains grep-auditable and consistent.
+11. **No v1 tenant context in v2/integration tests.** For API v2 activation
+    tests and integration tests, do not add `TenantContext.getCurrentTenant()`,
+    `TenantContext.setCurrentTenant(...)`, or `enableFilter("tenantFilter")`.
+    Use explicit tenant ids + `TxCtx`/`TenantScopedTransaction` helpers.
 
 ## Baseline: controller entrypoints already carry `TxCtx`
 
@@ -226,6 +234,18 @@ The evidence rule (hard rule 8) applies here too: quote the actual grep
 output or file lines behind each gate verdict, do not paraphrase them.
 
 ### Phase 1 — Inventory what the mass `TxCtx` wiring does NOT already cover
+
+Quick hygiene checks on changed files before deeper inventory:
+
+```bash
+# Any signature carrying TxCtx with non-first position must be fixed
+grep -rn "(.*,[[:space:]]*[@A-Za-z0-9_ ]*TxCtx[[:space:]]+[a-zA-Z_][a-zA-Z0-9_]*" \
+  openaev-api/src/main/java openaev-model/src/main/java --include="*.java"
+
+# In API v2 / integration tests, block v1 tenant-context/filter idioms
+grep -rn "TenantContext.getCurrentTenant\|TenantContext.setCurrentTenant\|enableFilter(\"tenantFilter\")" \
+  openaev-api/src/test/java --include="*.java"
+```
 
 Because of the baseline above, Phase 1 no longer hunts for missing `TxCtx` on
 controller entrypoints. It is still fully required for everything the
@@ -436,6 +456,12 @@ uses a FROM/JOIN shape the inspector does not cover at all, that is a
 blocker: stop and report (Phase 0), do not attempt to teach the inspector a
 new shape inside a table-activation PR.
 
+Also avoid CTE and alias names that match real active table names (for
+example `WITH tags AS (...)` once `tags` is active). PostgreSQL can resolve
+that shadowing, but the inspector's relation-name matching may treat the CTE
+as the active table and fail-close the read. Prefer explicit names such as
+`scenario_tags_agg`.
+
 Pin the fix with a regression test in `TenantStatementInspectorTest` using
 the REAL production SQL (read the `@Query` value via reflection off the
 repository method, as PR #7008 does), not a hand-simplified paraphrase — the
@@ -530,6 +556,17 @@ Notes that make or break the test:
 - `@TestPropertySource` activates the table for this test only. The test
   classpath keeps the allowlist empty on purpose; never add your table to the
   test-wide properties.
+- **Leave `@WithMockUser` at its default (`autoJoinDefaultTenant` stays
+  `false`) on this class.** The class-level mock user must resolve to exactly
+  the tenants `tenantHelper.createTenantWithCurrentUser(...)` granted it —
+  nothing more. Setting `autoJoinDefaultTenant = true` here silently adds a
+  second tenant membership, which (a) defeats the "create with no
+  selector → 400" assertion below (the fallback selector now sees an
+  unambiguous default tenant instead of an ambiguous multi-tenant scope) and
+  (b) can trip `TenantScopeTransactionAspect`'s "scope already set for this
+  transaction" guard the moment a second `mvc.perform` call in the same test
+  method resolves a wider scope than the first. See
+  `WithMockUser.autoJoinDefaultTenant()` javadoc for the full rationale.
 - Seed with a native `INSERT ... VALUES` including `tenant_id`, like the
   pilot's `seedMapper`. The inspector does not block VALUES inserts.
 - Ground-truth assertions (prove a row was NOT touched) use raw JDBC on the
@@ -805,6 +842,19 @@ carries no explicit selector, see
 The pilot does not use it: the resolver's single-tenant rule already refuses
 ambiguous writes. Do not add it unless the endpoint must refuse even an
 implicit single-tenant scope.
+
+**Testing the plain (non-isolation) create path.** Outside the two-tenant
+`{Entity}HttpIsolationTest` suite above, an ordinary create/import test (e.g.
+`{Entity}ApiCapabilityTest`, a permissions test) that hits the same
+`@RequireTenantSelector`-gated endpoint needs the mock user to resolve to
+exactly ONE authorized tenant, or `tenantForWrite` refuses it with 400 (empty
+authorized set is not a single tenant either). If that test doesn't already
+grant the mock user a tenant of its own, add
+`@WithMockUser(autoJoinDefaultTenant = true)` on that ONE test method — never
+at the class level, and never on a test in the isolation suite above, which
+must keep the default `false` (see Phase 2's note on this same flag). Models:
+`TagApiCapabilityTest#given_manageTags_should_createTag`,
+`ImportExportMapperApiTest#testImportCsvWithEndpointsCsvType`.
 
 Do NOT keep `TenantBaseListener` / `TenantIdBaseListener` on the entity. It is
 a v1 pattern that reads from `TenantContext` — which is no longer the source of
@@ -1290,6 +1340,9 @@ Before marking the issue done, write down:
       `InjectorContractService` search/association code already wired for
       `InjectorContractApi#injectorContracts`, missed because the shared
       service method was never re-grepped once one caller looked done)
+- [ ] every new/changed method signature carrying `TxCtx` has `TxCtx` in first
+      parameter position (annotation allowed), and callsites follow the same
+      order consistently
 - [ ] association-accessor scan run for every entity holding a reference to
       the activated entity, regardless of whether the activated table has its
       own API (eager/lazy loads bypass the repository grep either way)
@@ -1333,6 +1386,10 @@ Before marking the issue done, write down:
       table-function FROM item (`jsonb_array_elements`, `unnest`, ...) carries
       `LATERAL`; a regression test pins the real production SQL (#7007)
 - [ ] non-admin variant green
+- [ ] API v2/integration tests added or modified in this activation do not use
+      `TenantContext.getCurrentTenant()`, `TenantContext.setCurrentTenant(...)`,
+      or `enableFilter("tenantFilter")`; tenant scope is expressed via explicit
+      tenant ids and `TxCtx`/`TenantScopedTransaction`
 - [ ] arch tests updated and green
 - [ ] go-live is one commit: @Filter removed + allowlist entry + re-enabled test + config guard
 - [ ] v1 remnant audit complete: no `TenantContext`/`findByIdAndTenantId`/`TenantBaseListener`

@@ -455,7 +455,9 @@ class InjectImportTest extends IntegrationTest {
   }
 
   @Nested
-  @WithMockUser(withCapabilities = {Capability.MANAGE_ASSESSMENT})
+  @WithMockUser(
+      withCapabilities = {Capability.MANAGE_ASSESSMENT},
+      autoJoinDefaultTenant = true)
   @DisplayName("When imported objects don't already exist on the destination")
   public class WhenImportedObjectsDontAlreadyExistOnDestination {
 
@@ -1215,7 +1217,7 @@ class InjectImportTest extends IntegrationTest {
     }
 
     @Nested
-    @WithMockUser(isAdmin = true)
+    @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
     @DisplayName("When targeting atomic testing")
     public class WhenTargetingAtomicTesting {
 
@@ -1476,7 +1478,9 @@ class InjectImportTest extends IntegrationTest {
   }
 
   @Nested
-  @WithMockUser(withCapabilities = {Capability.ACCESS_ASSESSMENT, Capability.MANAGE_ASSESSMENT})
+  @WithMockUser(
+      withCapabilities = {Capability.ACCESS_ASSESSMENT, Capability.MANAGE_ASSESSMENT},
+      autoJoinDefaultTenant = true)
   @DisplayName("When imported objects already exist on the destination")
   public class WhenImportedObjectsAlreadyExistOnDestination {
 
@@ -2065,7 +2069,7 @@ class InjectImportTest extends IntegrationTest {
     }
 
     @Nested
-    @WithMockUser(isAdmin = true)
+    @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
     @DisplayName("When targeting atomic testing")
     public class WhenTargetingAtomicTesting {
 

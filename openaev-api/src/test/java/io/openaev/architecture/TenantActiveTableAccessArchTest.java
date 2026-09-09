@@ -32,6 +32,7 @@ import io.openaev.database.repository.KillChainPhaseRepository;
 import io.openaev.database.repository.LessonsTemplateRepository;
 import io.openaev.database.repository.MitigationRepository;
 import io.openaev.database.repository.SecurityCoverageRepository;
+import io.openaev.database.repository.TagRepository;
 import io.openaev.database.repository.attackpath.AttackPathExecutionRepository;
 import io.openaev.database.repository.attackpath.AttackPathFindingRepository;
 import io.openaev.database.repository.autonomous.AutonomousDirectiveRepository;
@@ -180,6 +181,7 @@ class TenantActiveTableAccessArchTest {
           "collectors",
           "executors",
           "injectors",
+          "tags",
           "channels",
           "domains",
           "attackpath_execution",
@@ -327,6 +329,51 @@ class TenantActiveTableAccessArchTest {
           .because(
               "mitigations is tenant-active: an accessor without a tenant scope silently reads"
                   + " zero rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule tags_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // TxCtx-carrying entrypoints, pinned by TenantScopedEntrypointsTxCtxArchTest:
+              io.openaev.rest.tag.TagApi.class,
+              io.openaev.rest.scenario.ScenarioApi.class,
+              io.openaev.rest.exercise.ExerciseApi.class,
+              io.openaev.rest.team.TeamApi.class,
+              io.openaev.rest.user.PlayerApi.class,
+              io.openaev.rest.organization.OrganizationApi.class,
+              io.openaev.rest.asset_group.AssetGroupApi.class,
+              io.openaev.rest.document.DocumentApi.class,
+              io.openaev.rest.challenge.ChallengeApi.class,
+              io.openaev.api.chaining.ChainingApi.class,
+              io.openaev.rest.asset.ai_targets.AiTargetApi.class,
+              io.openaev.rest.asset.security_platforms.SecurityPlatformApi.class,
+              // Services behind the entrypoints above and import/export paths using explicit
+              // tenant-scoped tag lookups:
+              io.openaev.rest.tag.TagService.class,
+              io.openaev.rest.inject.service.InjectService.class,
+              io.openaev.rest.injector_contract.InjectorContractService.class,
+              io.openaev.service.scenario.ScenarioService.class,
+              io.openaev.rest.user.PlayerService.class,
+              io.openaev.service.EndpointService.class,
+              io.openaev.rest.payload.service.PayloadCreationService.class,
+              io.openaev.rest.payload.service.PayloadUpdateService.class,
+              io.openaev.service.AtomicTestingService.class,
+              io.openaev.service.TagRuleService.class,
+              io.openaev.service.UserService.class,
+              io.openaev.service.credential.CredentialService.class,
+              io.openaev.rest.document.DocumentService.class,
+              io.openaev.service.ScenarioToExerciseService.class,
+              // Import path with explicit tenant remapping semantics:
+              io.openaev.importer.V1_DataImporter.class,
+              // Background indexing fetch path:
+              io.openaev.engine.model.tag.TagHandler.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(TagRepository.class)
+          .because(
+              "tags is tenant-active: an accessor without a tenant scope silently reads zero rows."
+                  + " New accessors must carry a scope and be allowlisted here");
 
   @ArchTest
   static final ArchRule domains_repository_access_is_reviewed =
