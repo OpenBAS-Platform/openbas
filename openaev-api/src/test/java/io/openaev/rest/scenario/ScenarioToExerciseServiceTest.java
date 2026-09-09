@@ -139,6 +139,7 @@ class ScenarioToExerciseServiceTest extends IntegrationTest {
     Document documentArticleSaved = this.documentRepository.save(documentArticle);
     Channel channel = new Channel();
     channel.setName("A channel");
+    channel.setTenant(new Tenant(Tenant.DEFAULT_TENANT_UUID));
     Channel channelSaved = this.channelRepository.save(channel);
     Article article = getArticle(channelSaved);
     article.setDocuments(
