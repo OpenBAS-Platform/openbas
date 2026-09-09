@@ -102,7 +102,7 @@ public class WorkflowEndService {
     }
 
     log.info(
-        "[Chaining] Stop {} active inject(s) of the simulation {}. due to workflow {}.",
+        "[Chaining] Stop {} active inject(s) of the simulation {} due to workflow {}.",
         stoppedCount,
         simulationId,
         cause.name());
