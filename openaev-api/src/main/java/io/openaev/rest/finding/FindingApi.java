@@ -52,6 +52,14 @@ public class FindingApi extends RestBehavior {
   private static Finding withScopedAssociationsInitialized(Finding finding) {
     if (finding.getInject() != null) {
       Hibernate.initialize(finding.getInject().getAssetGroups());
+      // One level deeper, and this is not decoration. Each asset group serializes its own assets as
+      // ids through MultiIdListSerializer, which walks the lazy collection while Jackson runs -
+      // after the transaction and its scope are gone. Initialising the groups alone leaves every
+      // asset_group_assets array empty, which is the same defect as the one above, one level down.
+      finding
+          .getInject()
+          .getAssetGroups()
+          .forEach(group -> Hibernate.initialize(group.getAssets()));
     }
     Hibernate.initialize(finding.getAssets());
     return finding;

@@ -1,9 +1,11 @@
 package io.openaev.rest.finding;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import io.openaev.IntegrationTest;
 import io.openaev.database.model.ContractOutputType;
 import io.openaev.database.model.Finding;
@@ -13,6 +15,7 @@ import io.openaev.utils.TenantIsolationTestHelper;
 import io.openaev.utils.fixtures.InjectFixture;
 import io.openaev.utils.mockUser.WithMockUser;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -63,6 +66,7 @@ class FindingAssetGroupSinkTest extends IntegrationTest {
   @org.junit.jupiter.api.AfterEach
   void sweep() {
     jdbc.update("DELETE FROM findings_assets WHERE asset_id = ?", assetId);
+    jdbc.update("DELETE FROM asset_groups_assets WHERE asset_id = ?", assetId);
     jdbc.update("DELETE FROM findings WHERE tenant_id = ?", tenantId);
     jdbc.update("DELETE FROM assets WHERE tenant_id = ?", tenantId);
     jdbc.update("DELETE FROM injects_asset_groups WHERE asset_group_id = ?", assetGroupId);
@@ -137,6 +141,17 @@ class FindingAssetGroupSinkTest extends IntegrationTest {
                   .setParameter("f", findingId)
                   .setParameter("a", assetId)
                   .executeUpdate();
+              // The same asset inside the asset group, which is a second, deeper association on the
+              // same activated table: each group serializes its own assets as ids through
+              // MultiIdListSerializer, one level below the group list this test already covers.
+              // Without this row the nested array is legitimately empty and proves nothing.
+              entityManager
+                  .createNativeQuery(
+                      "INSERT INTO asset_groups_assets (asset_group_id, asset_id)"
+                          + " VALUES (:g, :a)")
+                  .setParameter("g", assetGroupId)
+                  .setParameter("a", assetId)
+                  .executeUpdate();
               entityManager.flush();
             });
   }
@@ -150,15 +165,30 @@ class FindingAssetGroupSinkTest extends IntegrationTest {
             .andReturn()
             .getResponse()
             .getContentAsString();
-    assertTrue(
-        body.contains(assetGroupId),
+    // Asserted on the exact JSON paths, not on the whole body. The first version of this test used
+    // body.contains(assetId), which passed on the copy of that id inside finding_assets and so said
+    // nothing about the asset ids nested one level down, inside each asset group. The fail-closed
+    // detector caught what the assertion missed.
+    DocumentContext json = JsonPath.parse(body);
+
+    assertEquals(
+        List.of(assetGroupId),
+        json.read("$.finding_asset_groups[*].asset_group_id"),
         "finding_asset_groups must still hold the inject's asset group; an empty array here is the"
             + " #7026 regression, not a data problem: "
             + body);
-    assertTrue(
-        body.contains(assetId),
+    assertEquals(
+        List.of(assetId),
+        json.read("$.finding_assets"),
         "finding_assets must still hold the linked asset, for the same reason and on the other"
             + " activated table: "
+            + body);
+    assertEquals(
+        List.of(assetId),
+        json.read("$.finding_asset_groups[0].asset_group_assets"),
+        "each asset group must still carry its own asset ids: they are a lazy collection on the"
+            + " activated assets table, serialized by MultiIdListSerializer after the transaction"
+            + " closes, so initialising the groups alone leaves this array empty: "
             + body);
   }
 }
