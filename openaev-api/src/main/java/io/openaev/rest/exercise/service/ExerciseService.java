@@ -1355,9 +1355,9 @@ public class ExerciseService {
       ExpectationType type = entry.getKey();
 
       // we ignore manual expectation
-      //      if (ExpectationType.HUMAN_RESPONSE.equals(type)) {
-      //        continue;
-      //      }
+      if (ExpectationType.HUMAN_RESPONSE.equals(type)) {
+        continue;
+      }
 
       ExpectationResultsByType secondLastSimulationResultsByType =
           secondLastSimulationResultsMap.get(type);
