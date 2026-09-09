@@ -2,11 +2,11 @@ package io.openaev.utils.mapper;
 
 import io.openaev.database.model.*;
 import io.openaev.database.repository.FindingRepository;
-import io.openaev.helper.SensitiveValueMaskingUtils;
 import io.openaev.rest.atomic_testing.form.TargetSimple;
 import io.openaev.rest.finding.form.AggregatedFindingOutput;
 import io.openaev.rest.finding.form.FindingOutput;
 import io.openaev.rest.finding.form.RelatedFindingOutput;
+import io.openaev.utils.SensitiveValueMaskingUtils;
 import io.openaev.utils.TargetType;
 import java.time.Instant;
 import java.util.List;

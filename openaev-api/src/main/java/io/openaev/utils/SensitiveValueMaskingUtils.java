@@ -1,4 +1,4 @@
-package io.openaev.helper;
+package io.openaev.utils;
 
 import io.openaev.database.model.ChainingTypeRegistry;
 import io.openaev.database.model.ContractOutputType;
@@ -18,9 +18,11 @@ import java.util.stream.Collectors;
  * hash makes it masked automatically, with no column, no migration and no flag to thread through
  * the output processors.
  *
- * <p>This class lives in {@code openaev-model} on purpose: masking is needed both by the API layer
- * (finding serialization, chaining engine, attack path) and, potentially, by the indexing layer
- * ({@code FindingHandler}), which cannot depend on {@code openaev-api}.
+ * <p>Note on location: this class currently lives in {@code openaev-api}, which covers every place
+ * the platform hands a value out today (finding serialization, chaining engine, attack path). If
+ * masking at indexing time ever becomes necessary - so that reports and dashboards are covered too
+ * - this class will have to move back down to {@code openaev-model}, because {@code FindingHandler}
+ * lives there and cannot depend on {@code openaev-api}.
  *
  * <p>The database always keeps the cleartext value: deduplication, correlation and attack path
  * computation rely on it. Only the representation handed out is masked.
@@ -34,8 +36,11 @@ public final class SensitiveValueMaskingUtils {
   private static final int MASKING_VISIBLE_FRAGMENT_LENGTH = 2;
   private static final int MASKING_MIN_LENGTH_FOR_FRAGMENT = 5;
 
-  /** Primitive types whose values are secret material and must never leave the platform. */
-  private static final Set<PrimitiveType> SECRET_TYPES =
+  /**
+   * Primitive types whose values are secret material: they must never leave the platform in
+   * cleartext, so any value carrying one of them is masked.
+   */
+  private static final Set<PrimitiveType> TYPE_TO_MASK =
       Set.of(PrimitiveType.Password, PrimitiveType.Hash, PrimitiveType.Key);
 
   /**
@@ -62,7 +67,7 @@ public final class SensitiveValueMaskingUtils {
     if (type == null || NEVER_SENSITIVE.contains(type)) {
       return false;
     }
-    return primitiveTypesOf(type).stream().anyMatch(SECRET_TYPES::contains);
+    return primitiveTypesOf(type).stream().anyMatch(TYPE_TO_MASK::contains);
   }
 
   /**
@@ -80,7 +85,7 @@ public final class SensitiveValueMaskingUtils {
 
   /** Whether values of this primitive type are secret material. */
   public static boolean isSensitive(final PrimitiveType type) {
-    return type != null && SECRET_TYPES.contains(type);
+    return type != null && TYPE_TO_MASK.contains(type);
   }
 
   /**
@@ -92,6 +97,27 @@ public final class SensitiveValueMaskingUtils {
    */
   public static String maskIfNeeded(final PrimitiveType type, final String value) {
     return isSensitive(type) ? mask(value) : value;
+  }
+
+  /**
+   * Whether the candidate value is nothing but the masked representation of the value currently
+   * held.
+   *
+   * <p>A masked value is handed out by the API, so a client editing anything else of the same
+   * object sends it back unchanged. Persisting it would overwrite the secret with its own mask:
+   * this is the guard that detects the echo so the raw value can be kept instead.
+   *
+   * @param type the primitive type of the value
+   * @param rawValue the cleartext value currently held
+   * @param candidateValue the value received from the client
+   * @return true when the candidate is exactly what masking the raw value produces
+   */
+  public static boolean isMaskedRepresentationOfCurrentValue(
+      final PrimitiveType type, final String rawValue, final String candidateValue) {
+    if (type == null || rawValue == null || candidateValue == null) {
+      return false;
+    }
+    return maskIfNeeded(type, rawValue).equals(candidateValue);
   }
 
   /**

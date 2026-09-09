@@ -1,4 +1,4 @@
-package io.openaev.helper;
+package io.openaev.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -94,6 +94,8 @@ class SensitiveValueMaskingUtilsTest {
 
       // -------- Assert --------
       assertThat(masked).isEqualTo("admin:Sup3rS3cret");
+      assertThat(SensitiveValueMaskingUtils.maskIfNeeded(PrimitiveType.Text, "plain"))
+          .isEqualTo("plain");
     }
   }
 
@@ -150,6 +152,18 @@ class SensitiveValueMaskingUtilsTest {
     }
 
     @Test
+    @DisplayName("Should mask password, hash and key the same way")
+    void given_eachSecretPrimitiveType_should_maskItTheSameWay() {
+      // -------- Act & Assert --------
+      assertThat(SensitiveValueMaskingUtils.maskIfNeeded(PrimitiveType.Password, "Secret13"))
+          .isEqualTo("Se" + MASK);
+      assertThat(SensitiveValueMaskingUtils.maskIfNeeded(PrimitiveType.Hash, "ABC123XYZ"))
+          .isEqualTo("AB" + MASK);
+      assertThat(SensitiveValueMaskingUtils.maskIfNeeded(PrimitiveType.Key, "KEY123456890"))
+          .isEqualTo("KE" + MASK);
+    }
+
+    @Test
     @DisplayName("Should not leak the length of the secret")
     void given_twoSecretsOfDifferentLengths_should_produceTheSameMaskWidth() {
       // -------- Act --------
@@ -170,6 +184,49 @@ class SensitiveValueMaskingUtilsTest {
           .isNull();
       assertThat(SensitiveValueMaskingUtils.maskIfNeeded(ContractOutputType.Credentials, "  "))
           .isEqualTo("  ");
+    }
+  }
+
+  @Nested
+  @DisplayName("When echoing a masked value back")
+  class WhenEchoingAMaskedValue {
+
+    @Test
+    @DisplayName("Should recognize the mask of the value currently held")
+    void given_theMaskOfTheCurrentValue_should_recognizeIt() {
+      // -------- Act & Assert --------
+      assertThat(
+              SensitiveValueMaskingUtils.isMaskedRepresentationOfCurrentValue(
+                  PrimitiveType.Password, "TopSecret", "To" + MASK))
+          .isTrue();
+    }
+
+    @Test
+    @DisplayName("Should not mistake a genuine new value for a masked echo")
+    void given_aGenuineValue_should_notRecognizeItAsAnEcho() {
+      // -------- Act & Assert --------
+      assertThat(
+              SensitiveValueMaskingUtils.isMaskedRepresentationOfCurrentValue(
+                  PrimitiveType.Password, "TopSecret", "TopSecret"))
+          .isFalse();
+    }
+
+    @Test
+    @DisplayName("Should handle null arguments without recognizing an echo")
+    void given_aNullArgument_should_notRecognizeAnEcho() {
+      // -------- Act & Assert --------
+      assertThat(
+              SensitiveValueMaskingUtils.isMaskedRepresentationOfCurrentValue(
+                  null, "TopSecret", "To" + MASK))
+          .isFalse();
+      assertThat(
+              SensitiveValueMaskingUtils.isMaskedRepresentationOfCurrentValue(
+                  PrimitiveType.Password, null, "To" + MASK))
+          .isFalse();
+      assertThat(
+              SensitiveValueMaskingUtils.isMaskedRepresentationOfCurrentValue(
+                  PrimitiveType.Password, "TopSecret", null))
+          .isFalse();
     }
   }
 }

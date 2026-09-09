@@ -47,7 +47,7 @@ import io.openaev.service.attackpath.dto.AttackPathFindingPageDTO;
 import io.openaev.service.attackpath.dto.AttackPathFindingVerdictsDTO;
 import io.openaev.service.attackpath.dto.AttackPathNodeDTO;
 import io.openaev.service.attackpath.dto.ConsumedFindingKeyDTO;
-import io.openaev.utils.PrimitiveValueMaskingUtils;
+import io.openaev.utils.SensitiveValueMaskingUtils;
 import io.openaev.utils.mapper.PayloadMapper;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -408,7 +408,7 @@ public class AttackPathGraphService {
 
   /**
    * Replaces each redacted "-&lt;flag&gt; ***" in the injector's own trace with the real value,
-   * partially revealed by {@link PrimitiveValueMaskingUtils} for the fields we mask, in full for
+   * partially revealed by {@link SensitiveValueMaskingUtils} for the fields we mask, in full for
    * every other recognized field (e.g. username). Any unrecognized flag, or a recognized flag we
    * have no resolved value for, is left exactly as the injector logged it.
    */
@@ -429,7 +429,7 @@ public class AttackPathGraphService {
         String displayValue =
             maskedType == null
                 ? fieldValue
-                : PrimitiveValueMaskingUtils.maskForDisplay(maskedType, fieldValue);
+                : SensitiveValueMaskingUtils.maskIfNeeded(maskedType, fieldValue);
         replacement = flag + whitespace + displayValue;
       }
       matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
