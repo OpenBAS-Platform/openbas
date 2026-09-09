@@ -16,6 +16,7 @@ const NotificationCenterTabs = ({ current }: Props) => {
 
   return (
     <Tabs
+      aria-label={t('Notification center')}
       value={current}
       sx={{
         borderBottom: 1,
