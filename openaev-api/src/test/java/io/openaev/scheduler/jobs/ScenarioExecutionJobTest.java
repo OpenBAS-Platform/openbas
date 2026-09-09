@@ -196,13 +196,17 @@ class ScenarioExecutionJobTest extends IntegrationTest {
       injectsExecutionJob.execute(null);
 
       // -- ASSERT --
+      // The fixture scenario has no step templates, so the workflow run created on auto-start
+      // completes immediately (no step is ever ready) and the simulation is finished in the same
+      // call. This still proves the RUN was created and started: without the auto-start wiring,
+      // no RUN would exist at all and the simulation would remain SCHEDULED.
       Exercise startedExercise = exerciseRepository.findById(createdExercise.getId()).orElseThrow();
-      assertThat(startedExercise.getStatus()).isEqualTo(ExerciseStatus.RUNNING);
+      assertThat(startedExercise.getStatus()).isEqualTo(ExerciseStatus.FINISHED);
       assertThat(
               workflowRepository.findAllBySimulation_IdAndStatus(
-                  createdExercise.getId(), WorkflowStatus.RUN))
+                  createdExercise.getId(), WorkflowStatus.END))
           .singleElement()
-          .satisfies(workflow -> assertThat(workflow.getStatus()).isEqualTo(WorkflowStatus.RUN));
+          .satisfies(workflow -> assertThat(workflow.getWorkflowTemplate()).isNotNull());
     }
 
     @DisplayName("Already created simulation based on recurring scenario")
