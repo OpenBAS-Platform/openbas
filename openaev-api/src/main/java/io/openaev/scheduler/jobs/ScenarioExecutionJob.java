@@ -104,23 +104,24 @@ public class ScenarioExecutionJob implements Job {
               // Time-based scenarios stay scheduled and are auto-started later.
               // Chained scenarios only provision their simulation template here; the workflow run
               // is created when the scheduled simulation is auto-started.
-              .forEach(
-                  scenario -> {
-                    Instant start =
-                        scenarioRecurrenceService.getNextExecutionTime(scenario, now).orElse(now);
-                    // Keep scheduled chained simulations non-running here; the run is created on
-                    // auto-start so the workflow lifecycle stays aligned with manual launches.
-                    Exercise exercise =
-                        this.scenarioToExerciseService.toExercise(scenario, start, false);
-                    try {
-                      this.workflowService.provisionSimulationTemplateWorkflowIfChained(
-                          scenario.getId(), exercise);
-                    } catch (ChainingException e) {
-                      throw new IllegalStateException(
-                          "Could not provision chained scenario " + scenario.getId(), e);
-                    }
-                  });
+              .forEach(scenario -> createScheduledExercise(scenario, now));
         });
+  }
+
+  private void createScheduledExercise(Scenario scenario, Instant now) {
+    Instant start = scenarioRecurrenceService.getNextExecutionTime(scenario, now).orElse(now);
+    Exercise exercise = this.scenarioToExerciseService.toExercise(scenario, start, false);
+    // Chained scenarios need the workflow template now; the workflow run is created later when
+    // the scheduled exercise is auto-started.
+    provisionChainedWorkflowTemplateIfNeeded(scenario.getId(), exercise);
+  }
+
+  private void provisionChainedWorkflowTemplateIfNeeded(String scenarioId, Exercise exercise) {
+    try {
+      this.workflowService.provisionSimulationTemplateWorkflowIfChained(scenarioId, exercise);
+    } catch (ChainingException e) {
+      throw new IllegalStateException("Could not provision chained scenario " + scenarioId, e);
+    }
   }
 
   private void executeInTenant(@NotNull final String tenantId, @NotNull final Runnable work) {
