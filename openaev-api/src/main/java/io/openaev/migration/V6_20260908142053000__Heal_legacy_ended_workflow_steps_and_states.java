@@ -31,7 +31,7 @@ public class V6_20260908142053000__Heal_legacy_ended_workflow_steps_and_states
               + " USING workflows w"
               + " WHERE ws.workflow_execution_id = w.workflow_id"
               + " AND w.workflow_status = 'END'"
-              + " AND w.workflow_keep_alive != true;");
+              + " AND w.workflow_keep_alive IS NOT TRUE;");
 
       statement.execute(
           "UPDATE steps"
@@ -40,7 +40,7 @@ public class V6_20260908142053000__Heal_legacy_ended_workflow_steps_and_states
               + " WHERE steps.step_workflow_id = w.workflow_id"
               + " AND steps.step_status::text NOT IN ('END', 'TEMPLATE')"
               + " AND w.workflow_status = 'END'"
-              + " AND w.workflow_keep_alive != true;");
+              + " AND w.workflow_keep_alive IS NOT TRUE;");
     }
   }
 }
