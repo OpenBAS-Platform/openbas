@@ -57,7 +57,7 @@ test.describe('Multi-tenancy — tenant management', () => {
         response => response.url().includes('/api/me/tenants')
           && response.request().method() === 'GET'
           && response.ok(),
-        { timeout: 3*TIMEOUT },
+        { timeout: 3 * TIMEOUT },
       ),
       tenantsPage.submitCreate(),
     ]);
