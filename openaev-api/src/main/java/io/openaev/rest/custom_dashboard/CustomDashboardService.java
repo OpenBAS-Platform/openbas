@@ -6,11 +6,10 @@ import static io.openaev.database.specification.CustomDashboardSpecification.byN
 import static io.openaev.helper.StreamHelper.fromIterable;
 import static io.openaev.utils.pagination.PaginationUtils.buildPaginationJPA;
 
-import io.openaev.context.TenantContext;
 import io.openaev.database.model.CustomDashboard;
 import io.openaev.database.model.Setting;
-import io.openaev.database.model.TenantSettingKeys;
 import io.openaev.database.model.Tenant;
+import io.openaev.database.model.TenantSettingKeys;
 import io.openaev.database.model.Widget;
 import io.openaev.database.raw.RawCustomDashboard;
 import io.openaev.database.repository.CustomDashboardRepository;
@@ -265,17 +264,26 @@ public class CustomDashboardService {
   }
 
   private Optional<CustomDashboard> findTenantDefaultDashboardForResource(final String resourceId) {
-    final TenantSettingKeys defaultDashboardKey;
-    if (this.scenarioRepository.existsById(resourceId)) {
-      defaultDashboardKey = TenantSettingKeys.TENANT_SCENARIO_DASHBOARD;
-    } else if (this.exerciseRepository.existsById(resourceId)) {
-      defaultDashboardKey = TenantSettingKeys.TENANT_SIMULATION_DASHBOARD;
-    } else {
-      return Optional.empty();
-    }
-    String tenantId = TenantContext.getCurrentTenant();
-    return this.tenantSettingsService
-        .findSetting(tenantId, defaultDashboardKey.key())
+    Optional<Map.Entry<String, TenantSettingKeys>> scopedDashboardSetting =
+        this.scenarioRepository
+            .findById(resourceId)
+            .map(
+                scenario ->
+                    Map.entry(scenario.getTenant().getId(), TenantSettingKeys.TENANT_SCENARIO_DASHBOARD))
+            .or(
+                () ->
+                    this.exerciseRepository
+                        .findById(resourceId)
+                        .map(
+                            exercise ->
+                                Map.entry(
+                                    exercise.getTenant().getId(),
+                                    TenantSettingKeys.TENANT_SIMULATION_DASHBOARD)));
+    return scopedDashboardSetting
+        .flatMap(
+            tenantAndKey ->
+                this.tenantSettingsService.findSetting(
+                    tenantAndKey.getKey(), tenantAndKey.getValue().key()))
         .map(Setting::getValue)
         .filter(value -> !value.isEmpty())
         .flatMap(this.customDashboardRepository::findById);
