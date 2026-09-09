@@ -31,12 +31,13 @@ import org.springframework.test.context.TestPropertySource;
  * class is not {@code @Transactional}: the scoped primitive refuses to open inside an active
  * transaction, so seeding goes through an auto-committing {@link JdbcTemplate}.
  */
-@TestPropertySource(properties = "openaev.tenant.active-tables=asset_groups")
+@TestPropertySource(properties = "openaev.tenant.active-tables=asset_groups,findings")
 @DisplayName("product inventory gauges keep counting across tenants once a table is v2-active")
 class ProductInventoryTenantScopeTest extends IntegrationTest {
 
   @Autowired private ProductInventoryMetricCollector collector;
   @Autowired private DataSource dataSource;
+  @Autowired private io.openaev.database.repository.FindingRepository findingRepository;
 
   private JdbcTemplate jdbc;
   private final List<String> seededTenants = new ArrayList<>();
@@ -84,6 +85,32 @@ class ProductInventoryTenantScopeTest extends IntegrationTest {
         name);
     seededTenants.add(id);
     return id;
+  }
+
+  @Test
+  @DisplayName("the findings gauge counts every tenant's rows, not zero")
+  void findingsGaugeCountsAcrossTenants() {
+    // Same shape as the asset-group case above, on the table lot C activates. Non-empty on purpose:
+    // asserting zero would stay green through exactly the fail-closed regression this pins.
+    long baselineFindings =
+        requireNonNull(jdbc.queryForObject("SELECT count(*) FROM findings", Long.class));
+    assertEquals(
+        baselineFindings,
+        collector.countFindings(),
+        "findings_total must span every tenant; a zero here means the supplier lost its"
+            + " TxCtx.allTenants() scope and the gauge silently stopped counting");
+  }
+
+  @Test
+  @DisplayName("the same count without a scope returns zero: this is what the scope prevents")
+  void findingsCountUnscopedIsZero() {
+    // The red half. Without it the assertion above would also pass in a context where the
+    // inspector never fires, and would prove nothing about scoping.
+    assertEquals(
+        0L,
+        findingRepository.count(),
+        "an unscoped count on an active table must be zero; if it now returns rows the inspector"
+            + " stopped firing and the assertion above no longer proves anything");
   }
 
   private void seedAssetGroup(String tenantId, String name) {

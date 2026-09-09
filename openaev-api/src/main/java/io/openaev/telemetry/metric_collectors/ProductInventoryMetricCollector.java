@@ -56,8 +56,8 @@ import org.springframework.stereotype.Service;
  * <p>{@link #collectSecurityPlatforms()} and {@link #collectEndpoints()} carry the same scope for
  * the same reason: both count rows of the {@code assets} table (#6438).
  *
- * <p>TODO v2: #6442 - once findings gets v2 activated, {@code findings_total} needs the same
- * explicit scope. The same applies to any other gauge here whose table joins a future activation.
+ * <p>{@link #countFindings()} carries it too, for the same reason (#6420). The same applies to any
+ * other gauge here whose table joins a future activation.
  */
 @Slf4j
 @Service
@@ -138,7 +138,7 @@ public class ProductInventoryMetricCollector {
         "Number of chaining workflows",
         () -> safeCount(workflowRepository::count));
     metricRegistry.registerGauge(
-        "findings_total", "Number of findings", () -> safeCount(findingRepository::count));
+        "findings_total", "Number of findings", () -> safeCount(this::countFindings));
     metricRegistry.registerGauge(
         "vulnerabilities_total",
         "Number of vulnerabilities",
@@ -246,6 +246,16 @@ public class ProductInventoryMetricCollector {
       log.error("Telemetry - Failed to collect endpoint inventory", e);
     }
     return result;
+  }
+
+  /**
+   * Platform-wide on purpose, like every gauge here, and explicitly scoped because {@code findings}
+   * is v2-active: with {@code app.current_tenants} unset the inspector makes {@code
+   * can_access_tenant} false for every row and the count is silently ZERO. Same treatment as {@link
+   * #countAssetGroups()} (#6420).
+   */
+  long countFindings() {
+    return tenantTx.<Long>execute(TxCtx.allTenants(), () -> findingRepository.count());
   }
 
   private long countRecurringScenarios() {
