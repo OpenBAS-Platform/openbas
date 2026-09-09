@@ -60,7 +60,6 @@ import io.openaev.injectors.challenge.ChallengeExecutor;
 import io.openaev.injectors.channel.ChannelExecutor;
 import io.openaev.injectors.phishing.service.PhishingLandingPageService;
 import io.openaev.integration.ManagerFactory;
-import io.openaev.notification.engine.NotificationDispatchService;
 import io.openaev.integration.impl.injectors.challenge.ChallengeInjectorIntegration;
 import io.openaev.integration.impl.injectors.challenge.ChallengeInjectorIntegrationFactory;
 import io.openaev.integration.migration.ConfigurationMigration;
