@@ -87,6 +87,9 @@ class FindingOrphanRemovalTest extends IntegrationTest {
   void sweep() {
     jdbc.update("DELETE FROM findings WHERE tenant_id = ?", tenantId);
     jdbc.update("DELETE FROM injects WHERE tenant_id = ?", tenantId);
+    // Committed by createTenantWithCurrentUser and never rolled back, this class not being
+    // transactional. Own rows first, as deleteCommittedTenants documents, then the tenant (#7873).
+    tenantHelper.deleteCommittedTenants(tenantId);
   }
 
   @Test

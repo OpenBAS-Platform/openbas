@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.UUID;
 import org.hibernate.Session;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,6 +56,13 @@ class FindingWriteAttributionTest extends IntegrationTest {
     // The ambient tenant is deliberately NOT the inject's: that is what distinguishes attribution
     // from the inject from attribution by the listener.
     TenantContext.setCurrentTenant(ambientTenant);
+  }
+
+  @AfterEach
+  void clearTheAmbientTenant() {
+    // The rows roll back with the test transaction, the thread-local does not: it would carry this
+    // deliberately-wrong tenant into whatever runs next on the same thread.
+    TenantContext.clearCurrentTenant();
   }
 
   @Test

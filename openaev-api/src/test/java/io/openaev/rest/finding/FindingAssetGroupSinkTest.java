@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import io.openaev.IntegrationTest;
+import io.openaev.context.TenantContext;
 import io.openaev.database.model.ContractOutputType;
 import io.openaev.database.model.Finding;
 import io.openaev.database.model.Inject;
@@ -72,6 +73,15 @@ class FindingAssetGroupSinkTest extends IntegrationTest {
     jdbc.update("DELETE FROM injects_asset_groups WHERE asset_group_id = ?", assetGroupId);
     jdbc.update("DELETE FROM asset_groups WHERE tenant_id = ?", tenantId);
     jdbc.update("DELETE FROM injects WHERE tenant_id = ?", tenantId);
+    // The tenant was COMMITTED by createTenantWithCurrentUser, and this class is not transactional,
+    // so nothing rolls it back. Its own rows go first, as deleteCommittedTenants documents, then
+    // the
+    // tenant itself. Leaving it behind is what accumulates onboarding residue and per-tenant broker
+    // queues across a run (#7873).
+    tenantHelper.deleteCommittedTenants(tenantId);
+    // switchToTenant set the thread-local; it is not transactional either and would otherwise leak
+    // into whatever test runs next on this thread.
+    TenantContext.clearCurrentTenant();
   }
 
   @BeforeEach
