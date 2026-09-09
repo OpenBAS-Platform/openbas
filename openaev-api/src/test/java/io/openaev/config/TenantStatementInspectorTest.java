@@ -964,4 +964,42 @@ class TenantStatementInspectorTest {
         "both unnest FROM items must be LATERAL, otherwise the inspector refuses the query: "
             + out);
   }
+
+  // --- findings activation (#6420): the ES indexing query --------------------
+  //
+  // findForIndexing groups on f.finding_id and projects seven more columns of findings, relying on
+  // PostgreSQL's functional-dependency rule. That rule applies to BASE TABLES only, and the
+  // inspector rewrites "FROM findings f" into a derived table, so activating findings makes the
+  // query invalid SQL and search indexing fails outright. The query is read reflectively from the
+  // annotation, so an edit to the SQL is caught rather than a copy of it.
+
+  @Test
+  @DisplayName("the findings indexing query groups on every projected column")
+  void findingIndexingQueryGroupsOnEveryProjectedColumn() throws Exception {
+    String sql =
+        io.openaev.database.repository.FindingRepository.class
+            .getMethod("findForIndexing", java.time.Instant.class, int.class)
+            .getAnnotation(org.springframework.data.jpa.repository.Query.class)
+            .value();
+    String groupBy = sql.substring(sql.indexOf("GROUP BY")).toLowerCase();
+    for (String projected :
+        new String[] {
+          "f.finding_id",
+          "f.finding_value",
+          "f.finding_type",
+          "f.finding_field",
+          "f.finding_inject_id",
+          "f.finding_created_at",
+          "f.finding_updated_at",
+          "f.tenant_id"
+        }) {
+      assertTrue(
+          groupBy.contains(projected),
+          projected
+              + " is projected without being aggregated, so it must appear in the GROUP BY: the"
+              + " inspector's derived table removes the functional dependency the query would"
+              + " otherwise rely on. GROUP BY was: "
+              + groupBy);
+    }
+  }
 }
