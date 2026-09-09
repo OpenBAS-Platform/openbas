@@ -1,5 +1,8 @@
 package io.openaev.scheduler.jobs;
 
+import io.openaev.context.TenantContext;
+import io.openaev.context.TenantScopedTransaction;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.Step;
 import io.openaev.database.model.StepDelayQueue;
 import io.openaev.rest.exception.ChainingException;
@@ -25,6 +28,7 @@ public class QueueChainingJob implements Job {
   private final StepService stepService;
   private final WorkflowService workflowService;
   private final TransactionTemplate transactionTemplate;
+  private final TenantScopedTransaction tenantTx;
 
   /** Periodically processes the next eligible step from the delay queue. */
   @Override
@@ -40,6 +44,29 @@ public class QueueChainingJob implements Job {
               "[Chaining] QueueChainingJob: processing {} delayed step(s)", stepsDelayQueue.size());
 
           for (StepDelayQueue stepDelayQueue : stepsDelayQueue) {
+            // popNextPerWorkflowRun spans workflow runs and therefore tenants, while this job runs
+            // in ONE transaction so a processing failure rolls the DELETE back. Both scopes are
+            // moved per entry instead: the v2 GUC for the reads the inspector rewrites, and the v1
+            // thread-local for the tenant TenantBaseListener stamps on a write.
+            //
+            // Without this the whole transaction has no scope, and createReadySteps reaches
+            // ScopeService.getValidAssets -> assetService.assets(ids) on the activated assets
+            // table. That returns empty, expandTargetBatches takes its "scope resolves to no asset"
+            // branch, and the delayed inject fires with no per-asset target. No exception, no log.
+            String tenantId = tenantOf(stepDelayQueue);
+            if (tenantId == null) {
+              // Processed anyway rather than skipped: dropping a queued step would be the same
+              // silent loss this scoping exists to prevent, and a run with no simulation has no
+              // tenant to scope to. The warning is what makes the degraded read visible.
+              log.warn(
+                  "[Chaining] Delayed step {} has no simulation tenant, so it is processed with no"
+                      + " tenant scope: any read of an activated table will come back empty.",
+                  stepDelayQueue.getId());
+            } else {
+              TenantContext.setCurrentTenant(tenantId);
+              tenantTx.setScopeOnCurrentTransaction(TxCtx.forTenant(tenantId));
+            }
+
             // Guard: ignore if workflow run has already ended (e.g. timeout).
             if (workflowService.isWorkflowEnded(stepDelayQueue.getWorkflowRun().getId())) {
               log.info(
@@ -69,6 +96,20 @@ public class QueueChainingJob implements Job {
               log.error("[Chaining] Delay consume failed : {}", e.getMessage(), e);
             }
           }
+          TenantContext.clearCurrentTenant();
         });
+  }
+
+  /**
+   * The tenant a delayed step belongs to. {@code workflows} carries no tenant column of its own;
+   * the owning simulation does, through {@code TenantBase}.
+   */
+  private static String tenantOf(StepDelayQueue stepDelayQueue) {
+    if (stepDelayQueue.getWorkflowRun() == null
+        || stepDelayQueue.getWorkflowRun().getSimulation() == null
+        || stepDelayQueue.getWorkflowRun().getSimulation().getTenant() == null) {
+      return null;
+    }
+    return stepDelayQueue.getWorkflowRun().getSimulation().getTenant().getId();
   }
 }
