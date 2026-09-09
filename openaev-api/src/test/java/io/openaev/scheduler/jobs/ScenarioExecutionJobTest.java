@@ -211,7 +211,7 @@ class ScenarioExecutionJobTest extends IntegrationTest {
       createdExercise.setStart(Instant.now().minusSeconds(60));
       exerciseRepository.save(createdExercise);
 
-      injectsExecutionJob.handleAutoStartExercises();
+      injectsExecutionJob.autoStartDueExercises();
 
       Exercise startedExercise = exerciseRepository.findById(createdExercise.getId()).orElseThrow();
       assertThat(startedExercise.getStatus()).isEqualTo(ExerciseStatus.RUNNING);
