@@ -48,10 +48,14 @@ class ScenarioApiTenantPathTest extends IntegrationTest {
     @DisplayName("given_scenarioInTenant_should_returnScenarioDetails")
     void given_scenarioInTenant_should_returnScenarioDetails() throws Exception {
       // Arrange
-      String tenantId = tenantIsolationHelper.createTenantWithCurrentUser("scenario-tenant-path").getId();
+      String tenantId =
+          tenantIsolationHelper.createTenantWithCurrentUser("scenario-tenant-path").getId();
       tenantIsolationHelper.switchToTenant(tenantId, entityManager);
       Scenario scenario =
-          scenarioComposer.forScenario(ScenarioFixture.createDefaultCrisisScenario()).persist().get();
+          scenarioComposer
+              .forScenario(ScenarioFixture.createDefaultCrisisScenario())
+              .persist()
+              .get();
 
       // Act / Assert
       mvc.perform(get(TENANT_SCENARIO_URI + "/{scenarioId}", tenantId, scenario.getId()))
@@ -61,4 +65,3 @@ class ScenarioApiTenantPathTest extends IntegrationTest {
     }
   }
 }
-
