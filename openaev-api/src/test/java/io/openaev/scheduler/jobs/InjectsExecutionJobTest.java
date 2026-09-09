@@ -16,16 +16,13 @@ import io.openaev.database.repository.ComcheckRepository;
 import io.openaev.database.repository.EndpointRepository;
 import io.openaev.database.repository.ExerciseRepository;
 import io.openaev.database.repository.InjectRepository;
-import io.openaev.database.repository.ScenarioRepository;
 import io.openaev.database.repository.UserRepository;
-import io.openaev.database.repository.WorkflowRepository;
 import io.openaev.execution.ExecutableInject;
 import io.openaev.healthcheck.utils.HealthCheckUtils;
 import io.openaev.helper.InjectHelper;
 import io.openaev.integration.Manager;
 import io.openaev.integration.ManagerFactory;
 import io.openaev.rest.exercise.service.ExerciseService;
-import io.openaev.service.chaining.WorkflowService;
 import io.openaev.utils.fixtures.*;
 import io.openaev.utils.fixtures.composers.*;
 import jakarta.persistence.EntityManager;
@@ -63,7 +60,6 @@ class InjectsExecutionJobTest extends IntegrationTest {
   @Autowired private ExerciseService exerciseService;
   @Autowired private InjectRepository injectRepository;
   @Autowired private InjectHelper injectHelper;
-  @Autowired private WorkflowService workflowService;
 
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private ScenarioComposer scenarioComposer;
@@ -80,8 +76,6 @@ class InjectsExecutionJobTest extends IntegrationTest {
   @Autowired private UserRepository userRepository;
   @Autowired private InjectorContractFixture injectorContractFixture;
   @Autowired private ExerciseRepository exerciseRepository;
-  @Autowired private ScenarioRepository scenarioRepository;
-  @Autowired private WorkflowRepository workflowRepository;
   @Autowired private EndpointRepository endpointRepository;
   @Autowired private AgentRepository agentRepository;
   @Autowired private PlatformTransactionManager transactionManager;
