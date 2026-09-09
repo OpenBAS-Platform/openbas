@@ -17,7 +17,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openaev.IntegrationTest;
-import io.openaev.context.TenantContext;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.ChallengeRepository;
 import io.openaev.database.repository.InjectRepository;
@@ -63,15 +62,14 @@ class ChallengeApiTest extends IntegrationTest {
   @WithMockUser(isAdmin = true)
   void retrieveChallengesVariableForScenarioTest() throws Exception {
     // -- PREPARE --
-    challengeInjectorIntegrationFactory.registerConnectorForTenant(
-        TenantContext.getCurrentTenant());
-
     Scenario scenario = createDefaultCrisisScenario();
     Scenario scenarioCreated = this.scenarioService.createScenario(scenario);
     assertNotNull(scenarioCreated, "Scenario should be successfully created");
+    challengeInjectorIntegrationFactory.registerConnectorForTenant(scenarioCreated.getTenant().getId());
     String SCENARIO_ID = scenarioCreated.getId();
 
     Challenge challenge = createDefaultChallenge();
+    challenge.setTenant(scenarioCreated.getTenant());
     Challenge challengeCreated = this.challengeRepository.save(challenge);
     assertNotNull(challengeCreated, "Challenge should be successfully created");
     String CHALLENGE_ID = challengeCreated.getId();

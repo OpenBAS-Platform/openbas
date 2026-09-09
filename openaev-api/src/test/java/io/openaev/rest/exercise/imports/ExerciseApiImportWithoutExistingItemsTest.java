@@ -1,6 +1,6 @@
 package io.openaev.rest.exercise.imports;
 
-import static io.openaev.rest.exercise.ExerciseApi.EXERCISE_URI;
+import static io.openaev.rest.exercise.ExerciseApi.TENANT_EXERCISE_URI;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -20,6 +20,7 @@ import io.openaev.utils.constants.Constants;
 import io.openaev.utils.fixtures.*;
 import io.openaev.utils.fixtures.composers.*;
 import io.openaev.utils.helpers.TagHelper;
+import io.openaev.utils.mockUser.TestUserHolder;
 import io.openaev.utils.mockUser.WithMockUser;
 import jakarta.persistence.EntityManager;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -69,11 +71,17 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
   @Autowired private EntityManager entityManager;
   @Autowired private ChallengeService challengeService;
   @Autowired private ChallengeInjectorIntegrationFactory challengeInjectorIntegrationFactory;
+  @Autowired private TenantRepository tenantRepository;
+  @Autowired private TestUserHolder testUserHolder;
 
   private static final int FULL_EXPORT_OPTIONS = ExportOptions.mask(true, true, true);
 
   @BeforeEach
   void before() throws Exception {
+    if (testUserHolder.isSet()) {
+      tenantRepository.addUserToTenant(testUserHolder.get().getId(), Tenant.DEFAULT_TENANT_UUID);
+    }
+
     lessonsQuestionsComposer.reset();
     lessonsCategoryComposer.reset();
     teamComposer.reset();
@@ -168,6 +176,14 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
     return exportService.exportExerciseToZip(exercise, FULL_EXPORT_OPTIONS, true);
   }
 
+  private ResultActions doImport(MockMultipartFile mmf) throws Exception {
+    return mvc.perform(
+        multipart(TENANT_EXERCISE_URI + "/import", Tenant.DEFAULT_TENANT_UUID)
+            .file(mmf)
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .with(csrf()));
+  }
+
   @DisplayName(
       "Given a valid export zip file, given no preexisting objects, exercise imported correctly")
   @Test
@@ -181,12 +197,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -220,12 +232,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -260,12 +268,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -291,12 +295,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -338,12 +338,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -373,12 +369,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -413,12 +405,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -453,12 +441,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -502,12 +486,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -534,12 +514,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -580,12 +556,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -614,12 +586,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -653,12 +621,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -686,12 +650,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -728,12 +688,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -763,12 +719,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -806,12 +758,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -838,12 +786,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -879,12 +823,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -911,12 +851,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -962,12 +898,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -994,12 +926,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -1040,12 +968,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -1072,12 +996,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
@@ -1124,12 +1044,8 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
-    mvc.perform(
-            multipart(EXERCISE_URI + "/import")
-                .file(mmf)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .with(csrf()))
-        .andExpect(status().is2xxSuccessful());
+    doImport(mmf)
+         .andExpect(status().is2xxSuccessful());
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
