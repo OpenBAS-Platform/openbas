@@ -12,6 +12,8 @@ import io.openaev.api.chaining.InjectExecutionStep;
 import io.openaev.api.chaining.dto.ConditionCreateInput;
 import io.openaev.api.chaining.dto.StepInput;
 import io.openaev.api.chaining.dto.StepsCreateInput;
+import io.openaev.context.TenantContext;
+import io.openaev.context.TenantScopedTransaction;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.StepDelayQueueRepository;
 import io.openaev.database.repository.StepRepository;
@@ -50,6 +52,7 @@ class StepServiceTest {
   @Mock private StepDelayQueueService stepDelayQueueService;
   @Mock private StepDelayQueueRepository stepDelayQueueRepository;
   @Mock private SimulationRateLimitService simulationRateLimitService;
+  @Mock private TenantScopedTransaction tenantScopedTransaction;
 
   @Spy @InjectMocks StepService stepService;
   private QueueChainingJob queueChainingJob;
@@ -77,8 +80,25 @@ class StepServiceTest {
         .executeWithoutResult(any());
     queueChainingJob =
         new QueueChainingJob(
-            stepDelayQueueService, stepService, workflowService, transactionTemplate);
+            stepDelayQueueService,
+            stepService,
+            workflowService,
+            transactionTemplate,
+            tenantScopedTransaction);
+    lenient()
+        .doAnswer(
+            invocation -> {
+              ((Runnable) invocation.getArgument(1)).run();
+              return null;
+            })
+        .when(tenantScopedTransaction)
+        .executeNew(any(), any(Runnable.class));
     workflow = mock(Workflow.class);
+  }
+
+  @org.junit.jupiter.api.AfterEach
+  void tearDown() {
+    TenantContext.clearCurrentTenant();
   }
 
   /* ============================================================
@@ -986,6 +1006,11 @@ class StepServiceTest {
             .thenReturn(stepFound ? List.of(stepDelayQueue) : new ArrayList<>());
 
         if (stepFound) {
+          Exercise simulation = mock(Exercise.class);
+          Tenant tenant = mock(Tenant.class);
+          when(tenant.getId()).thenReturn("tenant-1");
+          when(simulation.getTenant()).thenReturn(tenant);
+          when(workflowRun.getSimulation()).thenReturn(simulation);
           when(stepDelayQueue.getWorkflowRun()).thenReturn(workflowRun);
           when(stepDelayQueue.getStepTemplate()).thenReturn(step);
 

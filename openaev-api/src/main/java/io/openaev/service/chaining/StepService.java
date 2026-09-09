@@ -1100,16 +1100,29 @@ public class StepService {
    * Ends all active steps for the given workflow run.
    *
    * @param workflowId the workflow run ID
-   * @return number of steps terminated
+   * @param cause the reason the workflow is ending, used for logging
    */
-  public int endActiveStepsByWorkflowId(String workflowId) {
-    List<Step> activeSteps =
-        stepRepository.findAllStepByWorkflow_IdAndStatusIn(workflowId, ACTIVE_STEP_STATUS);
+  public void endActiveStepsByWorkflowId(
+      String workflowId, WorkflowEndService.WORKFLOW_END_CAUSE cause) {
+    List<Step> activeSteps = findAllStepActiveByWorkflowRunId(workflowId);
     for (Step step : activeSteps) {
       step.setStatus(StepStatus.END);
     }
     stepRepository.saveAll(activeSteps);
-    return activeSteps.size();
+    if (cause == WorkflowEndService.WORKFLOW_END_CAUSE.NO_MORE_PROGRESS) {
+      if (!activeSteps.isEmpty())
+        log.error(
+            "[Chaining] Workflow {} ended due to {}. But {} active step(s) are still running.",
+            workflowId,
+            cause.name(),
+            activeSteps.size());
+    } else {
+      log.info(
+          "[Chaining] Stop {} active step(s). Workflow run {} force-completed due to {}.",
+          activeSteps.size(),
+          workflowId,
+          cause.name());
+    }
   }
 
   private Step findStepFromCondition(String stepFromId) {
