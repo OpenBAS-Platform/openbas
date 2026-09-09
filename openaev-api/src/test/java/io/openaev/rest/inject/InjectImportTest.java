@@ -295,17 +295,17 @@ class InjectImportTest extends IntegrationTest {
   private ResultActions doImportForScenario(String scenarioId, byte[] importZipData)
       throws Exception {
     String uri = String.format(SCENARIO_IMPORT_URI, scenarioId);
-    return doImportStringInput(uri, importZipData);
+    return doImportStringInput(tenantUri(uri), importZipData);
   }
 
   private ResultActions doImportForSimulation(String simulationId, byte[] importZipData)
       throws Exception {
     String uri = String.format(SIMULATION_IMPORT_URI, simulationId);
-    return doImportStringInput(uri, importZipData);
+    return doImportStringInput(tenantUri(uri), importZipData);
   }
 
   private ResultActions doImportForAtomicTestings(byte[] importZipData) throws Exception {
-    return doImportStringInput(ATOMIC_TESTING_IMPORT_URI, importZipData);
+    return doImportStringInput(tenantUri(ATOMIC_TESTING_IMPORT_URI), importZipData);
   }
 
   private ResultActions doImportStringInput(String uri, byte[] importZipData) throws Exception {

@@ -9,6 +9,7 @@ import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 import io.openaev.api.chaining.InjectExecutionStep;
+import io.openaev.database.model.Article;
 import io.openaev.database.model.AttackPattern;
 import io.openaev.database.model.CatalogConnector;
 import io.openaev.database.model.Document;
@@ -20,6 +21,7 @@ import io.openaev.database.model.SecurityPlatform;
 import io.openaev.database.model.Vulnerability;
 import io.openaev.database.model.attackpath.AttackPathExecution;
 import io.openaev.database.repository.ChallengeRepository;
+import io.openaev.database.repository.ChannelRepository;
 import io.openaev.database.repository.CollectorRepository;
 import io.openaev.database.repository.ConnectorInstanceRepository;
 import io.openaev.database.repository.CweRepository;
@@ -51,6 +53,7 @@ import io.openaev.healthcheck.utils.HealthCheckUtils;
 import io.openaev.helper.InjectHelper;
 import io.openaev.importer.V1_DataImporter;
 import io.openaev.injectors.challenge.ChallengeExecutor;
+import io.openaev.injectors.channel.ChannelExecutor;
 import io.openaev.injectors.phishing.service.PhishingLandingPageService;
 import io.openaev.integration.ManagerFactory;
 import io.openaev.integration.impl.injectors.challenge.ChallengeInjectorIntegration;
@@ -66,6 +69,8 @@ import io.openaev.rest.attack_pattern.service.AttackPatternService;
 import io.openaev.rest.challenge.ChallengeApi;
 import io.openaev.rest.challenge.ScenarioChallengeApi;
 import io.openaev.rest.challenge.SimulationChallengeApi;
+import io.openaev.rest.channel.ChannelApi;
+import io.openaev.rest.channel.output.ArticleOutput;
 import io.openaev.rest.collector.CollectorApi;
 import io.openaev.rest.collector.service.CollectorService;
 import io.openaev.rest.connector_instance.ConnectorInstanceApi;
@@ -75,10 +80,12 @@ import io.openaev.rest.domain.DomainService;
 import io.openaev.rest.executor.ExecutorApi;
 import io.openaev.rest.exercise.ExerciseApi;
 import io.openaev.rest.exercise.ExerciseImportApi;
+import io.openaev.rest.exercise.exports.ExerciseFileExport;
 import io.openaev.rest.exercise.service.ExerciseService;
 import io.openaev.rest.inject.InjectApi;
 import io.openaev.rest.inject.ScenarioInjectApi;
 import io.openaev.rest.inject.SimulationInjectApi;
+import io.openaev.rest.inject.exports.InjectsFileExport;
 import io.openaev.rest.inject.service.InjectService;
 import io.openaev.rest.inject.service.ScenarioInjectService;
 import io.openaev.rest.inject_expectation_trace.InjectExpectationTraceApi;
@@ -103,6 +110,7 @@ import io.openaev.rest.scenario.ScenarioImportApi;
 import io.openaev.rest.vulnerability.service.VulnerabilityService;
 import io.openaev.scheduler.jobs.ComchecksExecutionJob;
 import io.openaev.service.ChallengeService;
+import io.openaev.service.ChannelService;
 import io.openaev.service.EndpointService;
 import io.openaev.service.EsAttackPathService;
 import io.openaev.service.InjectExpectationTraceService;
@@ -182,6 +190,7 @@ class TenantActiveTableAccessArchTest {
           "collectors",
           "executors",
           "injectors",
+          "channels",
           "domains",
           "attackpath_execution",
           "attackpath_finding",
@@ -352,6 +361,73 @@ class TenantActiveTableAccessArchTest {
           .because(
               "domains is tenant-active: an accessor without a tenant scope silently reads zero"
                   + " rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule channels_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // TxCtx-carrying entrypoints, pinned by TenantScopedEntrypointsTxCtxArchTest:
+              ChannelApi.class,
+              // Service behind the ChannelApi handlers and the scenario/exercise channel lists:
+              ChannelService.class,
+              // HTTP-triggered importer; resolves the write tenant explicitly before reusing or
+              // creating a channel.
+              V1_DataImporter.class,
+              // Documented degraded background reader (telemetry counts read 0 rows unscoped):
+              ProductInventoryMetricCollector.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(ChannelRepository.class)
+          .because(
+              "channels is tenant-active: an accessor without a tenant scope silently reads zero"
+                  + " rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule channels_article_association_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // Derived getArticlesForChannel helpers on the owning aggregates:
+              Exercise.class,
+              Scenario.class,
+              // Mapped inside the scoped transaction of the calling handlers:
+              ArticleOutput.class,
+              ChannelService.class,
+              // Scenario/exercise copy flows read the channel association while carrying the source
+              // tenant scope, not from an unscoped serializer.
+              ExerciseService.class,
+              ScenarioService.class,
+              ScenarioToExerciseService.class,
+              // Background inject execution resolves article URLs under TenantScopedJobRunner.
+              ChannelExecutor.class,
+              // Export builders read the association inside TxCtx-scoped export handlers.
+              ExerciseFileExport.class,
+              InjectsFileExport.class)
+          .should()
+          .callMethod(Article.class, "getChannel")
+          .because(
+              "channels is reached through Article#getChannel without touching ChannelRepository."
+                  + " A lazy association load outside a scoped transaction silently resolves no"
+                  + " channel. New callers must run inside a scoped transaction and be allowlisted"
+                  + " here");
+
+  @ArchTest
+  static final ArchRule channels_document_logo_association_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // Relations DTO is built inside DocumentApi#getDocumentRelations' scoped
+              // transaction.
+              DocumentMapper.class)
+          .should()
+          .callMethod(Document.class, "getChannelsByLogoDark")
+          .orShould()
+          .callMethod(Document.class, "getChannelsByLogoLight")
+          .because(
+              "channels is also reached through Document's inverse logo associations without"
+                  + " touching ChannelRepository. New callers must build those relations inside a"
+                  + " scoped transaction and be allowlisted here");
 
   @ArchTest
   static final ArchRule collectors_repository_access_is_reviewed =
