@@ -1,6 +1,6 @@
 package io.openaev.rest.exercise.imports;
 
-import static io.openaev.rest.exercise.ExerciseApi.EXERCISE_URI;
+import static io.openaev.rest.exercise.ExerciseApi.TENANT_EXERCISE_URI;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -101,59 +101,63 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   // it runs out most tests use this exact structure as test data, therefore it's in its own
   // function up here
   private ExerciseComposer.Composer getExercise() {
-    return exerciseComposer
-        .forExercise(ExerciseFixture.createDefaultExercise())
-        .withArticle(
-            articleComposer
-                .forArticle(ArticleFixture.getDefaultArticle())
-                .withChannel(channelComposer.forChannel(ChannelFixture.getDefaultChannel())))
-        .withLessonCategory(
-            lessonsCategoryComposer
-                .forLessonsCategory(LessonsCategoryFixture.createDefaultLessonsCategory())
-                .withLessonsQuestion(
-                    lessonsQuestionsComposer.forLessonsQuestion(
-                        LessonsQuestionFixture.createDefaultLessonsQuestion())))
-        .withTeam(
-            teamComposer
-                .forTeam(TeamFixture.getDefaultTeam())
-                .withOrganisation(
-                    organizationComposer.forOrganization(
-                        OrganizationFixture.createDefaultOrganisation()))
-                .withTag(tagComposer.forTag(TagFixture.getTagWithText("Team tag")))
-                .withUser(userComposer.forUser(UserFixture.getUserWithDefaultEmail()))
-                .withUser(
-                    userComposer
-                        .forUser(UserFixture.getUserWithDefaultEmail())
-                        .withTag(tagComposer.forTag(TagFixture.getTagWithText("User tag")))
-                        .withOrganization(
-                            organizationComposer
-                                .forOrganization(OrganizationFixture.createDefaultOrganisation())
-                                .withTag(
-                                    tagComposer.forTag(
-                                        TagFixture.getTagWithText("Organization tag"))))))
-        .withTeamUsers()
-        .withInject(
-            injectComposer
-                .forInject(InjectFixture.getDefaultInject())
-                .withTag(tagComposer.forTag(TagFixture.getTagWithText("Inject tag")))
-                .withInjectorContract(
-                    injectorContractComposer
-                        .forInjectorContract(
-                            InjectorContractFixture.createDefaultInjectorContract())
-                        .withChallenge(
-                            challengeComposer
-                                .forChallenge(ChallengeFixture.createDefaultChallenge())
-                                .withTag(
-                                    tagComposer.forTag(
-                                        TagFixture.getTagWithText("Challenge tag"))))))
-        .withDocument(
-            documentComposer
-                .forDocument(DocumentFixture.getDocument(FileFixture.getPlainTextFileContent()))
-                .withTag(tagComposer.forTag(TagFixture.getTagWithText("Document tag")))
-                .withInMemoryFile(FileFixture.getPlainTextFileContent()))
-        .withObjective(objectiveComposer.forObjective(ObjectiveFixture.getDefaultObjective()))
-        .withTag(tagComposer.forTag(TagFixture.getTagWithText("Exercise tag")))
-        .withVariable(variableComposer.forVariable(VariableFixture.getDefaultVariable()));
+    ExerciseComposer.Composer exercise =
+        exerciseComposer
+            .forExercise(ExerciseFixture.createDefaultExercise())
+            .withArticle(
+                articleComposer
+                    .forArticle(ArticleFixture.getDefaultArticle())
+                    .withChannel(channelComposer.forChannel(ChannelFixture.getDefaultChannel())))
+            .withLessonCategory(
+                lessonsCategoryComposer
+                    .forLessonsCategory(LessonsCategoryFixture.createDefaultLessonsCategory())
+                    .withLessonsQuestion(
+                        lessonsQuestionsComposer.forLessonsQuestion(
+                            LessonsQuestionFixture.createDefaultLessonsQuestion())))
+            .withTeam(
+                teamComposer
+                    .forTeam(TeamFixture.getDefaultTeam())
+                    .withOrganisation(
+                        organizationComposer.forOrganization(
+                            OrganizationFixture.createDefaultOrganisation()))
+                    .withTag(tagComposer.forTag(TagFixture.getTagWithText("Team tag")))
+                    .withUser(userComposer.forUser(UserFixture.getUserWithDefaultEmail()))
+                    .withUser(
+                        userComposer
+                            .forUser(UserFixture.getUserWithDefaultEmail())
+                            .withTag(tagComposer.forTag(TagFixture.getTagWithText("User tag")))
+                            .withOrganization(
+                                organizationComposer
+                                    .forOrganization(
+                                        OrganizationFixture.createDefaultOrganisation())
+                                    .withTag(
+                                        tagComposer.forTag(
+                                            TagFixture.getTagWithText("Organization tag"))))))
+            .withTeamUsers()
+            .withInject(
+                injectComposer
+                    .forInject(InjectFixture.getDefaultInject())
+                    .withTag(tagComposer.forTag(TagFixture.getTagWithText("Inject tag")))
+                    .withInjectorContract(
+                        injectorContractComposer
+                            .forInjectorContract(
+                                InjectorContractFixture.createDefaultInjectorContract())
+                            .withChallenge(
+                                challengeComposer
+                                    .forChallenge(ChallengeFixture.createDefaultChallenge())
+                                    .withTag(
+                                        tagComposer.forTag(
+                                            TagFixture.getTagWithText("Challenge tag"))))))
+            .withDocument(
+                documentComposer
+                    .forDocument(DocumentFixture.getDocument(FileFixture.getPlainTextFileContent()))
+                    .withTag(tagComposer.forTag(TagFixture.getTagWithText("Document tag")))
+                    .withInMemoryFile(FileFixture.getPlainTextFileContent()))
+            .withObjective(objectiveComposer.forObjective(ObjectiveFixture.getDefaultObjective()))
+            .withTag(tagComposer.forTag(TagFixture.getTagWithText("Exercise tag")))
+            .withVariable(variableComposer.forVariable(VariableFixture.getDefaultVariable()));
+    exercise.get().setLessonsEnabled(true);
+    return exercise;
   }
 
   private Exercise findImportedExerciseFromDb(String baseName) {
@@ -176,7 +180,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, assign existing teams to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_assign_existing_teams_to_imported_exercise()
           throws Exception {
@@ -186,7 +190,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -208,7 +212,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, assign existing users to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_assign_existing_users_to_imported_exercise()
           throws Exception {
@@ -218,7 +222,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -242,7 +246,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, assign existing organisations to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_assign_existing_organisations_to_imported_exercise()
           throws Exception {
@@ -252,7 +256,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -282,7 +286,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
 
   @DisplayName("Given a valid export zip file, given existing objects, create new article anyway")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void given_a_valid_export_zip_file_given_existing_objects_create_new_article_anyway()
       throws Exception {
     ExerciseComposer.Composer exerciseWrapper = getExercise();
@@ -291,7 +295,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -331,7 +335,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, new articles attached to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_new_articles_attached_to_imported_exercise()
           throws Exception {
@@ -341,7 +345,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -364,7 +368,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, assign existing channels to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_assign_existing_channels_to_imported_exercise()
           throws Exception {
@@ -374,7 +378,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -399,7 +403,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, assign existing tags to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_assign_existing_tags_to_imported_exercise()
           throws Exception {
@@ -411,7 +415,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -435,7 +439,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, create new objectives anyway")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void given_a_valid_export_zip_file_given_existing_objects_create_new_objectives_anyway()
       throws Exception {
     ExerciseComposer.Composer exerciseWrapper = getExercise();
@@ -444,7 +448,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -483,7 +487,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, new objectives attached to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_new_objectives_attached_to_imported_exercise()
           throws Exception {
@@ -493,7 +497,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -517,7 +521,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, create new lessons categories anyway")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_create_new_lessons_categories_anyway()
           throws Exception {
@@ -527,7 +531,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -567,7 +571,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, new lessons categories attached to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_new_lessons_categories_attached_to_imported_exercise()
           throws Exception {
@@ -577,7 +581,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -600,7 +604,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, assign existing documents to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_assign_existing_documents_to_imported_exercise()
           throws Exception {
@@ -610,7 +614,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -632,7 +636,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
 
   @DisplayName("Given a valid export zip file, given existing objects, create new injects anyway")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void given_a_valid_export_zip_file_given_existing_objects_create_new_injects_anyway()
       throws Exception {
     ExerciseComposer.Composer exerciseWrapper = getExercise();
@@ -641,7 +645,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -683,7 +687,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, new injects attached to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_new_injects_attached_to_imported_exercise()
           throws Exception {
@@ -693,7 +697,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -715,7 +719,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
 
   @DisplayName("Given a valid export zip file, given existing objects, create new variables anyway")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void given_a_valid_export_zip_file_given_existing_objects_create_new_variables_anyway()
       throws Exception {
     ExerciseComposer.Composer exerciseWrapper = getExercise();
@@ -724,7 +728,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -763,7 +767,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, new variables attached to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_new_variables_attached_to_imported_exercise()
           throws Exception {
@@ -773,7 +777,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))
@@ -796,7 +800,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
   @DisplayName(
       "Given a valid export zip file, given existing objects, assign existing challenges to imported exercise")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   public void
       given_a_valid_export_zip_file_given_existing_objects_assign_existing_challenges_to_imported_exercise()
           throws Exception {
@@ -806,7 +810,7 @@ public class ExerciseApiImportWithExistingItemsTest extends IntegrationTest {
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
-            multipart(EXERCISE_URI + "/import")
+            multipart(tenantUri(TENANT_EXERCISE_URI + "/import"))
                 .file(mmf)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()))

@@ -73,12 +73,34 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.mitigation.MitigationApi#updateMitigation",
           "io.openaev.rest.mitigation.MitigationApi#upsertMitigation",
           "io.openaev.rest.mitigation.MitigationApi#deleteMitigation",
+          // tags (v2)
+          "io.openaev.rest.tag.TagApi#createTag",
+          "io.openaev.rest.tag.TagApi#upsertTag",
+          "io.openaev.rest.tag.TagApi#tags",
+          "io.openaev.rest.tag.TagApi#updateTag",
+          "io.openaev.rest.tag.TagApi#deleteTag",
+          "io.openaev.rest.tag.TagApi#optionsByName",
+          "io.openaev.rest.tag.TagApi#optionsById",
           // domains (v2)
           "io.openaev.rest.domain.DomainApi#domains",
           "io.openaev.rest.domain.DomainApi#getDomain",
           "io.openaev.rest.domain.DomainApi#upsertDomain",
           "io.openaev.rest.domain.DomainApi#findAllAsOptionsByName",
           "io.openaev.rest.domain.DomainApi#findAllAsOptionsById",
+          // channels (v2)
+          "io.openaev.rest.channel.ChannelApi#channels",
+          "io.openaev.rest.channel.ChannelApi#channel",
+          "io.openaev.rest.channel.ChannelApi#updateChannel",
+          "io.openaev.rest.channel.ChannelApi#updateChannelLogos",
+          "io.openaev.rest.channel.ChannelApi#createChannel",
+          "io.openaev.rest.channel.ChannelApi#deleteChannel",
+          "io.openaev.rest.channel.ChannelApi#observerArticles",
+          "io.openaev.rest.channel.ChannelApi#playerArticles",
+          "io.openaev.rest.channel.ChannelApi#documentsFromChannel",
+          "io.openaev.rest.scenario.ScenarioApi#channels",
+          "io.openaev.rest.exercise.ExerciseApi#channels",
+          "io.openaev.rest.document.DocumentApi#getChannelImageFromId",
+          "io.openaev.rest.document.DocumentApi#getDocumentRelations",
           // attackpath_execution / attackpath_finding (v2): every read of the projection, including
           // the delta cursor added with the real-time updates (#6647, spec 002). Losing the TxCtx
           // on
