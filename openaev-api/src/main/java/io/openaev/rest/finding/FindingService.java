@@ -83,6 +83,12 @@ public class FindingService {
   public Finding createFinding(@NotNull final Finding finding, @NotBlank final String injectId) {
     Inject inject = this.injectService.inject(injectId);
     finding.setInject(inject);
+    // The tenant comes from the inject that produced the finding, as it does in createFindings.
+    // Leaving it to TenantBaseListener would stamp whatever TenantContext holds, which is ambient
+    // and defaults to Tenant.DEFAULT_TENANT_UUID off the request path: a finding could end up in a
+    // tenant that does not own its inject. FindingWriteAttributionTest pins the distinction by
+    // pointing the ambient tenant at a different one on purpose.
+    finding.setTenant(inject.getTenant());
     return this.findingRepository.save(finding);
   }
 
