@@ -111,14 +111,12 @@ public class ScenarioExecutionJob implements Job {
                     boolean isChaining = this.workflowService.isScenarioChaining(scenario.getId());
                     Exercise exercise =
                         this.scenarioToExerciseService.toExercise(scenario, start, isChaining);
-                    if (isChaining) {
-                      try {
-                        this.workflowService.provisionSimulationTemplateWorkflow(
-                            scenario.getId(), exercise);
-                      } catch (ChainingException e) {
-                        throw new IllegalStateException(
-                            "Could not provision chained scenario " + scenario.getId(), e);
-                      }
+                    try {
+                      this.workflowService.provisionSimulationTemplateWorkflowIfChained(
+                          scenario.getId(), exercise);
+                    } catch (ChainingException e) {
+                      throw new IllegalStateException(
+                          "Could not provision chained scenario " + scenario.getId(), e);
                     }
                   });
         });

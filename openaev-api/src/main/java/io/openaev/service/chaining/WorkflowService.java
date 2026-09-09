@@ -1487,6 +1487,22 @@ public class WorkflowService {
   }
 
   /**
+   * Provisions the simulation TEMPLATE workflow only when the scenario is chained.
+   *
+   * @param scenarioId the scenario to inspect
+   * @param simulation the simulation to attach the template to
+   * @return the created simulation TEMPLATE workflow, or empty if the scenario is not chained
+   */
+  @Transactional(rollbackFor = Exception.class)
+  public Optional<Workflow> provisionSimulationTemplateWorkflowIfChained(
+      String scenarioId, Exercise simulation) throws ChainingException {
+    if (!isScenarioChaining(scenarioId)) {
+      return Optional.empty();
+    }
+    return Optional.of(provisionSimulationTemplateWorkflow(scenarioId, simulation));
+  }
+
+  /**
    * Starts workflow evaluation: seeds global state from allowlist scope rules and scope variables,
    * evaluates step progress, and saves the workflow run.
    *
