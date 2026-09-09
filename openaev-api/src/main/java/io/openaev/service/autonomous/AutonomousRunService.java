@@ -2274,8 +2274,14 @@ public class AutonomousRunService {
       // realignment error) rolls back only the mirror and cannot mark this callback's transaction
       // rollback-only.
       try {
+        // The run's own tenant, the same value already put on the v1 thread-local above. The
+        // mirror runs REQUIRES_NEW, so this is what carries the scope into that new transaction.
         workflowService.writeAllowlistScopeIsolated(
-            run.getScenarioId(), run.getSimulationId(), toAllowlistScopeInputs(scope), true);
+            TxCtx.forTenant(runTenantId(run)),
+            run.getScenarioId(),
+            run.getSimulationId(),
+            toAllowlistScopeInputs(scope),
+            true);
       } catch (Exception e) {
         log.warn(
             "[Autonomous] Scope recorded on run {} but the workflow mirror failed (best-effort)",
