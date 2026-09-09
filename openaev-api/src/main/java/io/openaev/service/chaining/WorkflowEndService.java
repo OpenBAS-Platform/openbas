@@ -215,7 +215,7 @@ public class WorkflowEndService {
       String simulationId, String tenantId, WORKFLOW_END_CAUSE cause) {
     int count = assetAgentJobRepository.deleteAllBySimulationIdAndTenantId(simulationId, tenantId);
     log.info(
-        "[Chaining] {} asset agent jobs of simulation {} has been deleted due to {}",
+        "[Chaining] {} asset agent jobs of simulation {} have been deleted due to {}",
         count,
         simulationId,
         cause.name());
@@ -230,7 +230,7 @@ public class WorkflowEndService {
   public void deleteWorkflowStatesBySimulationId(String simulationId, WORKFLOW_END_CAUSE cause) {
     int count = workflowStateRepository.deleteAllByWorkflowExecution_Simulation_Id(simulationId);
     log.info(
-        "[Chaining] {} workflow states of simulation {} has been deleted due to {}",
+        "[Chaining] {} workflow states of simulation {} have been deleted due to {}",
         count,
         simulationId,
         cause.name());

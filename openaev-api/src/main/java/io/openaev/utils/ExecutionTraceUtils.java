@@ -87,7 +87,7 @@ public class ExecutionTraceUtils {
   public static void addSimulationNoMoreProgressTrace(InjectStatus status) {
     status.addTrace(
         ExecutionTraceStatus.INTERRUPTED,
-        "Inject stopped due to simulation no more progress.",
+        "Inject stopped due to simulation reaching no more progress.",
         ExecutionTraceAction.COMPLETE,
         null);
   }

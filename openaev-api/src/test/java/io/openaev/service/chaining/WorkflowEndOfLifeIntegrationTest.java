@@ -157,7 +157,7 @@ class WorkflowEndOfLifeIntegrationTest extends IntegrationTest {
       assertTrue(anyLogContains("Stop 0 active inject(s)"));
       assertTrue(anyLogContains("due to workflow TIMEOUT"));
       assertTrue(anyLogContains("asset agent jobs"));
-      assertTrue(anyLogContains("has been deleted due to TIMEOUT"));
+      assertTrue(anyLogContains("have been deleted due to TIMEOUT"));
       assertTrue(anyLogContains("1 workflow states"));
       assertTrue(anyLogContains("finished due to workflow TIMEOUT"));
       assertTrue(errorMessages().isEmpty(), "No error expected for a clean TIMEOUT end");
@@ -232,7 +232,7 @@ class WorkflowEndOfLifeIntegrationTest extends IntegrationTest {
       assertTrue(anyLogContains("Stop 1 active inject(s)"));
       assertTrue(anyLogContains("due to workflow CANCELED"));
       assertTrue(anyLogContains("asset agent jobs"));
-      assertTrue(anyLogContains("has been deleted due to CANCELED"));
+      assertTrue(anyLogContains("have been deleted due to CANCELED"));
       assertTrue(anyLogContains("2 workflow states"));
       assertFalse(
           anyLogContains("finished due to workflow CANCELED"),
@@ -288,7 +288,7 @@ class WorkflowEndOfLifeIntegrationTest extends IntegrationTest {
       assertTrue(anyLogContains("Stop 0 active inject(s)"));
       assertTrue(anyLogContains("due to workflow NO_MORE_PROGRESS"));
       assertTrue(anyLogContains("asset agent jobs"));
-      assertTrue(anyLogContains("has been deleted due to NO_MORE_PROGRESS"));
+      assertTrue(anyLogContains("have been deleted due to NO_MORE_PROGRESS"));
       assertTrue(anyLogContains("0 workflow states"));
       assertTrue(anyLogContains("finished due to workflow NO_MORE_PROGRESS"));
       assertFalse(
