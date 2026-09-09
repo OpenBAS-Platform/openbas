@@ -456,6 +456,12 @@ uses a FROM/JOIN shape the inspector does not cover at all, that is a
 blocker: stop and report (Phase 0), do not attempt to teach the inspector a
 new shape inside a table-activation PR.
 
+Also avoid CTE and alias names that match real active table names (for
+example `WITH tags AS (...)` once `tags` is active). PostgreSQL can resolve
+that shadowing, but the inspector's relation-name matching may treat the CTE
+as the active table and fail-close the read. Prefer explicit names such as
+`scenario_tags_agg`.
+
 Pin the fix with a regression test in `TenantStatementInspectorTest` using
 the REAL production SQL (read the `@Query` value via reflection off the
 repository method, as PR #7008 does), not a hand-simplified paraphrase — the
