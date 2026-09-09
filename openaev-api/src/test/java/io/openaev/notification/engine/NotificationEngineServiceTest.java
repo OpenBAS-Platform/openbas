@@ -12,6 +12,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.openaev.context.TenantScopedTransaction;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.NotificationEventRecord;
 import io.openaev.database.model.NotificationTriggerEventType;
 import io.openaev.database.model.NotificationTriggerType;
@@ -19,10 +21,12 @@ import io.openaev.database.model.ResourceType;
 import io.openaev.database.repository.NotificationEventRecordRepository;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 
 @DisplayName("Notification engine live stage")
 class NotificationEngineServiceTest {
@@ -31,6 +35,7 @@ class NotificationEngineServiceTest {
   private NotificationMatchingService matchingService;
   private NotificationDispatchService dispatchService;
   private NotificationEventRecordRepository eventRecordRepository;
+  private TenantScopedTransaction tenantTx;
   private NotificationEngineService engineService;
 
   private static final String TENANT_A = "tenant-a";
@@ -42,9 +47,15 @@ class NotificationEngineServiceTest {
     matchingService = mock(NotificationMatchingService.class);
     dispatchService = mock(NotificationDispatchService.class);
     eventRecordRepository = mock(NotificationEventRecordRepository.class);
+    // The engine now scopes its filter re-check through the primitive. This stub runs the supplier
+    // inline: the unit test is about trigger selection and dispatch, and the scope itself is pinned
+    // against a real database by NotificationLiveTriggerTenantScopeTest.
+    tenantTx = mock(TenantScopedTransaction.class);
+    when(tenantTx.<Boolean>execute(any(TxCtx.class), ArgumentMatchers.<Supplier<Boolean>>any()))
+        .thenAnswer(invocation -> invocation.<Supplier<Boolean>>getArgument(1).get());
     engineService =
         new NotificationEngineService(
-            cacheService, matchingService, dispatchService, eventRecordRepository);
+            cacheService, matchingService, dispatchService, eventRecordRepository, tenantTx);
   }
 
   private ResolvedNotificationTrigger liveTrigger(
