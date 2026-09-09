@@ -247,7 +247,7 @@ public class V1_DataImporter implements Importer {
     importUsers(importNode, prefix, baseIds);
     importTeams(importNode, prefix, savedExercise, savedScenario, baseIds);
     importChallenges(importNode, prefix, baseIds);
-    importChannels(importNode, prefix, baseIds);
+    importChannels(ctx, importNode, prefix, baseIds);
     importArticles(importNode, prefix, savedExercise, savedScenario, baseIds);
     importObjectives(importNode, prefix, savedExercise, savedScenario, baseIds);
     importLessons(importNode, prefix, savedExercise, savedScenario, baseIds);
@@ -639,7 +639,7 @@ public class V1_DataImporter implements Importer {
   private List<KillChainPhase> importKillChainPhase(
       TxCtx ctx, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
     List<KillChainPhase> killChainPhases = new ArrayList<>();
-    String writeTenant = tenantWriteScopeResolver.tenantForWrite(ctx, null);
+    String tenantId = tenantWriteScopeResolver.tenantForWrite(ctx, null);
     resolveJsonElements(importNode, prefix + "kill_chain_phases")
         .forEach(
             nodeKillChainPhase -> {
@@ -655,7 +655,7 @@ public class V1_DataImporter implements Importer {
               }
               KillChainPhase killChainPhase =
                   this.killChainPhaseService.resolveOrCreateForImport(
-                      writeTenant, createKillChainPhase(nodeKillChainPhase, writeTenant));
+                      tenantId, createKillChainPhase(nodeKillChainPhase, tenantId));
               baseIds.put(id, killChainPhase);
               killChainPhases.add(killChainPhase);
             });
@@ -1151,7 +1151,9 @@ public class V1_DataImporter implements Importer {
 
   // -- CHANNELS --
 
-  private void importChannels(JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+  private void importChannels(
+      TxCtx ctx, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+    String tenantId = tenantWriteScopeResolver.tenantForWrite(ctx, null);
     resolveJsonElements(importNode, prefix + "channels")
         .forEach(
             nodeChannel -> {
@@ -1163,17 +1165,19 @@ public class V1_DataImporter implements Importer {
               String channelName = nodeChannel.get("channel_name").textValue();
 
               List<Channel> existingChannels =
-                  this.channelRepository.findByNameIgnoreCase(channelName);
+                  this.channelRepository.findByNameIgnoreCaseAndTenantId(channelName, tenantId);
               if (!existingChannels.isEmpty()) {
                 baseIds.put(id, existingChannels.getFirst());
               } else {
-                baseIds.put(id, this.channelRepository.save(createChannel(nodeChannel, baseIds)));
+                baseIds.put(
+                    id, this.channelRepository.save(createChannel(nodeChannel, baseIds, tenantId)));
               }
             });
   }
 
-  private Channel createChannel(JsonNode nodeChannel, Map<String, Base> baseIds) {
+  private Channel createChannel(JsonNode nodeChannel, Map<String, Base> baseIds, String tenantId) {
     Channel channel = new Channel();
+    channel.setTenant(new Tenant(tenantId));
     channel.setName(nodeChannel.get("channel_name").textValue());
     channel.setType(nodeChannel.get("channel_type").textValue());
     channel.setDescription(nodeChannel.get("channel_description").textValue());
