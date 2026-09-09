@@ -6,6 +6,8 @@ import java.util.Set;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayName("TenantStatementInspector")
 class TenantStatementInspectorTest {
@@ -1001,5 +1003,41 @@ class TenantStatementInspectorTest {
               + " otherwise rely on. GROUP BY was: "
               + groupBy);
     }
+  }
+
+  // The two asset-group option queries JOIN findings inside an IN (SELECT ...). They pass today
+  // with only asset_groups active, because the inspector rewrites the outer table and leaves the
+  // subquery's findings alone. Activating findings pulls that join into rewriting too, so the
+  // accepted shape has to be pinned before go-live rather than discovered by a 500. Read
+  // reflectively so an edit to the SQL is caught, not a copy of it.
+
+  @ParameterizedTest
+  @DisplayName("the asset-group option queries survive findings being active")
+  @ValueSource(
+      strings = {"findAllByNameLinkedToFindings", "findAllByNameLinkedToFindingsWithContext"})
+  void assetGroupOptionQueriesAcceptFindingsActive(String methodName) throws Exception {
+    String sql =
+        java.util.Arrays.stream(
+                io.openaev.database.repository.AssetGroupRepository.class.getMethods())
+            .filter(m -> m.getName().equals(methodName))
+            .findFirst()
+            .orElseThrow()
+            .getAnnotation(org.springframework.data.jpa.repository.Query.class)
+            .value();
+
+    TenantStatementInspector bothActive =
+        new TenantStatementInspector(
+            new TenantTables(Set.of("asset_groups", "findings"), Set.of()));
+    String out = bothActive.inspect(sql).replaceAll("\\s+", " ").trim();
+
+    assertTrue(
+        out.contains("can_access_tenant(ag.tenant_id)"),
+        "the outer asset_groups must be filtered: " + out);
+    assertTrue(
+        out.contains("can_access_tenant(f.tenant_id)"),
+        methodName
+            + " joins findings inside a subquery; once findings is active that join must be"
+            + " filtered too, otherwise the option list spans tenants: "
+            + out);
   }
 }
