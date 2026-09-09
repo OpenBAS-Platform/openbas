@@ -126,9 +126,7 @@ public class ProductInventoryMetricCollector {
     metricRegistry.registerGauge(
         "reports_total", "Number of reports", () -> safeCount(reportingRepository::count));
     metricRegistry.registerGauge(
-        "mappers_total",
-        "Number of XLS import mappers",
-        () -> safeCount(importMapperRepository::count));
+        "mappers_total", "Number of XLS import mappers", () -> safeCount(this::countImportMappers));
     metricRegistry.registerGauge(
         "notification_triggers_total",
         "Number of notification triggers",
@@ -146,7 +144,7 @@ public class ProductInventoryMetricCollector {
     metricRegistry.registerGauge(
         "vulnerable_endpoints_total",
         "Number of vulnerable endpoints",
-        () -> safeCount(vulnerableEndpointRepository::count));
+        () -> safeCount(this::countVulnerableEndpoints));
     metricRegistry.registerGauge(
         "attack_patterns_total",
         "Number of attack patterns",
@@ -264,6 +262,18 @@ public class ProductInventoryMetricCollector {
    * allTenants()} is the scope that matches this gauge's stated intention (platform-wide
    * telemetry), and it is resolved into an explicit list of live tenants, never a wildcard.
    */
+  // VulnerableEndpointRepository is a JpaRepository<Endpoint, String> and Endpoint is a
+  // discriminator on the activated assets table, so an unscoped count() is filtered by
+  // can_access_tenant against an empty scope and reports zero.
+  long countVulnerableEndpoints() {
+    return tenantTx.<Long>execute(TxCtx.allTenants(), () -> vulnerableEndpointRepository.count());
+  }
+
+  // import_mappers has been active since the pilot (#6212); this gauge was never scoped with it.
+  long countImportMappers() {
+    return tenantTx.<Long>execute(TxCtx.allTenants(), () -> importMapperRepository.count());
+  }
+
   long countAssetGroups() {
     // Explicit type witness: TenantScopedTransaction overloads execute() on Supplier and
     // Runnable, so a value-returning method reference is ambiguous without it.
