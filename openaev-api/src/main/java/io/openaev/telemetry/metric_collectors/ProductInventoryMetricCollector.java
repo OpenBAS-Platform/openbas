@@ -109,7 +109,7 @@ public class ProductInventoryMetricCollector {
     metricRegistry.registerGauge(
         "injects_total", "Number of injects", () -> safeCount(injectRepository::count));
     metricRegistry.registerGauge(
-        "challenges_total", "Number of challenges", () -> safeCount(challengeRepository::count));
+        "challenges_total", "Number of challenges", () -> safeCount(this::countChallenges));
     metricRegistry.registerGauge(
         "documents_total", "Number of documents", () -> safeCount(documentRepository::count));
     metricRegistry.registerGauge(
@@ -253,6 +253,11 @@ public class ProductInventoryMetricCollector {
   /** Counts channels across the whole platform (channels is v2-active). */
   long countChannels() {
     return countAcrossAllTenants(channelRepository::count);
+  }
+
+  /** Counts challenges across the whole platform (challenges is v2-active, #6416). */
+  long countChallenges() {
+    return countAcrossAllTenants(challengeRepository::count);
   }
 
   /** Counts XLS import mappers across the whole platform (import_mappers is v2-active). */

@@ -466,6 +466,17 @@ class TenantScopedEntrypointsTxCtxArchTest {
           // ScenarioApi#bulkDeleteScenarios). Dropping it would silently empty the phase lists.
           "io.openaev.rest.inject.SimulationInjectApi#bulkUpdateInjectsForSimulation",
           "io.openaev.rest.inject.ScenarioInjectApi#bulkUpdateInjectsForScenario",
+          // challenges (v2, #6416): the table's own API, plus every path that reads or writes it.
+          "io.openaev.rest.challenge.ChallengeApi#challenges",
+          "io.openaev.rest.challenge.ChallengeApi#findEndpoints",
+          "io.openaev.rest.challenge.ChallengeApi#updateChallenge",
+          "io.openaev.rest.challenge.ChallengeApi#createChallenge",
+          "io.openaev.rest.challenge.ChallengeApi#deleteChallenge",
+          "io.openaev.rest.challenge.ChallengeApi#documentsFromChallenge",
+          "io.openaev.rest.challenge.ScenarioChallengeApi#scenarioChallenges",
+          "io.openaev.rest.challenge.SimulationChallengeApi#exerciseChallenges",
+          "io.openaev.rest.challenge.SimulationChallengeApi#observerChallenges",
+          "io.openaev.rest.challenge.SimulationChallengeApi#playerChallenges",
           // asset_groups activation (#6435). Every endpoint the Phase 1 inventory found
           // reading the table, whether it returns asset groups or merely consumes them.
           // The wiring itself came with #7781; listing them here is what stops a future

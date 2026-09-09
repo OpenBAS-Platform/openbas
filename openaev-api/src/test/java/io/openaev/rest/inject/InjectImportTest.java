@@ -21,6 +21,7 @@ import io.openaev.database.model.Tag;
 import io.openaev.database.repository.ExerciseRepository;
 import io.openaev.database.repository.InjectRepository;
 import io.openaev.database.repository.ScenarioRepository;
+import io.openaev.database.repository.TenantRepository;
 import io.openaev.ee.EnterpriseEditionService;
 import io.openaev.integration.impl.injectors.challenge.ChallengeInjectorIntegrationFactory;
 import io.openaev.integration.impl.injectors.channel.ChannelInjectorIntegrationFactory;
@@ -32,6 +33,7 @@ import io.openaev.service.FileService;
 import io.openaev.utils.fixtures.*;
 import io.openaev.utils.fixtures.composers.*;
 import io.openaev.utils.helpers.TagHelper;
+import io.openaev.utils.mockUser.TestUserHolder;
 import io.openaev.utils.mockUser.WithMockUser;
 import jakarta.persistence.EntityManager;
 import java.io.IOException;
@@ -84,12 +86,18 @@ class InjectImportTest extends IntegrationTest {
   @Autowired private InjectRepository injectRepository;
   @Autowired private ArticleService articleService;
   @Autowired private InjectorFixture injectorFixture;
+  @Autowired private TenantRepository tenantRepository;
+  @Autowired private TestUserHolder testUserHolder;
   @MockitoBean private EnterpriseEditionService enterpriseEditionService;
   @Autowired private ChannelInjectorIntegrationFactory channelInjectorIntegrationFactory;
   @Autowired private ChallengeInjectorIntegrationFactory challengeInjectorIntegrationFactory;
 
   @BeforeEach
   void before() throws Exception {
+    if (testUserHolder.isSet()) {
+      tenantRepository.addUserToTenant(testUserHolder.get().getId(), Tenant.DEFAULT_TENANT_UUID);
+    }
+
     channelInjectorIntegrationFactory.registerConnectorForTenant(TenantContext.getCurrentTenant());
     challengeInjectorIntegrationFactory.registerConnectorForTenant(
         TenantContext.getCurrentTenant());
@@ -303,7 +311,7 @@ class InjectImportTest extends IntegrationTest {
   private ResultActions doImportStringInput(String uri, byte[] importZipData) throws Exception {
     ResultActions ra =
         mvc.perform(
-            multipart(uri)
+            multipart(uri, Tenant.DEFAULT_TENANT_UUID)
                 .file(new MockMultipartFile("file", importZipData))
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .with(csrf()));
