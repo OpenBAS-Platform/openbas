@@ -33,6 +33,22 @@ public class FindingWriter {
     String findingId =
         findingRepository.upsertFinding(
             findingField, findingType, findingValue, findingLabels, injectId, name, tenantId);
+    if (findingId == null) {
+      // The tenant statement inspector rewrites the upsert's conflict branch to
+      // "DO UPDATE SET ... WHERE can_access_tenant(findings.tenant_id) RETURNING finding_id".
+      // On a conflict with no scope, or with a row owned by another tenant, that predicate is
+      // false: nothing is updated, RETURNING yields nothing, and this comes back null. Refusing
+      // here names the cause; without it the next line inserts a null finding_id into
+      // findings_assets and the failure surfaces as a NOT NULL violation on a different table.
+      throw new IllegalStateException(
+          "Finding upsert returned no id for inject "
+              + injectId
+              + " in tenant "
+              + tenantId
+              + ": the conflicting row is outside the current tenant scope, or no scope is set on"
+              + " this transaction. A background caller must open one (TenantScopedTransaction);"
+              + " an HTTP caller must carry a TxCtx.");
+    }
     findingRepository.insertFindingAsset(findingId, assetId);
     findingRepository.insertFindingTags(findingId, tagIds);
   }
