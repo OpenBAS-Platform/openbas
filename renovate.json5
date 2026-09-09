@@ -295,13 +295,19 @@
         // rule also has to sit after the batches for a second reason: a batched PR takes its title
         // from groupName, so the [DANGER] prefix set above would stop appearing.
         //
-        // This list is the patches that actually exist: `ls openaev-front/patches/` returns
-        // react-apexcharts.patch and nothing else, and the resolutions block in
-        // openaev-front/package.json references only that one. html-to-image is not here because it
-        // carries no patch, despite the [DANGER] rule still on main saying it does. That rule is
-        // wrong and is removed separately.
+        // Two members, two reasons, so the rule says both rather than implying they are the same.
+        //
+        // react-apexcharts is the patched one, and it is the only patched dependency in the
+        // repository: `ls openaev-front/patches/` returns react-apexcharts.patch and nothing else,
+        // and the resolutions block in openaev-front/package.json references only that one.
+        // html-to-image is deliberately not here, despite the [DANGER] rule still on main claiming it
+        // carries a patch. It does not. That rule is wrong and is removed separately.
+        //
+        // apexcharts carries no patch. It is here because react-apexcharts is pinned below 1.8.0 to
+        // stay on an apexcharts 4.x that is still MIT, so the two move as a pair. Batching one and
+        // not the other is how they end up out of step.
         {
-            description: 'Patched dependencies keep their own PR',
+            description: 'The patched dependency and the one it moves with keep their own PR',
             matchDepNames: [
                 'react-apexcharts',
                 'apexcharts',
@@ -327,6 +333,9 @@
                 '/^org\\.apache\\.tomcat/',
                 '/^org\\.apache\\.httpcomponents/',
                 '/^org\\.hibernate/',
+                // registers Hibernate UserTypes for JSON and array columns, so it decides how those
+                // columns serialise. Same family as Hibernate itself, on the line above.
+                '/^io\\.hypersistence/',
                 '/^com\\.fasterxml\\.jackson/',
                 '/^tools\\.jackson/',
                 '/^co\\.elastic\\.clients/',
