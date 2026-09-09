@@ -1489,7 +1489,6 @@ public class WorkflowService {
    *
    * @param workflowRun the workflow run to start
    */
-  @Transactional(rollbackFor = Exception.class)
   public void startWorkflow(Workflow workflowRun) throws ChainingException {
     // Telemetry: one chaining workflow run started.
     resultsMetricCollector.recordWorkflowRun();
