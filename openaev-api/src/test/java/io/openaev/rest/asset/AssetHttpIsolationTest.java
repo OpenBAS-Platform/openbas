@@ -140,9 +140,13 @@ class AssetHttpIsolationTest extends IntegrationTest {
   @DisplayName("under tenant A's path: the generic asset search spans A's discriminators only")
   void genericAssetSearchUnderTenantAReturnsOnlyA() throws Exception {
     String body = okBody(searchUnder("/api/tenants/{tenantId}/assets/search", tenantA));
+    // Two discriminators, each with its own positive half. A negative alone cannot tell isolation
+    // apart from a route that returns nothing, and there is no assertion here about security
+    // platforms on purpose: AssetService.searchAssets excludes SECURITY_PLATFORM unconditionally,
+    // so asserting B's platform is absent would hold with tenant isolation entirely removed.
     assertTrue(body.contains("iso-endpoint-a"), "A's endpoint must appear: " + body);
+    assertTrue(body.contains("iso-ai-a"), "A's AI target must appear: " + body);
     assertFalse(body.contains("iso-endpoint-b"), "B's endpoint must not appear: " + body);
-    assertFalse(body.contains("iso-platform-b"), "B's platform must not appear: " + body);
     assertFalse(body.contains("iso-ai-b"), "B's AI target must not appear: " + body);
   }
 

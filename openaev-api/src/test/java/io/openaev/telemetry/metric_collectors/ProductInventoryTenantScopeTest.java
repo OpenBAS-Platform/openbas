@@ -31,7 +31,8 @@ import org.springframework.test.context.TestPropertySource;
  * class is not {@code @Transactional}: the scoped primitive refuses to open inside an active
  * transaction, so seeding goes through an auto-committing {@link JdbcTemplate}.
  */
-@TestPropertySource(properties = "openaev.tenant.active-tables=asset_groups,findings")
+@TestPropertySource(
+    properties = "openaev.tenant.active-tables=asset_groups,assets,import_mappers,findings")
 @DisplayName("product inventory gauges keep counting across tenants once a table is v2-active")
 class ProductInventoryTenantScopeTest extends IntegrationTest {
 
@@ -42,6 +43,8 @@ class ProductInventoryTenantScopeTest extends IntegrationTest {
   private JdbcTemplate jdbc;
   private final List<String> seededTenants = new ArrayList<>();
   private long baseline;
+  private long endpointBaseline;
+  private long mapperBaseline;
 
   @BeforeEach
   void seedTwoTenantsWithOneAssetGroupEach() {
@@ -50,14 +53,25 @@ class ProductInventoryTenantScopeTest extends IntegrationTest {
     // scope. Asserting on a DELTA rather than an absolute count keeps the test independent of what
     // else lives in the shared test database: never delete rows this test did not create.
     baseline = requireNonNull(jdbc.queryForObject("SELECT count(*) FROM asset_groups", Long.class));
+    endpointBaseline =
+        requireNonNull(
+            jdbc.queryForObject(
+                "SELECT count(*) FROM assets WHERE asset_type = 'Endpoint'", Long.class));
+    mapperBaseline =
+        requireNonNull(jdbc.queryForObject("SELECT count(*) FROM import_mappers", Long.class));
     seedAssetGroup(seedTenant("telemetry-a-" + UUID.randomUUID()), "telemetry-group-a");
     seedAssetGroup(seedTenant("telemetry-b-" + UUID.randomUUID()), "telemetry-group-b");
+    seedEndpoint(seededTenants.get(0), "telemetry-vuln-endpoint-a");
+    seedEndpoint(seededTenants.get(1), "telemetry-vuln-endpoint-b");
+    seedImportMapper(seededTenants.get(0), "telemetry-mapper-a");
   }
 
   @AfterEach
   void cleanup() {
     for (String tenantId : seededTenants) {
       jdbc.update("DELETE FROM asset_groups WHERE tenant_id = ?", tenantId);
+      jdbc.update("DELETE FROM assets WHERE tenant_id = ?", tenantId);
+      jdbc.update("DELETE FROM import_mappers WHERE tenant_id = ?", tenantId);
       jdbc.update("DELETE FROM tenants WHERE tenant_id = ?", tenantId);
     }
     seededTenants.clear();
@@ -121,6 +135,63 @@ class ProductInventoryTenantScopeTest extends IntegrationTest {
         UUID.randomUUID().toString(),
         name,
         "{}",
+        tenantId);
+  }
+
+  @Test
+  @DisplayName("the scoped vulnerable-endpoint count spans every tenant, not zero")
+  void vulnerableEndpointCountSpansTenants() {
+    // This half proves the SCOPE works against a real database. That the gauge is actually wired to
+    // this method rather than to the unscoped repository is asserted in
+    // ProductInventoryMetricCollectorTest, which captures the registered supplier - calling the
+    // method here would stay green through exactly the mis-wiring that caused the defect.
+    assertEquals(
+        endpointBaseline + 2L,
+        collector.countVulnerableEndpoints(),
+        "the count must span every tenant; a short count means it lost its TxCtx.allTenants()"
+            + " scope");
+  }
+
+  @Test
+  @DisplayName("the scoped import-mapper count spans every tenant, not zero")
+  void importMapperCountSpansTenants() {
+    assertEquals(
+        mapperBaseline + 1L,
+        collector.countImportMappers(),
+        "import_mappers has been active since the pilot; a short count means a lost scope");
+  }
+
+  @Test
+  @DisplayName("without a scope the activated table denies every row, so the red half is real")
+  void unscopedCountIsZero() {
+    assertEquals(
+        0L,
+        jdbc.queryForObject(
+            "SELECT count(*) FROM assets WHERE asset_type = 'Endpoint'"
+                + " AND can_access_tenant(tenant_id)",
+            Long.class),
+        "with no scope set, can_access_tenant must deny every row; if this is non-zero the"
+            + " inspector is not firing and the assertions above prove nothing");
+  }
+
+  private void seedEndpoint(String tenantId, String name) {
+    jdbc.update(
+        "INSERT INTO assets (asset_id, asset_name, asset_type, asset_created_at, asset_updated_at,"
+            + " tenant_id, asset_hostname, endpoint_platform, endpoint_arch)"
+            + " VALUES (?, ?, 'Endpoint', now(), now(), ?, ?, 'Linux', 'x86_64')",
+        UUID.randomUUID().toString(),
+        name,
+        tenantId,
+        name);
+  }
+
+  private void seedImportMapper(String tenantId, String name) {
+    jdbc.update(
+        "INSERT INTO import_mappers (mapper_id, mapper_name, mapper_inject_type_column,"
+            + " mapper_created_at, mapper_updated_at, tenant_id)"
+            + " VALUES (CAST(? AS uuid), ?, 'A', now(), now(), ?)",
+        UUID.randomUUID().toString(),
+        name,
         tenantId);
   }
 }

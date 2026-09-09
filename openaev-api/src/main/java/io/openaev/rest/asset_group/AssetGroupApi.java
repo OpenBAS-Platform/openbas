@@ -73,11 +73,10 @@ public class AssetGroupApi extends RestBehavior {
    * endpoint returns 200 with {@code asset_group_assets: []} for every group, whatever the data.
    * Carrying a {@code TxCtx} is necessary and not sufficient.
    *
-   * <p>Same shape and same fix as {@code SecurityPlatformApi.withManagerLinksInitialized} (#7026)
-   * and {@code FindingApi.withScopedAssociationsInitialized}. Pinned by {@code
-   * AssetAssociationSinkTest}, which is deliberately NOT {@code @Transactional}: a transactional
-   * test keeps the scope alive through serialization and would pass while proving nothing, which is
-   * exactly how this defect stayed invisible.
+   * <p>Same shape and same fix as {@code SecurityPlatformApi.withManagerLinksInitialized} (#7026).
+   * Pinned by {@code AssetAssociationSinkTest}, which is deliberately NOT {@code @Transactional}: a
+   * transactional test keeps the scope alive through serialization and would pass while proving
+   * nothing, which is exactly how this defect stayed invisible.
    */
   private static AssetGroup withAssetsInitialized(AssetGroup assetGroup) {
     Hibernate.initialize(assetGroup.getAssets());
