@@ -48,6 +48,8 @@ public class WorkflowTimeoutJob implements Job {
         "[Chaining] Found {} expired workflow run(s) to force-complete.", expiredWorkflows.size());
 
     for (Workflow workflow : expiredWorkflows) {
+      // RUN workflows always have a simulation (only TEMPLATE runs can be null).
+      // TODO: read tenantId directly from Workflow once it carries its own tenant_id.
       String tenantId = workflow.getSimulation().getTenant().getId();
       TenantContext.setCurrentTenant(tenantId);
       try {
