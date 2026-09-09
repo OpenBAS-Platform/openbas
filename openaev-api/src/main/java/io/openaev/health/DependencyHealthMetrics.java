@@ -33,7 +33,9 @@ public class DependencyHealthMetrics {
     for (PlatformDependency dependency : PlatformDependency.values()) {
       Gauge.builder("openaev.dependency.up", store, s -> upValue(s, dependency))
           .tag(DEPENDENCY_TAG, dependency.getLabel())
-          .description("1 when the last connectivity probe of the dependency succeeded, 0 when not")
+          .description(
+              "1 when the last connectivity probe of the dependency succeeded, 0 when it failed,"
+                  + " NaN when it has never been probed")
           .register(meterRegistry);
       TimeGauge.builder(
               "openaev.dependency.probe.duration",

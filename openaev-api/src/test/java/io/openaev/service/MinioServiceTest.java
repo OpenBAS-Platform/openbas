@@ -149,14 +149,22 @@ class MinioServiceTest extends IntegrationTest {
   @Test
   void should_pass_the_access_check_when_the_tenant_has_no_file() {
     // -- ARRANGE --
-    String previousTenant = TenantContext.getCurrentTenant();
+    // getCurrentTenant() falls back to the default tenant, so the previous state has to be read
+    // from hasCurrentTenant(): restoring a fallback value would leave a tenant set for the tests
+    // that follow.
+    boolean hadTenant = TenantContext.hasCurrentTenant();
+    String previousTenant = hadTenant ? TenantContext.getCurrentTenant() : null;
     TenantContext.setCurrentTenant(UUID.randomUUID().toString());
 
     // -- ACT & ASSERT --
     try {
       assertDoesNotThrow(() -> minioService.checkStorageAccessible());
     } finally {
-      TenantContext.setCurrentTenant(previousTenant);
+      if (hadTenant) {
+        TenantContext.setCurrentTenant(previousTenant);
+      } else {
+        TenantContext.clearCurrentTenant();
+      }
     }
   }
 }

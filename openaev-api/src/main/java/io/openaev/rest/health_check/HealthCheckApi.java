@@ -79,7 +79,10 @@ public class HealthCheckApi extends RestBehavior {
       healthCheckService.runHealthCheck();
     } catch (HealthCheckFailureException e) {
       String message = String.format("Health check failure : %s", e.getMessage());
-      log.error(message, e);
+      // WARN without the stack: load balancers poll this endpoint constantly, so an outage would
+      // otherwise flood the logs. The probe that observed the failure already logged it with its
+      // cause in DependencyProbeService.
+      log.warn(message);
       throw new ResponseStatusException(
           HttpStatusCode.valueOf(HttpStatus.SERVICE_UNAVAILABLE.value()), message);
     }
