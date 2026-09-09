@@ -4,6 +4,7 @@ import static io.openaev.helper.StreamHelper.fromIterable;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.AssetRepository;
 import io.openaev.database.repository.FindingRepository;
@@ -190,7 +191,12 @@ public class FindingService {
   public void saveAgentFinding(
       Inject inject, Asset asset, ContractOutputContext contractOutputContext, String value) {
 
+    // One value drives both the scope of the writer's own REQUIRES_NEW transaction and the tenant
+    // the row is attributed to, so the conflict branch can only ever match what the insert writes.
+    String tenantId = inject.getTenant() != null ? inject.getTenant().getId() : null;
+
     findingWriter.saveCompleteFinding(
+        tenantId == null ? TxCtx.missing() : TxCtx.forTenant(tenantId),
         contractOutputContext.key(),
         contractOutputContext.type().name(),
         value,
@@ -199,7 +205,7 @@ public class FindingService {
         contractOutputContext.name(),
         asset.getId(),
         contractOutputContext.tagIds(),
-        inject.getTenant() != null ? inject.getTenant().getId() : null);
+        tenantId);
   }
 
   private Optional<Asset> resolveAssetFromStructuredOutput(

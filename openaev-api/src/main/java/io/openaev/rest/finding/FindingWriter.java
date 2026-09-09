@@ -1,6 +1,5 @@
 package io.openaev.rest.finding;
 
-import io.openaev.context.TenantScopedTransaction;
 import io.openaev.context.TxCtx;
 import io.openaev.database.repository.FindingRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,16 +13,24 @@ import org.springframework.transaction.annotation.Transactional;
  * the tenant inspector can filter them once the findings table is activated. The {@code
  * REQUIRES_NEW} boundary lives here in the API layer (not on the repository) and is reached
  * cross-bean, so the new transaction actually applies.
+ *
+ * <p>That boundary is why {@link #saveCompleteFinding} declares a {@link TxCtx}: {@code
+ * REQUIRES_NEW} suspends the caller's transaction, so the caller's scope does not travel with it
+ * and the new transaction would start with {@code app.current_tenants} unset. Every read predicate
+ * the inspector adds would then be false, the upsert's {@code ON CONFLICT DO UPDATE} branch
+ * included, so a re-detected finding could never be updated. The scope is set by the tenant aspect
+ * from that parameter, which is how the HTTP path carries a scope; the background primitive must
+ * not be reachable from here.
  */
 @Component
 @RequiredArgsConstructor
 public class FindingWriter {
 
   private final FindingRepository findingRepository;
-  private final TenantScopedTransaction tenantTx;
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void saveCompleteFinding(
+      TxCtx ctx,
       String findingField,
       String findingType,
       String findingValue,
@@ -42,17 +49,6 @@ public class FindingWriter {
               + " without a tenant: findings.tenant_id is NOT NULL and the row would be"
               + " unattributed. The caller must resolve the tenant from the inject.");
     }
-    // REQUIRES_NEW suspends the caller's transaction, so the caller's scope does not come with it:
-    // this transaction starts with app.current_tenants unset. Every read predicate the inspector
-    // adds is then false, including the upsert's conflict branch, so a re-detected finding could
-    // never be updated.
-    //
-    // Scoping from the tenantId argument rather than from an ambient value widens nothing: that
-    // same argument is what the INSERT already writes into tenant_id, and it is resolved from the
-    // finding's own inject, which the caller reached through its own scoped read. This aligns the
-    // conflict branch's read predicate with the attribution the write was always going to use.
-    tenantTx.setScopeOnCurrentTransaction(TxCtx.forTenant(tenantId));
-
     String findingId =
         findingRepository.upsertFinding(
             findingField, findingType, findingValue, findingLabels, injectId, name, tenantId);
