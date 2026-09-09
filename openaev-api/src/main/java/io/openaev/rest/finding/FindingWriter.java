@@ -1,5 +1,7 @@
 package io.openaev.rest.finding;
 
+import io.openaev.context.TenantScopedTransaction;
+import io.openaev.context.TxCtx;
 import io.openaev.database.repository.FindingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FindingWriter {
 
   private final FindingRepository findingRepository;
+  private final TenantScopedTransaction tenantTx;
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void saveCompleteFinding(
@@ -30,6 +33,26 @@ public class FindingWriter {
       String assetId,
       String[] tagIds,
       String tenantId) {
+    // findings.tenant_id is NOT NULL, so a blank tenant already failed here, as a constraint
+    // violation naming neither the inject nor the cause. Refusing up front says what is wrong.
+    if (tenantId == null || tenantId.isBlank()) {
+      throw new IllegalStateException(
+          "Cannot write a finding for inject "
+              + injectId
+              + " without a tenant: findings.tenant_id is NOT NULL and the row would be"
+              + " unattributed. The caller must resolve the tenant from the inject.");
+    }
+    // REQUIRES_NEW suspends the caller's transaction, so the caller's scope does not come with it:
+    // this transaction starts with app.current_tenants unset. Every read predicate the inspector
+    // adds is then false, including the upsert's conflict branch, so a re-detected finding could
+    // never be updated.
+    //
+    // Scoping from the tenantId argument rather than from an ambient value widens nothing: that
+    // same argument is what the INSERT already writes into tenant_id, and it is resolved from the
+    // finding's own inject, which the caller reached through its own scoped read. This aligns the
+    // conflict branch's read predicate with the attribution the write was always going to use.
+    tenantTx.setScopeOnCurrentTransaction(TxCtx.forTenant(tenantId));
+
     String findingId =
         findingRepository.upsertFinding(
             findingField, findingType, findingValue, findingLabels, injectId, name, tenantId);
