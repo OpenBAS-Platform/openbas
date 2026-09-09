@@ -5,6 +5,7 @@ import io.openaev.database.repository.FindingRepository;
 import io.openaev.rest.atomic_testing.form.TargetSimple;
 import io.openaev.rest.finding.form.AggregatedFindingOutput;
 import io.openaev.rest.finding.form.FindingOutput;
+import io.openaev.rest.finding.form.FindingSummaryOutput;
 import io.openaev.rest.finding.form.RelatedFindingOutput;
 import io.openaev.utils.SensitiveValueMaskingUtils;
 import io.openaev.utils.TargetType;
@@ -21,12 +22,44 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class FindingMapper {
 
-  private final FindingRepository findingRepository;
   private final EndpointMapper endpointMapper;
   private final AssetGroupMapper assetGroupMapper;
   private final ExerciseMapper exerciseMapper;
   private final ScenarioMapper scenarioMapper;
   private final InjectMapper injectMapper;
+
+  /**
+   * Group-wide impact counts of a finding, resolved by the service and handed over as one value so
+   * four positional {@code long} arguments cannot be silently swapped.
+   */
+  public record FindingImpactCounts(long assets, long teams, long users, long assetGroups) {}
+
+  /**
+   * Group-wide summary of a finding, deduplicated by (type, value) across every occurrence in the
+   * tenant. The finding overview hero relies on this instead of the picked representative row, so
+   * the first/last seen and impact counts reflect the whole group rather than one arbitrary
+   * occurrence.
+   *
+   * @param finding the representative finding row of the group
+   * @param seen the group-wide first/last seen and occurrence count, null when the aggregate could
+   *     not be resolved - the representative row's own dates are then used
+   * @param counts the group-wide impact counts
+   */
+  public FindingSummaryOutput toFindingSummaryOutput(
+      Finding finding, FindingRepository.FindingSeenAggregate seen, FindingImpactCounts counts) {
+    return FindingSummaryOutput.builder()
+        .id(finding.getId())
+        .type(finding.getType())
+        .value(SensitiveValueMaskingUtils.maskIfNeeded(finding.getType(), finding.getValue()))
+        .firstSeen(seen != null ? seen.getFirstSeen() : finding.getCreationDate())
+        .lastSeen(seen != null ? seen.getLastSeen() : finding.getUpdateDate())
+        .occurrences(seen != null ? seen.getOccurrences() : 1)
+        .assetsCount(counts.assets())
+        .teamsCount(counts.teams())
+        .usersCount(counts.users())
+        .assetGroupsCount(counts.assetGroups())
+        .build();
+  }
 
   /**
    * Single finding output for the CRUD endpoints. This is the only representation of a finding the
