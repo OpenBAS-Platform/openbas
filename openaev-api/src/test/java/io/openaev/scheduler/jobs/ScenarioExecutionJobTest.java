@@ -9,10 +9,12 @@ import static org.mockito.Mockito.mockStatic;
 
 import io.openaev.IntegrationTest;
 import io.openaev.database.model.Exercise;
+import io.openaev.database.model.ExerciseStatus;
 import io.openaev.database.model.Scenario;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.ExerciseRepository;
 import io.openaev.database.repository.ScenarioRepository;
+import io.openaev.database.repository.WorkflowRepository;
 import io.openaev.multitenancy.DependenciesManagerException;
 import io.openaev.service.scenario.ScenarioService;
 import io.openaev.utils.TenantIsolationTestHelper;
@@ -47,6 +49,7 @@ class ScenarioExecutionJobTest extends IntegrationTest {
   @Autowired private ScenarioService scenarioService;
   @Autowired private ScenarioRepository scenarioRepository;
   @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private WorkflowRepository workflowRepository;
 
   @Autowired private TenantIsolationTestHelper tenantIsolationTestHelper;
   @Autowired private EntityManager entityManager;
@@ -58,6 +61,7 @@ class ScenarioExecutionJobTest extends IntegrationTest {
 
   @AfterEach
   void after() {
+    workflowRepository.deleteAll();
     exerciseRepository.deleteAll();
     scenarioRepository.deleteAll();
   }
@@ -122,8 +126,44 @@ class ScenarioExecutionJobTest extends IntegrationTest {
       assertEquals(1, createdExercises.size());
       Exercise createdExercise = createdExercises.getFirst();
       assertNotNull(createdExercise.getStart());
+      assertFalse(workflowRepository.existsBySimulationId(createdExercise.getId()));
 
       EXERCISE_ID = createdExercise.getId();
+    }
+
+    @DisplayName("Create chained simulation based on recurring scenario now")
+    @Test
+    void given_chained_cron_in_one_minute_should_create_and_start_simulation() throws Exception {
+      // -- PREPARE --
+      ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("UTC"));
+
+      Scenario scenario = ScenarioFixture.getScenario();
+      int minuteToStart = (zonedDateTime.getMinute() + 1) % 60;
+      int hourToStart = zonedDateTime.getHour() + ((zonedDateTime.getMinute() + 1) / 60);
+      hourToStart = hourToStart % 24;
+
+      scenario.setRecurrence(
+          "0 " + minuteToStart + " " + hourToStart + " * * *"); // Every day now + 1 minute
+      Scenario scenarioSaved = scenarioService.createScenario(scenario);
+      scenarioSaved = scenarioService.createScenarioChaining(scenarioSaved);
+      SCENARIO_ID_3 = scenarioSaved.getId();
+
+      // -- EXECUTE --
+      job.execute(null);
+
+      // -- ASSERT --
+      List<Exercise> createdExercises =
+          fromIterable(exerciseRepository.findAll()).stream()
+              .filter(exercise -> exercise.getScenario() != null)
+              .filter(exercise -> SCENARIO_ID_3.equals(exercise.getScenario().getId()))
+              .toList();
+      assertEquals(1, createdExercises.size());
+      Exercise createdExercise = createdExercises.getFirst();
+      assertEquals(ExerciseStatus.RUNNING, createdExercise.getStatus());
+      assertNotNull(createdExercise.getStart());
+      assertTrue(workflowRepository.existsBySimulationId(createdExercise.getId()));
+      assertNotNull(
+          exerciseRepository.rawDetailsById(createdExercise.getId()).getExercise_workflow_id());
     }
 
     @DisplayName("Already created simulation based on recurring scenario")

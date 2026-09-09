@@ -10,6 +10,8 @@ import io.openaev.database.model.Exercise;
 import io.openaev.database.model.Scenario;
 import io.openaev.database.repository.ExerciseRepository;
 import io.openaev.database.repository.TenantRepository;
+import io.openaev.rest.exception.ChainingException;
+import io.openaev.service.chaining.WorkflowService;
 import io.openaev.service.ScenarioToExerciseService;
 import io.openaev.service.scenario.ScenarioRecurrenceService;
 import io.openaev.service.scenario.ScenarioService;
@@ -38,6 +40,7 @@ public class ScenarioExecutionJob implements Job {
   private final ScenarioRecurrenceService scenarioRecurrenceService;
   private final ExerciseRepository exerciseRepository;
   private final ScenarioToExerciseService scenarioToExerciseService;
+  private final WorkflowService workflowService;
   private final EntityManager entityManager;
   private final TenantScopedTransaction tenantTx;
   private final TenantRepository tenantRepository;
@@ -98,13 +101,25 @@ public class ScenarioExecutionJob implements Job {
           // Filter scenarios with this results
           validScenarios.stream()
               .filter(scenario -> !alreadyExistIds.contains(scenario.getId()))
-              // Create simulation with start date provided by cron
+              // Time-based scenarios stay scheduled and are auto-started later.
+              // Chained scenarios must be launched immediately so the workflow run exists and
+              // starts on the scheduled tick, matching the manual chained launch flow.
               .forEach(
                   scenario -> {
-                    this.scenarioToExerciseService.toExercise(
-                        scenario,
-                        scenarioRecurrenceService.getNextExecutionTime(scenario, now).orElse(now),
-                        false);
+                    Instant start =
+                        scenarioRecurrenceService.getNextExecutionTime(scenario, now).orElse(now);
+                    boolean isChaining = this.workflowService.isScenarioChaining(scenario.getId());
+                    Exercise exercise =
+                        this.scenarioToExerciseService.toExercise(scenario, start, isChaining);
+                    if (isChaining) {
+                      try {
+                        this.workflowService.startWorkflowByScenarioIdAndSimulation(
+                            scenario.getId(), exercise);
+                      } catch (ChainingException e) {
+                        throw new IllegalStateException(
+                            "Could not start chained scenario " + scenario.getId(), e);
+                      }
+                    }
                   });
         });
   }
