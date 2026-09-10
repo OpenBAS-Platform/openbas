@@ -44,15 +44,30 @@ public final class SensitiveValueMaskingUtils {
       Set.of(PrimitiveType.Password, PrimitiveType.Hash, PrimitiveType.Key);
 
   /**
-   * Contract output types explicitly excluded from the derivation, whatever their recipe says.
+   * Contract output types explicitly excluded from the derivation, whatever their recipe says. The
+   * recipe describes the fields of the <em>contract</em>, not the composition of the finding value,
+   * so it yields two distinct kinds of false positive.
    *
-   * <p>{@link ContractOutputType#PasswordPolicy} decomposes into {@link PrimitiveType#Key} - but
-   * that {@code key} is the <em>name of a password policy setting</em> (for instance {@code
-   * MinimumPasswordLength}), not a cryptographic key. Masking it would hide the very information
-   * the finding exists to report, so Product explicitly decided to keep it in cleartext.
+   * <p><b>False positive of vocabulary.</b> {@link ContractOutputType#PasswordPolicy} decomposes
+   * into {@link PrimitiveType#Key} - but that {@code key} is the <em>name of a password policy
+   * setting</em> (for instance {@code MinimumPasswordLength}), not a cryptographic key. Masking it
+   * would hide the very information the finding exists to report.
+   *
+   * <p><b>False positive of composition.</b> {@link ContractOutputType#AsreproastableAccount} and
+   * {@link ContractOutputType#KerberoastableAccount} declare a {@code hash} field, but their
+   * processors build the finding value from the username alone ({@code toFindingValue} returns
+   * {@code buildString(jsonNode, USERNAME)}): the hash never reaches the value, so there is nothing
+   * to protect and masking would only hide an account name.
+   *
+   * <p>Both exclusions are explicit Product decisions (issue 7500). This set must be revisited if
+   * {@code toFindingValue} of either account processor ever starts including the hash: the value
+   * would then carry crackable material and the exclusion would become a leak.
    */
   private static final Set<ContractOutputType> NEVER_SENSITIVE =
-      Set.of(ContractOutputType.PasswordPolicy);
+      Set.of(
+          ContractOutputType.PasswordPolicy,
+          ContractOutputType.AsreproastableAccount,
+          ContractOutputType.KerberoastableAccount);
 
   private SensitiveValueMaskingUtils() {}
 

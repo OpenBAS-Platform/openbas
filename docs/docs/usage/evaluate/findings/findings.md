@@ -41,20 +41,21 @@ Some Finding types carry secret material: their value is masked everywhere the p
 | Sensitive type | Value shape | Masked as |
 | --- | --- | --- |
 | Credentials | `admin:motdepasse` | `ad******:mo******` |
-| ASREPRoastable account | `svc_account:$krb5asrep$...` | `sv******:$k******` |
-| Kerberoastable account | `svc_account:$krb5tgs$...` | `sv******:$k******` |
 
 Sensitivity is **derived from the Finding type**, not stored: a type is sensitive as soon as it is
-made of a password, a hash or a key. The roastable accounts are included because the hash they
-expose can be cracked offline.
+made of a password, a hash or a key.
 
 Every part of the value - the parts being separated by `:` - is masked the same way: only a two
 character fragment is kept, so you can still tell which Finding is which when you already know the
 value, without the platform ever disclosing it. A part too short to keep a fragment safely is masked
 entirely, and the mask has a fixed width so the length of the secret is not leaked either.
 
-Password policy Findings are an explicit exception: their `key` is the name of a policy setting
-(`MinimumPasswordLength`...), not a secret, so they are never masked.
+Two families of Finding are explicit exceptions, and are never masked:
+
+- **Password policy**: its `key` is the name of a policy setting (`MinimumPasswordLength`...), not a
+  secret.
+- **Kerberoastable and ASREPRoastable accounts**: their type declares a hash, but the Finding value
+  is the account name alone - the hash is never part of it, so there is nothing to protect.
 
 !!! warning "The secret is not deleted"
 

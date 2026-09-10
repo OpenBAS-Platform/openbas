@@ -18,16 +18,35 @@ class SensitiveValueMaskingUtilsTest {
   class WhenDerivingSensitivity {
 
     @Test
-    @DisplayName("Should flag the types whose recipe holds a password or a hash")
+    @DisplayName("Should flag the types whose finding value holds a password or a hash")
     void given_aTypeHoldingSecretMaterial_should_flagItSensitive() {
       // -------- Act & Assert --------
-      // Credentials carry `password` + `hash`, the roastable accounts carry a `hash` that is
-      // crackable offline: all three are secret material.
+      // CredentialsOutputProcessor.toFindingValue concatenates `username:password` (or
+      // `username:hash`), so the value really carries the secret.
       assertThat(SensitiveValueMaskingUtils.isSensitive(ContractOutputType.Credentials)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Should not flag a roastable account, whose value is the username alone")
+    void given_aRoastableAccount_should_notFlagItSensitive() {
+      // -------- Arrange --------
+      // Both recipes declare a `hash` field, but the processors build the finding value from the
+      // username alone (toFindingValue returns buildString(jsonNode, USERNAME)): the hash never
+      // reaches the value, so masking would only hide an account name. Product decided so.
+
+      // -------- Act & Assert --------
       assertThat(SensitiveValueMaskingUtils.isSensitive(ContractOutputType.AsreproastableAccount))
-          .isTrue();
+          .isFalse();
       assertThat(SensitiveValueMaskingUtils.isSensitive(ContractOutputType.KerberoastableAccount))
-          .isTrue();
+          .isFalse();
+      assertThat(
+              SensitiveValueMaskingUtils.maskIfNeeded(
+                  ContractOutputType.AsreproastableAccount, "administrator"))
+          .isEqualTo("administrator");
+      assertThat(
+              SensitiveValueMaskingUtils.maskIfNeeded(
+                  ContractOutputType.KerberoastableAccount, "svc_sql"))
+          .isEqualTo("svc_sql");
     }
 
     @Test
@@ -38,6 +57,8 @@ class SensitiveValueMaskingUtilsTest {
       assertThat(SensitiveValueMaskingUtils.isSensitive(ContractOutputType.Port)).isFalse();
       assertThat(SensitiveValueMaskingUtils.isSensitive(ContractOutputType.IPv4)).isFalse();
       assertThat(SensitiveValueMaskingUtils.isSensitive(ContractOutputType.PortsScan)).isFalse();
+      // A SID is an identity, not a secret (Product decision on issue 7500).
+      assertThat(SensitiveValueMaskingUtils.isSensitive(ContractOutputType.Sid)).isFalse();
     }
 
     @Test
