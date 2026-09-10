@@ -1997,6 +1997,37 @@ class StepServiceTest {
   class DelayedStepTenantScope {
 
     @Test
+    @DisplayName("a tenant-less entry does not inherit the previous entry's scope")
+    void given_aTenantLessEntryAfterAScopedOne_should_notInheritItsScope() throws Exception {
+      // Every entry shares one transaction, so the scope set for entry 1 is still active when
+      // entry 2 is reached. Leaving it there would read tenant A's rows for an entry that belongs
+      // to nobody, which is a cross-tenant read, not the empty read the warning promises.
+      String tenantId = UUID.randomUUID().toString();
+      Exercise simulation = mock(Exercise.class);
+      when(simulation.getTenant()).thenReturn(new Tenant(tenantId));
+      Workflow scopedRun = mock(Workflow.class);
+      when(scopedRun.getSimulation()).thenReturn(simulation);
+      when(scopedRun.getId()).thenReturn(UUID.randomUUID().toString());
+      StepDelayQueue scopedEntry = mock(StepDelayQueue.class);
+      when(scopedEntry.getWorkflowRun()).thenReturn(scopedRun);
+
+      Workflow orphanRun = mock(Workflow.class);
+      when(orphanRun.getSimulation()).thenReturn(null);
+      when(orphanRun.getScenario()).thenReturn(null);
+      when(orphanRun.getId()).thenReturn(UUID.randomUUID().toString());
+      StepDelayQueue orphanEntry = mock(StepDelayQueue.class);
+      when(orphanEntry.getWorkflowRun()).thenReturn(orphanRun);
+
+      when(stepDelayQueueService.popNextToProcess()).thenReturn(List.of(scopedEntry, orphanEntry));
+      when(workflowService.isWorkflowEnded(any())).thenReturn(true);
+
+      queueChainingJob.execute(mock(JobExecutionContext.class));
+
+      verify(tenantScopedTransaction).setScopeOnCurrentTransaction(TxCtx.forTenant(tenantId));
+      verify(tenantScopedTransaction).setScopeOnCurrentTransaction(TxCtx.missing());
+    }
+
+    @Test
     @DisplayName("each delayed step is processed under its own simulation's tenant scope")
     void given_aDelayedStep_should_scopeTheTransactionToItsTenant() throws Exception {
       // The job runs ONE transaction so a processing failure rolls the DELETE back, and
@@ -2059,8 +2090,12 @@ class StepServiceTest {
       queueChainingJob.execute(mock(JobExecutionContext.class));
 
       // Processed, not skipped: dropping the step would be the same silent loss the scoping
-      // exists to prevent. What must not happen is a scope being invented for it.
-      verify(tenantScopedTransaction, never()).setScopeOnCurrentTransaction(any());
+      // exists to prevent. What must not happen is a TENANT being invented for it: the scope is
+      // set to missing(), which denies every row, rather than left at whatever the previous entry
+      // put there.
+      verify(tenantScopedTransaction).setScopeOnCurrentTransaction(TxCtx.missing());
+      verify(tenantScopedTransaction, never())
+          .setScopeOnCurrentTransaction(any(TxCtx.Restricted.class));
       verify(workflowService).isWorkflowEnded(any());
     }
   }
