@@ -15,6 +15,7 @@ import io.openaev.context.TenantScopedTransaction;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.model.Exercise;
+import io.openaev.database.model.Scenario;
 import io.openaev.database.model.StepDelayQueue;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.StepDelayQueueRepository;
@@ -2006,10 +2007,34 @@ class StepServiceTest {
     }
 
     @Test
+    @DisplayName("a scenario-backed run is scoped to its scenario's tenant")
+    void given_aScenarioBackedRun_should_scopeToTheScenarioTenant() throws Exception {
+      // chk_workflow_simulation_or_scenario allows exactly one of the two, so a workflow with no
+      // simulation still has a tenant, through its scenario. Reading only the simulation left every
+      // scenario-backed run unscoped.
+      String tenantId = UUID.randomUUID().toString();
+      Scenario scenario = mock(Scenario.class);
+      when(scenario.getTenant()).thenReturn(new Tenant(tenantId));
+      Workflow run = mock(Workflow.class);
+      when(run.getSimulation()).thenReturn(null);
+      when(run.getScenario()).thenReturn(scenario);
+      when(run.getId()).thenReturn(UUID.randomUUID().toString());
+      StepDelayQueue entry = mock(StepDelayQueue.class);
+      when(entry.getWorkflowRun()).thenReturn(run);
+      when(stepDelayQueueService.popNextToProcess()).thenReturn(List.of(entry));
+      when(workflowService.isWorkflowEnded(any())).thenReturn(true);
+
+      queueChainingJob.execute(mock(JobExecutionContext.class));
+
+      verify(tenantTx).setScopeOnCurrentTransaction(TxCtx.forTenant(tenantId));
+    }
+
+    @Test
     @DisplayName("a delayed step whose run has no simulation tenant gets no invented scope")
     void given_noTenant_should_processWithoutInventingAScope() throws Exception {
       Workflow run = mock(Workflow.class);
       when(run.getSimulation()).thenReturn(null);
+      when(run.getScenario()).thenReturn(null);
       StepDelayQueue entry = mock(StepDelayQueue.class);
       when(entry.getWorkflowRun()).thenReturn(run);
       when(stepDelayQueueService.popNextToProcess()).thenReturn(List.of(entry));

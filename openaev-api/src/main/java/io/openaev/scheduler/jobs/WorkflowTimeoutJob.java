@@ -62,8 +62,15 @@ public class WorkflowTimeoutJob implements Job {
 
   /** Workflows carry no tenant column; the owning simulation does. */
   private static String tenantOf(Workflow workflow) {
-    return workflow.getSimulation() == null || workflow.getSimulation().getTenant() == null
-        ? null
-        : workflow.getSimulation().getTenant().getId();
+    // chk_workflow_simulation_or_scenario guarantees exactly one of the two is set, and both
+    // Exercise and Scenario are TenantBase. Reading only the simulation left every
+    // scenario-backed workflow unscoped.
+    if (workflow.getSimulation() != null && workflow.getSimulation().getTenant() != null) {
+      return workflow.getSimulation().getTenant().getId();
+    }
+    if (workflow.getScenario() != null && workflow.getScenario().getTenant() != null) {
+      return workflow.getScenario().getTenant().getId();
+    }
+    return null;
   }
 }

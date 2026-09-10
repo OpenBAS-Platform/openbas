@@ -5,6 +5,7 @@ import io.openaev.context.TenantScopedTransaction;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.Step;
 import io.openaev.database.model.StepDelayQueue;
+import io.openaev.database.model.Workflow;
 import io.openaev.rest.exception.ChainingException;
 import io.openaev.service.chaining.StepDelayQueueService;
 import io.openaev.service.chaining.StepService;
@@ -104,14 +105,23 @@ public class QueueChainingJob implements Job {
 
   /**
    * The tenant a delayed step belongs to. {@code workflows} carries no tenant column of its own;
-   * the owning simulation does, through {@code TenantBase}.
+   * its owner does. {@code chk_workflow_simulation_or_scenario} allows exactly one of a simulation
+   * or a scenario, and both are {@code TenantBase}, so both have to be read.
    */
   private static String tenantOf(StepDelayQueue stepDelayQueue) {
-    if (stepDelayQueue.getWorkflowRun() == null
-        || stepDelayQueue.getWorkflowRun().getSimulation() == null
-        || stepDelayQueue.getWorkflowRun().getSimulation().getTenant() == null) {
+    // chk_workflow_simulation_or_scenario guarantees exactly one of the two is set, and both
+    // Exercise and Scenario are TenantBase. Reading only the simulation left every
+    // scenario-backed workflow unscoped.
+    Workflow run = stepDelayQueue.getWorkflowRun();
+    if (run == null) {
       return null;
     }
-    return stepDelayQueue.getWorkflowRun().getSimulation().getTenant().getId();
+    if (run.getSimulation() != null && run.getSimulation().getTenant() != null) {
+      return run.getSimulation().getTenant().getId();
+    }
+    if (run.getScenario() != null && run.getScenario().getTenant() != null) {
+      return run.getScenario().getTenant().getId();
+    }
+    return null;
   }
 }
