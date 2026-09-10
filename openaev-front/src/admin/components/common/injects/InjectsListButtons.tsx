@@ -42,7 +42,7 @@ const InjectsListButtons: FunctionComponent<Props> = ({
       {hasImportModesEnabled()
         && permissions.canManage && <InjectImportMenu onImportedInjects={onImportedInjects} />}
       <ButtonGroup
-        size="sm"
+        size="md"
         style={{ float: 'right' }}
         aria-label="Change view mode"
         value={viewModeContext}

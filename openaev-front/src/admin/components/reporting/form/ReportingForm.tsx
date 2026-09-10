@@ -408,7 +408,7 @@ const ReportingForm: FunctionComponent<Props> = ({
               <SelectLabel>{t('Subject type')}</SelectLabel>
               {/* The trigger shows the label alone; the rows carry the icon. This
                 is what `renderValue` did, expressed as the trigger's content. */}
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <span>{t(REPORTING_CONTEXT_LABELS[field.value as ReportingContextType])}</span>
               </SelectTrigger>
               <SelectContent>

@@ -632,7 +632,9 @@ export class ToolBarComponent extends Component<ToolBarProps, ToolBarState> {
                         </SelectContent>
                       </Select>
                     </Box>
-                    <Box>
+                    {/* Its trigger is `w-full`, so it needs a real basis: in a shrink-to-fit
+                        flex item the 100% would resolve against the content and collapse. */}
+                    <Box sx={{ flex: '0 0 25%' }}>
                       {this.renderFieldOptions(i)}
                     </Box>
                     <Box sx={{

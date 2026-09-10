@@ -243,7 +243,7 @@ const Channel = () => {
             )}
             action={(
               <ButtonGroup
-                size="sm"
+                size="md"
                 value={previewMode}
                 onValueChange={value => setPreviewMode(value as 'dark' | 'light')}
                 // The global MuiToggleButtonGroup override pins the group to

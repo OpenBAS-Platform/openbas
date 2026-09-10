@@ -630,7 +630,7 @@ const AttackPathHeader: FunctionComponent<Props> = ({
         </Combobox>
       </div>
       <ButtonGroup
-        size="sm"
+        size="md"
         value={view}
         onValueChange={v => onViewChange(v as 'graph' | 'table')}
         aria-label={t('View')}

@@ -133,7 +133,7 @@ const SecurityPlatforms = () => {
   const viewSwitcher = (
     <ButtonGroup
       value={viewMode}
-      size="sm"
+      size="md"
       onValueChange={handleViewModeChange}
       aria-label={t('View mode')}
     >

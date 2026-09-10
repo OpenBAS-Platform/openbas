@@ -55,7 +55,7 @@ const FindingOccurrences = ({ searchFindings, finding, contextId }: Props) => {
         </Box>
         <div style={{ flex: 1 }} />
         <ButtonGroup
-          size="sm"
+          size="md"
           value={viewMode}
           onValueChange={mode => handleViewMode(mode as ViewMode)}
           aria-label={t('Occurrences view mode')}

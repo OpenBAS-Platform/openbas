@@ -277,7 +277,7 @@ const InjectContractPicker: FunctionComponent<Props> = ({
             attackPatterns={attackPatterns}
             topBarButtons={(
               <ButtonGroup
-                size="sm"
+                size="md"
                 value={viewMode}
                 onValueChange={handleViewMode}
                 style={{ marginLeft: 1.5 }}

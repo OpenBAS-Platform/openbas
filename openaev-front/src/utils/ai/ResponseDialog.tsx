@@ -335,7 +335,7 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
               disabled={effectiveDisabled}
             >
               <SelectLabel>{t('Tone')}</SelectLabel>
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder={t('Tone')} />
               </SelectTrigger>
               <SelectContent>

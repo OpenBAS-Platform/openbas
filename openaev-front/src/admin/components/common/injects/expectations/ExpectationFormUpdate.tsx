@@ -100,7 +100,7 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
           error={!!errors.expectation_type}
         >
           <SelectLabel>{t('Type')}</SelectLabel>
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

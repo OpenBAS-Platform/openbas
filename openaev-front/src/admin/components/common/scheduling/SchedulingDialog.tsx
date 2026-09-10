@@ -405,7 +405,7 @@ const SchedulingDialog: FunctionComponent<Props> = ({ open, onClose, initialValu
                             onValueChange={next => (field.onChange)(Number(next))}
                           >
                             <SelectLabel>{t('Week of month')}</SelectLabel>
-                            <SelectTrigger>
+                            <SelectTrigger className="w-full">
                               <SelectValue placeholder={t('Week of month')} />
                             </SelectTrigger>
                             <SelectContent>
@@ -428,7 +428,7 @@ const SchedulingDialog: FunctionComponent<Props> = ({ open, onClose, initialValu
                           onValueChange={next => (field.onChange)(Number(next))}
                         >
                           <SelectLabel>{t('Day of week')}</SelectLabel>
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder={t('Day of week')} />
                           </SelectTrigger>
                           <SelectContent>
