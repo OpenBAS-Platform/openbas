@@ -75,21 +75,22 @@ const ChallengesPlayer = () => {
     dispatch(validateChallenge(exerciseId, challengeId, userId, data)).then(
       (response: ValidateChallengeResult) => {
         const challengeEntries = response.entities?.simulationChallengesReaders?.[response.result]?.exercise_challenges ?? [];
-        setCurrentChallengeEntry(
-          challengeEntries.find(entry => entry.challenge_detail?.challenge_id === challengeId) ?? null,
-        );
+        const updatedEntry = challengeEntries.find(entry => entry.challenge_detail?.challenge_id === challengeId);
+        if (updatedEntry) {
+          setCurrentChallengeEntry(updatedEntry);
+        }
         setHasSubmitted(true);
       },
     );
   };
 
   // Result
-
   const resultList = currentExpectation?.inject_expectation_results ?? [];
+  const answeredResults = resultList.filter(r => r.result != null);
 
-  const hasResult = () => resultList.length > 0 || hasSubmitted;
-  const validResult = () => resultList.length > 0 && resultList.some(r => r.result === SUCCESS);
-  const invalidResult = () => (resultList.length === 0 && hasSubmitted) || resultList.every(r => r.result === FAILED);
+  const hasResult = () => answeredResults.length > 0 || hasSubmitted;
+  const validResult = () => answeredResults.some(r => r.result === SUCCESS);
+  const invalidResult = () => (answeredResults.length === 0 ? hasSubmitted : answeredResults.every(r => r.result === FAILED));
   const maxAttemptsExceeded = () => !!currentChallenge?.challenge_max_attempts && (currentAttempt ?? 0) >= currentChallenge.challenge_max_attempts;
 
   if (!exercise) {
@@ -103,11 +104,11 @@ const ChallengesPlayer = () => {
     return acc;
   }, {});
 
-  const challengeStatus: (result: InjectExpectationResult) => ({
+  const challengeStatus: (result: InjectExpectationResult | undefined) => ({
     color: 'inherit' | 'success' | 'error';
     icon: JSX.Element;
-  }) = (result: InjectExpectationResult) => {
-    if (result.result == null) {
+  }) = (result: InjectExpectationResult | undefined) => {
+    if (result?.result == null) {
       return {
         color: 'inherit',
         icon: <PendingActionsOutlined fontSize="large" />,
@@ -221,8 +222,8 @@ const ChallengesPlayer = () => {
                   return null;
                 }
                 const status = challengeStatus(
-                  challengeEntry.challenge_expectation?.inject_expectation_results?.[0]
-                  ?? ({} as InjectExpectationResult));
+                  challengeEntry.challenge_expectation?.inject_expectation_results?.[0],
+                );
                 return (
                   <ChallengeCard
                     key={challenge.challenge_id}
