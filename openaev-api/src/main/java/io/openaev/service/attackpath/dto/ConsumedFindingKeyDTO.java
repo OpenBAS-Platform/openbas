@@ -3,6 +3,7 @@ package io.openaev.service.attackpath.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.openaev.database.model.PrimitiveType;
 import io.openaev.utils.SensitiveValueMaskingUtils;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 /**
@@ -34,7 +35,7 @@ public record ConsumedFindingKeyDTO(
     String value,
     String eventName,
     List<String> matchedFindingIds,
-    @JsonIgnore String rawValue) {
+    @JsonIgnore @Schema(hidden = true) String rawValue) {
 
   /**
    * Built from a condition, masking the value when the key targets secret material; the matched
