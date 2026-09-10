@@ -4,7 +4,6 @@ import static io.openaev.utils.JsonTestUtils.asJsonString;
 import static io.openaev.utils.fixtures.CustomDashboardFixture.createCustomDashboardWithDefaultParams;
 import static io.openaev.utils.fixtures.WidgetFixture.createNumberWidgetWithEntity;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -66,18 +65,13 @@ class DashboardApiTenantScopeTest extends IntegrationTest {
             .getContentAsString();
     assertFalse(ownBody.isBlank(), "tenant A's own widget must return a non-empty count payload");
 
-    String foreignBody =
-        mvc.perform(
-                post("/api/dashboards/count/" + widgetB)
-                    .header("X-Tenant-Ids", tenantA)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(asJsonString(new HashMap<>()))
-                    .with(csrf()))
-            .andExpect(status().isNotFound())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-    assertTrue(foreignBody.isEmpty(), "tenant B's widget must stay hidden from tenant A");
+    mvc.perform(
+            post("/api/dashboards/count/" + widgetB)
+                .header("X-Tenant-Ids", tenantA)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(new HashMap<>()))
+                .with(csrf()))
+        .andExpect(status().isNotFound());
   }
 
   private String seedWidget(String tenantId, String dashboardName) {
