@@ -1640,8 +1640,16 @@ public class AttackPathGraphService {
     return node;
   }
 
+  /**
+   * The graph node of a single finding. The value of a sensitive type is masked here, at the only
+   * place finding nodes are built, so no graph payload ever carries a secret in the clear - the
+   * front used to mask on render, which any network inspection defeated. The node id is masked
+   * separately by {@link AttackPathIds#findingNode} (it hashes the value), since an id encoding the
+   * raw value would leak just as much.
+   */
   private AttackPathNodeDTO findingNode(
-      String id, String type, String value, String typeNodeId, String assetNodeId) {
+      String id, String type, String rawValue, String typeNodeId, String assetNodeId) {
+    String value = SensitiveValueMaskingUtils.maskIfNeeded(type, rawValue);
     AttackPathNodeDTO node = new AttackPathNodeDTO();
     node.setId(id);
     node.setType(TYPE_FINDING);

@@ -1,5 +1,8 @@
 package io.openaev.service.attackpath.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.openaev.database.model.PrimitiveType;
+import io.openaev.utils.SensitiveValueMaskingUtils;
 import java.util.List;
 
 /**
@@ -15,26 +18,49 @@ import java.util.List;
  * the front can tell the analyst which event the consuming action was triggered by (e.g. "SMB UP")
  * rather than only the raw key match. Null when the event has no name.
  *
- * <p>{@code matchedFindingIds} are the finding-node ids ({@code NODE_FINDING|type|value}) this key
- * matched, resolved by the backend (spec 011, back-authoritative). The front anchors the causal
- * edge on these instead of re-matching. Empty until resolved, or when nothing matched.
+ * <p>{@code matchedFindingIds} are the finding-node ids this key matched, resolved by the backend
+ * (spec 011, back-authoritative). The front anchors the causal edge on these instead of
+ * re-matching. Empty until resolved, or when nothing matched.
+ *
+ * <p>A condition targeting a password, a hash or a key carries the secret itself as its value, so
+ * {@code value} is the <b>masked</b> form: it is what leaves the platform. Matching a key against a
+ * finding needs the cleartext, so it is kept apart in {@code rawValue}, which is never serialized.
+ * Splitting the two makes the DTO safe by construction - no serialization path can reach the secret
+ * - while keeping the matcher exact.
  */
 public record ConsumedFindingKeyDTO(
     String keyType,
     String operator,
     String value,
     String eventName,
-    List<String> matchedFindingIds) {
+    List<String> matchedFindingIds,
+    @JsonIgnore String rawValue) {
 
   /**
-   * Built from a condition; the matched producing findings are resolved later (empty until then).
+   * Built from a condition, masking the value when the key targets secret material; the matched
+   * producing findings are resolved later (empty until then).
+   */
+  public static ConsumedFindingKeyDTO of(
+      PrimitiveType keyType, String operator, String rawValue, String eventName) {
+    return new ConsumedFindingKeyDTO(
+        keyType == null ? null : keyType.label,
+        operator,
+        SensitiveValueMaskingUtils.maskIfNeeded(keyType, rawValue),
+        eventName,
+        List.of(),
+        rawValue);
+  }
+
+  /**
+   * Built from an already-resolved key type label, for a value that carries no secret. Kept for
+   * callers that only know the label; the value is stored as-is on both sides.
    */
   public ConsumedFindingKeyDTO(String keyType, String operator, String value, String eventName) {
-    this(keyType, operator, value, eventName, List.of());
+    this(keyType, operator, value, eventName, List.of(), value);
   }
 
   /** A copy carrying the finding-node ids this key matched. */
   public ConsumedFindingKeyDTO withMatchedFindingIds(List<String> ids) {
-    return new ConsumedFindingKeyDTO(keyType, operator, value, eventName, ids);
+    return new ConsumedFindingKeyDTO(keyType, operator, value, eventName, ids, rawValue);
   }
 }

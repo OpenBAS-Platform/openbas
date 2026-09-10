@@ -5,7 +5,10 @@ import io.openaev.database.model.ContractOutputType;
 import io.openaev.database.model.PrimitiveType;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -68,6 +71,13 @@ public final class SensitiveValueMaskingUtils {
           ContractOutputType.PasswordPolicy,
           ContractOutputType.AsreproastableAccount,
           ContractOutputType.KerberoastableAccount);
+
+  /** Every contract output type indexed by its label, for the label-based overload. */
+  private static final Map<String, ContractOutputType> LABEL_TO_TYPE =
+      Arrays.stream(ContractOutputType.values())
+          .collect(
+              Collectors.toUnmodifiableMap(
+                  type -> type.getLabel().toLowerCase(Locale.ROOT), Function.identity()));
 
   private SensitiveValueMaskingUtils() {}
 
@@ -145,6 +155,43 @@ public final class SensitiveValueMaskingUtils {
    */
   public static String maskIfNeeded(final ContractOutputType type, final String value) {
     return isSensitive(type) ? mask(value) : value;
+  }
+
+  /**
+   * Masks the value when the type <em>label</em> denotes a sensitive contract output type, returns
+   * it untouched otherwise.
+   *
+   * <p>The attack path graph manipulates lowercase type labels ({@code "credentials"}, {@code
+   * "sid"}, {@code "file"}...) rather than {@link ContractOutputType} constants, and some of its
+   * categories are curated groupings with no enum counterpart. An unknown label is therefore
+   * <b>not</b> an error: it resolves to no type, hence to "not sensitive", so a single unmapped
+   * label can never make a whole graph page fail.
+   *
+   * @param typeLabel the {@link ContractOutputType#getLabel() label} of the type, case insensitive
+   * @param value the cleartext value
+   * @return the masked value, or the value as-is when the label is unknown or not sensitive
+   */
+  public static String maskIfNeeded(final String typeLabel, final String value) {
+    return isSensitive(typeLabel) ? mask(value) : value;
+  }
+
+  /**
+   * Whether findings carrying this type <em>label</em> hold secret material. Same label resolution
+   * as {@link #maskIfNeeded(String, String)}: an unknown label is not sensitive.
+   *
+   * @param typeLabel the {@link ContractOutputType#getLabel() label} of the type, case insensitive
+   * @return true when the label resolves to a sensitive contract output type
+   */
+  public static boolean isSensitive(final String typeLabel) {
+    return isSensitive(fromLabel(typeLabel));
+  }
+
+  /** The contract output type carrying this label, or {@code null} when none does. */
+  private static ContractOutputType fromLabel(final String typeLabel) {
+    if (typeLabel == null || typeLabel.isBlank()) {
+      return null;
+    }
+    return LABEL_TO_TYPE.get(typeLabel.toLowerCase(Locale.ROOT));
   }
 
   /**
