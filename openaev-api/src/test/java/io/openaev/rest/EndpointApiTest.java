@@ -269,6 +269,7 @@ class EndpointApiTest extends IntegrationTest {
     EndpointRegisterInput registerInput =
         createWindowsEndpointRegisterInput(List.of(tag.getId()), externalReference);
     Endpoint endpoint = new Endpoint();
+    endpoint.setTenant(new Tenant(TenantContext.getCurrentTenant()));
     endpoint.setUpdateAttributes(registerInput);
     endpoint.setIps(EndpointMapper.setIps(registerInput.getIps()));
     endpoint.setMacAddresses(EndpointMapper.setMacAddresses(registerInput.getMacAddresses()));
@@ -322,6 +323,7 @@ class EndpointApiTest extends IntegrationTest {
     EndpointRegisterInput registerInput =
         createWindowsEndpointRegisterInput(List.of(tag.getId()), externalReference);
     Endpoint endpoint = new Endpoint();
+    endpoint.setTenant(new Tenant(TenantContext.getCurrentTenant()));
     endpoint.setUpdateAttributes(registerInput);
     endpoint.setIps(EndpointMapper.setIps(registerInput.getIps()));
     endpoint.setMacAddresses(EndpointMapper.setMacAddresses(registerInput.getMacAddresses()));
@@ -363,6 +365,7 @@ class EndpointApiTest extends IntegrationTest {
     String externalReference = "external01";
     EndpointInput endpointInput = createWindowsEndpointInput(List.of(tag.getId()));
     Endpoint endpoint = new Endpoint();
+    endpoint.setTenant(new Tenant(TenantContext.getCurrentTenant()));
     endpoint.setUpdateAttributes(endpointInput);
     endpoint.setIps(EndpointMapper.setIps(endpointInput.getIps()));
     endpoint.setMacAddresses(EndpointMapper.setMacAddresses(endpointInput.getMacAddresses()));
@@ -412,6 +415,7 @@ class EndpointApiTest extends IntegrationTest {
     String externalReference = "external01";
     EndpointInput endpointInput = createWindowsEndpointInput(List.of(tag.getId()));
     Endpoint endpoint = new Endpoint();
+    endpoint.setTenant(new Tenant(TenantContext.getCurrentTenant()));
     endpoint.setUpdateAttributes(endpointInput);
     endpoint.setIps(EndpointMapper.setIps(endpointInput.getIps()));
     endpoint.setMacAddresses(EndpointMapper.setMacAddresses(endpointInput.getMacAddresses()));

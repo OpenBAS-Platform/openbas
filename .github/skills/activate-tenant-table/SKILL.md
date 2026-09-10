@@ -50,15 +50,15 @@ incident. Do not trade them away to make a test pass.
    delete or `@Disabled` an existing test to get green, with one exception
    introduced in Phase 2 and resolved in Phase 6 (the documented go-live guard).
 
-   **Red for the intended reason is not enough. Ask: "name a change to the
-   production code that keeps this test green."** Every false green this
-   programme has shipped passed its own red-then-green check. The gauge tests of
-   lot C were red without their fix and green with it, and stayed green when the
-   gauge was re-wired to the unscoped repository, because they called the scoped
-   method directly instead of the supplier the gauge registers. Before calling a
-   test done, remove the fix a SECOND way - a different line, a different layer -
-   and confirm it fails again. If you cannot name a mutation that breaks it, the
-   test is pinning your fix, not the behaviour.
+   **Red for the intended reason is not enough.** A test that goes red when you
+   remove your fix may only be pinning that fix, not the behaviour it is meant
+   to protect. Before calling it done, break the behaviour a SECOND way, on a
+   different line or in a different layer, and confirm it fails again.
+
+   Lot C's gauge tests are the example. They were red without their fix and
+   green with it, then stayed green when the gauge was re-wired to the unscoped
+   repository: they called the scoped method directly instead of the supplier
+   the gauge actually registers.
 2. **Background writers go through the primitive, never `@Transactional`.** A
    scheduler job, queue consumer, connector-side path or startup task that
    writes the table is NOT an automatic stop anymore (it was before #6398).
