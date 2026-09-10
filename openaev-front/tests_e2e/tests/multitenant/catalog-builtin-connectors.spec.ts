@@ -6,8 +6,6 @@ import InjectorsListPage from '../../model/integrations/InjectorsListPage';
 import { TIMEOUT } from '../../utils/constants';
 import { tenantUrl } from '../../utils/url';
 
-const APP_URL = process.env.APP_URL ?? 'http://localhost:3001';
-
 /**
  * End-to-end tests: built-in connectors provisioned on new tenant creation.
  */
@@ -34,28 +32,16 @@ test.describe('Multi-tenancy — built-in connectors', () => {
     'Expectations Vulnerability Manager',
   ];
 
-  test.beforeAll(async ({ browser }) => {
-    const context = await browser.newContext({
-      storageState: 'tests_e2e/.auth/user.json',
-      baseURL: APP_URL,
-    });
+  test.beforeAll(async ({ request }) => {
     const tenantName = `Tenant Builtin E2E ${Date.now()}`;
-    const createdTenant = await new TenantApiHelpers(context.request).createTenant(tenantName);
+    const createdTenant = await new TenantApiHelpers(request).createTenant(tenantName);
     newTenantId = createdTenant.tenant_id;
     expect(newTenantId).not.toBeNull();
-
-    await context.close();
   });
 
-  test.afterAll(async ({ browser }) => {
+  test.afterAll(async ({ request }) => {
     if (newTenantId) {
-      const context = await browser.newContext({
-        storageState: 'tests_e2e/.auth/user.json',
-        baseURL: APP_URL,
-      });
-      const request = context.request;
       await new TenantApiHelpers(request).softDeleteTenant(newTenantId);
-      await context.close();
       newTenantId = null;
     }
   });
