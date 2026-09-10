@@ -28,7 +28,6 @@ public class QueueChainingJob implements Job {
   private final StepDelayQueueService stepDelayQueueService;
   private final StepService stepService;
   private final WorkflowService workflowService;
-  private final TransactionTemplate transactionTemplate;
 
   /**
    * MT scoping for this job (mirrors {@code StepEventService#handleReadyStepEvent}, #6357). {@code
@@ -48,8 +47,9 @@ public class QueueChainingJob implements Job {
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
     // Pop and process inside the same transaction so that if processing fails,
     // the DELETE is rolled back and the entry is not lost.
-    transactionTemplate.executeWithoutResult(
-        status -> {
+        tenantTx.execute(
+                TxCtx.allTenants(),
+                () -> {
           List<StepDelayQueue> stepsDelayQueue = stepDelayQueueService.popNextToProcess();
           if (stepsDelayQueue.isEmpty()) return;
 

@@ -1,12 +1,5 @@
 package io.openaev.service.chaining;
 
-import static io.openaev.service.chaining.StepService.ACTIVE_STEP_STATUS;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-
 import io.openaev.api.chaining.ActionStep;
 import io.openaev.api.chaining.InjectExecutionStep;
 import io.openaev.api.chaining.dto.ConditionCreateInput;
@@ -21,10 +14,6 @@ import io.openaev.rest.exception.ChainingException;
 import io.openaev.rest.exception.ElementNotFoundException;
 import io.openaev.rest.exception.WorkflowNotEditableException;
 import io.openaev.scheduler.jobs.QueueChainingJob;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -36,7 +25,19 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.JobExecutionException;
-import org.springframework.transaction.support.TransactionTemplate;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static io.openaev.service.chaining.StepService.ACTIVE_STEP_STATUS;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.isNull;
 
 @ExtendWith(MockitoExtension.class)
 class StepServiceTest {
@@ -56,7 +57,6 @@ class StepServiceTest {
 
   @Spy @InjectMocks StepService stepService;
   private QueueChainingJob queueChainingJob;
-  private TransactionTemplate transactionTemplate;
 
   private Workflow workflow;
 
@@ -69,21 +69,11 @@ class StepServiceTest {
 
   @BeforeEach
   void setUp() {
-    transactionTemplate = mock(TransactionTemplate.class);
-    lenient()
-        .doAnswer(
-            invocation -> {
-              ((java.util.function.Consumer<Object>) invocation.getArgument(0)).accept(null);
-              return null;
-            })
-        .when(transactionTemplate)
-        .executeWithoutResult(any());
     queueChainingJob =
         new QueueChainingJob(
             stepDelayQueueService,
             stepService,
             workflowService,
-            transactionTemplate,
             tenantScopedTransaction);
     lenient()
         .doAnswer(
@@ -93,6 +83,14 @@ class StepServiceTest {
             })
         .when(tenantScopedTransaction)
         .executeNew(any(), any(Runnable.class));
+    lenient()
+        .doAnswer(
+            invocation -> {
+              ((Runnable) invocation.getArgument(1)).run();
+              return null;
+            })
+        .when(tenantScopedTransaction)
+        .execute(any(), any(Runnable.class));
     workflow = mock(Workflow.class);
   }
 
