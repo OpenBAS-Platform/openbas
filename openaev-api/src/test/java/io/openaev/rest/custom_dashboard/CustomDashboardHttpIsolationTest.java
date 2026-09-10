@@ -71,7 +71,8 @@ class CustomDashboardHttpIsolationTest extends IntegrationTest {
   @DisplayName("under tenant A's path: the dashboard keeps its widget list during JSON rendering")
   void readOwnDashboardKeepsWidgetsInitialized() throws Exception {
     String body =
-        mvc.perform(get(TENANT_CUSTOM_DASHBOARDS_URI.replace("{tenantId}", tenantA) + "/" + dashboardA))
+        mvc.perform(
+                get(TENANT_CUSTOM_DASHBOARDS_URI.replace("{tenantId}", tenantA) + "/" + dashboardA))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()
@@ -115,14 +116,17 @@ class CustomDashboardHttpIsolationTest extends IntegrationTest {
                 post(CUSTOM_DASHBOARDS_URI + "/search")
                     .header("X-Tenant-Ids", tenantA)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(asJsonString(PaginationFixture.getDefault().textSearch("dashboard").build()))
+                    .content(
+                        asJsonString(
+                            PaginationFixture.getDefault().textSearch("dashboard").build()))
                     .with(csrf()))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()
             .getContentAsString();
 
-    assertTrue(body.contains(dashboardA), "A's dashboard must appear when A is selected via header");
+    assertTrue(
+        body.contains(dashboardA), "A's dashboard must appear when A is selected via header");
     assertFalse(body.contains(dashboardB), "B's dashboard must not appear");
   }
 
@@ -227,7 +231,10 @@ class CustomDashboardHttpIsolationTest extends IntegrationTest {
     JsonApiDocument<ResourceObject> document =
         new JsonApiDocument<>(
             new ResourceObject(
-                null, "custom_dashboards", Map.of("custom_dashboard_name", dashboardName), Map.of()),
+                null,
+                "custom_dashboards",
+                Map.of("custom_dashboard_name", dashboardName),
+                Map.of()),
             List.of());
     byte[] zip = zipJsonService.writeZip(document, Map.of());
     return new MockMultipartFile("file", "dashboard.zip", "application/zip", zip);

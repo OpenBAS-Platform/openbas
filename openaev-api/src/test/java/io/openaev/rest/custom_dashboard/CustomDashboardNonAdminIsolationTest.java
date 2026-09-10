@@ -40,7 +40,8 @@ class CustomDashboardNonAdminIsolationTest extends IntegrationTest {
 
   @BeforeEach
   void seedTwoTenantsTheCallerBelongsToWithOneDashboardEach() throws Exception {
-    tenantA = tenantHelper.createTenantWithCapabilities("dashboard-nonadmin-a", READ_DASHBOARDS).getId();
+    tenantA =
+        tenantHelper.createTenantWithCapabilities("dashboard-nonadmin-a", READ_DASHBOARDS).getId();
     String tenantB =
         tenantHelper.createTenantWithCapabilities("dashboard-nonadmin-b", READ_DASHBOARDS).getId();
     dashboardA = seedDashboard(tenantA, "nonadmin-a");
@@ -54,14 +55,16 @@ class CustomDashboardNonAdminIsolationTest extends IntegrationTest {
         mvc.perform(
                 post("/api/tenants/{tenantId}/custom-dashboards/search", tenantA)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(asJsonString(PaginationFixture.getDefault().textSearch("nonadmin").build()))
+                    .content(
+                        asJsonString(PaginationFixture.getDefault().textSearch("nonadmin").build()))
                     .with(csrf()))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()
             .getContentAsString();
 
-    assertTrue(body.contains(dashboardA), "A's dashboard must appear for the non-admin member of A");
+    assertTrue(
+        body.contains(dashboardA), "A's dashboard must appear for the non-admin member of A");
     assertFalse(body.contains(dashboardB), "B's dashboard must not leak to A's scope");
   }
 

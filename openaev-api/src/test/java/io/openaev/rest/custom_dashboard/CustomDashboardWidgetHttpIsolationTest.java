@@ -21,7 +21,6 @@ import io.openaev.utils.TenantIsolationTestHelper;
 import io.openaev.utils.fixtures.composers.CustomDashboardComposer;
 import io.openaev.utils.fixtures.composers.WidgetComposer;
 import io.openaev.utils.mockUser.WithMockUser;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @TestPropertySource(properties = "openaev.tenant.active-tables=custom_dashboards,widgets")
 @WithMockUser(isAdmin = true)
-@DisplayName("widgets stay isolated through the real custom-dashboard widget endpoints once v2 is active")
+@DisplayName(
+    "widgets stay isolated through the real custom-dashboard widget endpoints once v2 is active")
 class CustomDashboardWidgetHttpIsolationTest extends IntegrationTest {
 
   @Autowired private MockMvc mvc;
@@ -61,9 +61,21 @@ class CustomDashboardWidgetHttpIsolationTest extends IntegrationTest {
   @Test
   @DisplayName("under tenant A's path: A's widget is readable and B's is not")
   void widgetReadsStayScoped() throws Exception {
-    mvc.perform(get(TENANT_CUSTOM_DASHBOARDS_URI.replace("{tenantId}", tenantA) + "/" + dashboardA + "/widgets/" + widgetA))
+    mvc.perform(
+            get(
+                TENANT_CUSTOM_DASHBOARDS_URI.replace("{tenantId}", tenantA)
+                    + "/"
+                    + dashboardA
+                    + "/widgets/"
+                    + widgetA))
         .andExpect(status().isOk());
-    mvc.perform(get(TENANT_CUSTOM_DASHBOARDS_URI.replace("{tenantId}", tenantA) + "/" + dashboardA + "/widgets/" + widgetB))
+    mvc.perform(
+            get(
+                TENANT_CUSTOM_DASHBOARDS_URI.replace("{tenantId}", tenantA)
+                    + "/"
+                    + dashboardA
+                    + "/widgets/"
+                    + widgetB))
         .andExpect(status().isNotFound());
   }
 
@@ -77,7 +89,10 @@ class CustomDashboardWidgetHttpIsolationTest extends IntegrationTest {
 
     String body =
         mvc.perform(
-                post(TENANT_CUSTOM_DASHBOARDS_URI.replace("{tenantId}", tenantA) + "/" + dashboardA + "/widgets")
+                post(TENANT_CUSTOM_DASHBOARDS_URI.replace("{tenantId}", tenantA)
+                        + "/"
+                        + dashboardA
+                        + "/widgets")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(asJsonString(input))
                     .with(csrf()))

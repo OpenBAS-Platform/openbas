@@ -8,9 +8,9 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
+import io.openaev.api.chaining.InjectExecutionStep;
 import io.openaev.api.custom_dashboard.CustomDashboardApiExporter;
 import io.openaev.api.custom_dashboard.CustomDashboardApiImporter;
-import io.openaev.api.chaining.InjectExecutionStep;
 import io.openaev.api.notification.NotificationApi;
 import io.openaev.api.notifier.NotifierApi;
 import io.openaev.api.xtmhub.XtmHubApi;
@@ -43,10 +43,10 @@ import io.openaev.database.repository.LessonsTemplateRepository;
 import io.openaev.database.repository.MitigationRepository;
 import io.openaev.database.repository.NotificationRepository;
 import io.openaev.database.repository.SecurityCoverageRepository;
-import io.openaev.database.repository.WidgetRepository;
 import io.openaev.database.repository.TagRepository;
 import io.openaev.database.repository.TagRuleRepository;
 import io.openaev.database.repository.TenantXtmHubRegistrationRepository;
+import io.openaev.database.repository.WidgetRepository;
 import io.openaev.database.repository.attackpath.AttackPathExecutionRepository;
 import io.openaev.database.repository.attackpath.AttackPathFindingRepository;
 import io.openaev.database.repository.autonomous.AutonomousDirectiveRepository;
@@ -77,8 +77,8 @@ import io.openaev.integration.impl.injectors.challenge.ChallengeInjectorIntegrat
 import io.openaev.integration.migration.ConfigurationMigration;
 import io.openaev.notification.engine.NotificationDispatchService;
 import io.openaev.processor.core.V20260420_Migrate_rabbitmq_queues;
-import io.openaev.processor.datapack.V20260330_Default_tenant_data;
 import io.openaev.processor.datapack.V20260101_Starter_pack;
+import io.openaev.processor.datapack.V20260330_Default_tenant_data;
 import io.openaev.processor.datapack.V20260708_Dynamic_injectors_base_url;
 import io.openaev.rest.asset.security_platforms.SecurityPlatformApi;
 import io.openaev.rest.atomic_testing.AtomicTestingApi;
@@ -921,8 +921,7 @@ class TenantActiveTableAccessArchTest {
               // These services initialize the LAZY widget collection inside the request-scoped
               // transaction before open-in-view serialization (pinned by the custom dashboard
               // isolation tests and TenantScopedEntrypointsTxCtxArchTest):
-              CustomDashboardService.class,
-              CustomDashboardTenantService.class)
+              CustomDashboardService.class, CustomDashboardTenantService.class)
           .should()
           .callMethod(CustomDashboard.class, "getWidgets")
           .because(

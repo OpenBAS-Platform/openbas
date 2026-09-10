@@ -269,7 +269,8 @@ public class CustomDashboardService {
             .findById(resourceId)
             .map(
                 scenario ->
-                    Map.entry(scenario.getTenant().getId(), TenantSettingKeys.TENANT_SCENARIO_DASHBOARD))
+                    Map.entry(
+                        scenario.getTenant().getId(), TenantSettingKeys.TENANT_SCENARIO_DASHBOARD))
             .or(
                 () ->
                     this.exerciseRepository
