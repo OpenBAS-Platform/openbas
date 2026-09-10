@@ -393,33 +393,47 @@ const ReportingForm: FunctionComponent<Props> = ({
         control={control}
         name="reporting_context_type"
         render={({ field }) => (
-          <Select
-            value={field.value}
-            onValueChange={(next) => {
-              field.onChange(next);
-              // A subject entity belongs to exactly one type.
-              setValue('reporting_context_id', '');
-            }}
-            name={field.name}
-          >
-            <SelectLabel>{t('Subject type')}</SelectLabel>
-            {/* The trigger shows the label alone; the rows carry the icon. This
+          <div>
+            {/* The library Select renders no wrapper of its own; without this div
+                the column gap would separate its label from its trigger. */}
+            <Select
+              value={field.value}
+              onValueChange={(next) => {
+                field.onChange(next);
+                // A subject entity belongs to exactly one type.
+                setValue('reporting_context_id', '');
+              }}
+              name={field.name}
+            >
+              <SelectLabel>{t('Subject type')}</SelectLabel>
+              {/* The trigger shows the label alone; the rows carry the icon. This
                 is what `renderValue` did, expressed as the trigger's content. */}
-            <SelectTrigger>
-              <span>{t(REPORTING_CONTEXT_LABELS[field.value as ReportingContextType])}</span>
-            </SelectTrigger>
-            <SelectContent>
-              {REPORTING_CONTEXT_TYPES.map((type) => {
-                const TypeIcon = REPORTING_CONTEXT_ICONS[type];
-                return (
-                  <SelectItem key={type} value={type}>
-                    <TypeIcon fontSize="small" color="primary" />
-                    {t(REPORTING_CONTEXT_LABELS[type])}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
+              <SelectTrigger>
+                <span>{t(REPORTING_CONTEXT_LABELS[field.value as ReportingContextType])}</span>
+              </SelectTrigger>
+              <SelectContent>
+                {REPORTING_CONTEXT_TYPES.map((type) => {
+                  const TypeIcon = REPORTING_CONTEXT_ICONS[type];
+                  return (
+                    <SelectItem key={type} value={type}>
+                      {/* Radix wraps an item's children in a single span, so the row's own
+                        flex never reaches them: without this the glyph sits on the text
+                        baseline with no gap. */}
+                      <span style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                      }}
+                      >
+                        <TypeIcon fontSize="small" color="primary" />
+                        {t(REPORTING_CONTEXT_LABELS[type])}
+                      </span>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
         )}
       />
       {contextType !== 'PLATFORM' && (

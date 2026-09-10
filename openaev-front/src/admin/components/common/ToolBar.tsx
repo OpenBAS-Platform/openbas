@@ -1,4 +1,13 @@
 import {
+  Combobox,
+  ComboboxChips,
+  ComboboxClear,
+  ComboboxContent,
+  ComboboxControls,
+  ComboboxField,
+  ComboboxInput,
+  ComboboxLabel,
+  ComboboxTrigger,
   Select,
   SelectContent,
   SelectItem,
@@ -18,7 +27,15 @@ import {
   GroupsOutlined,
   InfoOutlined,
 } from '@mui/icons-material';
-import { Autocomplete, Box, Button, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { SelectGroup } from 'mdi-material-ui';
 import { Component, type ComponentType, type JSX } from 'react';
 import { connect } from 'react-redux';
@@ -297,145 +314,64 @@ export class ToolBarComponent extends Component<ToolBarProps, ToolBarState> {
     const { t } = this.props;
     const { actionsInputs } = this.state;
     const disabled = !actionsInputs[i]?.field;
+    // The three fields differ only in where their options come from and which
+    // glyph each row draws, so they share one field.
+    const sources: Record<string, {
+      options: ToolBarSelectOption[];
+      Glyph: typeof GroupsOutlined;
+    }> = {
+      assets: {
+        options: this.props.endpoints,
+        Glyph: DevicesOtherOutlined,
+      },
+      asset_groups: {
+        options: this.props.assetGroups,
+        Glyph: SelectGroup,
+      },
+      teams: {
+        options: this.props.teams,
+        Glyph: GroupsOutlined,
+      },
+    };
+    const source = sources[actionsInputs[i]?.field ?? ''];
+    if (source) {
+      const { options, Glyph } = source;
+      return (
+        <Combobox<ToolBarSelectOption>
+          multiple
+          disabled={disabled}
+          options={options}
+          value={(actionsInputs[i]?.values as ToolBarSelectOption[]) || []}
+          getOptionLabel={option => option.label ?? ''}
+          isOptionEqualToValue={(option, val) => option.value === val.value}
+          inputValue={actionsInputs[i]?.inputValue || ''}
+          onInputChange={(search, meta) => {
+            if (meta.cause === 'type') {
+              this.handleSearch(i, meta.event, search);
+            }
+          }}
+          onValueChange={next => this.handleChangeActionInputValues(i, null, next as ToolBarSelectOption[])}
+          renderOption={option => (
+            <>
+              <Glyph fontSize="small" />
+              <span>{option.label}</span>
+            </>
+          )}
+        >
+          <ComboboxLabel>{t('Values')}</ComboboxLabel>
+          <ComboboxField>
+            <ComboboxChips />
+            <ComboboxInput />
+            <ComboboxControls>
+              <ComboboxClear />
+              <ComboboxTrigger />
+            </ComboboxControls>
+          </ComboboxField>
+          <ComboboxContent emptyMessage={t('No available options')} />
+        </Combobox>
+      );
+    }
     switch (actionsInputs[i]?.field) {
-      case 'assets':
-        return (
-          <Autocomplete
-            disabled={disabled}
-            size="small"
-            fullWidth
-            selectOnFocus
-            autoHighlight
-            getOptionLabel={(option: ToolBarSelectOption) => (option.label ? option.label : '')}
-            value={(actionsInputs[i]?.values as ToolBarSelectOption[]) || []}
-            multiple
-            renderInput={params => (
-              <TextField
-                {...params}
-                variant="standard"
-                label={t('Values')}
-                fullWidth
-                style={{ marginTop: 3 }}
-              />
-            )}
-            noOptionsText={t('No available options')}
-            options={this.props.endpoints}
-            onInputChange={(event, value) => this.handleSearch(i, event, value)}
-            inputValue={actionsInputs[i]?.inputValue || ''}
-            onChange={(event, value) => this.handleChangeActionInputValues(i, event, value)}
-            renderOption={(props, option: ToolBarSelectOption) => (
-              <li {...props}>
-                <Box sx={{
-                  pt: 0.5,
-                  display: 'inline-block',
-                }}
-                >
-                  <DevicesOtherOutlined />
-                </Box>
-                <Box sx={{
-                  display: 'inline-block',
-                  flexGrow: 1,
-                  ml: 1.25,
-                }}
-                >
-                  {option.label}
-                </Box>
-              </li>
-            )}
-          />
-        );
-      case 'asset_groups':
-        return (
-          <Autocomplete
-            disabled={disabled}
-            size="small"
-            fullWidth
-            selectOnFocus
-            autoHighlight
-            getOptionLabel={(option: ToolBarSelectOption) => (option.label ? option.label : '')}
-            value={(actionsInputs[i]?.values as ToolBarSelectOption[]) || []}
-            multiple
-            renderInput={params => (
-              <TextField
-                {...params}
-                variant="standard"
-                label={t('Values')}
-                fullWidth
-                style={{ marginTop: 3 }}
-              />
-            )}
-            noOptionsText={t('No available options')}
-            options={this.props.assetGroups}
-            onInputChange={(event, value) => this.handleSearch(i, event, value)}
-            inputValue={actionsInputs[i]?.inputValue || ''}
-            onChange={(event, value) => this.handleChangeActionInputValues(i, event, value)}
-            renderOption={(props, option: ToolBarSelectOption) => (
-              <li {...props}>
-                <Box sx={{
-                  pt: 0.5,
-                  display: 'inline-block',
-                }}
-                >
-                  <SelectGroup />
-                </Box>
-                <Box sx={{
-                  display: 'inline-block',
-                  flexGrow: 1,
-                  ml: 1.25,
-                }}
-                >
-                  {option.label}
-                </Box>
-              </li>
-            )}
-          />
-        );
-      case 'teams':
-        return (
-          <Autocomplete
-            disabled={disabled}
-            size="small"
-            fullWidth
-            selectOnFocus
-            autoHighlight
-            getOptionLabel={(option: ToolBarSelectOption) => (option.label ? option.label : '')}
-            value={(actionsInputs[i]?.values as ToolBarSelectOption[]) || []}
-            multiple
-            renderInput={params => (
-              <TextField
-                {...params}
-                variant="standard"
-                label={t('Values')}
-                fullWidth
-                style={{ marginTop: 3 }}
-              />
-            )}
-            noOptionsText={t('No available options')}
-            options={this.props.teams}
-            onInputChange={(event, value) => this.handleSearch(i, event, value)}
-            inputValue={actionsInputs[i]?.inputValue || ''}
-            onChange={(event, value) => this.handleChangeActionInputValues(i, event, value)}
-            renderOption={(props, option: ToolBarSelectOption) => (
-              <li {...props}>
-                <Box sx={{
-                  pt: 0.5,
-                  display: 'inline-block',
-                }}
-                >
-                  <GroupsOutlined />
-                </Box>
-                <Box sx={{
-                  display: 'inline-block',
-                  flexGrow: 1,
-                  ml: 1.25,
-                }}
-                >
-                  {option.label}
-                </Box>
-              </li>
-            )}
-          />
-        );
       default:
         return (
           <TextField
