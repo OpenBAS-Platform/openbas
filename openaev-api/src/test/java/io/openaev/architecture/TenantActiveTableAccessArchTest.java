@@ -37,6 +37,7 @@ import io.openaev.database.repository.MitigationRepository;
 import io.openaev.database.repository.NotificationRepository;
 import io.openaev.database.repository.SecurityCoverageRepository;
 import io.openaev.database.repository.TagRepository;
+import io.openaev.database.repository.TagRuleRepository;
 import io.openaev.database.repository.attackpath.AttackPathExecutionRepository;
 import io.openaev.database.repository.attackpath.AttackPathFindingRepository;
 import io.openaev.database.repository.autonomous.AutonomousDirectiveRepository;
@@ -197,6 +198,7 @@ class TenantActiveTableAccessArchTest {
           "executors",
           "injectors",
           "tags",
+          "tag_rules",
           "channels",
           "domains",
           "attackpath_execution",
@@ -434,6 +436,25 @@ class TenantActiveTableAccessArchTest {
           .because(
               "tags is tenant-active: an accessor without a tenant scope silently reads zero rows."
                   + " New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule tag_rules_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // Sole class depending on TagRuleRepository. Every entrypoint is either a
+              // TxCtx-carrying handler (TagRuleApi, pinned by
+              // TenantScopedEntrypointsTxCtxArchTest) or a tenant-scoped datapack/service call
+              // (ensurePresetRules resolves the write tenant via TenantWriteScopeResolver; reads
+              // through ExerciseService/ScenarioService/InjectService/InjectExecutionStep run
+              // inside their own TxCtx-carrying entrypoints):
+              io.openaev.service.TagRuleService.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(TagRuleRepository.class)
+          .because(
+              "tag_rules is tenant-active: an accessor without a tenant scope silently reads zero"
+                  + " rows. New accessors must carry a scope and be allowlisted here");
 
   @ArchTest
   static final ArchRule domains_repository_access_is_reviewed =
