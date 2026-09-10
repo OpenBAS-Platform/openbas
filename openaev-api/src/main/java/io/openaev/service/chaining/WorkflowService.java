@@ -10,6 +10,7 @@ import io.openaev.api.chaining.dto.StepsCreateInput;
 import io.openaev.api.chaining.dto.WorkflowConfigurationInput;
 import io.openaev.api.chaining.dto.WorkflowScopeRuleInput;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.*;
 import io.openaev.rest.exception.AlreadyExistingException;
@@ -274,8 +275,21 @@ public class WorkflowService {
    * call to the {@code @Transactional} sibling would bypass the Spring proxy (see {@code
    * TenantBackgroundTransactionArchTest#no_transactional_self_invocation}).
    */
+  /**
+   * The {@code ctx} argument is load-bearing even though this body never reads it: {@code
+   * REQUIRES_NEW} suspends the caller's transaction, so the caller's scope does not travel with it
+   * and the new transaction would start with {@code app.current_tenants} unset. The tenant aspect
+   * sets it from this parameter.
+   *
+   * <p>Without it the realignment below reads {@code ScopeService.getValidAssets}, which resolves
+   * an ASSET_ID allowlist through the activated {@code assets} table, gets nothing, and then
+   * PERSISTS {@code inject_assets: []} onto every asset-centric step template of the workflow. A
+   * fail-closed read driving a destructive write is the worst shape this migration can produce, so
+   * the scope is not optional here.
+   */
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
   public void writeAllowlistScopeIsolated(
+      TxCtx ctx,
       String scenarioId,
       String simulationId,
       List<WorkflowScopeRuleInput> allowlistRules,

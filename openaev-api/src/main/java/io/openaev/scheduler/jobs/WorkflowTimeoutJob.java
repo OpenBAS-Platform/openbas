@@ -1,9 +1,7 @@
 package io.openaev.scheduler.jobs;
 
-import io.openaev.context.TenantContext;
-import io.openaev.context.TenantScopedTransaction;
-import io.openaev.context.TxCtx;
 import io.openaev.database.model.Workflow;
+import io.openaev.scheduler.TenantScopedJobRunner;
 import io.openaev.service.chaining.WorkflowEndService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,18 +22,7 @@ import org.springframework.stereotype.Component;
 public class WorkflowTimeoutJob implements Job {
 
   private final WorkflowEndService workflowEndService;
-
-  /**
-   * MT scoping for this job (mirrors {@code StepEventService#handleReadyStepEvent}, #6357). {@code
-   * findAllExpiredRunWorkflows()} itself stays unscoped: it must see every tenant's expired runs in
-   * one pass. But {@code forceCompleteWorkflowByTimeout()} ends a single run and reads/writes v1
-   * {@code @Filter} entities (asset agent jobs, workflow states, simulation) scoped by the
-   * thread-local {@link TenantContext}, which this background thread carries none of by default.
-   * Each expired workflow is therefore completed in its own top-level transaction, scoped to its
-   * run's tenant, set-then-finally-clear, so one workflow's tenant scope (and failure) never leaks
-   * into the next.
-   */
-  private final TenantScopedTransaction tenantTx;
+  private final TenantScopedJobRunner tenantScopedJobRunner;
 
   @Override
   public void execute(JobExecutionContext jobExecutionContext) {
@@ -48,22 +35,42 @@ public class WorkflowTimeoutJob implements Job {
         "[Chaining] Found {} expired workflow run(s) to force-complete.", expiredWorkflows.size());
 
     for (Workflow workflow : expiredWorkflows) {
-      // RUN workflows always have a simulation (only TEMPLATE runs can be null).
-      // TODO: read tenantId directly from Workflow once it carries its own tenant_id.
-      String tenantId = workflow.getSimulation().getTenant().getId();
-      TenantContext.setCurrentTenant(tenantId);
       try {
-        tenantTx.execute(
-            TxCtx.forTenant(tenantId),
-            () -> workflowEndService.forceCompleteWorkflowByTimeout(workflow));
+        // findAllExpiredRunWorkflows spans tenants and this job carries no scope of its own, so the
+        // end snapshot resolved its assets with none: every rule of a non-default tenant froze as
+        // DELETED_DURING_EXECUTION for assets that still exist. One scope per workflow, taken from
+        // the simulation that owns it (workflows carry no tenant column).
+        String tenantId = tenantOf(workflow);
+        if (tenantId == null) {
+          log.warn(
+              "[Chaining] Expired workflow run {} has no simulation tenant; force-completing it"
+                  + " with no tenant scope, so its end snapshot may resolve nothing.",
+              workflow.getId());
+          workflowEndService.forceCompleteWorkflowByTimeout(workflow);
+        } else {
+          tenantScopedJobRunner.runInTenant(
+              tenantId, () -> workflowEndService.forceCompleteWorkflowByTimeout(workflow));
+        }
       } catch (Exception e) {
         log.error(
             "[Chaining] Failed to force-complete expired workflow run {}. Will retry on next cycle.",
             workflow.getId(),
             e);
-      } finally {
-        TenantContext.clearCurrentTenant();
       }
     }
+  }
+
+  /** Workflows carry no tenant column; the owning simulation does. */
+  private static String tenantOf(Workflow workflow) {
+    // chk_workflow_simulation_or_scenario guarantees exactly one of the two is set, and both
+    // Exercise and Scenario are TenantBase. Reading only the simulation left every
+    // scenario-backed workflow unscoped.
+    if (workflow.getSimulation() != null && workflow.getSimulation().getTenant() != null) {
+      return workflow.getSimulation().getTenant().getId();
+    }
+    if (workflow.getScenario() != null && workflow.getScenario().getTenant() != null) {
+      return workflow.getScenario().getTenant().getId();
+    }
+    return null;
   }
 }

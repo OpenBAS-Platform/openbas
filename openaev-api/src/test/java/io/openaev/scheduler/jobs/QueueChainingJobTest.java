@@ -1,6 +1,9 @@
 package io.openaev.scheduler.jobs;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doThrow;
 
 import io.openaev.IntegrationTest;
 import io.openaev.database.model.Scenario;
@@ -12,6 +15,7 @@ import io.openaev.database.repository.ScenarioRepository;
 import io.openaev.database.repository.StepDelayQueueRepository;
 import io.openaev.database.repository.StepRepository;
 import io.openaev.database.repository.WorkflowRepository;
+import io.openaev.service.chaining.StepService;
 import io.openaev.utils.fixtures.ScenarioFixture;
 import io.openaev.utils.fixtures.StepFixture;
 import io.openaev.utils.fixtures.WorkflowFixture;
@@ -24,6 +28,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * Tests for {@link QueueChainingJob}, now opening its top-level transaction through {@link
@@ -47,6 +52,7 @@ class QueueChainingJobTest extends IntegrationTest {
   @Autowired private WorkflowRepository workflowRepository;
   @Autowired private StepRepository stepRepository;
   @Autowired private ScenarioRepository scenarioRepository;
+  @MockitoSpyBean private StepService stepService;
 
   @AfterEach
   void cleanup() {
@@ -68,8 +74,8 @@ class QueueChainingJobTest extends IntegrationTest {
   private StepDelayQueue persistDueDelayQueueEntry(Workflow workflowRun) {
     Step stepTemplate = StepFixture.getDefaultStepTemplate();
     // A workflow must reference a simulation OR a scenario (chk_workflow_simulation_or_scenario).
-    // Attaching a scenario (rather than a simulation) keeps getSimulation() null, which is exactly
-    // what processDelayedStep needs to dereference in order to throw the NPE these tests rely on.
+    // A scenario-backed run is the interesting case: it has no simulation, and the job resolves its
+    // tenant from the scenario instead of dereferencing getSimulation().
     Workflow persistedWorkflowRun =
         workflowComposer
             .forWorkflow(workflowRun)
@@ -92,16 +98,18 @@ class QueueChainingJobTest extends IntegrationTest {
 
   @Test
   @DisplayName("an uncaught failure while processing a popped entry rolls back the whole pop batch")
-  void given_processing_failure_should_roll_back_the_pop() {
-    // Arrange: a workflow run with NO simulation attached; processDelayedStep dereferences
-    // getSimulation() to resolve the tenant, so processing this entry throws an uncaught NPE -
-    // exactly the "processing fails" case the job's transactional boundary is meant to survive.
-    Workflow workflowRunWithoutSimulation =
-        WorkflowFixture.getDefaultWorkflowExecution(WorkflowStatus.RUN);
-    StepDelayQueue dueEntry = persistDueDelayQueueEntry(workflowRunWithoutSimulation);
+  void given_processing_failure_should_roll_back_the_pop() throws Exception {
+    // Arrange: the failure is injected rather than taken from a null simulation. Resolving the
+    // tenant no longer throws on a scenario-backed run - the job reads the scenario's tenant - so
+    // the rollback has to be provoked by a genuine processing failure instead.
+    Workflow scenarioBackedRun = WorkflowFixture.getDefaultWorkflowExecution(WorkflowStatus.RUN);
+    StepDelayQueue dueEntry = persistDueDelayQueueEntry(scenarioBackedRun);
+    doThrow(new IllegalStateException("processing blew up"))
+        .when(stepService)
+        .createReadySteps(any(), any(), any(), anyInt());
 
     // Act & Assert: the exception escapes the job's top-level transaction uncaught ...
-    assertThatThrownBy(() -> job.execute(null)).isInstanceOf(NullPointerException.class);
+    assertThatThrownBy(() -> job.execute(null)).isInstanceOf(IllegalStateException.class);
 
     // ... which rolls back the DELETE...RETURNING pop: the entry is not lost, it stays queued for
     // the next tick, exactly as before the job was moved onto TenantScopedTransaction.

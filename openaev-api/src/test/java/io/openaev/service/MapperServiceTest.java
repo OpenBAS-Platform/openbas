@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReaderBuilder;
 import io.openaev.IntegrationTest;
+import io.openaev.config.TenantWriteScopeResolver;
 import io.openaev.context.TenantContext;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.AttackPattern;
@@ -71,6 +72,7 @@ public class MapperServiceTest extends IntegrationTest {
   @Mock private EndpointRepository endpointRepository;
   @Mock private ObjectMapper objectMapper;
   @Mock private EndpointService endpointService;
+  @Mock private TenantWriteScopeResolver writeScopeResolver;
   @Mock private TagService tagService;
 
   private MapperService mapperService;
@@ -84,6 +86,7 @@ public class MapperServiceTest extends IntegrationTest {
             injectorContractRepository,
             endpointRepository,
             endpointService,
+            writeScopeResolver,
             tagService,
             objectMapper);
   }

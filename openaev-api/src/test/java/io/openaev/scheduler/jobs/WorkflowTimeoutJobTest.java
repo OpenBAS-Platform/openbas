@@ -2,17 +2,14 @@ package io.openaev.scheduler.jobs;
 
 import static org.mockito.Mockito.*;
 
-import io.openaev.context.TenantContext;
-import io.openaev.context.TenantScopedTransaction;
-import io.openaev.context.TxCtx;
 import io.openaev.database.model.Exercise;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.model.Workflow;
 import io.openaev.database.model.WorkflowStatus;
+import io.openaev.scheduler.TenantScopedJobRunner;
 import io.openaev.service.chaining.WorkflowEndService;
 import java.util.Collections;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,28 +24,10 @@ import org.quartz.JobExecutionContext;
 class WorkflowTimeoutJobTest {
 
   @Mock private WorkflowEndService workflowEndService;
-  @Mock private TenantScopedTransaction tenantScopedTransaction;
+  @Mock private TenantScopedJobRunner tenantScopedJobRunner;
   @Mock private JobExecutionContext jobExecutionContext;
 
   @InjectMocks private WorkflowTimeoutJob workflowTimeoutJob;
-
-  @AfterEach
-  void tearDown() {
-    TenantContext.clearCurrentTenant();
-  }
-
-  /** Stubs the primitive to actually run the work, scoped in {@code tenantTx.execute(...)}. */
-  private void stubTenantScopedTransactionToRunWork() {
-    lenient()
-        .doAnswer(
-            invocation -> {
-              Runnable work = invocation.getArgument(1);
-              work.run();
-              return null;
-            })
-        .when(tenantScopedTransaction)
-        .execute(any(TxCtx.class), any(Runnable.class));
-  }
 
   @Nested
   @DisplayName("execute")
@@ -72,8 +51,7 @@ class WorkflowTimeoutJobTest {
     @DisplayName("given_singleExpiredWorkflow_should_forceCompleteIt")
     void given_singleExpiredWorkflow_should_forceCompleteIt() {
       // Arrange
-      stubTenantScopedTransactionToRunWork();
-      Workflow expiredWorkflow = buildRunWorkflow("tenant-1");
+      Workflow expiredWorkflow = buildRunWorkflow();
       when(workflowEndService.findAllExpiredRunWorkflows()).thenReturn(List.of(expiredWorkflow));
 
       // Act
@@ -84,39 +62,37 @@ class WorkflowTimeoutJobTest {
     }
 
     @Test
-    @DisplayName("given_expiredWorkflow_should_scopeTenantContextToItsSimulationTenant")
-    void given_expiredWorkflow_should_scopeTenantContextToItsSimulationTenant() {
-      // Arrange
+    @DisplayName("an expired run owned by a tenant is completed inside that tenant's scope")
+    void given_expiredWorkflowWithATenant_should_completeItInsideThatScope() {
+      // The unscoped path is already covered above, where the run has no tenant. This is the other
+      // half: when the run does have one, the completion must go through the runner, which carries
+      // both the v1 thread-local and the v2 GUC into forceCompleteWorkflowByTimeout.
       String tenantId = "tenant-42";
-      Workflow expiredWorkflow = buildRunWorkflow(tenantId);
+      Workflow expiredWorkflow = buildRunWorkflow();
+      Exercise simulation = mock(Exercise.class);
+      when(simulation.getTenant()).thenReturn(new Tenant(tenantId));
+      expiredWorkflow.setSimulation(simulation);
       when(workflowEndService.findAllExpiredRunWorkflows()).thenReturn(List.of(expiredWorkflow));
       doAnswer(
               invocation -> {
-                // Assert (inside the scoped work): TenantContext carries the run's tenant.
-                org.junit.jupiter.api.Assertions.assertEquals(
-                    tenantId, TenantContext.getCurrentTenant());
-                Runnable work = invocation.getArgument(1);
-                work.run();
+                ((Runnable) invocation.getArgument(1)).run();
                 return null;
               })
-          .when(tenantScopedTransaction)
-          .execute(eq(TxCtx.forTenant(tenantId)), any(Runnable.class));
+          .when(tenantScopedJobRunner)
+          .runInTenant(eq(tenantId), any(Runnable.class));
 
-      // Act
       workflowTimeoutJob.execute(jobExecutionContext);
 
-      // Assert: cleared after the job runs so it never leaks to the next Quartz fire.
-      verify(tenantScopedTransaction).execute(eq(TxCtx.forTenant(tenantId)), any(Runnable.class));
-      org.junit.jupiter.api.Assertions.assertFalse(TenantContext.hasCurrentTenant());
+      verify(tenantScopedJobRunner).runInTenant(eq(tenantId), any(Runnable.class));
+      verify(workflowEndService).forceCompleteWorkflowByTimeout(expiredWorkflow);
     }
 
     @Test
     @DisplayName("given_multipleExpiredWorkflows_should_forceCompleteAll")
     void given_multipleExpiredWorkflows_should_forceCompleteAll() {
       // Arrange
-      stubTenantScopedTransactionToRunWork();
-      Workflow expired1 = buildRunWorkflow("tenant-1");
-      Workflow expired2 = buildRunWorkflow("tenant-2");
+      Workflow expired1 = buildRunWorkflow();
+      Workflow expired2 = buildRunWorkflow();
       when(workflowEndService.findAllExpiredRunWorkflows()).thenReturn(List.of(expired1, expired2));
 
       // Act
@@ -132,9 +108,8 @@ class WorkflowTimeoutJobTest {
         "given_firstWorkflowFailsForceComplete_should_continueProcessingRemainingWorkflows")
     void given_firstWorkflowFailsForceComplete_should_continueProcessingRemainingWorkflows() {
       // Arrange
-      stubTenantScopedTransactionToRunWork();
-      Workflow failingWorkflow = buildRunWorkflow("tenant-1");
-      Workflow successWorkflow = buildRunWorkflow("tenant-2");
+      Workflow failingWorkflow = buildRunWorkflow();
+      Workflow successWorkflow = buildRunWorkflow();
       when(workflowEndService.findAllExpiredRunWorkflows())
           .thenReturn(List.of(failingWorkflow, successWorkflow));
       doThrow(new RuntimeException("DB error"))
@@ -150,19 +125,12 @@ class WorkflowTimeoutJobTest {
     }
   }
 
-  private static Workflow buildRunWorkflow(String tenantId) {
-    Tenant tenant = new Tenant();
-    tenant.setId(tenantId);
-
-    Exercise simulation = new Exercise();
-    simulation.setTenant(tenant);
-
+  private static Workflow buildRunWorkflow() {
     Workflow workflow = new Workflow();
     workflow.setId(java.util.UUID.randomUUID().toString());
     workflow.setStatus(WorkflowStatus.RUN);
     workflow.setTimeoutEnabled(true);
     workflow.setTimeoutSeconds(60L);
-    workflow.setSimulation(simulation);
     return workflow;
   }
 }
