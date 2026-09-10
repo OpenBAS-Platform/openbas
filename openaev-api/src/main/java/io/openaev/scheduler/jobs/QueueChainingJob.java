@@ -18,7 +18,6 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.support.TransactionTemplate;
 
 @Component
 @RequiredArgsConstructor
@@ -47,9 +46,9 @@ public class QueueChainingJob implements Job {
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
     // Pop and process inside the same transaction so that if processing fails,
     // the DELETE is rolled back and the entry is not lost.
-        tenantTx.execute(
-                TxCtx.allTenants(),
-                () -> {
+    tenantTx.execute(
+        TxCtx.allTenants(),
+        () -> {
           List<StepDelayQueue> stepsDelayQueue = stepDelayQueueService.popNextToProcess();
           if (stepsDelayQueue.isEmpty()) return;
 
