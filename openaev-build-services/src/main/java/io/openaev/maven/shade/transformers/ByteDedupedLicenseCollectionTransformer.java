@@ -48,7 +48,7 @@ public class ByteDedupedLicenseCollectionTransformer implements ReproducibleReso
 
   @Override
   public boolean canTransformResource(String resource) {
-    return resource.contains("LICENSE");
+    return resource.contains("LICENSE") || resource.contains("DEPENDENCIES");
   }
 
   @Override

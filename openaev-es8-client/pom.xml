@@ -77,13 +77,39 @@
                                     <pattern>org.elasticsearch.client</pattern>
                                     <shadedPattern>es8.org.elasticsearch.client</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>io.opentelemetry</pattern>
+                                    <shadedPattern>es8.io.opentelemetry</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>jakarta.json</pattern>
+                                    <shadedPattern>es8.jakarta.json</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>javax.annotation</pattern>
+                                    <shadedPattern>es8.javax.annotation</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache.commons.codec</pattern>
+                                    <shadedPattern>es8.org.apache.commons.codec</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache.http</pattern>
+                                    <shadedPattern>es8.org.apache.http</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.eclipse.parsson</pattern>
+                                    <shadedPattern>es8.org.eclipse.parsson</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>tools.jackson</pattern>
+                                    <shadedPattern>es8.tools.jackson</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.fasterxml.jackson</pattern>
+                                    <shadedPattern>es8.com.fasterxml.jackson</shadedPattern>
+                                </relocation>
                             </relocations>
-                            <artifactSet>
-                                <includes>
-                                    <include>co.elastic.clients:*</include>
-                                    <include>org.elasticsearch.client:*</include>
-                                </includes>
-                            </artifactSet>
                             <createDependencyReducedPom>true</createDependencyReducedPom>
                             <useDependencyReducedPomInJar>true</useDependencyReducedPomInJar>
                             <transformers>
