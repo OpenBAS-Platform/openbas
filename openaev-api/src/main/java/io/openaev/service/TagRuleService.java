@@ -3,6 +3,7 @@ package io.openaev.service;
 import static io.openaev.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import com.cronutils.utils.VisibleForTesting;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.AssetGroup;
 import io.openaev.database.model.Tag;
 import io.openaev.database.model.TagRule;
@@ -218,10 +219,15 @@ public class TagRuleService {
             .collect(Collectors.toList());
   }
 
-  public Set<TagRule> ensurePresetRules() {
+  public Set<TagRule> ensurePresetRules(TxCtx ctx) {
     Set<TagRule> tagRules = new HashSet<>();
+    Set<Tag> wellKnownTags = tagService.ensureWellKnownTags(ctx);
     for (String tagName : TagRule.RESERVED_TAG_NAMES) {
-      Tag tag = tagRepository.findByName(tagName).orElseGet(() -> tagService.createTag(tagName));
+      Tag tag =
+          wellKnownTags.stream()
+              .filter(existingTag -> existingTag.getName().equals(tagName))
+              .findFirst()
+              .orElseGet(() -> tagService.createTag(ctx, tagName));
       tagRules.add(
           this.findByTagName(tag.getName())
               .orElseGet(() -> this.createTagRule(tag, new ArrayList<>(), true)));

@@ -221,6 +221,21 @@ class TenantStatementInspectorTest {
     assertTrue(out.contains("jsonb_exists"), out);
   }
 
+  @Test
+  @DisplayName("the channel documents query is accepted with channels active")
+  void channelDocumentsQueryPassesWithChannelsActive() throws Exception {
+    String sql =
+        io.openaev.database.repository.DocumentRepository.class
+            .getMethod("rawAllDocumentsByChannelId", String.class)
+            .getAnnotation(org.springframework.data.jpa.repository.Query.class)
+            .value();
+    TenantStatementInspector channelsActive =
+        new TenantStatementInspector(new TenantTables(Set.of("channels"), Set.of()));
+    String out = channelsActive.inspect(sql).replaceAll("\\s+", " ").trim();
+    assertTrue(out.contains("can_access_tenant(chl_light.tenant_id)"), out);
+    assertTrue(out.contains("can_access_tenant(chl_dark.tenant_id)"), out);
+  }
+
   // --- Single table --------------------------------------------------------
 
   @Test
@@ -821,5 +836,113 @@ class TenantStatementInspectorTest {
     // The CTE structure and the json aggregation must survive the rewrite rather than be refused.
     assertTrue(out.contains("json_agg"), out);
     assertTrue(out.toUpperCase().contains("WITH"), out);
+  }
+
+  // --- asset_groups activation (#6435): every native query on the table ------
+  //
+  // Activating asset_groups pulls every native query that names the table into the fail-closed
+  // rewrite. The API test suite ships an EMPTY allowlist, so this class is the only layer that
+  // exercises the rewriter for asset_groups: without these pins, an edit introducing a FROM/JOIN
+  // shape the inspector does not cover ships green and breaks in production (#7007 class).
+  //
+  // Each pin reads the REAL production SQL off the repository method, never a paraphrase.
+
+  private static final TenantStatementInspector ASSET_GROUPS_ACTIVE =
+      new TenantStatementInspector(new TenantTables(Set.of("asset_groups"), Set.of()));
+
+  private static String assetGroupQuery(String method, Class<?>... args) throws Exception {
+    String sql =
+        io.openaev.database.repository.AssetGroupRepository.class
+            .getMethod(method, args)
+            .getAnnotation(org.springframework.data.jpa.repository.Query.class)
+            .value();
+    // Spring resolves the SpEL selector into a bind parameter long before Hibernate sees the SQL;
+    // JSqlParser only ever parses the resolved form.
+    return sql.replaceAll(":#\\{#[^}]*}", "?");
+  }
+
+  private static String inspectWithAssetGroupsActive(String sql) {
+    return ASSET_GROUPS_ACTIVE.inspect(sql).replaceAll("\\s+", " ").trim();
+  }
+
+  @Test
+  @DisplayName("the dynamic-filter lookup is filtered with asset_groups active")
+  void rawDynamicFiltersQueryIsFilteredWithAssetGroupsActive() throws Exception {
+    String out =
+        inspectWithAssetGroupsActive(
+            assetGroupQuery("rawDynamicFiltersByAssetGroupIds", java.util.List.class));
+    assertTrue(out.contains("can_access_tenant(ag.tenant_id)"), out);
+  }
+
+  @Test
+  @DisplayName("the asset-groups-by-exercise projection is filtered with asset_groups active")
+  void assetGroupsByExerciseIdsIsFilteredWithAssetGroupsActive() throws Exception {
+    String out =
+        inspectWithAssetGroupsActive(
+            assetGroupQuery("assetGroupsByExerciseIds", java.util.Set.class));
+    assertTrue(out.contains("can_access_tenant(ag.tenant_id)"), out);
+    // The injects_asset_groups / injects joins carry no tenant_id of their own and must survive.
+    assertTrue(out.contains("injects_asset_groups"), out);
+  }
+
+  @Test
+  @DisplayName("the asset-groups-by-inject projection is filtered with asset_groups active")
+  void assetGroupsByInjectIdsIsFilteredWithAssetGroupsActive() throws Exception {
+    String out =
+        inspectWithAssetGroupsActive(
+            assetGroupQuery("assetGroupsByInjectIds", java.util.Set.class));
+    assertTrue(out.contains("can_access_tenant(ag.tenant_id)"), out);
+    assertTrue(out.contains("injects_asset_groups"), out);
+  }
+
+  @Test
+  @DisplayName("the atomic-testing asset-group lookup is filtered with asset_groups active")
+  void atomicTestingAssetGroupsQueryIsFilteredWithAssetGroupsActive() throws Exception {
+    String out =
+        inspectWithAssetGroupsActive(
+            assetGroupQuery("findAllAssetGroupsForAtomicTestingsSimulationsAndScenarios"));
+    assertTrue(out.contains("can_access_tenant(ag.tenant_id)"), out);
+    // SELECT ag.* still resolves once the table is wrapped in its filtered sub-query.
+    assertTrue(out.contains("ag.*"), out);
+  }
+
+  @Test
+  @DisplayName("the findings-linked options query is filtered with asset_groups active")
+  void findingsLinkedOptionsQueryIsFilteredWithAssetGroupsActive() throws Exception {
+    String out =
+        inspectWithAssetGroupsActive(
+            assetGroupQuery(
+                "findAllByNameLinkedToFindings",
+                String.class,
+                org.springframework.data.domain.Pageable.class));
+    assertTrue(out.contains("can_access_tenant(ag.tenant_id)"), out);
+    // findings is NOT active in this lot: its join must pass through untouched.
+    assertTrue(out.contains("findings"), out);
+  }
+
+  @Test
+  @DisplayName("the contextual findings-linked options query is filtered with asset_groups active")
+  void contextualFindingsLinkedOptionsQueryIsFilteredWithAssetGroupsActive() throws Exception {
+    String out =
+        inspectWithAssetGroupsActive(
+            assetGroupQuery(
+                "findAllByNameLinkedToFindingsWithContext",
+                String.class,
+                String.class,
+                org.springframework.data.domain.Pageable.class));
+    assertTrue(out.contains("can_access_tenant(ag.tenant_id)"), out);
+    assertTrue(out.contains("scenarios_exercises"), out);
+  }
+
+  @Test
+  @DisplayName("the ES indexing cursor is filtered with asset_groups active")
+  void indexingQueryIsFilteredWithAssetGroupsActive() throws Exception {
+    String out =
+        inspectWithAssetGroupsActive(
+            assetGroupQuery("findForIndexing", java.time.Instant.class, int.class));
+    assertTrue(out.contains("can_access_tenant(ag.tenant_id)"), out);
+    // This is why the engine sync sweep MUST run under an explicit scope: with none set,
+    // can_access_tenant is fail-closed and the asset-group index silently stops being fed.
+    assertTrue(out.toUpperCase().contains("ORDER BY"), out);
   }
 }

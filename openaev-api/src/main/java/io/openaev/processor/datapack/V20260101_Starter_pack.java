@@ -106,8 +106,9 @@ public class V20260101_Starter_pack extends DataPack {
     enableV1TenantFilter(tenant);
 
     // unconditionally run this code
-    Set<Tag> tags = tagService.ensureWellKnownTags();
-    Set<TagRule> tagRules = tagRuleService.ensurePresetRules();
+    TxCtx ctx = TxCtx.forTenant(tenant.getId());
+    Set<Tag> tags = tagService.ensureWellKnownTags(ctx);
+    Set<TagRule> tagRules = tagRuleService.ensurePresetRules(ctx);
 
     try {
       Endpoint honeyScanMeEndpoint =
@@ -120,7 +121,7 @@ public class V20260101_Starter_pack extends DataPack {
                                   .contains(t.getName()))
                       .map(Tag::getId)
                       .toList()));
-      AssetGroup allEndpointAssetGroup = this.createAllEndpointsAssetGroup();
+      AssetGroup allEndpointAssetGroup = this.createAllEndpointsAssetGroup(tenant.getId());
 
       TagRule openCTITagRule =
           tagRules.stream()
@@ -154,7 +155,7 @@ public class V20260101_Starter_pack extends DataPack {
     return this.endpointService.createEndpoint(endpointInput);
   }
 
-  private AssetGroup createAllEndpointsAssetGroup() {
+  private AssetGroup createAllEndpointsAssetGroup(String tenantId) {
     Filters.Filter filter = new Filters.Filter();
     filter.setKey(AllEndpointsAssetGroup.KEY);
     filter.setOperator(AllEndpointsAssetGroup.OPERATOR);
@@ -169,7 +170,8 @@ public class V20260101_Starter_pack extends DataPack {
     allEndpointsAssetGroup.setName(AllEndpointsAssetGroup.NAME);
     allEndpointsAssetGroup.setDynamicFilter(filterGroup);
 
-    return this.assetGroupService.createAssetGroup(allEndpointsAssetGroup);
+    // Tenant provisioning: the pack runs for one tenant, so the write carries it explicitly.
+    return this.assetGroupService.createAssetGroup(allEndpointsAssetGroup, tenantId);
   }
 
   private void importScenariosFromResources(String tenantId, Asset asset, AssetGroup assetGroup) {

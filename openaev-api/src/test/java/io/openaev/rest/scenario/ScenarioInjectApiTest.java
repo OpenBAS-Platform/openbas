@@ -100,11 +100,13 @@ class ScenarioInjectApiTest extends IntegrationTest {
     ALL_ASSETGROUP =
         assetGroupService.createAssetGroup(
             AssetGroupFixture.createAssetGroupWithAssets(
-                "all", List.of(LINUX_X86_64, WINDOWS_ARM64, WINDOWS_X86_64)));
+                "all", List.of(LINUX_X86_64, WINDOWS_ARM64, WINDOWS_X86_64)),
+            Tenant.DEFAULT_TENANT_UUID);
     ALL_WINDOWS =
         assetGroupService.createAssetGroup(
             AssetGroupFixture.createAssetGroupWithAssets(
-                "all", List.of(WINDOWS_ARM64, WINDOWS_X86_64)));
+                "all", List.of(WINDOWS_ARM64, WINDOWS_X86_64)),
+            Tenant.DEFAULT_TENANT_UUID);
   }
 
   @AfterAll

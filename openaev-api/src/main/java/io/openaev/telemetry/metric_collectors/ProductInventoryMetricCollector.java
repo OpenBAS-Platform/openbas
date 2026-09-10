@@ -3,6 +3,8 @@ package io.openaev.telemetry.metric_collectors;
 import static io.opentelemetry.api.common.AttributeKey.booleanKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
+import io.openaev.context.TenantScopedTransaction;
+import io.openaev.context.TxCtx;
 import io.openaev.database.repository.ArticleRepository;
 import io.openaev.database.repository.AssetGroupRepository;
 import io.openaev.database.repository.AttackPatternRepository;
@@ -37,12 +39,22 @@ import org.springframework.stereotype.Service;
  * never any object content.
  *
  * <p>Tenant scoping: every gauge here is intentionally platform-wide (telemetry is per-instance,
- * not per-tenant), like {@code total_users_count} in {@link GlobalMetricCollector}. All suppliers
- * run on the OpenTelemetry exporter thread outside any {@code @Transactional} method, so the
- * Hibernate {@code tenantFilter} is never enabled (it is only turned on by {@code
- * HibernateFilterTransactionAspect} on method-level {@code @Transactional} executions): both the
- * JPQL queries and the Spring Data {@code count()} calls therefore consistently count across all
- * tenants.
+ * not per-tenant), like {@code total_users_count} in {@link GlobalMetricCollector}. How that is
+ * achieved depends on which isolation the counted table is on, and the difference is easy to miss.
+ *
+ * <p>For a table still on v1, it comes for free: the suppliers run on the OpenTelemetry exporter
+ * thread outside any {@code @Transactional} method, so the Hibernate {@code tenantFilter} is never
+ * enabled (it is only turned on by {@code HibernateFilterTransactionAspect} on method-level
+ * {@code @Transactional} executions) and the count spans every tenant.
+ *
+ * <p>For a table in {@code openaev.tenant.active-tables} that reasoning does NOT hold. {@code
+ * TenantStatementInspector} does not care whether a transaction is active: with {@code
+ * app.current_tenants} unset, {@code can_access_tenant} returns false and the count is silently
+ * ZERO. Such a gauge must open an explicit {@code TxCtx.allTenants()} scope through {@link
+ * TenantScopedTransaction}, as {@link #countAssetGroups()} does.
+ *
+ * <p>TODO v2: #6442 - once findings gets v2 activated, {@code findings_total} needs the same
+ * explicit scope. The same applies to any other gauge here whose table joins a future activation.
  */
 @Slf4j
 @Service
@@ -50,6 +62,7 @@ import org.springframework.stereotype.Service;
 public class ProductInventoryMetricCollector {
 
   private final MetricRegistry metricRegistry;
+  private final TenantScopedTransaction tenantTx;
   private final AssetGroupRepository assetGroupRepository;
   private final OrganizationRepository organizationRepository;
   private final InjectRepository injectRepository;
@@ -84,9 +97,7 @@ public class ProductInventoryMetricCollector {
         "Number of scenarios with a scheduled recurrence",
         () -> safeCount(this::countRecurringScenarios));
     metricRegistry.registerGauge(
-        "asset_groups_total",
-        "Number of asset groups",
-        () -> safeCount(assetGroupRepository::count));
+        "asset_groups_total", "Number of asset groups", () -> safeCount(this::countAssetGroups));
     metricRegistry.registerMultiGauge(
         "security_platforms_total",
         "Security platforms broken down by type (EDR, XDR, SIEM, ...)",
@@ -98,11 +109,11 @@ public class ProductInventoryMetricCollector {
     metricRegistry.registerGauge(
         "injects_total", "Number of injects", () -> safeCount(injectRepository::count));
     metricRegistry.registerGauge(
-        "challenges_total", "Number of challenges", () -> safeCount(challengeRepository::count));
+        "challenges_total", "Number of challenges", () -> safeCount(this::countChallenges));
     metricRegistry.registerGauge(
         "documents_total", "Number of documents", () -> safeCount(documentRepository::count));
     metricRegistry.registerGauge(
-        "channels_total", "Number of media channels", () -> safeCount(channelRepository::count));
+        "channels_total", "Number of media channels", () -> safeCount(this::countChannels));
     metricRegistry.registerGauge(
         "articles_total", "Number of media articles", () -> safeCount(articleRepository::count));
     metricRegistry.registerGauge(
@@ -112,9 +123,7 @@ public class ProductInventoryMetricCollector {
     metricRegistry.registerGauge(
         "reports_total", "Number of reports", () -> safeCount(reportingRepository::count));
     metricRegistry.registerGauge(
-        "mappers_total",
-        "Number of XLS import mappers",
-        () -> safeCount(importMapperRepository::count));
+        "mappers_total", "Number of XLS import mappers", () -> safeCount(this::countImportMappers));
     metricRegistry.registerGauge(
         "notification_triggers_total",
         "Number of notification triggers",
@@ -227,6 +236,39 @@ public class ProductInventoryMetricCollector {
             "select count(s) from Scenario s where s.recurrence is not null and s.recurrence <> ''",
             Long.class)
         .getSingleResult();
+  }
+
+  /**
+   * Counts asset groups across the whole platform.
+   *
+   * <p>{@code asset_groups} is v2-active, so this count MUST carry an explicit scope: {@code
+   * can_access_tenant} is fail-closed and an unscoped count returns zero, not an error. {@code
+   * allTenants()} is the scope that matches this gauge's stated intention (platform-wide
+   * telemetry), and it is resolved into an explicit list of live tenants, never a wildcard.
+   */
+  long countAssetGroups() {
+    return countAcrossAllTenants(assetGroupRepository::count);
+  }
+
+  /** Counts channels across the whole platform (channels is v2-active). */
+  long countChannels() {
+    return countAcrossAllTenants(channelRepository::count);
+  }
+
+  /** Counts challenges across the whole platform (challenges is v2-active, #6416). */
+  long countChallenges() {
+    return countAcrossAllTenants(challengeRepository::count);
+  }
+
+  /** Counts XLS import mappers across the whole platform (import_mappers is v2-active). */
+  long countImportMappers() {
+    return countAcrossAllTenants(importMapperRepository::count);
+  }
+
+  private long countAcrossAllTenants(Supplier<Long> counter) {
+    // Explicit type witness: TenantScopedTransaction overloads execute() on Supplier and
+    // Runnable, so a value-returning method reference is ambiguous without it.
+    return tenantTx.<Long>execute(TxCtx.allTenants(), counter);
   }
 
   private long safeCount(Supplier<Long> counter) {

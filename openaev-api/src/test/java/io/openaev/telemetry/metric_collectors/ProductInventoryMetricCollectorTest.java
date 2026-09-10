@@ -7,10 +7,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.openaev.context.TenantScopedTransaction;
+import io.openaev.context.TxCtx;
 import io.openaev.database.repository.ArticleRepository;
 import io.openaev.database.repository.AssetGroupRepository;
 import io.openaev.database.repository.AttackPatternRepository;
@@ -39,6 +43,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -49,6 +54,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 class ProductInventoryMetricCollectorTest {
 
   @Mock private MetricRegistry metricRegistry;
+  @Mock private TenantScopedTransaction tenantTx;
   @Mock private AssetGroupRepository assetGroupRepository;
   @Mock private OrganizationRepository organizationRepository;
   @Mock private InjectRepository injectRepository;
@@ -77,6 +83,7 @@ class ProductInventoryMetricCollectorTest {
     collector =
         new ProductInventoryMetricCollector(
             metricRegistry,
+            tenantTx,
             assetGroupRepository,
             organizationRepository,
             injectRepository,
@@ -93,6 +100,14 @@ class ProductInventoryMetricCollectorTest {
             vulnerabilityRepository,
             vulnerableEndpointRepository,
             attackPatternRepository);
+    // The real primitive opens a scoped transaction and runs the supplier. For this unit test the
+    // scope itself is out of scope (AssetGroupBackgroundIsolationTest and
+    // ProductInventoryTenantScopeTest prove it against a real database); what matters here is that
+    // the gauge still delegates to the repository, so the mock simply runs the supplier.
+    lenient()
+        .when(tenantTx.execute(any(TxCtx.class), ArgumentMatchers.<Supplier<Long>>any()))
+        .thenAnswer(invocation -> invocation.<Supplier<Long>>getArgument(1).get());
+
     // @PersistenceContext field is container-injected in production
     ReflectionTestUtils.setField(collector, "entityManager", entityManager);
   }
@@ -210,6 +225,32 @@ class ProductInventoryMetricCollectorTest {
 
       verify(metricRegistry).registerGauge(eq("asset_groups_total"), any(), gaugeCaptor.capture());
       assertThat(gaugeCaptor.getValue().get()).isEqualTo(7L);
+    }
+
+    @Test
+    @DisplayName("channels gauge uses the all-tenants scoped transaction for v2 tables")
+    void given_channelsGauge_should_runInAllTenantsScope() {
+      when(channelRepository.count()).thenReturn(11L);
+
+      collector.init();
+
+      verify(metricRegistry).registerGauge(eq("channels_total"), any(), gaugeCaptor.capture());
+      assertThat(gaugeCaptor.getValue().get()).isEqualTo(11L);
+      verify(channelRepository).count();
+      verify(tenantTx, times(1)).execute(any(TxCtx.class), ArgumentMatchers.<Supplier<Long>>any());
+    }
+
+    @Test
+    @DisplayName("mappers gauge uses the all-tenants scoped transaction for v2 tables")
+    void given_mappersGauge_should_runInAllTenantsScope() {
+      when(importMapperRepository.count()).thenReturn(5L);
+
+      collector.init();
+
+      verify(metricRegistry).registerGauge(eq("mappers_total"), any(), gaugeCaptor.capture());
+      assertThat(gaugeCaptor.getValue().get()).isEqualTo(5L);
+      verify(importMapperRepository).count();
+      verify(tenantTx, times(1)).execute(any(TxCtx.class), ArgumentMatchers.<Supplier<Long>>any());
     }
 
     @Test

@@ -230,7 +230,7 @@ public class V1_DataImporter implements Importer {
     } else if (importNode.has("payload_information")) {
       prefix = "payload_";
     }
-    importTags(importNode, prefix, baseIds);
+    importTags(ctx, importNode, prefix, baseIds);
     Exercise savedExercise =
         Optional.ofNullable(importExercise(importNode, baseIds, suffix)).orElse(exercise);
     Scenario savedScenario =
@@ -246,8 +246,8 @@ public class V1_DataImporter implements Importer {
     importOrganizations(importNode, prefix, baseIds);
     importUsers(importNode, prefix, baseIds);
     importTeams(importNode, prefix, savedExercise, savedScenario, baseIds);
-    importChallenges(importNode, prefix, baseIds);
-    importChannels(importNode, prefix, baseIds);
+    importChallenges(ctx, importNode, prefix, baseIds);
+    importChannels(ctx, importNode, prefix, baseIds);
     importArticles(importNode, prefix, savedExercise, savedScenario, baseIds);
     importObjectives(importNode, prefix, savedExercise, savedScenario, baseIds);
     importLessons(importNode, prefix, savedExercise, savedScenario, baseIds);
@@ -299,7 +299,9 @@ public class V1_DataImporter implements Importer {
 
   // -- TAGS --
 
-  private void importTags(JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+  private void importTags(
+      TxCtx ctx, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+    String writeTenant = tenantWriteScopeResolver.tenantForWrite(ctx, null);
     resolveJsonElements(importNode, prefix + "tags")
         .forEach(
             nodeTag -> {
@@ -310,19 +312,21 @@ public class V1_DataImporter implements Importer {
               }
               String name = nodeTag.get("tag_name").textValue();
 
-              List<Tag> existingTags = this.tagRepository.findByNameIgnoreCase(name);
-              if (!existingTags.isEmpty()) {
-                baseIds.put(id, existingTags.getFirst());
+              Optional<Tag> existingTag =
+                  this.tagRepository.findByNameAndTenantId(name.toLowerCase(), writeTenant);
+              if (existingTag.isPresent()) {
+                baseIds.put(id, existingTag.get());
               } else {
-                baseIds.put(id, this.tagRepository.save(createTag(nodeTag)));
+                baseIds.put(id, this.tagRepository.save(createTag(nodeTag, writeTenant)));
               }
             });
   }
 
-  private Tag createTag(JsonNode jsonNode) {
+  private Tag createTag(JsonNode jsonNode, String tenantId) {
     Tag tag = new Tag();
     tag.setName(jsonNode.get("tag_name").textValue());
     tag.setColor(jsonNode.get("tag_color").textValue());
+    tag.setTenant(new Tenant(tenantId));
     return tag;
   }
 
@@ -362,11 +366,9 @@ public class V1_DataImporter implements Importer {
                 return;
               }
 
-              // Tenant-scoped on purpose: the id comes from the import file and a PK load bypasses
-              // the Hibernate tenant filter, so a foreign tenant's domain must never be reused.
-              Optional<Domain> existingDomain =
-                  this.domainService.findOptionalByIdAndTenantId(
-                      id, TenantContext.getCurrentTenant());
+              // Tenant-scoped by the transaction scope (TxCtx): the id comes from the import file,
+              // so a foreign tenant's domain must never be reused.
+              Optional<Domain> existingDomain = this.domainService.findOptionalById(id);
               if (existingDomain.isPresent()) {
                 baseIds.put(id, existingDomain.get());
                 domains.add(existingDomain.get());
@@ -439,7 +441,7 @@ public class V1_DataImporter implements Importer {
               // first, then upsert by name (cross-instance).
               Domain resolved =
                   this.domainService
-                      .findOptionalByIdAndTenantId(id, TenantContext.getCurrentTenant())
+                      .findOptionalById(id)
                       .orElseGet(() -> upsertDomainFromNode(nodeDomain));
               baseIds.put(id, resolved);
             });
@@ -637,7 +639,7 @@ public class V1_DataImporter implements Importer {
   private List<KillChainPhase> importKillChainPhase(
       TxCtx ctx, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
     List<KillChainPhase> killChainPhases = new ArrayList<>();
-    String writeTenant = tenantWriteScopeResolver.tenantForWrite(ctx, null);
+    String tenantId = tenantWriteScopeResolver.tenantForWrite(ctx, null);
     resolveJsonElements(importNode, prefix + "kill_chain_phases")
         .forEach(
             nodeKillChainPhase -> {
@@ -653,7 +655,7 @@ public class V1_DataImporter implements Importer {
               }
               KillChainPhase killChainPhase =
                   this.killChainPhaseService.resolveOrCreateForImport(
-                      writeTenant, createKillChainPhase(nodeKillChainPhase, writeTenant));
+                      tenantId, createKillChainPhase(nodeKillChainPhase, tenantId));
               baseIds.put(id, killChainPhase);
               killChainPhases.add(killChainPhase);
             });
@@ -700,6 +702,14 @@ public class V1_DataImporter implements Importer {
     exercise.setHeader(exerciseNode.get("exercise_message_header").textValue());
     exercise.setFooter(exerciseNode.get("exercise_message_footer").textValue());
     exercise.setFrom(exerciseNode.get("exercise_mail_from").textValue());
+    exercise.setLessonsAnonymized(
+        ofNullable(exerciseNode.get("exercise_lessons_anonymized"))
+            .map(node -> node.asBoolean(false))
+            .orElse(false));
+    exercise.setLessonsEnabled(
+        ofNullable(exerciseNode.get("exercise_lessons_enabled"))
+            .map(node -> node.asBoolean(false))
+            .orElse(false));
     exercise.setTags(
         resolveJsonIds(exerciseNode, "exercise_tags").stream()
             .map(baseIds::get)
@@ -741,6 +751,14 @@ public class V1_DataImporter implements Importer {
     scenario.setHeader(scenarioNode.get("scenario_message_header").textValue());
     scenario.setFooter(scenarioNode.get("scenario_message_footer").textValue());
     scenario.setFrom(scenarioNode.get("scenario_mail_from").textValue());
+    scenario.setLessonsAnonymized(
+        ofNullable(scenarioNode.get("scenario_lessons_anonymized"))
+            .map(node -> node.asBoolean(false))
+            .orElse(false));
+    scenario.setLessonsEnabled(
+        ofNullable(scenarioNode.get("scenario_lessons_enabled"))
+            .map(node -> node.asBoolean(false))
+            .orElse(false));
     scenario.setTags(
         resolveJsonIds(scenarioNode, "scenario_tags").stream()
             .map(baseIds::get)
@@ -1076,7 +1094,9 @@ public class V1_DataImporter implements Importer {
 
   // -- CHALLENGES --
 
-  private void importChallenges(JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+  private void importChallenges(
+      TxCtx ctx, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+    String writeTenant = tenantWriteScopeResolver.tenantForWrite(ctx, null);
     resolveJsonElements(importNode, prefix + "challenges")
         .forEach(
             nodeChallenge -> {
@@ -1088,18 +1108,22 @@ public class V1_DataImporter implements Importer {
               String name = nodeChallenge.get("challenge_name").textValue();
 
               List<Challenge> existingChallenges =
-                  this.challengeRepository.findByNameIgnoreCase(name);
+                  this.challengeRepository.findByNameIgnoreCaseAndTenantId(name, writeTenant);
               if (!existingChallenges.isEmpty()) {
                 baseIds.put(id, existingChallenges.getFirst());
               } else {
                 baseIds.put(
-                    id, this.challengeRepository.save(createChallenge(nodeChallenge, baseIds)));
+                    id,
+                    this.challengeRepository.save(
+                        createChallenge(nodeChallenge, baseIds, writeTenant)));
               }
             });
   }
 
-  private Challenge createChallenge(JsonNode nodeChallenge, Map<String, Base> baseIds) {
+  private Challenge createChallenge(
+      JsonNode nodeChallenge, Map<String, Base> baseIds, String tenantId) {
     Challenge challenge = new Challenge();
+    challenge.setTenant(new Tenant(tenantId));
     challenge.setName(nodeChallenge.get("challenge_name").textValue());
     challenge.setCategory(nodeChallenge.get("challenge_category").textValue());
     challenge.setContent(nodeChallenge.get("challenge_content").textValue());
@@ -1133,7 +1157,9 @@ public class V1_DataImporter implements Importer {
 
   // -- CHANNELS --
 
-  private void importChannels(JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+  private void importChannels(
+      TxCtx ctx, JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+    String tenantId = tenantWriteScopeResolver.tenantForWrite(ctx, null);
     resolveJsonElements(importNode, prefix + "channels")
         .forEach(
             nodeChannel -> {
@@ -1145,17 +1171,19 @@ public class V1_DataImporter implements Importer {
               String channelName = nodeChannel.get("channel_name").textValue();
 
               List<Channel> existingChannels =
-                  this.channelRepository.findByNameIgnoreCase(channelName);
+                  this.channelRepository.findByNameIgnoreCaseAndTenantId(channelName, tenantId);
               if (!existingChannels.isEmpty()) {
                 baseIds.put(id, existingChannels.getFirst());
               } else {
-                baseIds.put(id, this.channelRepository.save(createChannel(nodeChannel, baseIds)));
+                baseIds.put(
+                    id, this.channelRepository.save(createChannel(nodeChannel, baseIds, tenantId)));
               }
             });
   }
 
-  private Channel createChannel(JsonNode nodeChannel, Map<String, Base> baseIds) {
+  private Channel createChannel(JsonNode nodeChannel, Map<String, Base> baseIds, String tenantId) {
     Channel channel = new Channel();
+    channel.setTenant(new Tenant(tenantId));
     channel.setName(nodeChannel.get("channel_name").textValue());
     channel.setType(nodeChannel.get("channel_type").textValue());
     channel.setDescription(nodeChannel.get("channel_description").textValue());
@@ -1687,7 +1715,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private ContractOutputElementInput buildOuputElementFromJsonNode(
-      JsonNode node, Map<String, Base> baseIds) {
+      TxCtx ctx, JsonNode node, Map<String, Base> baseIds) {
     ContractOutputElementInput outputElement = new ContractOutputElementInput();
     outputElement.setFinding(node.get("contract_output_element_is_finding").asBoolean());
     outputElement.setRule(node.get("contract_output_element_rule").textValue());
@@ -1695,7 +1723,7 @@ public class V1_DataImporter implements Importer {
     outputElement.setKey(node.get("contract_output_element_key").textValue());
     outputElement.setType(
         formatStringToContractOutputType(node.get("contract_output_element_type").textValue()));
-    importTags(node, "contract_output_element_", baseIds);
+    importTags(ctx, node, "contract_output_element_", baseIds);
     outputElement.setTagIds(
         resolveJsonIds(node, "contract_output_element_tags").stream()
             .filter(baseIds::containsKey)
@@ -1712,7 +1740,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private OutputParserInput buildOutputParserFromJsonNode(
-      JsonNode node, Map<String, Base> baseIds) {
+      TxCtx ctx, JsonNode node, Map<String, Base> baseIds) {
     OutputParserInput parser = new OutputParserInput();
     parser.setType(ParserType.valueOf(node.get("output_parser_type").textValue()));
     parser.setMode(ParserMode.valueOf(node.get("output_parser_mode").textValue()));
@@ -1720,13 +1748,13 @@ public class V1_DataImporter implements Importer {
     for (JsonNode outputElementNode : outputElementNodes) {
       parser
           .getContractOutputElements()
-          .add(buildOuputElementFromJsonNode(outputElementNode, baseIds));
+          .add(buildOuputElementFromJsonNode(ctx, outputElementNode, baseIds));
     }
     return parser;
   }
 
   private Set<OutputParserInput> buildOutputParsersFromPayloadJsonNode(
-      JsonNode payloadNode, Map<String, Base> baseIds) {
+      TxCtx ctx, JsonNode payloadNode, Map<String, Base> baseIds) {
     Set<OutputParserInput> outputParserInputs = new HashSet<>();
     if (!payloadNode.has("payload_output_parsers")) {
       return outputParserInputs;
@@ -1734,7 +1762,7 @@ public class V1_DataImporter implements Importer {
 
     ArrayNode outputParserNodes = (ArrayNode) payloadNode.get("payload_output_parsers");
     for (JsonNode outputParserNode : outputParserNodes) {
-      outputParserInputs.add(buildOutputParserFromJsonNode(outputParserNode, baseIds));
+      outputParserInputs.add(buildOutputParserFromJsonNode(ctx, outputParserNode, baseIds));
     }
     return outputParserInputs;
   }
@@ -1746,7 +1774,7 @@ public class V1_DataImporter implements Importer {
       @Nullable JsonNode injectorContractNode) {
     PayloadCreateInput payloadCreateInput = buildPayload(payloadNode);
     payloadCreateInput.setOutputParsers(
-        buildOutputParsersFromPayloadJsonNode(payloadNode, baseIds));
+        buildOutputParsersFromPayloadJsonNode(ctx, payloadNode, baseIds));
     payloadCreateInput.setDetectionRemediations(buildDetectionRemediationsJsonNode(payloadNode));
 
     // Tags — merge from payload and injector contract nodes
@@ -3520,7 +3548,7 @@ public class V1_DataImporter implements Importer {
    * discarded and re-read fresh from the DB a few lines later.
    *
    * <p>Resolution reuses {@link #importDomains} (no duplicated logic): baseIds cache first, then
-   * {@code domainService.findOptionalByIdAndTenantId} (same id present on target), then {@code
+   * {@code domainService.findOptionalById} (same id present on target), then {@code
    * domainService.upsert} (find-by-name or create) for object-shaped entries. Bare source ids that
    * resolve to nothing are dropped rather than kept dangling (degraded but non-blocking; the field
    * is never used at run time after deserialization). The array is then replaced with the resolved
