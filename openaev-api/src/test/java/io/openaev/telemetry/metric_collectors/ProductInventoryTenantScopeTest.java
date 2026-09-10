@@ -45,6 +45,7 @@ class ProductInventoryTenantScopeTest extends IntegrationTest {
   private long baseline;
   private long endpointBaseline;
   private long mapperBaseline;
+  private long findingBaseline;
 
   @BeforeEach
   void seedTwoTenantsWithOneAssetGroupEach() {
@@ -59,11 +60,17 @@ class ProductInventoryTenantScopeTest extends IntegrationTest {
                 "SELECT count(*) FROM assets WHERE asset_type = 'Endpoint'", Long.class));
     mapperBaseline =
         requireNonNull(jdbc.queryForObject("SELECT count(*) FROM import_mappers", Long.class));
+    findingBaseline =
+        requireNonNull(jdbc.queryForObject("SELECT count(*) FROM findings", Long.class));
     seedAssetGroup(seedTenant("telemetry-a-" + UUID.randomUUID()), "telemetry-group-a");
     seedAssetGroup(seedTenant("telemetry-b-" + UUID.randomUUID()), "telemetry-group-b");
     seedEndpoint(seededTenants.get(0), "telemetry-vuln-endpoint-a");
     seedEndpoint(seededTenants.get(1), "telemetry-vuln-endpoint-b");
     seedImportMapper(seededTenants.get(0), "telemetry-mapper-a");
+    // Findings in BOTH tenants. Without a seed the gauge assertion compared a zero baseline to a
+    // zero count and held whether or not the supplier kept its TxCtx.allTenants() scope.
+    seedFinding(seededTenants.get(0), "telemetry-finding-a");
+    seedFinding(seededTenants.get(1), "telemetry-finding-b");
   }
 
   @AfterEach
@@ -71,6 +78,8 @@ class ProductInventoryTenantScopeTest extends IntegrationTest {
     for (String tenantId : seededTenants) {
       jdbc.update("DELETE FROM asset_groups WHERE tenant_id = ?", tenantId);
       jdbc.update("DELETE FROM assets WHERE tenant_id = ?", tenantId);
+      jdbc.update("DELETE FROM findings WHERE tenant_id = ?", tenantId);
+      jdbc.update("DELETE FROM injects WHERE tenant_id = ?", tenantId);
       jdbc.update("DELETE FROM import_mappers WHERE tenant_id = ?", tenantId);
       jdbc.update("DELETE FROM tenants WHERE tenant_id = ?", tenantId);
     }
@@ -104,12 +113,12 @@ class ProductInventoryTenantScopeTest extends IntegrationTest {
   @Test
   @DisplayName("the findings gauge counts every tenant's rows, not zero")
   void findingsGaugeCountsAcrossTenants() {
-    // Same shape as the asset-group case above, on the table lot C activates. Non-empty on purpose:
-    // asserting zero would stay green through exactly the fail-closed regression this pins.
-    long baselineFindings =
-        requireNonNull(jdbc.queryForObject("SELECT count(*) FROM findings", Long.class));
+    // A delta against a baseline taken BEFORE seeding, like the asset-group case above. The first
+    // version of this test read the baseline at assertion time and compared it to the gauge: on a
+    // clean database that was 0 == 0, and it held whether or not the supplier kept its scope,
+    // because the class seeded no findings at all. Two are seeded now, one per tenant.
     assertEquals(
-        baselineFindings,
+        findingBaseline + 2L,
         collector.countFindings(),
         "findings_total must span every tenant; a zero here means the supplier lost its"
             + " TxCtx.allTenants() scope and the gauge silently stopped counting");
@@ -192,6 +201,25 @@ class ProductInventoryTenantScopeTest extends IntegrationTest {
             + " VALUES (CAST(? AS uuid), ?, 'A', now(), now(), ?)",
         UUID.randomUUID().toString(),
         name,
+        tenantId);
+  }
+
+  private void seedFinding(String tenantId, String value) {
+    String injectId = UUID.randomUUID().toString();
+    jdbc.update(
+        "INSERT INTO injects (inject_id, inject_title, inject_created_at, inject_updated_at,"
+            + " inject_depends_duration, inject_all_teams, inject_enabled, tenant_id)"
+            + " VALUES (?, ?, now(), now(), 0, false, true, ?)",
+        injectId,
+        "telemetry-inject-" + value,
+        tenantId);
+    jdbc.update(
+        "INSERT INTO findings (finding_id, finding_field, finding_type, finding_value,"
+            + " finding_inject_id, finding_created_at, finding_updated_at, tenant_id)"
+            + " VALUES (?, 'hostname', 'text', ?, ?, now(), now(), ?)",
+        UUID.randomUUID().toString(),
+        value,
+        injectId,
         tenantId);
   }
 }

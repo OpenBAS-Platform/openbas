@@ -46,7 +46,7 @@ import org.springframework.test.web.servlet.MockMvc;
  * the request's own transaction has closed, which means committing the seed and sweeping it by
  * hand.
  */
-@TestPropertySource(properties = "openaev.tenant.active-tables=asset_groups,assets")
+@TestPropertySource(properties = "openaev.tenant.active-tables=findings,asset_groups,assets")
 @WithMockUser(isAdmin = true)
 @DisplayName("a finding still carries its inject's asset groups when serialized")
 class FindingAssetGroupSinkTest extends IntegrationTest {

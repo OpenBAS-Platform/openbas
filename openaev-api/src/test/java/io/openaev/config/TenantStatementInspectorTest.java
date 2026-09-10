@@ -983,7 +983,13 @@ class TenantStatementInspectorTest {
             .getMethod("findForIndexing", java.time.Instant.class, int.class)
             .getAnnotation(org.springframework.data.jpa.repository.Query.class)
             .value();
-    String groupBy = sql.substring(sql.indexOf("GROUP BY")).toLowerCase();
+    // Cut at ORDER BY: the substring used to run to the end of the query, which ends
+    // "ORDER BY f.finding_updated_at LIMIT :limit". contains("f.finding_updated_at") was then
+    // satisfied by the ORDER BY occurrence, so deleting that column from the real GROUP BY - the
+    // exact edit this test exists to catch - left it green.
+    String tail = sql.substring(sql.indexOf("GROUP BY"));
+    int orderBy = tail.indexOf("ORDER BY");
+    String groupBy = (orderBy < 0 ? tail : tail.substring(0, orderBy)).toLowerCase();
     for (String projected :
         new String[] {
           "f.finding_id",
@@ -993,7 +999,10 @@ class TenantStatementInspectorTest {
           "f.finding_inject_id",
           "f.finding_created_at",
           "f.finding_updated_at",
-          "f.tenant_id"
+          "f.tenant_id",
+          // Projected and non-aggregated like the rest, and absent from this list until the
+          // ORDER BY hole above was closed.
+          "i.inject_exercise"
         }) {
       assertTrue(
           groupBy.contains(projected),

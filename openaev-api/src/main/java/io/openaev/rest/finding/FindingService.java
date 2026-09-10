@@ -45,6 +45,11 @@ public class FindingService {
 
   // -- CRUD --
 
+  /**
+   * No production caller: only tests reach this. Kept because two tenant-isolation suites use it as
+   * their subject, but it is a trap for the next person - an unscoped {@code findAll} on an
+   * activated table returns nothing in production. Tracked for removal with its test callers.
+   */
   public List<Finding> findings() {
     return fromIterable(this.findingRepository.findAll());
   }
