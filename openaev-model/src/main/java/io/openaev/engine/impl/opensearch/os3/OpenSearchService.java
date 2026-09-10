@@ -1312,7 +1312,12 @@ public class OpenSearchService implements EngineService {
 
   @Override
   public void cleanUpIndex(String model) throws IOException {
-    driver.cleanUpIndex(model, openSearchClient);
+    this.cleanUpIndex(model, true);
+  }
+
+  @Override
+  public void cleanUpIndex(String model, boolean withTemplate) throws IOException {
+    driver.cleanUpIndex(model, openSearchClient, withTemplate);
   }
 
   @Override

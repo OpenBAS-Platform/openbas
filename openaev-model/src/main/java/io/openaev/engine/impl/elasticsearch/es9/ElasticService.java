@@ -501,7 +501,12 @@ public class ElasticService implements EngineService {
 
   @Override
   public void cleanUpIndex(String model) throws IOException {
-    driver.cleanUpIndex(model, elasticClient);
+    this.cleanUpIndex(model, true);
+  }
+
+  @Override
+  public void cleanUpIndex(String model, boolean withTemplate) throws IOException {
+    driver.cleanUpIndex(model, elasticClient, withTemplate);
   }
 
   public void bulkDelete(List<String> ids) {

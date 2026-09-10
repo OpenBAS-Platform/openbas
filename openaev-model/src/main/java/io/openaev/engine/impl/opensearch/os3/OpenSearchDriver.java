@@ -1,6 +1,7 @@
 package io.openaev.engine.impl.opensearch.os3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es9.co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import io.openaev.config.EngineConfig;
 import io.openaev.database.model.IndexingStatus;
 import io.openaev.database.repository.IndexingStatusRepository;
@@ -490,33 +491,44 @@ public class OpenSearchDriver {
    * @throws IOException in case of an exception during the call to opensearch
    */
   public void cleanUpIndex(String indexName, OpenSearchClient client) throws IOException {
+    cleanUpIndex(indexName, client, true);
+  }
+
+  public void cleanUpIndex(String indexName, OpenSearchClient client, boolean withTemplate)
+      throws IOException {
     try {
       String fullIndexName = config.getIndexPrefix() + "_" + indexName;
       String fullIndexWithSuffix = fullIndexName + config.getIndexSuffix();
 
-      // 1. Delete index and alias if they exist. Probe existence first (this runs at every
-      // startup for retired models) so a healthy platform boots without deletion warnings, and
-      // delete the concrete index before the alias name: removing the index also removes its
-      // alias, so the alias-name delete (which would fail with "matches an alias") is skipped.
-      for (String name : List.of(fullIndexWithSuffix, fullIndexName)) {
-        if (!client.indices().exists(b -> b.index(name)).value()) {
-          continue;
-        }
-        try {
-          client.indices().delete(d -> d.index(name));
-          log.info("Deleted index: {}", name);
-        } catch (OpenSearchException e) {
-          log.warn("Index {} could not be deleted: {}", name, e.getMessage());
-        }
-      }
+      deleteIndex(fullIndexName, fullIndexWithSuffix, client);
 
-      // 2. Delete index template
-      if (client.indices().existsIndexTemplate(b -> b.name(fullIndexName)).value()) {
-        client.indices().deleteIndexTemplate(d -> d.name(fullIndexName));
-        log.info("Deleted index template: {}", fullIndexName);
+      if (withTemplate) {
+        deleteIndexTemplate(fullIndexName, client);
       }
     } catch (IOException e) {
-      throw new AnalyticsEngineException("Failed to delete index " + indexName, e);
+      throw new RuntimeException("Failed to delete index " + indexName, e);
+    }
+  }
+
+  private void deleteIndex(String name, String nameWithSuffix, OpenSearchClient client)
+      throws IOException {
+    for (String idxName : List.of(nameWithSuffix, name)) {
+      if (!client.indices().exists(b -> b.index(idxName)).value()) {
+        continue;
+      }
+      try {
+        client.indices().delete(d -> d.index(idxName));
+        log.info("Deleted index: {}", idxName);
+      } catch (ElasticsearchException e) {
+        log.warn("Index {} could not be deleted: {}", idxName, e.getMessage());
+      }
+    }
+  }
+
+  private void deleteIndexTemplate(String name, OpenSearchClient client) throws IOException {
+    if (client.indices().existsIndexTemplate(b -> b.name(name)).value()) {
+      client.indices().deleteIndexTemplate(d -> d.name(name));
+      log.info("Deleted index template: {}", name);
     }
   }
 }

@@ -112,7 +112,7 @@ public class DatabaseSnapshotManager {
 
     try {
       for (EsModel<EsBase> model : models) {
-        service.cleanUpIndex(model.getName());
+        service.cleanUpIndex(model.getName(), false);
       }
       log.info("Deleted all openaev_* Elasticsearch indices");
     } catch (Exception e) {

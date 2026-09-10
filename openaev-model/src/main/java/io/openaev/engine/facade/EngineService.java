@@ -44,6 +44,15 @@ public interface EngineService {
   void cleanUpIndex(String model) throws IOException;
 
   /**
+   * Clean up the index
+   *
+   * @param model the model to clean up
+   * @param withTemplate if true, also delete the index template
+   * @throws IOException in case of issue communicating with the analytics engine
+   */
+  void cleanUpIndex(String model, boolean withTemplate) throws IOException;
+
+  /**
    * Deletes the documents for the given entity ids (and their cascade dependencies), then cleans
    * the deleted ids out of the denormalized {@code base_*_side} references. Ids are processed in
    * batches of {@link #BULK_DELETE_BATCH_SIZE}.
