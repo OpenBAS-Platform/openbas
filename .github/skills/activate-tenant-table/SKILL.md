@@ -49,6 +49,16 @@ incident. Do not trade them away to make a test pass.
    for the expected reason before you write any production code. Never weaken,
    delete or `@Disabled` an existing test to get green, with one exception
    introduced in Phase 2 and resolved in Phase 6 (the documented go-live guard).
+
+   **Red for the intended reason is not enough.** A test that goes red when you
+   remove your fix may only be pinning that fix, not the behaviour it is meant
+   to protect. Before calling it done, break the behaviour a SECOND way, on a
+   different line or in a different layer, and confirm it fails again.
+
+   Lot C's gauge tests are the example. They were red without their fix and
+   green with it, then stayed green when the gauge was re-wired to the unscoped
+   repository: they called the scoped method directly instead of the supplier
+   the gauge actually registers.
 2. **Background writers go through the primitive, never `@Transactional`.** A
    scheduler job, queue consumer, connector-side path or startup task that
    writes the table is NOT an automatic stop anymore (it was before #6398).
@@ -299,6 +309,94 @@ Classify every hit:
 - background writer → convert to the primitive in Phase 5b. If you are not
   converting it in this run, it is a blocker: stop and report (Phase 0)
 
+#### Removing the v1 `@Filter` silently disarms every isolation test that does not activate the table
+
+The test profile declares no `openaev.tenant.active-tables`, so the inspector never fires in a test
+context unless that context sets it. Every isolation test therefore needs
+`@TestPropertySource(properties = "openaev.tenant.active-tables={table}")`, which the RED phase
+above already tells you to write.
+
+The trap is the other direction, and it is about tests you did NOT write. A suite that asserted this
+table's isolation **before** the activation was relying on the v1 `@Filter`. Removing that filter
+takes its isolation away, and because the inspector is not active in its context either, the
+assertions keep running against nothing. They do not fail loudly: a cross-tenant read simply starts
+returning the other tenant's rows, and only an assertion precise enough to notice will catch it.
+
+That is what happened on the `assets` activation (#6438). `EndpointApiTest`'s `TenantIsolation`
+nested class had four cross-tenant tests and no `@TestPropertySource`. Removing `Asset`'s `@Filter`
+turned one of them red (`given_endpointInTenantX_should_notAppearInTenantYSearch` returned tenant X's
+endpoint to a search under tenant Y) while the other three stayed green **without isolating
+anything**. Attribution was correct throughout; only the read was unprotected.
+
+Find them before go-live:
+
+```bash
+# test classes that assert something about this table's isolation, and whether they activate it
+grep -rln "{Entity}\|{table}" openaev-api/src/test --include="*.java"   | xargs grep -ln "Tenant\|tenant"   | xargs grep -Ln "TestPropertySource"
+```
+
+Read every hit. A class that asserts cross-tenant behaviour and does not set `active-tables` is
+either proving nothing or about to break.
+
+**Put the annotation on the outermost test class, not on a `@Nested` one.** A `@TestPropertySource`
+on a nested class builds a second Spring context, and the mock user provisioned by
+`WithMockUserTestExecutionListener` lives in the parent's `TestUserHolder`; the nested context gets
+an empty one and every test fails on "The given id must not be null" before reaching its assertion.
+
+#### Code that relied on the v1 `@Filter` breaks silently, and it is not only tests
+
+The previous section is about test suites. The same removal takes isolation away from **production**
+paths that never carried a `TxCtx` and were scoped by the v1 filter alone, enabled on every
+`@Transactional` method by `HibernateFilterTransactionAspect` from the thread-local.
+
+`NotificationMatchingService.matches` is the case to remember. It is `@Transactional` with no
+`TxCtx`, reached from an `@Async` `@TransactionalEventListener` - a pool thread, after commit, no
+ambient transaction - and `NotificationEngineService` states the dependency in its own comment:
+*"runs with the trigger's tenant so the Hibernate tenant filter scopes every query correctly"*.
+Activating `assets`, `asset_groups` or `findings` removes that filter, so every LIVE notification
+trigger with a non-empty filter on those resources counted zero rows and stopped firing. No log, no
+exception: `matches` catches and returns false.
+
+`session.disableFilter("tenantFilter")` is the same family read from the other side. It is how v1
+code declares "this read is deliberately cross-tenant", and it is **inert** under v2: it does nothing
+to `app.current_tenants`, and the inspector never consults the Hibernate filter.
+
+```bash
+# both directions, before go-live
+rg -n 'disableFilter\("tenantFilter"\)' --type java
+rg -n 'HibernateFilterTransactionAspect|tenant filter' --type java openaev-api/src/main
+# then, for each hit, answer: does this path reach {table}, and what sets its scope now?
+```
+
+Follow the call chain to the tables it actually reaches, not the imports of the class in front of
+you. `QueueChainingJob` was classified as safe because its own imports name only `steps`,
+`workflow_runs` and `step_delay_queue`; four levels down, `createReadySteps` reaches
+`ScopeService.getValidAssets` -> `assetService.assets(ids)` on the activated `assets` table.
+
+#### The inspector rewrites `UPDATE` and `DELETE`, not only `SELECT`
+
+`rewriteUpdate` adds `can_access_tenant(...)` to an UPDATE's WHERE. With no scope the statement
+updates **zero rows and reports success**. On the `findings` activation this hit the test-only date
+setters (`endpointRepository.setCreationDate`): they silently did nothing, every endpoint kept
+`now()` as its creation date, and three date-range dashboard assertions counted all of them. The
+symptom looked like over-counting across tenants, which is the wrong diagnosis entirely.
+
+Any `@Modifying` query on the table needs a scope, in tests as much as in production.
+
+#### A `@Transactional` MockMvc test keeps the scope the request resolved
+
+The tenant aspect is `@Before`-only and writes `set_config(..., true)`, which is transaction-local.
+In a `@Transactional` test the handler joins the test transaction, so after `mvc.perform` returns,
+the scope the request resolved is **still set**. Anything the test then reads through a repository
+sees it.
+
+That silently couples the expectation to the response. `FindingApiTest` compared its HTTP response
+against `findingRepository.findAll()` taken in that same transaction: if the search ever failed
+closed, both sides came back empty and `[] == []` held. Eight assertions were affected.
+
+Either materialise the expectation from the fixtures you seeded, read it through raw JDBC (which the
+inspector never rewrites), or at minimum assert it is non-empty - that single guard is what turns
+`[] == []` back into a failure.
 #### Telemetry gauge check: `ProductInventoryMetricCollector`
 
 `openaev-api/src/main/java/io/openaev/telemetry/metric_collectors/ProductInventoryMetricCollector.java`
@@ -866,6 +964,21 @@ Rules for this sub-phase:
   asserting the computed field is NON-NULL on a representative endpoint per
   controller family, not just on the table's own API. A null-valued scalar is
   the failure mode; an empty-array assertion will not catch it.
+- **That pin must NOT be `@Transactional`, and this is not a style detail.** The
+  defect is a lazy association resolved by Jackson AFTER the handler's
+  transaction closed. A `@Transactional` test class keeps that transaction open:
+  the handler joins it, serialization happens inside it, the scope is still set,
+  and the assertion passes. The test then looks like a pin and is not one. Seed
+  through a committed `TransactionTemplate` and sweep the rows in an
+  `@AfterEach`, so the request's own transaction is the one that closes before
+  serialization.
+
+  Three defects of this family have shipped or nearly shipped:
+  `SecurityPlatform#collectors` (#7026, found in production months after
+  go-live), `Finding.getAssetGroups()` and `Finding.assets` (#6420), and
+  `AssetGroup.assets` (#6438). The last two were each covered by a sink test
+  that **passed** while the endpoint returned an empty array, because both tests
+  were transactional. Correcting the test is what turned them red.
 
 ### Phase 4 — RED then GREEN: write attribution
 
