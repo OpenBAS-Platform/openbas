@@ -1,5 +1,7 @@
 package io.openaev.scheduler.jobs;
 
+import static org.assertj.core.api.Assertions.*;
+
 import io.openaev.IntegrationTest;
 import io.openaev.database.model.Scenario;
 import io.openaev.database.model.Step;
@@ -16,15 +18,12 @@ import io.openaev.utils.fixtures.WorkflowFixture;
 import io.openaev.utils.fixtures.composers.ScenarioComposer;
 import io.openaev.utils.fixtures.composers.StepComposer;
 import io.openaev.utils.fixtures.composers.WorkflowComposer;
+import java.time.Instant;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.time.Instant;
-
-import static org.assertj.core.api.Assertions.*;
 
 /**
  * Tests for {@link QueueChainingJob}, now opening its top-level transaction through {@link
