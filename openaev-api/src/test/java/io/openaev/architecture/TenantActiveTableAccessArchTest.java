@@ -29,6 +29,7 @@ import io.openaev.database.repository.ConnectorInstanceRepository;
 import io.openaev.database.repository.CweRepository;
 import io.openaev.database.repository.DomainRepository;
 import io.openaev.database.repository.ExecutorRepository;
+import io.openaev.database.repository.FindingRepository;
 import io.openaev.database.repository.ImportMapperRepository;
 import io.openaev.database.repository.InjectorRepository;
 import io.openaev.database.repository.KillChainPhaseRepository;
@@ -42,7 +43,9 @@ import io.openaev.database.repository.attackpath.AttackPathFindingRepository;
 import io.openaev.database.repository.autonomous.AutonomousDirectiveRepository;
 import io.openaev.database.repository.autonomous.AutonomousEventRepository;
 import io.openaev.database.repository.autonomous.AutonomousRunRepository;
+import io.openaev.engine.model.finding.FindingHandler;
 import io.openaev.engine.model.securitydomain.SecurityDomainHandler;
+import io.openaev.engine.model.vulnerableendpoint.VulnerableEndpointHandler;
 import io.openaev.executors.Executor;
 import io.openaev.executors.ExecutorService;
 import io.openaev.executors.caldera.service.CalderaExecutorContextService;
@@ -87,6 +90,10 @@ import io.openaev.rest.exercise.ExerciseApi;
 import io.openaev.rest.exercise.ExerciseImportApi;
 import io.openaev.rest.exercise.exports.ExerciseFileExport;
 import io.openaev.rest.exercise.service.ExerciseService;
+import io.openaev.rest.finding.FindingDistinctSearchService;
+import io.openaev.rest.finding.FindingSearchApi;
+import io.openaev.rest.finding.FindingService;
+import io.openaev.rest.finding.FindingWriter;
 import io.openaev.rest.inject.InjectApi;
 import io.openaev.rest.inject.ScenarioInjectApi;
 import io.openaev.rest.inject.SimulationInjectApi;
@@ -150,6 +157,7 @@ import io.openaev.telemetry.metric_collectors.ProductInventoryMetricCollector;
 import io.openaev.utils.ExpectationUtils;
 import io.openaev.utils.InjectUtils;
 import io.openaev.utils.mapper.DocumentMapper;
+import io.openaev.utils.mapper.FindingMapper;
 import io.openaev.utils.mapper.InjectMapper;
 import io.openaev.utils.mapper.VulnerabilityMapper;
 import java.io.FileInputStream;
@@ -212,6 +220,7 @@ class TenantActiveTableAccessArchTest {
           "notifications",
           "challenges",
           "asset_groups",
+          "findings",
           "assets");
 
   @ArchTest
@@ -857,6 +866,40 @@ class TenantActiveTableAccessArchTest {
           .because(
               "attackpath_finding is tenant-active: an accessor without a tenant scope silently"
                   + " reads zero rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule findings_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // HTTP read/write paths: every entrypoint carries a TxCtx and the aspect scopes the
+              // transaction (pinned by TenantScopedEntrypointsTxCtxArchTest).
+              FindingSearchApi.class,
+              FindingService.class,
+              FindingDistinctSearchService.class,
+              // Reached only from those handlers, inside their scoped transaction.
+              FindingMapper.class,
+              // REQUIRES_NEW, so it declares its own TxCtx and the aspect scopes the new
+              // transaction (see the note on the class).
+              FindingWriter.class,
+              // Background writers, each reaching the primitive with the tenant taken from the
+              // inject or run that owns the work.
+              AttackPathExecutionIngestionService.class,
+              AttackPathFindingIngestionService.class,
+              AttackPathGraphService.class,
+              AutonomousRunService.class,
+              // ES indexing sweep: EngineSyncExecutionJob opens TxCtx.allTenants() before calling
+              // either handler.
+              FindingHandler.class,
+              VulnerableEndpointHandler.class,
+              // Telemetry gauge, explicitly TxCtx.allTenants() (ProductInventoryTenantScopeTest).
+              ProductInventoryMetricCollector.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(FindingRepository.class)
+          .because(
+              "findings is tenant-active: an accessor without a tenant scope silently reads zero"
+                  + " rows. New accessors must carry a scope and be allowlisted here");
 
   @ArchTest
   static final ArchRule security_coverages_repository_access_is_reviewed =
