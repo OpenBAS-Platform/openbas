@@ -3,7 +3,6 @@ package io.openaev.maven.shade.transformers;
 import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -19,7 +18,8 @@ public class ByteDedupedLicenseCollectionTransformer implements ReproducibleReso
 
   private record ResourceMetadata(String fileName, byte[] byteContents) {}
 
-  Map<String, ResourceMetadata> entries = new HashMap<>();
+  private Map<String, ResourceMetadata> entries = new HashMap<>();
+  private long time;
 
   private static String bytesToHex(byte[] hash) {
     StringBuilder hexString = new StringBuilder(2 * hash.length);
@@ -36,6 +36,7 @@ public class ByteDedupedLicenseCollectionTransformer implements ReproducibleReso
   @Override
   public void processResource(
       String resource, InputStream is, List<Relocator> relocators, long time) throws IOException {
+    this.time = time;
     byte[] contents = is.readAllBytes();
     String fileName = new File(resource).getName();
     try {
@@ -69,7 +70,7 @@ public class ByteDedupedLicenseCollectionTransformer implements ReproducibleReso
       ResourceMetadata resourceMetadata = entry.getValue();
       JarEntry jarEntry =
           new JarEntry("%s/%s_%s.md".formatted(LICENSE_DIR, resourceMetadata.fileName(), digest));
-      jarEntry.setTime(Instant.now().toEpochMilli());
+      jarEntry.setTime(this.time);
       jos.putNextEntry(jarEntry);
       jos.write(resourceMetadata.byteContents());
       jos.flush();
