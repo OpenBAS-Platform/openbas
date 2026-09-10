@@ -934,6 +934,9 @@ class TenantActiveTableAccessArchTest {
       noClasses()
           .that()
           .doNotBelongToAnyOf(
+              // Owning entity itself: Lombok-generated methods may call its own getter; this is not
+              // an external accessor path.
+              Widget.class,
               // DashboardService resolves the widget and then dereferences its owning dashboard
               // inside TxCtx-scoped endpoints (pinned by DashboardApiTenantScopeTest and
               // TenantScopedEntrypointsTxCtxArchTest):

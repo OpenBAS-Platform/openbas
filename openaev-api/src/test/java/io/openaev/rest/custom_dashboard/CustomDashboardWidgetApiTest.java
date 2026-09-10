@@ -252,9 +252,9 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
       // and the read call below sets it to Y - the aspect refuses a scope change within one
       // transaction (see TenantScopeTransactionAspect). Composer persistence bypasses that
       // entirely (no controller/TxCtx involved).
-      Widget widget = seedWidgetInTenant(tenantX);
-      String dashboardId = widget.getCustomDashboard().getId();
-      String widgetId = widget.getId();
+      SeededWidget seededWidget = seedWidgetInTenant(tenantX);
+      String dashboardId = seededWidget.dashboardId();
+      String widgetId = seededWidget.widgetId();
 
       // Act
       int response =
@@ -344,8 +344,8 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
       // and the list call below sets it to Y - the aspect refuses a scope change within one
       // transaction (see TenantScopeTransactionAspect). Composer persistence bypasses that
       // entirely (no controller/TxCtx involved).
-      Widget widget = seedWidgetInTenant(tenantX);
-      String dashboardId = widget.getCustomDashboard().getId();
+      SeededWidget seededWidget = seedWidgetInTenant(tenantX);
+      String dashboardId = seededWidget.dashboardId();
 
       // Act + Assert
       mockMvc
@@ -375,9 +375,9 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
       // and the update call below sets it to Y - the aspect refuses a scope change within one
       // transaction (see TenantScopeTransactionAspect). Composer persistence bypasses that
       // entirely (no controller/TxCtx involved).
-      Widget widget = seedWidgetInTenant(tenantX);
-      String dashboardId = widget.getCustomDashboard().getId();
-      String widgetId = widget.getId();
+      SeededWidget seededWidget = seedWidgetInTenant(tenantX);
+      String dashboardId = seededWidget.dashboardId();
+      String widgetId = seededWidget.widgetId();
 
       WidgetInput updateWidgetInput = createDefaultWidgetInput("Hijacked widget title");
 
@@ -418,9 +418,9 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
       // and the delete call below sets it to Y - the aspect refuses a scope change within one
       // transaction (see TenantScopeTransactionAspect). Composer persistence bypasses that
       // entirely (no controller/TxCtx involved).
-      Widget widget = seedWidgetInTenant(tenantX);
-      String dashboardId = widget.getCustomDashboard().getId();
-      String widgetId = widget.getId();
+      SeededWidget seededWidget = seedWidgetInTenant(tenantX);
+      String dashboardId = seededWidget.dashboardId();
+      String widgetId = seededWidget.widgetId();
 
       // Act
       int response =
@@ -448,18 +448,23 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
      * a different tenant within the same test (see TenantScopeTransactionAspect). Composer
      * persistence goes straight to the repository, bypassing any controller/TxCtx.
      */
-    private Widget seedWidgetInTenant(Tenant tenant) {
+    private SeededWidget seedWidgetInTenant(Tenant tenant) {
       tenantIsolationHelper.switchToTenant(tenant.getId(), entityManager);
+      CustomDashboardComposer.Composer dashboardComposer =
+          customDashboardComposer.forCustomDashboard(createDefaultCustomDashboard());
       Widget widget =
           widgetComposer
               .forWidget(createDefaultWidget())
-              .withCustomDashboard(
-                  customDashboardComposer.forCustomDashboard(createDefaultCustomDashboard()))
+              .withCustomDashboard(dashboardComposer)
               .persist()
               .get();
+      String dashboardId = dashboardComposer.get().getId();
+      String widgetId = widget.getId();
       entityManager.flush();
       entityManager.clear();
-      return widget;
+      return new SeededWidget(dashboardId, widgetId);
     }
+
+    private record SeededWidget(String dashboardId, String widgetId) {}
   }
 }

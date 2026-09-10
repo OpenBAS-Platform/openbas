@@ -248,7 +248,7 @@ class CustomDashboardHttpIsolationTest extends IntegrationTest {
             .doReturningWork(
                 connection -> {
                   try (java.sql.PreparedStatement stmt = connection.prepareStatement(sql)) {
-                    stmt.setObject(1, java.util.UUID.fromString(id));
+                    stmt.setString(1, id);
                     try (java.sql.ResultSet rs = stmt.executeQuery()) {
                       rs.next();
                       return rs.getString(1);
