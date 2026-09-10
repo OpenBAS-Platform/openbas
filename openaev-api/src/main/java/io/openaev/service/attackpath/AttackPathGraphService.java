@@ -237,7 +237,9 @@ public class AttackPathGraphService {
                 r ->
                     new AttackPathFindingItemDTO(
                         r.type(),
-                        maskValue ? SensitiveValueMaskingUtils.mask(r.value()) : r.value(),
+                        maskValue
+                            ? SensitiveValueMaskingUtils.maskIfNeeded(r.type(), r.value())
+                            : r.value(),
                         r.endpointKey(),
                         AttackPathIds.endpointNode(r.endpointKey()),
                         links.executionIds().getOrDefault(r.id(), List.of()),
@@ -273,7 +275,7 @@ public class AttackPathGraphService {
       findings.add(
           new AttackPathExecutionFindingItemDTO(
               f.type(),
-              credential ? SensitiveValueMaskingUtils.mask(f.value()) : f.value(),
+              credential ? SensitiveValueMaskingUtils.maskIfNeeded(f.type(), f.value()) : f.value(),
               executionVerdicts));
     }
     // Mask, in the free-text command and output, the secrets of every credential discovered on this
@@ -450,9 +452,10 @@ public class AttackPathGraphService {
 
   /**
    * Replaces each known credential secret with {@link SensitiveValueMaskingUtils#MASK} wherever it
-   * appears in free text. Structured values are masked through {@link
-   * SensitiveValueMaskingUtils#mask(String)} instead; here there is nothing to split, so only the
-   * secret substrings are substituted, with the same mask so the rendering stays consistent.
+   * appears in free text. Structured values go through {@link
+   * SensitiveValueMaskingUtils#maskIfNeeded(String, String)} instead, which knows their composition
+   * and masks only their secret segment; here there is no structure to read, so the secret
+   * substrings are substituted one by one, with the same mask so the rendering stays consistent.
    */
   private static String maskSecrets(String text, Set<String> secrets) {
     if (text == null || secrets.isEmpty()) {

@@ -225,7 +225,7 @@ class AttackPathExecutionDetailTest extends IntegrationTest {
         .satisfiesExactlyInAnyOrder(
             item -> {
               assertThat(item.type()).isEqualTo("credentials");
-              assertThat(item.value()).isEqualTo("ad******:se******");
+              assertThat(item.value()).isEqualTo("admin:******");
             },
             item -> {
               assertThat(item.type()).isEqualTo("cve");

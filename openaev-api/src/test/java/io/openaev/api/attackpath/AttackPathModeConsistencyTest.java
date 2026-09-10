@@ -88,7 +88,7 @@ class AttackPathModeConsistencyTest extends IntegrationTest {
     assertThat(expand.findings())
         .extracting(AttackPathNodeDTO::getValue)
         // masked server-side: credentials are sensitive
-        .containsExactly("ad******:se******");
+        .containsExactly("admin:******");
   }
 
   @Test

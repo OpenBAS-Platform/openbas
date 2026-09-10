@@ -292,7 +292,7 @@ describe('file finding type wiring', () => {
 describe('displayFindingValue', () => {
   it('shows secret values as the backend returned them, already masked', () => {
     // masking is server-side now: the helper must not mask a second time, nor reveal anything
-    expect(displayFindingValue('credentials', 'ad******:se******')).toBe('ad******:se******');
+    expect(displayFindingValue('credentials', 'admin:******')).toBe('admin:******');
     expect(displayFindingValue('sid', 'S-1-5-21')).toBe('S-1-5-21');
   });
 

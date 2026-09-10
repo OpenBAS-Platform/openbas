@@ -140,7 +140,7 @@ class AttackPathGraphServiceTest extends IntegrationTest {
     AttackPathDTO dto = service.buildGraph(SIM);
     long credentialNodes =
         dto.attackPathNodes().stream()
-            .filter(n -> "FINDING".equals(n.getType()) && "ad******:se******".equals(n.getValue()))
+            .filter(n -> "FINDING".equals(n.getType()) && "admin:******".equals(n.getValue()))
             .count();
     assertThat(credentialNodes).isEqualTo(1);
 
@@ -633,7 +633,7 @@ class AttackPathGraphServiceTest extends IntegrationTest {
     assertThat(dto.findings())
         .extracting(AttackPathNodeDTO::getValue)
         // the credential is masked server-side, the cve is not sensitive
-        .containsExactlyInAnyOrder("ad******:se******", "CVE-2023-1");
+        .containsExactlyInAnyOrder("admin:******", "CVE-2023-1");
   }
 
   @Test

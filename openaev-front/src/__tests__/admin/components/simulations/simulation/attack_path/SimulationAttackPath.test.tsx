@@ -181,7 +181,7 @@ const setup = () => {
       total: 1,
       items: [{
         type: 'credentials',
-        value: 'ad******:se******',
+        value: 'admin:******',
         endpointKey: 'host-x',
         endpointNodeId: ENDPOINT_NODE,
         executionIds: ['exec-1'],
@@ -213,7 +213,7 @@ const setup = () => {
       }],
       findings: [{
         type: 'credentials',
-        value: 'ad******:se******',
+        value: 'admin:******',
       }],
       command: 'nmap -p 445 host-x -u admin -p ******',
       terminalOutput: 'open\nclosed',
@@ -239,7 +239,7 @@ describe('SimulationAttackPath findings drawer + cross-focus', () => {
     expect(mocks.fetchFindingsByCategory).toHaveBeenCalledWith('sim-1', 'credentials', 0, 1000);
 
     // The drawer renders the fetched finding; the client re-masks defensively (server also masks).
-    const item = await screen.findByText('ad******:se******');
+    const item = await screen.findByText('admin:******');
     fireEvent.click(item);
 
     // Clicking the finding refocuses the map on its attack path (fit requested) and loads the
@@ -373,7 +373,7 @@ describe('SimulationAttackPath findings drawer + cross-focus', () => {
     expect(await screen.findByText('Executions (1)')).toBeTruthy();
     // Its Findings section shows only findings attributed to this injector's executions (exec-1), via the
     // category endpoint's executionIds — here the captured credential.
-    expect(await screen.findByText('ad******:se******')).toBeTruthy();
+    expect(await screen.findByText('admin:******')).toBeTruthy();
 
     // Clicking the listed execution opens its Result / Execution details / Remediation detail (fetched by
     // its raw ref), showing the global command it ran.

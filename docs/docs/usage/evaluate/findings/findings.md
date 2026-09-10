@@ -40,22 +40,26 @@ Some Finding types carry secret material: their value is masked everywhere the p
 
 | Sensitive type | Value shape | Masked as |
 | --- | --- | --- |
-| Credentials | `admin:motdepasse` | `ad******:mo******` |
+| Credentials | `admin:motdepasse` | `admin:******` |
 
-Sensitivity is **derived from the Finding type**, not stored: a type is sensitive as soon as it is
-made of a password, a hash or a key.
+Sensitivity is **derived from the Finding type**, not stored: a type is sensitive as soon as its
+value is made of a password, a hash or a key.
 
-Every part of the value - the parts being separated by `:` - is masked the same way: only a two
-character fragment is kept, so you can still tell which Finding is which when you already know the
-value, without the platform ever disclosing it. A part too short to keep a fragment safely is masked
-entirely, and the mask has a fixed width so the length of the secret is not leaked either.
+Masking is applied **segment by segment**. The platform knows how each Finding value is composed, so
+it masks only the segments that are actually secret: a credential is returned as `admin:******`,
+keeping the account name - which tells you *which* account is compromised, and is not itself a
+secret - and withholding only the password or the hash.
 
-Two families of Finding are explicit exceptions, and are never masked:
+The mask has a fixed width, so the length of the secret is not leaked either. When the composition
+of a value is unknown, or when a value does not match the expected shape, the whole value is masked
+instead: an omission can only ever hide too much, never disclose a secret.
 
-- **Password policy**: its `key` is the name of a policy setting (`MinimumPasswordLength`...), not a
-  secret.
-- **Kerberoastable and ASREPRoastable accounts**: their type declares a hash, but the Finding value
-  is the account name alone - the hash is never part of it, so there is nothing to protect.
+**Password policy** Findings are an explicit exception and are never masked: their `key` is the name
+of a policy setting (`MinimumPasswordLength`...), not a secret.
+
+Kerberoastable and ASREPRoastable account Findings are not masked either, and need no exception to
+be so: their value is the account name alone. The hash their type declares never reaches the value,
+so segment-level masking leaves them untouched on its own.
 
 !!! warning "The secret is not deleted"
 

@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -20,6 +21,12 @@ import java.util.stream.Collectors;
  * hash} or a {@code key} is sensitive by construction. Adding a new contract output type carrying a
  * hash makes it masked automatically, with no column, no migration and no flag to thread through
  * the output processors.
+ *
+ * <p>Masking is applied <b>per segment</b> rather than to the whole value whenever the composition
+ * of that value is known (see {@link #VALUE_COMPOSITIONS}): a credential is handed out as {@code
+ * jdoe:******}, keeping the identity of the compromised account - the actionable half - and
+ * withholding only the secret. Where the composition is unknown, the whole value is masked, so an
+ * omission can only ever over-mask.
  *
  * <p>Note on location: this class currently lives in {@code openaev-api}, which covers every place
  * the platform hands a value out today (finding serialization, chaining engine, attack path). If
@@ -47,30 +54,70 @@ public final class SensitiveValueMaskingUtils {
       Set.of(PrimitiveType.Password, PrimitiveType.Hash, PrimitiveType.Key);
 
   /**
-   * Contract output types explicitly excluded from the derivation, whatever their recipe says. The
-   * recipe describes the fields of the <em>contract</em>, not the composition of the finding value,
-   * so it yields two distinct kinds of false positive.
+   * Contract output types excluded from the derivation whatever their recipe says, because the
+   * recipe names a secret primitive that the value does not actually carry.
    *
-   * <p><b>False positive of vocabulary.</b> {@link ContractOutputType#PasswordPolicy} decomposes
-   * into {@link PrimitiveType#Key} - but that {@code key} is the <em>name of a password policy
-   * setting</em> (for instance {@code MinimumPasswordLength}), not a cryptographic key. Masking it
-   * would hide the very information the finding exists to report.
+   * <p>{@link ContractOutputType#PasswordPolicy} decomposes into {@link PrimitiveType#Key} - but
+   * that {@code key} is the <em>name of a password policy setting</em> (for instance {@code
+   * MinimumPasswordLength}), not a cryptographic key. It is a collision of vocabulary, which no
+   * amount of splitting can resolve: the whole value is policy text, so the only way out is to
+   * exclude the type. Product decided so on issue 7500.
    *
-   * <p><b>False positive of composition.</b> {@link ContractOutputType#AsreproastableAccount} and
-   * {@link ContractOutputType#KerberoastableAccount} declare a {@code hash} field, but their
-   * processors build the finding value from the username alone ({@code toFindingValue} returns
-   * {@code buildString(jsonNode, USERNAME)}): the hash never reaches the value, so there is nothing
-   * to protect and masking would only hide an account name.
-   *
-   * <p>Both exclusions are explicit Product decisions (issue 7500). This set must be revisited if
-   * {@code toFindingValue} of either account processor ever starts including the hash: the value
-   * would then carry crackable material and the exclusion would become a leak.
+   * <p>Types whose value merely holds the secret in <em>one of its segments</em> do not belong
+   * here: {@link #VALUE_COMPOSITIONS} handles them by masking that segment alone.
    */
   private static final Set<ContractOutputType> NEVER_SENSITIVE =
-      Set.of(
-          ContractOutputType.PasswordPolicy,
+      Set.of(ContractOutputType.PasswordPolicy);
+
+  /**
+   * How a finding value is composed, for the types whose value is more than a single primitive: the
+   * separator its segments are joined with ({@code null} when there is only one segment) and the
+   * primitive type of each segment, in order.
+   */
+  record ValueComposition(String separator, List<PrimitiveType> segments) {}
+
+  /**
+   * The composition of the finding value, per contract output type - the inverse of the processors'
+   * {@code toFindingValue}.
+   *
+   * <p>It exists because {@link ChainingTypeRegistry} describes the fields of the
+   * <em>contract</em>, not what the processor actually concatenates into the value. Deriving from
+   * the recipe alone is all-or-nothing: it masks {@code jdoe:Sup3rS3cret} entirely, hiding the
+   * username - which is not a secret and is the actionable part for an analyst - and it flags
+   * account types whose value turns out to be a username alone. Knowing the segments lets the very
+   * same {@link #TYPE_TO_MASK} be applied one level down, per segment.
+   *
+   * <p><b>Why here and not on the processors.</b> Declaring the composition next to {@code
+   * toFindingValue} would be the natural home, but reaching it needs {@code
+   * OutputProcessorFactory}, and {@code FindingMapper} - the main caller - would then depend on
+   * every {@code OutputProcessor} bean, whose {@code CredentialsOutputProcessor} depends on {@code
+   * FindingService}, which depends back on {@code FindingMapper}: a Spring dependency cycle, and an
+   * application that no longer starts. Neither {@code @Lazy} nor {@code ObjectProvider} is an
+   * answer, as both hide the cycle instead of removing it. So the table is static, and a test walks
+   * the processors to prove it never drifts from them (see {@code
+   * SensitiveValueCompositionConsistencyTest}).
+   *
+   * <p>{@code Credentials} is emitted as {@code username:password} or {@code username:hash}
+   * depending on what the payload carried. Declaring {@link PrimitiveType#Password} covers both:
+   * only the membership of {@link #TYPE_TO_MASK} matters here, and {@link PrimitiveType#Hash} is in
+   * it too, so the second segment is masked in either branch.
+   */
+  private static final Map<ContractOutputType, ValueComposition> VALUE_COMPOSITIONS =
+      Map.of(
+          ContractOutputType.Credentials,
+          new ValueComposition(":", List.of(PrimitiveType.Username, PrimitiveType.Password)),
           ContractOutputType.AsreproastableAccount,
-          ContractOutputType.KerberoastableAccount);
+          new ValueComposition(null, List.of(PrimitiveType.Username)),
+          ContractOutputType.KerberoastableAccount,
+          new ValueComposition(null, List.of(PrimitiveType.Username)));
+
+  /**
+   * The declared compositions, for the test that walks the output processors and proves the table
+   * still matches what their {@code toFindingValue} produces. Not part of the masking API.
+   */
+  static Map<ContractOutputType, ValueComposition> valueCompositions() {
+    return VALUE_COMPOSITIONS;
+  }
 
   /** Every contract output type indexed by its label, for the label-based overload. */
   private static final Map<String, ContractOutputType> LABEL_TO_TYPE =
@@ -85,12 +132,23 @@ public final class SensitiveValueMaskingUtils {
    * Whether findings of this contract output type hold secret material, hence must be masked when
    * the platform hands their value out.
    *
+   * <p>When the value composition is known, a type is sensitive if and only if <b>one of its
+   * segments</b> is secret material; the recipe as a whole is not consulted, since it describes the
+   * contract rather than the value. This matters beyond display: {@code AttackPathIds} hashes the
+   * ids of sensitive findings, and hashing the id of a value that holds nothing to hide would cost
+   * readability for no gain.
+   *
    * @param type the contract output type the value was extracted as
-   * @return true when at least one primitive type of its recipe is secret material
+   * @return true when at least one segment - or, with no known composition, at least one primitive
+   *     type of its recipe - is secret material
    */
   public static boolean isSensitive(final ContractOutputType type) {
     if (type == null || NEVER_SENSITIVE.contains(type)) {
       return false;
+    }
+    ValueComposition composition = VALUE_COMPOSITIONS.get(type);
+    if (composition != null) {
+      return composition.segments().stream().anyMatch(TYPE_TO_MASK::contains);
     }
     return primitiveTypesOf(type).stream().anyMatch(TYPE_TO_MASK::contains);
   }
@@ -116,12 +174,20 @@ public final class SensitiveValueMaskingUtils {
   /**
    * Masks the value when the primitive type holds secret material, returns it untouched otherwise.
    *
+   * <p>This is the <b>bare secret</b> path - a chaining scope variable, a condition target value -
+   * where the whole value is the secret and nothing else. It therefore never splits: a password
+   * happening to contain {@code :} would otherwise be handed out as two masked parts, each keeping
+   * its own readable fragment, disclosing more of it than masking it as one unit ever does.
+   *
    * @param type the primitive type of the value
    * @param value the cleartext value
    * @return the masked value, or the value as-is when the type is not sensitive
    */
   public static String maskIfNeeded(final PrimitiveType type, final String value) {
-    return isSensitive(type) ? mask(value) : value;
+    if (!isSensitive(type) || value == null || value.isBlank()) {
+      return value;
+    }
+    return maskPart(value);
   }
 
   /**
@@ -149,12 +215,53 @@ public final class SensitiveValueMaskingUtils {
    * Masks the value when the contract output type holds secret material, returns it untouched
    * otherwise.
    *
+   * <p>When the composition of the value is known, only the segments whose primitive type is secret
+   * material are masked, so {@code jdoe:Sup3rS3cret} becomes {@code jdoe:******}: the identity of
+   * the compromised account stays readable, which is what the analyst acts on, and only the secret
+   * is withheld.
+   *
    * @param type the contract output type of the value
    * @param value the cleartext value
    * @return the masked value, or the value as-is when the type is not sensitive
    */
   public static String maskIfNeeded(final ContractOutputType type, final String value) {
-    return isSensitive(type) ? mask(value) : value;
+    if (!isSensitive(type) || value == null || value.isBlank()) {
+      return value;
+    }
+    ValueComposition composition = VALUE_COMPOSITIONS.get(type);
+    return composition == null ? mask(value) : maskSegments(composition, value);
+  }
+
+  /**
+   * Masks the secret segments of a value whose composition is known, keeping the others as they
+   * are.
+   *
+   * <p>Every departure from the declared shape falls back to masking the whole value: an omission
+   * can then only over-mask, never leak. That is why the split is <b>limited</b> to the number of
+   * declared segments - a password containing the separator, as in {@code jdoe:pa:ss}, must yield
+   * {@code ["jdoe", "pa:ss"]}. Splitting without the limit would shift the segments and hand the
+   * tail of the password out in the clear, under the guise of a username.
+   */
+  private static String maskSegments(final ValueComposition composition, final String value) {
+    List<PrimitiveType> segments = composition.segments();
+    if (composition.separator() == null || segments.size() == 1) {
+      return isSensitive(segments.getFirst()) ? mask(value) : value;
+    }
+
+    String[] parts =
+        value.split(Pattern.quote(composition.separator()), segments.size()); // limited on purpose
+    if (parts.length != segments.size()) {
+      return mask(value);
+    }
+
+    StringBuilder masked = new StringBuilder();
+    for (int i = 0; i < parts.length; i++) {
+      if (i > 0) {
+        masked.append(composition.separator());
+      }
+      masked.append(isSensitive(segments.get(i)) ? MASK : parts[i]);
+    }
+    return masked.toString();
   }
 
   /**
@@ -167,12 +274,16 @@ public final class SensitiveValueMaskingUtils {
    * <b>not</b> an error: it resolves to no type, hence to "not sensitive", so a single unmapped
    * label can never make a whole graph page fail.
    *
+   * <p>Resolving the label to its type rather than masking outright is what makes the graph and the
+   * findings page agree down to the character: the composition of the resolved type applies here
+   * too, so the drawer shows the same {@code jdoe:******}.
+   *
    * @param typeLabel the {@link ContractOutputType#getLabel() label} of the type, case insensitive
    * @param value the cleartext value
    * @return the masked value, or the value as-is when the label is unknown or not sensitive
    */
   public static String maskIfNeeded(final String typeLabel, final String value) {
-    return isSensitive(typeLabel) ? mask(value) : value;
+    return maskIfNeeded(fromLabel(typeLabel), value);
   }
 
   /**
@@ -195,7 +306,8 @@ public final class SensitiveValueMaskingUtils {
   }
 
   /**
-   * Masks a value whatever its type.
+   * Masks a value whole, whatever its type - the closed fallback, used when the composition of the
+   * value is unknown or does not match, and by callers that have already decided to mask.
    *
    * <p>Every part of the value - the parts being separated by {@code :} - is masked the same way: a
    * two character fragment is kept so an operator can still tell WHICH secret was discovered when

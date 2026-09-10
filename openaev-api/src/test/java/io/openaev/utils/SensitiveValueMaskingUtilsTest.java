@@ -31,8 +31,8 @@ class SensitiveValueMaskingUtilsTest {
     void given_aRoastableAccount_should_notFlagItSensitive() {
       // -------- Arrange --------
       // Both recipes declare a `hash` field, but the processors build the finding value from the
-      // username alone (toFindingValue returns buildString(jsonNode, USERNAME)): the hash never
-      // reaches the value, so masking would only hide an account name. Product decided so.
+      // username alone. The declared composition says so, so the derivation clears them by itself,
+      // with no need to list them as exceptions.
 
       // -------- Act & Assert --------
       assertThat(SensitiveValueMaskingUtils.isSensitive(ContractOutputType.AsreproastableAccount))
@@ -125,28 +125,72 @@ class SensitiveValueMaskingUtilsTest {
   class WhenSensitive {
 
     @Test
-    @DisplayName("Should mask each part of a credential value")
-    void given_aCredentialShapedValue_should_maskEveryPart() {
+    @DisplayName("Should keep the username of a credential and mask only the secret")
+    void given_aCredentialShapedValue_should_maskOnlyTheSecretSegment() {
       // -------- Act --------
       String masked =
           SensitiveValueMaskingUtils.maskIfNeeded(
-              ContractOutputType.Credentials, "admin:motdepasse");
+              ContractOutputType.Credentials, "jdoe:Sup3rS3cret");
 
       // -------- Assert --------
-      assertThat(masked).isEqualTo("ad" + MASK + ":mo" + MASK);
-      assertThat(masked).doesNotContain("motdepasse");
+      // The username is the actionable half - which account is compromised - and is not a secret.
+      assertThat(masked).isEqualTo("jdoe:" + MASK);
+      assertThat(masked).doesNotContain("Sup3rS3cret");
     }
 
     @Test
-    @DisplayName("Should mask every part of a value holding several separators")
-    void given_aValueWithSeveralSeparators_should_maskEveryPart() {
+    @DisplayName(
+        "Should keep a secret containing the separator whole rather than shift the segments")
+    void given_aSecretContainingTheSeparator_should_keepItInTheSecretSegment() {
+      // -------- Act --------
+      String masked =
+          SensitiveValueMaskingUtils.maskIfNeeded(ContractOutputType.Credentials, "jdoe:pa:ss");
+
+      // -------- Assert --------
+      // The split is limited to the declared segment count: without that limit the parts would
+      // shift and the tail of the password would be handed out in the clear as a username.
+      assertThat(masked).isEqualTo("jdoe:" + MASK);
+      assertThat(masked).doesNotContain("ss");
+    }
+
+    @Test
+    @DisplayName("Should mask an NTLM hash the same way as a password")
+    void given_aCredentialCarryingAHash_should_maskTheSecondSegment() {
       // -------- Act --------
       String masked =
           SensitiveValueMaskingUtils.maskIfNeeded(
-              ContractOutputType.Credentials, "admin:aad3b435:31d6cfe0");
+              ContractOutputType.Credentials, "administrator:aad3b435b51404ee");
 
       // -------- Assert --------
-      assertThat(masked).isEqualTo("ad" + MASK + ":aa" + MASK + ":31" + MASK);
+      // Only the membership of TYPE_TO_MASK matters, and Hash belongs to it just like Password.
+      assertThat(masked).isEqualTo("administrator:" + MASK);
+    }
+
+    @Test
+    @DisplayName("Should mask the whole value when it does not match the declared composition")
+    void given_aValueNotMatchingTheComposition_should_maskItEntirely() {
+      // -------- Act --------
+      String masked =
+          SensitiveValueMaskingUtils.maskIfNeeded(ContractOutputType.Credentials, "no-separator");
+
+      // -------- Assert --------
+      // Closed fallback: an unexpected shape can only ever over-mask, never leak.
+      assertThat(masked).isEqualTo("no" + MASK);
+    }
+
+    @Test
+    @DisplayName(
+        "Should mask every part when falling back, for a type with no declared composition")
+    void given_noDeclaredComposition_should_maskTheWholeValue() {
+      // -------- Arrange --------
+      // Every type carrying secret material happens to have a composition today, so this exercises
+      // the fallback directly: it is the shape a future sensitive type gets until someone declares
+      // how its value is built. Masking everything is the safe default.
+
+      // -------- Act & Assert --------
+      assertThat(SensitiveValueMaskingUtils.mask("admin:motdepasse"))
+          .isEqualTo("ad" + MASK + ":mo" + MASK);
+      assertThat(SensitiveValueMaskingUtils.mask("MIIEvQIBADAN")).isEqualTo("MI" + MASK);
     }
 
     @Test
@@ -169,7 +213,24 @@ class SensitiveValueMaskingUtilsTest {
       assertThat(
               SensitiveValueMaskingUtils.maskIfNeeded(
                   ContractOutputType.Credentials, "administrator:pwd"))
-          .isEqualTo("ad" + MASK + ":" + MASK);
+          .isEqualTo("administrator:" + MASK);
+    }
+
+    @Test
+    @DisplayName("Should never split a bare secret, even when it contains the separator")
+    void given_aBareSecretContainingASeparator_should_maskItAsOneUnit() {
+      // -------- Arrange --------
+      // The PrimitiveType path receives a chaining scope variable or a condition target value: the
+      // whole value IS the secret. Splitting it would hand out a readable fragment of each part.
+
+      // -------- Act & Assert --------
+      assertThat(SensitiveValueMaskingUtils.maskIfNeeded(PrimitiveType.Password, "abcdef:ghijkl"))
+          .isEqualTo("ab" + MASK)
+          .doesNotContain("gh");
+      assertThat(SensitiveValueMaskingUtils.maskIfNeeded(PrimitiveType.Key, "aa:bb:cc:dd"))
+          .isEqualTo("aa" + MASK);
+      assertThat(SensitiveValueMaskingUtils.maskIfNeeded(PrimitiveType.Hash, "p:ss"))
+          .isEqualTo(MASK);
     }
 
     @Test
