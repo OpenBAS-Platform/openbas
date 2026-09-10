@@ -1,5 +1,13 @@
 package io.openaev.service.chaining;
 
+import static io.openaev.service.chaining.StepService.ACTIVE_STEP_STATUS;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.isNull;
+
 import io.openaev.api.chaining.ActionStep;
 import io.openaev.api.chaining.InjectExecutionStep;
 import io.openaev.api.chaining.dto.ConditionCreateInput;
@@ -14,6 +22,10 @@ import io.openaev.rest.exception.ChainingException;
 import io.openaev.rest.exception.ElementNotFoundException;
 import io.openaev.rest.exception.WorkflowNotEditableException;
 import io.openaev.scheduler.jobs.QueueChainingJob;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,19 +37,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.JobExecutionException;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static io.openaev.service.chaining.StepService.ACTIVE_STEP_STATUS;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.anyList;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.isNull;
 
 @ExtendWith(MockitoExtension.class)
 class StepServiceTest {
@@ -71,10 +70,7 @@ class StepServiceTest {
   void setUp() {
     queueChainingJob =
         new QueueChainingJob(
-            stepDelayQueueService,
-            stepService,
-            workflowService,
-            tenantScopedTransaction);
+            stepDelayQueueService, stepService, workflowService, tenantScopedTransaction);
     lenient()
         .doAnswer(
             invocation -> {
