@@ -1775,7 +1775,8 @@ public class V1_DataImporter implements Importer {
     PayloadCreateInput payloadCreateInput = buildPayload(payloadNode);
     payloadCreateInput.setOutputParsers(
         buildOutputParsersFromPayloadJsonNode(ctx, payloadNode, baseIds));
-    payloadCreateInput.setDetectionRemediations(buildDetectionRemediationsJsonNode(payloadNode));
+    payloadCreateInput.setDetectionRemediations(
+        buildDetectionRemediationsJsonNode(ctx, payloadNode));
 
     // Tags — merge from payload and injector contract nodes
     Set<Tag> tags =
@@ -2397,7 +2398,8 @@ public class V1_DataImporter implements Importer {
     return (fieldNode != null && !fieldNode.isNull()) ? fieldNode.intValue() : null;
   }
 
-  private List<DetectionRemediationInput> buildDetectionRemediationsJsonNode(JsonNode payloadNode) {
+  private List<DetectionRemediationInput> buildDetectionRemediationsJsonNode(
+      TxCtx ctx, JsonNode payloadNode) {
     List<DetectionRemediationInput> detectionRemediationInputs = new ArrayList<>();
 
     JsonNode remediationsNode = payloadNode.get("payload_detection_remediations");
@@ -2413,7 +2415,7 @@ public class V1_DataImporter implements Importer {
       }
 
       Optional<SecurityPlatform> securityPlatform =
-          resolveDetectionRemediationSecurityPlatform(detectionNode);
+          resolveDetectionRemediationSecurityPlatform(ctx, detectionNode);
       if (securityPlatform.isPresent()) {
         DetectionRemediationInput detectionRemediation = new DetectionRemediationInput();
         detectionRemediation.setValues(valuesText);
@@ -2435,7 +2437,7 @@ public class V1_DataImporter implements Importer {
    * platform when absent - so old exports keep importing without any collector installed.
    */
   private Optional<SecurityPlatform> resolveDetectionRemediationSecurityPlatform(
-      JsonNode detectionNode) {
+      TxCtx ctx, JsonNode detectionNode) {
     String platformId = getTextValue(detectionNode, "detection_remediation_security_platform");
     if (!platformId.isEmpty()) {
       Optional<SecurityPlatform> byId = securityPlatformRepository.findById(platformId);
@@ -2455,6 +2457,10 @@ public class V1_DataImporter implements Importer {
       return byName;
     }
     SecurityPlatform created = new SecurityPlatform();
+    // The platform is a row of the tenant-active assets table, so the fallback creation needs the
+    // importing tenant explicitly: ctx is the import request's scope, threaded down from
+    // buildPayloadCreateInput rather than read from the v1 thread-local.
+    created.setTenant(new Tenant(tenantWriteScopeResolver.tenantForWrite(ctx, null)));
     created.setName(humanized.name());
     created.setSecurityPlatformType(humanized.type());
     return Optional.of(securityPlatformRepository.save(created));
