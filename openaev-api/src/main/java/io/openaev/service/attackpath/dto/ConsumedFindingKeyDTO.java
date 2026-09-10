@@ -26,8 +26,12 @@ import java.util.List;
  * <p>A condition targeting a password, a hash or a key carries the secret itself as its value, so
  * {@code value} is the <b>masked</b> form: it is what leaves the platform. Matching a key against a
  * finding needs the cleartext, so it is kept apart in {@code rawValue}, which is never serialized.
- * Splitting the two makes the DTO safe by construction - no serialization path can reach the secret
- * - while keeping the matcher exact.
+ * Splitting the two makes the DTO safe by construction - every factory and convenience constructor
+ * masks, so no ordinary way of building it can put a secret on the wire - while keeping the matcher
+ * exact. A record's canonical constructor cannot be narrowed below the visibility of the record
+ * itself, so it stays reachable: it takes {@code value} and {@code rawValue} as two distinct
+ * arguments though, which makes handing out a cleartext value a deliberate act rather than an
+ * oversight.
  */
 public record ConsumedFindingKeyDTO(
     String keyType,
@@ -53,11 +57,21 @@ public record ConsumedFindingKeyDTO(
   }
 
   /**
-   * Built from an already-resolved key type label, for a value that carries no secret. Kept for
-   * callers that only know the label; the value is stored as-is on both sides.
+   * Built from a key type <em>label</em>, for callers that only know the label. Resolves it back to
+   * its {@link PrimitiveType} so the same masking applies as in {@link #of}: the invariant must
+   * hold for every way of building the record, not only for the one production happens to use
+   * today. An unknown or null label resolves to no type, hence to "not sensitive", so a label the
+   * enum does not know can never fail the construction.
    */
   public ConsumedFindingKeyDTO(String keyType, String operator, String value, String eventName) {
-    this(keyType, operator, value, eventName, List.of(), value);
+    this(
+        keyType,
+        operator,
+        SensitiveValueMaskingUtils.maskIfNeeded(
+            PrimitiveType.fromLabelOptional(keyType).orElse(null), value),
+        eventName,
+        List.of(),
+        value);
   }
 
   /** A copy carrying the finding-node ids this key matched. */
