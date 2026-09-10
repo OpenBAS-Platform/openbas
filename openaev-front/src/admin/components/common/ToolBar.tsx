@@ -30,7 +30,6 @@ import {
 import {
   Box,
   Button,
-  Grid,
   IconButton,
   Tooltip,
   Typography,
@@ -610,8 +609,14 @@ export class ToolBarComponent extends Component<ToolBarProps, ToolBarState> {
                   >
                     <CancelOutlined fontSize="small" />
                   </IconButton>
-                  <Grid container spacing={3} sx={{ width: '100%' }}>
-                    <Grid size={{ xs: 3 }}>
+                  <Box sx={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 3,
+                    width: '100%',
+                  }}
+                  >
+                    <Box>
                       <Select
                         value={actionsInputs[i]?.type || ''}
                         onValueChange={next => this.handleChangeActionInput(i, 'type', { target: { value: next } })}
@@ -626,14 +631,18 @@ export class ToolBarComponent extends Component<ToolBarProps, ToolBarState> {
                           <SelectItem value="REMOVE">{t('Remove')}</SelectItem>
                         </SelectContent>
                       </Select>
-                    </Grid>
-                    <Grid size={{ xs: 3 }}>
+                    </Box>
+                    <Box>
                       {this.renderFieldOptions(i)}
-                    </Grid>
-                    <Grid size={{ xs: 6 }}>
+                    </Box>
+                    <Box sx={{
+                      flex: 1,
+                      minWidth: 0,
+                    }}
+                    >
                       {this.renderValuesOptions(i)}
-                    </Grid>
-                  </Grid>
+                    </Box>
+                  </Box>
                 </Box>
               ))}
             <Box>
