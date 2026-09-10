@@ -3,9 +3,11 @@ package io.openaev.rest.finding;
 import static io.openaev.helper.StreamHelper.fromIterable;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.openaev.config.TenantWriteScopeResolver;
 import io.openaev.context.TenantContext;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
+import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.AssetRepository;
 import io.openaev.database.repository.FindingRepository;
 import io.openaev.database.repository.TeamRepository;
@@ -36,6 +38,7 @@ public class FindingService {
 
   private final FindingRepository findingRepository;
   private final FindingWriter findingWriter;
+  private final TenantWriteScopeResolver tenantWriteScopeResolver;
   private final AssetRepository assetRepository;
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
@@ -81,7 +84,8 @@ public class FindingService {
         .build();
   }
 
-  public Finding createFinding(@NotNull final Finding finding, @NotBlank final String injectId) {
+  public Finding createFinding(
+      @NotNull final TxCtx ctx, @NotNull final Finding finding, @NotBlank final String injectId) {
     Inject inject = this.injectService.inject(injectId);
     finding.setInject(inject);
     // The tenant comes from the inject that produced the finding, as it does in createFindings.
@@ -89,7 +93,17 @@ public class FindingService {
     // and defaults to Tenant.DEFAULT_TENANT_UUID off the request path: a finding could end up in a
     // tenant that does not own its inject. FindingWriteAttributionTest pins the distinction by
     // pointing the ambient tenant at a different one on purpose.
-    finding.setTenant(inject.getTenant());
+    //
+    // Validated against the request scope rather than trusted. injectService.inject() is a primary
+    // key load, which no tenant predicate filters, and the @AccessControl on the endpoint checks a
+    // capability with no resourceId - so the caller-supplied finding_inject_id is never authorized
+    // on its own. Without this a member of tenant A could post an inject id belonging to tenant B
+    // and have the row attributed to B: a write into someone else's tenant, which is the one thing
+    // this isolation exists to prevent. tenantForWrite refuses with a 400 instead.
+    String tenantId =
+        this.tenantWriteScopeResolver.tenantForWrite(
+            ctx, inject.getTenant() != null ? inject.getTenant().getId() : null);
+    finding.setTenant(new Tenant(tenantId));
     return this.findingRepository.save(finding);
   }
 

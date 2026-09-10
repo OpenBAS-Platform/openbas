@@ -94,7 +94,7 @@ public class FindingApi extends RestBehavior {
     return ResponseEntity.ok(
         withScopedAssociationsInitialized(
             this.findingService.createFinding(
-                input.toFinding(new Finding()), input.getInjectId())));
+                ctx, input.toFinding(new Finding()), input.getInjectId())));
   }
 
   @PutMapping({FINDING_URI + "/{id}", TENANT_FINDING_URI + "/{id}"})

@@ -1,12 +1,15 @@
 package io.openaev.rest.finding;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.openaev.IntegrationTest;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.Finding;
 import io.openaev.database.model.Inject;
 import io.openaev.database.model.Tenant;
+import io.openaev.rest.exception.TenantWriteScopeException;
 import io.openaev.utils.TenantIsolationTestHelper;
 import io.openaev.utils.mockUser.WithMockUser;
 import jakarta.persistence.EntityManager;
@@ -74,7 +77,8 @@ class FindingWriteAttributionTest extends IntegrationTest {
     finding.setField("hostname");
     finding.setName("attribution probe");
 
-    Finding created = findingService.createFinding(finding, injectId);
+    Finding created =
+        findingService.createFinding(TxCtx.forTenant(injectTenant), finding, injectId);
     entityManager.flush();
 
     assertEquals(
@@ -83,6 +87,27 @@ class FindingWriteAttributionTest extends IntegrationTest {
         "the finding must belong to the tenant that owns its inject; the ambient TenantContext points"
             + " at another tenant on purpose, so a match on that one means the listener attributed"
             + " it rather than the create path");
+  }
+
+  @Test
+  @DisplayName("createFinding refuses an inject that belongs to a tenant outside the request scope")
+  void createFindingRefusesAnInjectOutsideTheRequestScope() {
+    // injectService.inject() is a primary-key load, which no tenant predicate filters, and the
+    // endpoint's @AccessControl checks a capability with no resourceId - so finding_inject_id
+    // arrives straight from the request body, unauthorized. Taking the tenant from that inject
+    // without checking it would attribute the row to a tenant the caller has no access to: a write
+    // into someone else's tenant, not a read leak.
+    Finding finding = new Finding();
+    finding.setValue("cross-tenant-" + UUID.randomUUID());
+    finding.setType(io.openaev.database.model.ContractOutputType.Text);
+    finding.setField("hostname");
+    finding.setName("cross-tenant probe");
+
+    // The request is scoped to a tenant that does not own the inject.
+    assertThrows(
+        TenantWriteScopeException.class,
+        () -> findingService.createFinding(TxCtx.forTenant(ambientTenant), finding, injectId),
+        "a finding must not be attributed to a tenant outside the request scope");
   }
 
   /** Ground truth by raw JDBC: a scoped read could not see a row in the wrong tenant. */
