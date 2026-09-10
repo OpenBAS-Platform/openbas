@@ -216,7 +216,8 @@ class TenantActiveTableAccessArchTest {
           "tenant_xtmhub_registrations",
           "notifications",
           "challenges",
-          "asset_groups");
+          "asset_groups",
+          "assets");
 
   @ArchTest
   static void every_active_table_is_guarded(JavaClasses classes) throws Exception {
@@ -235,7 +236,49 @@ class TenantActiveTableAccessArchTest {
             + active.stream().filter(t -> !GUARDED_TABLES.contains(t)).collect(Collectors.toSet())
             + ". Extend the repository/accessor rules and the allowlists (see the"
             + " activate-tenant-table skill, go-live phase).");
+
+    // Membership in GUARDED_TABLES is bookkeeping: it is satisfied by adding a string. What this
+    // class actually promises is an accessor rule per table, and for several tables that rule was
+    // never written - the string was added and the promise quietly lapsed. This asserts the rule
+    // exists, and lists the tables that still owe one so the gap is visible rather than implied.
+    //
+    // TABLES_OWING_AN_ACCESSOR_RULE must only ever SHRINK. Adding a table to it to make a build
+    // pass re-creates exactly the silence this check exists to end.
+    Set<String> declaredRules =
+        Arrays.stream(TenantActiveTableAccessArchTest.class.getDeclaredFields())
+            .filter(f -> ArchRule.class.isAssignableFrom(f.getType()))
+            .map(java.lang.reflect.Field::getName)
+            .collect(Collectors.toSet());
+    Set<String> missingRule =
+        active.stream()
+            .filter(t -> !TABLES_OWING_AN_ACCESSOR_RULE.contains(t))
+            .filter(t -> declaredRules.stream().noneMatch(r -> r.startsWith(t + "_")))
+            .collect(Collectors.toSet());
+    assertTrue(
+        missingRule.isEmpty(),
+        "these active tables have no accessor rule in this class, so nothing constrains who reads"
+            + " them: "
+            + missingRule
+            + ". Add a <table>_repository_access_is_reviewed rule with an explicit allowlist.");
   }
+
+  /**
+   * Active tables whose accessor rule has not been written yet, with the reason. Every entry is a
+   * table where a new unscoped accessor would ship silently. Tracked in #7874.
+   *
+   * <p>Shrink-only. This list is a debt register, not an escape hatch.
+   */
+  private static final Set<String> TABLES_OWING_AN_ACCESSOR_RULE =
+      Set.of(
+          // 26 accessor classes across AssetRepository, EndpointRepository and
+          // SecurityPlatformRepository - by far the widest surface of any activation so far. An
+          // allowlist is only worth writing once each accessor's scope mechanism has been traced,
+          // and waiving them wholesale would be the same silence this check is meant to remove.
+          "assets",
+          // Same, one lot earlier.
+          "asset_groups",
+          "secrets",
+          "secret_references");
 
   /**
    * Repositories whose joined {@code @Query} methods have been reviewed for tenant correlation.

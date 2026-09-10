@@ -197,6 +197,23 @@ class ImportMapperActivationConfigTest {
   }
 
   @Test
+  @DisplayName("openaev.tenant.active-tables in application.properties contains assets")
+  void prodConfigActivatesAssets() throws Exception {
+    Properties props = new Properties();
+    try (InputStream in = new FileInputStream("src/main/resources/application.properties")) {
+      props.load(in);
+    }
+    String active = props.getProperty("openaev.tenant.active-tables", "");
+    assertTrue(
+        active.contains("assets"),
+        "assets must stay in openaev.tenant.active-tables: its v1 @Filter was removed, so dropping"
+            + " it would leave endpoints, security platforms and AI targets with no read isolation"
+            + " at all. Found: '"
+            + active
+            + "'");
+  }
+
+  @Test
   @DisplayName("openaev.tenant.active-tables in application.properties contains tags")
   void prodConfigActivatesTags() throws Exception {
     Properties props = new Properties();
@@ -206,8 +223,8 @@ class ImportMapperActivationConfigTest {
     String active = props.getProperty("openaev.tenant.active-tables", "");
     assertTrue(
         active.contains("tags"),
-        "tags must stay in openaev.tenant.active-tables: its v1 @Filter was removed, so"
-            + " dropping it would leave the table with no tenant isolation. Found: '"
+        "tags must stay in openaev.tenant.active-tables: its v1 @Filter was removed, so dropping it"
+            + " would leave the table with no tenant isolation. Found: '"
             + active
             + "'");
   }

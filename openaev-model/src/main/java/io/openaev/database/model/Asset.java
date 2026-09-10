@@ -14,7 +14,6 @@ import io.openaev.annotation.Ipv4OrIpv6Constraint;
 import io.openaev.annotation.Queryable;
 import io.openaev.database.audit.AuditStateIgnore;
 import io.openaev.database.audit.ModelBaseListener;
-import io.openaev.database.audit.TenantBaseListener;
 import io.openaev.helper.MultiIdSetSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -31,7 +30,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -53,9 +51,35 @@ import org.hibernate.annotations.UuidGenerator;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "asset_type", discriminatorType = STRING)
 @DiscriminatorValue(AssetType.Values.ASSET_TYPE)
-@EntityListeners({ModelBaseListener.class, TenantBaseListener.class})
-@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
+@EntityListeners(ModelBaseListener.class)
 public class Asset implements TenantBase {
+
+  // assets is on multi-tenancy v2 (#6438 / #6422).
+  //
+  // The v1 @Filter is GONE and must not come back: reads are scoped by TenantStatementInspector
+  // from app.current_tenants, and re-adding the filter would AND a thread-local predicate onto the
+  // rewritten one, silently emptying every result reached without TenantContext.
+  //
+  // TenantBaseListener is KEPT for now, and that is a deliberate departure from the runbook, which
+  // asks for its removal at go-live. Removing it is what #7844 is for, and it is separable: read
+  // isolation comes from dropping @Filter and activating the table, which is done here. The
+  // listener only stamps tenant_id on write and never filters a read, so keeping it is not an
+  // isolation risk.
+  //
+  // The reason is measured, not preference. On asset_groups the removal cost one line in a fixture.
+  // Here sixty-three test sites build an Endpoint, a SecurityPlatform or a bare Asset by hand and
+  // persist it straight through a repository, reaching neither fixture nor composer, so every one
+  // of them would have to be rewritten inside this activation. That is not a minimal go-live diff,
+  // and it is exactly the "just one more fix" the runbook's Phase 6 warns against.
+  //
+  // It is redundant rather than load-bearing: every production create path already resolves the
+  // tenant explicitly. EndpointService.createEndpoint takes it as a required parameter, the
+  // security platform and AI target endpoints resolve it through TenantWriteScopeResolver, and
+  // background callers pass the tenant their own scope was opened for. The fixtures and composers
+  // stamp it too, so #7844 will find the ground already prepared.
+  //
+  // The table is SINGLE_TABLE with three discriminators (Endpoint, SecurityPlatform, and the bare
+  // Asset an AI target is), so anything reasoning about "assets" has to cover all three.
 
   /** Provider of an AI target ({@code category = AI_TARGET}). */
   public enum AI_TARGET_PROVIDER {

@@ -53,6 +53,9 @@ import org.springframework.stereotype.Service;
  * ZERO. Such a gauge must open an explicit {@code TxCtx.allTenants()} scope through {@link
  * TenantScopedTransaction}, as {@link #countAssetGroups()} does.
  *
+ * <p>{@link #collectSecurityPlatforms()} and {@link #collectEndpoints()} carry the same scope for
+ * the same reason: both count rows of the {@code assets} table (#6438).
+ *
  * <p>TODO v2: #6442 - once findings gets v2 activated, {@code findings_total} needs the same
  * explicit scope. The same applies to any other gauge here whose table joins a future activation.
  */
@@ -141,7 +144,7 @@ public class ProductInventoryMetricCollector {
     metricRegistry.registerGauge(
         "vulnerable_endpoints_total",
         "Number of vulnerable endpoints",
-        () -> safeCount(vulnerableEndpointRepository::count));
+        () -> safeCount(this::countVulnerableEndpoints));
     metricRegistry.registerGauge(
         "attack_patterns_total",
         "Number of attack patterns",
@@ -190,16 +193,23 @@ public class ProductInventoryMetricCollector {
     return result;
   }
 
-  private Map<Attributes, Long> collectSecurityPlatforms() {
+  /** Package-private: the tenant-scope regression test calls it without the OTel plumbing. */
+  Map<Attributes, Long> collectSecurityPlatforms() {
     Map<Attributes, Long> result = new HashMap<>();
     try {
+      // SecurityPlatform is a row of the v2-active assets table, so this platform-wide gauge needs
+      // the explicit all-tenants scope like countAssetGroups; without it the count is silently
+      // zero.
       List<Object[]> rows =
-          entityManager
-              .createQuery(
-                  "select sp.securityPlatformType, count(sp) from SecurityPlatform sp"
-                      + " group by sp.securityPlatformType",
-                  Object[].class)
-              .getResultList();
+          tenantTx.execute(
+              TxCtx.allTenants(),
+              () ->
+                  entityManager
+                      .createQuery(
+                          "select sp.securityPlatformType, count(sp) from SecurityPlatform sp"
+                              + " group by sp.securityPlatformType",
+                          Object[].class)
+                      .getResultList());
       for (Object[] row : rows) {
         result.merge(
             Attributes.of(stringKey("type"), normalizeEnumLabel(row[0])), (Long) row[1], Long::sum);
@@ -210,14 +220,20 @@ public class ProductInventoryMetricCollector {
     return result;
   }
 
-  private Map<Attributes, Long> collectEndpoints() {
+  /** Package-private: the tenant-scope regression test calls it without the OTel plumbing. */
+  Map<Attributes, Long> collectEndpoints() {
     Map<Attributes, Long> result = new HashMap<>();
     try {
+      // Endpoint is a row of the v2-active assets table: same explicit scope as above.
       List<Object[]> rows =
-          entityManager
-              .createQuery(
-                  "select e.platform, count(e) from Endpoint e group by e.platform", Object[].class)
-              .getResultList();
+          tenantTx.execute(
+              TxCtx.allTenants(),
+              () ->
+                  entityManager
+                      .createQuery(
+                          "select e.platform, count(e) from Endpoint e group by e.platform",
+                          Object[].class)
+                      .getResultList());
       for (Object[] row : rows) {
         result.merge(
             Attributes.of(stringKey("platform"), normalizeEnumLabel(row[0])),
@@ -246,6 +262,13 @@ public class ProductInventoryMetricCollector {
    * allTenants()} is the scope that matches this gauge's stated intention (platform-wide
    * telemetry), and it is resolved into an explicit list of live tenants, never a wildcard.
    */
+  // VulnerableEndpointRepository is a JpaRepository<Endpoint, String> and Endpoint is a
+  // discriminator on the activated assets table, so an unscoped count() is filtered by
+  // can_access_tenant against an empty scope and reports zero.
+  long countVulnerableEndpoints() {
+    return countAcrossAllTenants(vulnerableEndpointRepository::count);
+  }
+
   long countAssetGroups() {
     return countAcrossAllTenants(assetGroupRepository::count);
   }

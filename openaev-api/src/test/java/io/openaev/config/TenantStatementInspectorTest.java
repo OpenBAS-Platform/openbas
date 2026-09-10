@@ -945,4 +945,38 @@ class TenantStatementInspectorTest {
     // can_access_tenant is fail-closed and the asset-group index silently stops being fed.
     assertTrue(out.toUpperCase().contains("ORDER BY"), out);
   }
+
+  // --- assets activation (#6438 / #6422): the endpoint MAC lookup -----------
+  //
+  // TenantStatementInspector accepts a TableFunction FROM item only when its prefix is LATERAL
+  // (filterFromItem). This query has two bare unnest(...) FROM items, so activating assets pulls it
+  // into rewriting and it is refused fail-closed, breaking endpoint lookup by hostname and MAC:
+  // the agent registration path. Nothing covered this before, because the only test touching the
+  // method is a Mockito unit test that stubs the repository, so the SQL never reaches the
+  // inspector.
+
+  @Test
+  @DisplayName("the endpoint MAC lookup is accepted with assets active (LATERAL on the unnests)")
+  void endpointMacLookupIsAcceptedWithAssetsActive() throws Exception {
+    String sql =
+        io.openaev.database.repository.EndpointRepository.class
+            .getMethod(
+                "findByHostnameAndAtleastOneMacAddress", String.class, String[].class, String.class)
+            .getAnnotation(org.springframework.data.jpa.repository.Query.class)
+            .value()
+            .replaceAll(":#\\{[^}]*}", "?");
+    TenantStatementInspector assetsActive =
+        new TenantStatementInspector(new TenantTables(Set.of("assets"), Set.of()));
+
+    String out = assetsActive.inspect(sql).replaceAll("\\s+", " ").trim();
+
+    assertTrue(out.contains("can_access_tenant(e.tenant_id)"), out);
+    // LATERAL is a noise word for a function-call FROM item in PostgreSQL, identical semantics and
+    // plan, but it is the marker the inspector uses to accept one. Both unnests must carry it.
+    assertEquals(
+        2,
+        out.split("LATERAL unnest", -1).length - 1,
+        "both unnest FROM items must be LATERAL, otherwise the inspector refuses the query: "
+            + out);
+  }
 }
