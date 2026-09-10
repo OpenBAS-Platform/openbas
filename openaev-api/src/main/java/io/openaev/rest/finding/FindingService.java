@@ -93,18 +93,10 @@ public class FindingService {
       @NotNull final TxCtx ctx, @NotNull final Finding finding, @NotBlank final String injectId) {
     Inject inject = this.injectService.inject(injectId);
     finding.setInject(inject);
-    // The tenant comes from the inject that produced the finding, as it does in createFindings.
-    // Leaving it to TenantBaseListener would stamp whatever TenantContext holds, which is ambient
-    // and defaults to Tenant.DEFAULT_TENANT_UUID off the request path: a finding could end up in a
-    // tenant that does not own its inject. FindingWriteAttributionTest pins the distinction by
-    // pointing the ambient tenant at a different one on purpose.
-    //
-    // Validated against the request scope rather than trusted. injectService.inject() is a primary
-    // key load, which no tenant predicate filters, and the @AccessControl on the endpoint checks a
-    // capability with no resourceId - so the caller-supplied finding_inject_id is never authorized
-    // on its own. Without this a member of tenant A could post an inject id belonging to tenant B
-    // and have the row attributed to B: a write into someone else's tenant, which is the one thing
-    // this isolation exists to prevent. tenantForWrite refuses with a 400 instead.
+    // The inject's tenant is validated against the request scope, not trusted: inject() is a
+    // primary key load that no tenant predicate filters, and the endpoint's @AccessControl checks a
+    // capability with no resourceId, so a caller could otherwise attribute a finding to a tenant
+    // that does not own the inject.
     String tenantId =
         this.tenantWriteScopeResolver.tenantForWrite(
             ctx, inject.getTenant() != null ? inject.getTenant().getId() : null);
