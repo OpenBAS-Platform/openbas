@@ -110,8 +110,7 @@ class FindingWriterTest extends IntegrationTest {
                     injectId,
                     "writer probe",
                     assetId,
-                    new String[0],
-                    otherTenant));
+                    new String[0]));
 
     assertTrue(
         thrown.getMessage().contains("outside the current tenant scope"),
@@ -141,8 +140,7 @@ class FindingWriterTest extends IntegrationTest {
         injectId,
         "writer probe",
         assetId,
-        new String[0],
-        ownerTenant);
+        new String[0]);
 
     assertEquals(
         1L,
@@ -160,8 +158,8 @@ class FindingWriterTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("a blank tenant is refused before the insert, naming the inject")
-  void blankTenantIsRefused() {
+  @DisplayName("a scope that names no single tenant is refused, naming the inject")
+  void scopeWithoutASingleTenantIsRefused() {
     IllegalStateException thrown =
         assertThrows(
             IllegalStateException.class,
@@ -175,8 +173,7 @@ class FindingWriterTest extends IntegrationTest {
                     injectId,
                     "writer probe",
                     assetId,
-                    new String[0],
-                    null));
+                    new String[0]));
 
     assertTrue(
         thrown.getMessage().contains(injectId),

@@ -38,17 +38,19 @@ public class FindingWriter {
       String injectId,
       String name,
       String assetId,
-      String[] tagIds,
-      String tenantId) {
-    // findings.tenant_id is NOT NULL, so a blank tenant already failed here, as a constraint
-    // violation naming neither the inject nor the cause. Refusing up front says what is wrong.
-    if (tenantId == null || tenantId.isBlank()) {
+      String[] tagIds) {
+    // The transaction's scope and the row's tenant are one value. Taking both from the caller let
+    // them disagree: the transaction scoped to one tenant while the row carried another's id, so
+    // the upsert's conflict branch could never match. A scope naming anything but exactly one
+    // tenant cannot attribute a row, and findings.tenant_id is NOT NULL.
+    if (!(ctx instanceof TxCtx.Restricted restricted) || restricted.tenantIds().size() != 1) {
       throw new IllegalStateException(
           "Cannot write a finding for inject "
               + injectId
-              + " without a tenant: findings.tenant_id is NOT NULL and the row would be"
-              + " unattributed. The caller must resolve the tenant from the inject.");
+              + " without a single-tenant scope: findings.tenant_id is NOT NULL and the row would"
+              + " be unattributed. The caller must resolve the tenant from the inject.");
     }
+    String tenantId = restricted.tenantIds().get(0);
     String findingId =
         findingRepository.upsertFinding(
             findingField, findingType, findingValue, findingLabels, injectId, name, tenantId);
