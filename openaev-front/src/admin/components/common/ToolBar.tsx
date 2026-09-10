@@ -616,13 +616,13 @@ export class ToolBarComponent extends Component<ToolBarProps, ToolBarState> {
                     width: '100%',
                   }}
                   >
-                    <Box>
+                    <Box sx={{ flex: '0 0 25%' }}>
                       <Select
                         value={actionsInputs[i]?.type || ''}
                         onValueChange={next => this.handleChangeActionInput(i, 'type', { target: { value: next } })}
                       >
                         <SelectLabel>{t('Action type')}</SelectLabel>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder={t('Action type')} />
                         </SelectTrigger>
                         <SelectContent>

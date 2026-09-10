@@ -74,7 +74,7 @@ const CatalogToolbar = ({ keyword, onSearch, searchResetKey, sort, onSortChange,
         onValueChange={next => onSortChange(next as CatalogSort)}
       >
         <SelectLabel>{t('Sort by')}</SelectLabel>
-        <SelectTrigger>
+        <SelectTrigger style={{ width: 200 }}>
           <SelectValue placeholder={t('Sort by')} />
         </SelectTrigger>
         <SelectContent>

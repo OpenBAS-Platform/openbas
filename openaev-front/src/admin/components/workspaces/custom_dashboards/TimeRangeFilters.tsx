@@ -42,7 +42,7 @@ const TimeRangeFilters: FunctionComponent<Props> = ({ handleTimeRange, handleSta
           }}
         >
           <SelectLabel>{t('Time range')}</SelectLabel>
-          <SelectTrigger>
+          <SelectTrigger style={{ minWidth: 120 }}>
             <SelectValue placeholder={t('Time range')} />
           </SelectTrigger>
           <SelectContent>
