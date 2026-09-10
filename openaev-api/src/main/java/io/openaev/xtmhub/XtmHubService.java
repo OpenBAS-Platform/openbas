@@ -96,7 +96,7 @@ public class XtmHubService {
 
   public void unregister(TxCtx ctx) {
     tenantXtmHubRegistrationRepository.deleteByTenantId(
-        singleTenantScope(ctx, "Unregistering from XTM Hub"));
+        tenantWriteScopeResolver.tenantForWrite(ctx, null));
   }
 
   public TenantXtmHubRegistration refreshConnectivity(TxCtx ctx) {
@@ -172,7 +172,7 @@ public class XtmHubService {
               new ConnectivityCheckResult(
                   status, parseLastConnectivityCheck(registration), registration);
           updateRegistrationStatus(registration, checkResult);
-          handleTenantConnectivityLossNotification(settings, checkResult);
+          handleTenantConnectivityLossNotification(checkResult);
           allCheckResults.add(checkResult);
         });
 
@@ -262,8 +262,7 @@ public class XtmHubService {
     }
   }
 
-  private void handleTenantConnectivityLossNotification(
-      PlatformSettings settings, ConnectivityCheckResult checkResult) {
+  private void handleTenantConnectivityLossNotification(ConnectivityCheckResult checkResult) {
     TenantXtmHubRegistration registration = checkResult.registration();
     if (checkResult.status() == XtmHubConnectivityStatus.ACTIVE) {
       if (!registration.isConnectivityEmailEligible()) {

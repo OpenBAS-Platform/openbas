@@ -9,9 +9,9 @@ import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 import io.openaev.api.chaining.InjectExecutionStep;
-import io.openaev.api.xtmhub.XtmHubApi;
 import io.openaev.api.notification.NotificationApi;
 import io.openaev.api.notifier.NotifierApi;
+import io.openaev.api.xtmhub.XtmHubApi;
 import io.openaev.database.model.Article;
 import io.openaev.database.model.AttackPattern;
 import io.openaev.database.model.CatalogConnector;
@@ -37,8 +37,8 @@ import io.openaev.database.repository.LessonsTemplateRepository;
 import io.openaev.database.repository.MitigationRepository;
 import io.openaev.database.repository.NotificationRepository;
 import io.openaev.database.repository.SecurityCoverageRepository;
-import io.openaev.database.repository.TenantXtmHubRegistrationRepository;
 import io.openaev.database.repository.TagRepository;
+import io.openaev.database.repository.TenantXtmHubRegistrationRepository;
 import io.openaev.database.repository.attackpath.AttackPathExecutionRepository;
 import io.openaev.database.repository.attackpath.AttackPathFindingRepository;
 import io.openaev.database.repository.autonomous.AutonomousDirectiveRepository;
@@ -213,7 +213,7 @@ class TenantActiveTableAccessArchTest {
           "autonomous_directives",
           "kill_chain_phases",
           "security_coverages",
-          "tenant_xtmhub_registrations");
+          "tenant_xtmhub_registrations",
           "notifications",
           "challenges",
           "asset_groups");
@@ -371,6 +371,8 @@ class TenantActiveTableAccessArchTest {
               "tenant_xtmhub_registrations is tenant-active: an accessor without a tenant scope"
                   + " silently reads zero rows. New accessors must carry a scope and be"
                   + " allowlisted here");
+
+  @ArchTest
   static final ArchRule tags_repository_access_is_reviewed =
       noClasses()
           .that()

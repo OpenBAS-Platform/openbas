@@ -48,7 +48,7 @@ public class XtmHubApiTest extends IntegrationTest {
   @Autowired private TenantIsolationTestHelper tenantIsolationTestHelper;
 
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   @DisplayName("Should save registration data")
   public void whenRegisterUpdateRegistrationData() throws Exception {
     String token = "token";
@@ -94,7 +94,7 @@ public class XtmHubApiTest extends IntegrationTest {
   }
 
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   @DisplayName("Should delete registration data")
   public void whenUnregisterDeleteRegistrationData() throws Exception {
     // Setup: register first so there is something to delete
@@ -125,7 +125,7 @@ public class XtmHubApiTest extends IntegrationTest {
   }
 
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   @DisplayName("Should return registration data when registered")
   public void whenGetRegistrationAndRegistered_ShouldReturnRegistration() throws Exception {
     // Setup: register first
@@ -157,7 +157,7 @@ public class XtmHubApiTest extends IntegrationTest {
   }
 
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   @DisplayName("Should return 204 when not registered")
   public void whenGetRegistrationAndNotRegistered_ShouldReturn204() throws Exception {
     mvc.perform(get(XtmHubApi.XTMHUB_URI + "/registration").accept(MediaType.APPLICATION_JSON))
