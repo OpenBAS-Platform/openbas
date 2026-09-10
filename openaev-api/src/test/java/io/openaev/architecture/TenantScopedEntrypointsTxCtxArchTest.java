@@ -73,12 +73,44 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.mitigation.MitigationApi#updateMitigation",
           "io.openaev.rest.mitigation.MitigationApi#upsertMitigation",
           "io.openaev.rest.mitigation.MitigationApi#deleteMitigation",
+          // tags (v2)
+          "io.openaev.rest.tag.TagApi#createTag",
+          "io.openaev.rest.tag.TagApi#upsertTag",
+          "io.openaev.rest.tag.TagApi#tags",
+          "io.openaev.rest.tag.TagApi#updateTag",
+          "io.openaev.rest.tag.TagApi#deleteTag",
+          "io.openaev.rest.tag.TagApi#optionsByName",
+          "io.openaev.rest.tag.TagApi#optionsById",
           // domains (v2)
           "io.openaev.rest.domain.DomainApi#domains",
           "io.openaev.rest.domain.DomainApi#getDomain",
           "io.openaev.rest.domain.DomainApi#upsertDomain",
           "io.openaev.rest.domain.DomainApi#findAllAsOptionsByName",
           "io.openaev.rest.domain.DomainApi#findAllAsOptionsById",
+          // notifications (v2)
+          "io.openaev.api.notification.NotificationApi#searchMyNotifications",
+          "io.openaev.api.notification.NotificationApi#unreadNotificationsCount",
+          "io.openaev.api.notification.NotificationApi#markNotificationRead",
+          "io.openaev.api.notification.NotificationApi#markAllNotificationsRead",
+          "io.openaev.api.notification.NotificationApi#bulkDeleteNotifications",
+          "io.openaev.api.notification.NotificationApi#bulkMarkNotificationsRead",
+          "io.openaev.api.notification.NotificationApi#deleteNotification",
+          // notifications write-through from the notifier test endpoint
+          "io.openaev.api.notifier.NotifierApi#testNotifier",
+          // channels (v2)
+          "io.openaev.rest.channel.ChannelApi#channels",
+          "io.openaev.rest.channel.ChannelApi#channel",
+          "io.openaev.rest.channel.ChannelApi#updateChannel",
+          "io.openaev.rest.channel.ChannelApi#updateChannelLogos",
+          "io.openaev.rest.channel.ChannelApi#createChannel",
+          "io.openaev.rest.channel.ChannelApi#deleteChannel",
+          "io.openaev.rest.channel.ChannelApi#observerArticles",
+          "io.openaev.rest.channel.ChannelApi#playerArticles",
+          "io.openaev.rest.channel.ChannelApi#documentsFromChannel",
+          "io.openaev.rest.scenario.ScenarioApi#channels",
+          "io.openaev.rest.exercise.ExerciseApi#channels",
+          "io.openaev.rest.document.DocumentApi#getChannelImageFromId",
+          "io.openaev.rest.document.DocumentApi#getDocumentRelations",
           // attackpath_execution / attackpath_finding (v2): every read of the projection, including
           // the delta cursor added with the real-time updates (#6647, spec 002). Losing the TxCtx
           // on
@@ -444,6 +476,17 @@ class TenantScopedEntrypointsTxCtxArchTest {
           // ScenarioApi#bulkDeleteScenarios). Dropping it would silently empty the phase lists.
           "io.openaev.rest.inject.SimulationInjectApi#bulkUpdateInjectsForSimulation",
           "io.openaev.rest.inject.ScenarioInjectApi#bulkUpdateInjectsForScenario",
+          // challenges (v2, #6416): the table's own API, plus every path that reads or writes it.
+          "io.openaev.rest.challenge.ChallengeApi#challenges",
+          "io.openaev.rest.challenge.ChallengeApi#findEndpoints",
+          "io.openaev.rest.challenge.ChallengeApi#updateChallenge",
+          "io.openaev.rest.challenge.ChallengeApi#createChallenge",
+          "io.openaev.rest.challenge.ChallengeApi#deleteChallenge",
+          "io.openaev.rest.challenge.ChallengeApi#documentsFromChallenge",
+          "io.openaev.rest.challenge.ScenarioChallengeApi#scenarioChallenges",
+          "io.openaev.rest.challenge.SimulationChallengeApi#exerciseChallenges",
+          "io.openaev.rest.challenge.SimulationChallengeApi#observerChallenges",
+          "io.openaev.rest.challenge.SimulationChallengeApi#playerChallenges",
           // asset_groups activation (#6435). Every endpoint the Phase 1 inventory found
           // reading the table, whether it returns asset groups or merely consumes them.
           // The wiring itself came with #7781; listing them here is what stops a future

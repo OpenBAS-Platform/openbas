@@ -112,11 +112,11 @@ public class ProductInventoryMetricCollector {
     metricRegistry.registerGauge(
         "injects_total", "Number of injects", () -> safeCount(injectRepository::count));
     metricRegistry.registerGauge(
-        "challenges_total", "Number of challenges", () -> safeCount(challengeRepository::count));
+        "challenges_total", "Number of challenges", () -> safeCount(this::countChallenges));
     metricRegistry.registerGauge(
         "documents_total", "Number of documents", () -> safeCount(documentRepository::count));
     metricRegistry.registerGauge(
-        "channels_total", "Number of media channels", () -> safeCount(channelRepository::count));
+        "channels_total", "Number of media channels", () -> safeCount(this::countChannels));
     metricRegistry.registerGauge(
         "articles_total", "Number of media articles", () -> safeCount(articleRepository::count));
     metricRegistry.registerGauge(
@@ -266,18 +266,32 @@ public class ProductInventoryMetricCollector {
   // discriminator on the activated assets table, so an unscoped count() is filtered by
   // can_access_tenant against an empty scope and reports zero.
   long countVulnerableEndpoints() {
-    return tenantTx.<Long>execute(TxCtx.allTenants(), () -> vulnerableEndpointRepository.count());
-  }
-
-  // import_mappers has been active since the pilot (#6212); this gauge was never scoped with it.
-  long countImportMappers() {
-    return tenantTx.<Long>execute(TxCtx.allTenants(), () -> importMapperRepository.count());
+    return countAcrossAllTenants(vulnerableEndpointRepository::count);
   }
 
   long countAssetGroups() {
+    return countAcrossAllTenants(assetGroupRepository::count);
+  }
+
+  /** Counts channels across the whole platform (channels is v2-active). */
+  long countChannels() {
+    return countAcrossAllTenants(channelRepository::count);
+  }
+
+  /** Counts challenges across the whole platform (challenges is v2-active, #6416). */
+  long countChallenges() {
+    return countAcrossAllTenants(challengeRepository::count);
+  }
+
+  /** Counts XLS import mappers across the whole platform (import_mappers is v2-active). */
+  long countImportMappers() {
+    return countAcrossAllTenants(importMapperRepository::count);
+  }
+
+  private long countAcrossAllTenants(Supplier<Long> counter) {
     // Explicit type witness: TenantScopedTransaction overloads execute() on Supplier and
     // Runnable, so a value-returning method reference is ambiguous without it.
-    return tenantTx.<Long>execute(TxCtx.allTenants(), () -> assetGroupRepository.count());
+    return tenantTx.<Long>execute(TxCtx.allTenants(), counter);
   }
 
   private long safeCount(Supplier<Long> counter) {

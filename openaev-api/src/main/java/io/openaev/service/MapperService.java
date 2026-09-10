@@ -22,7 +22,9 @@ import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+import io.openaev.config.TenantWriteScopeResolver;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.EndpointRepository;
 import io.openaev.database.repository.ImportMapperRepository;
@@ -73,6 +75,7 @@ public class MapperService {
   private final InjectorContractRepository injectorContractRepository;
   private final EndpointRepository endpointRepository;
   private final EndpointService endpointService;
+  private final TenantWriteScopeResolver writeScopeResolver;
 
   private final TagService tagService;
   private final ObjectMapper objectMapper;
@@ -557,8 +560,7 @@ public class MapperService {
    * @param csvType entity to know which columns format we use for the import
    * @throws Exception exception if problem during the import
    */
-  public void importMappersCsv(MultipartFile file, CsvType csvType, String tenantId)
-      throws Exception {
+  public void importMappersCsv(TxCtx ctx, MultipartFile file, CsvType csvType) throws Exception {
     File tempFile = createTempFile("openaev-import-" + now().getEpochSecond(), ".csv");
     FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
 
@@ -578,7 +580,7 @@ public class MapperService {
       switch (csvType) {
         case ENDPOINTS:
           try {
-            importEndpointsCsv(setEndpointsColumnMapping(), csvReader, tenantId);
+            importEndpointsCsv(ctx, setEndpointsColumnMapping(), csvReader);
           } catch (Exception e) {
             throw new RuntimeException("Error during export CSV", e);
           }
@@ -593,9 +595,7 @@ public class MapperService {
   }
 
   private void importEndpointsCsv(
-      ColumnPositionMappingStrategy columnPositionMappingStrategy,
-      CSVReader csvReader,
-      String tenantId)
+      TxCtx ctx, ColumnPositionMappingStrategy columnPositionMappingStrategy, CSVReader csvReader)
       throws JsonProcessingException {
 
     CsvToBean csv = new CsvToBean();
@@ -628,12 +628,17 @@ public class MapperService {
         TagCreateInput tagCreateInput = new TagCreateInput();
         tagCreateInput.setName(tag.getName());
         tagCreateInput.setColor(tag.getColor());
-        tagsForCreation.add(this.tagService.upsertTag(tagCreateInput));
+        tagsForCreation.add(this.tagService.upsertTag(ctx, tagCreateInput));
       }
       endpoint.setTags(iterableToSet(tagsForCreation));
       endpoint.setEoL(endpointExportImport.isEol());
       // CSV import writes into the tenant the request selected, never the thread-local.
-      endpointService.createEndpoint(endpoint, tenantId);
+      // main plumbs the TxCtx down to this method; lot B made the tenant a REQUIRED argument of
+      // createEndpoint, so a forgotten attribution is a compile error rather than a silent write
+      // into whatever the v1 thread-local held. Keep both: resolve from the request scope,
+      // attribute
+      // explicitly. tenantForWrite refuses an ambiguous multi-tenant scope with a 400.
+      endpointService.createEndpoint(endpoint, writeScopeResolver.tenantForWrite(ctx, null));
     }
   }
 

@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -247,17 +248,29 @@ class ProductInventoryMetricCollectorTest {
     }
 
     @Test
-    @DisplayName("the import-mapper gauge is wired to the scoped supplier, not the repository")
-    void importMapperGaugeGoesThroughTheScope() {
+    @DisplayName("channels gauge uses the all-tenants scoped transaction for v2 tables")
+    void given_channelsGauge_should_runInAllTenantsScope() {
+      when(channelRepository.count()).thenReturn(11L);
+
+      collector.init();
+
+      verify(metricRegistry).registerGauge(eq("channels_total"), any(), gaugeCaptor.capture());
+      assertThat(gaugeCaptor.getValue().get()).isEqualTo(11L);
+      verify(channelRepository).count();
+      verify(tenantTx, times(1)).execute(any(TxCtx.class), ArgumentMatchers.<Supplier<Long>>any());
+    }
+
+    @Test
+    @DisplayName("mappers gauge uses the all-tenants scoped transaction for v2 tables")
+    void given_mappersGauge_should_runInAllTenantsScope() {
       when(importMapperRepository.count()).thenReturn(5L);
 
       collector.init();
 
       verify(metricRegistry).registerGauge(eq("mappers_total"), any(), gaugeCaptor.capture());
-      Supplier<Long> gauge = gaugeCaptor.getValue();
-      clearInvocations(tenantTx);
-      assertThat(gauge.get()).isEqualTo(5L);
-      verify(tenantTx).execute(any(TxCtx.class), ArgumentMatchers.<Supplier<Long>>any());
+      assertThat(gaugeCaptor.getValue().get()).isEqualTo(5L);
+      verify(importMapperRepository).count();
+      verify(tenantTx, times(1)).execute(any(TxCtx.class), ArgumentMatchers.<Supplier<Long>>any());
     }
 
     @Test

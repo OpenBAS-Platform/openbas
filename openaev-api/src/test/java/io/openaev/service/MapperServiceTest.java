@@ -14,7 +14,9 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReaderBuilder;
 import io.openaev.IntegrationTest;
+import io.openaev.config.TenantWriteScopeResolver;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.AttackPattern;
 import io.openaev.database.model.Domain;
 import io.openaev.database.model.ImportMapper;
@@ -24,7 +26,6 @@ import io.openaev.database.model.InjectorContract;
 import io.openaev.database.model.InjectorContractId;
 import io.openaev.database.model.Payload;
 import io.openaev.database.model.Tag;
-import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.EndpointRepository;
 import io.openaev.database.repository.ImportMapperRepository;
 import io.openaev.database.repository.InjectorContractRepository;
@@ -71,6 +72,7 @@ public class MapperServiceTest extends IntegrationTest {
   @Mock private EndpointRepository endpointRepository;
   @Mock private ObjectMapper objectMapper;
   @Mock private EndpointService endpointService;
+  @Mock private TenantWriteScopeResolver writeScopeResolver;
   @Mock private TagService tagService;
 
   private MapperService mapperService;
@@ -84,6 +86,7 @@ public class MapperServiceTest extends IntegrationTest {
             injectorContractRepository,
             endpointRepository,
             endpointService,
+            writeScopeResolver,
             tagService,
             objectMapper);
   }
@@ -377,7 +380,8 @@ public class MapperServiceTest extends IntegrationTest {
     // Act / Assert
     assertThrows(
         BadRequestException.class,
-        () -> mapperService.importMappersCsv(csvFile, CsvType.AGENT, Tenant.DEFAULT_TENANT_UUID));
+        () ->
+            mapperService.importMappersCsv(TxCtx.forTenant("tenant-test"), csvFile, CsvType.AGENT));
   }
 
   @DisplayName("given_mappersInput_should_appendImportedSuffix_whenImportMappers")

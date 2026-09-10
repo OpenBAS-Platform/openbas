@@ -221,6 +221,21 @@ class TenantStatementInspectorTest {
     assertTrue(out.contains("jsonb_exists"), out);
   }
 
+  @Test
+  @DisplayName("the channel documents query is accepted with channels active")
+  void channelDocumentsQueryPassesWithChannelsActive() throws Exception {
+    String sql =
+        io.openaev.database.repository.DocumentRepository.class
+            .getMethod("rawAllDocumentsByChannelId", String.class)
+            .getAnnotation(org.springframework.data.jpa.repository.Query.class)
+            .value();
+    TenantStatementInspector channelsActive =
+        new TenantStatementInspector(new TenantTables(Set.of("channels"), Set.of()));
+    String out = channelsActive.inspect(sql).replaceAll("\\s+", " ").trim();
+    assertTrue(out.contains("can_access_tenant(chl_light.tenant_id)"), out);
+    assertTrue(out.contains("can_access_tenant(chl_dark.tenant_id)"), out);
+  }
+
   // --- Single table --------------------------------------------------------
 
   @Test

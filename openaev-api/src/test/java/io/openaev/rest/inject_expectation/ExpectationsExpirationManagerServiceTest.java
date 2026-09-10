@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.openaev.IntegrationTest;
 import io.openaev.collectors.expectations_expiration_manager.ExpectationsExpirationManagerJob;
 import io.openaev.collectors.expectations_expiration_manager.service.ExpectationsExpirationManagerService;
-import io.openaev.context.TenantContext;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.*;
 import io.openaev.execution.ExecutableInject;
@@ -69,12 +68,12 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
   void beforeEach() throws Exception {
     // Register the builtin collector for the test tenant (builtins are only registered
     // for tenants that exist at startup, not for the test tenant created by @WithMockUser)
-    expectationsExpirationManagerJob.registerForTenant(TenantContext.getCurrentTenant());
+    expectationsExpirationManagerJob.registerForTenant(Tenant.DEFAULT_TENANT_UUID);
 
     // Use the builtin injector if already registered, otherwise create it
     savedInjector =
         injectorRepository
-            .findByIdAndTenantId(OPENAEV_INJECTOR_ID, TenantContext.getCurrentTenant())
+            .findByIdAndTenantId(OPENAEV_INJECTOR_ID, Tenant.DEFAULT_TENANT_UUID)
             .orElseGet(
                 () ->
                     injectorRepository.save(

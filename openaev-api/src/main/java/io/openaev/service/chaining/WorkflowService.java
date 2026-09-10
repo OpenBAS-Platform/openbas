@@ -17,6 +17,7 @@ import io.openaev.rest.exception.AlreadyExistingException;
 import io.openaev.rest.exception.ChainingException;
 import io.openaev.rest.exception.ElementNotFoundException;
 import io.openaev.rest.inject.form.InjectInput;
+import io.openaev.service.LessonsService;
 import io.openaev.telemetry.metric_collectors.ChainingSafetyPolicyMetricCollector;
 import io.openaev.telemetry.metric_collectors.ResultsMetricCollector;
 import io.openaev.telemetry.metric_collectors.ScopeMetricCollector;
@@ -56,6 +57,7 @@ public class WorkflowService {
   private final StepDelayQueueService stepDelayQueueService;
   private final ScopeSnapshotService scopeSnapshotService;
   private final ScopeService scopeService;
+  private final LessonsService lessonsService;
 
   private final WorkflowRepository workflowRepository;
   private final WorkflowScopeRuleRepository workflowScopeRuleRepository;
@@ -204,6 +206,7 @@ public class WorkflowService {
     }
     if (change.scopeRulesChanged()) {
       realignTemplateActionTargets(workflow);
+      pruneLessonTargets(workflow);
     }
     return workflow;
   }
@@ -311,6 +314,7 @@ public class WorkflowService {
                 w -> {
                   if (writeAllowlistRules(w, rules, replaceExisting)) {
                     realignTemplateActionTargets(w);
+                    pruneLessonTargets(w);
                   }
                 });
       } catch (ChainingException e) {
@@ -320,7 +324,12 @@ public class WorkflowService {
     }
     if (hasText(simulationId)) {
       findWorkflowRunBySimulationId(simulationId)
-          .forEach(w -> writeAllowlistRules(w, rules, replaceExisting));
+          .forEach(
+              w -> {
+                if (writeAllowlistRules(w, rules, replaceExisting)) {
+                  pruneLessonTargets(w);
+                }
+              });
     }
   }
 
@@ -450,6 +459,31 @@ public class WorkflowService {
             .map(Asset::getId)
             .toList();
     stepService.syncScopeAssetsOnStepTemplates(workflow, scopedAssetIds);
+  }
+
+  /**
+   * Removes lesson-target teams that are no longer part of the workflow scope.
+   *
+   * <p>Lesson categories store their own team links, so scope edits must prune them explicitly or
+   * stale targets remain selectable even after the scope author removed them.
+   */
+  private void pruneLessonTargets(Workflow workflow) {
+    if (workflow == null) {
+      return;
+    }
+    List<String> scopedTeamIds =
+        Optional.ofNullable(scopeService.getValidTeams(workflow.getId())).orElse(List.of()).stream()
+            .map(Team::getId)
+            .toList();
+    Exercise simulation = workflow.getSimulation();
+    if (simulation != null) {
+      lessonsService.pruneTeamsForSimulation(simulation.getId(), scopedTeamIds);
+      return;
+    }
+    Scenario scenario = workflow.getScenario();
+    if (scenario != null) {
+      lessonsService.pruneTeamsForScenario(scenario.getId(), scopedTeamIds);
+    }
   }
 
   /**

@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -21,7 +22,6 @@ import io.openaev.database.model.ResourceType;
 import io.openaev.database.repository.NotificationEventRecordRepository;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,12 +47,14 @@ class NotificationEngineServiceTest {
     matchingService = mock(NotificationMatchingService.class);
     dispatchService = mock(NotificationDispatchService.class);
     eventRecordRepository = mock(NotificationEventRecordRepository.class);
-    // The engine now scopes its filter re-check through the primitive. This stub runs the supplier
-    // inline: the unit test is about trigger selection and dispatch, and the scope itself is pinned
-    // against a real database by NotificationLiveTriggerTenantScopeTest.
     tenantTx = mock(TenantScopedTransaction.class);
-    when(tenantTx.<Boolean>execute(any(TxCtx.class), ArgumentMatchers.<Supplier<Boolean>>any()))
-        .thenAnswer(invocation -> invocation.<Supplier<Boolean>>getArgument(1).get());
+    doAnswer(
+            invocation -> {
+              invocation.<Runnable>getArgument(1).run();
+              return null;
+            })
+        .when(tenantTx)
+        .execute(any(TxCtx.class), ArgumentMatchers.<Runnable>any());
     engineService =
         new NotificationEngineService(
             cacheService, matchingService, dispatchService, eventRecordRepository, tenantTx);
@@ -100,6 +102,7 @@ class NotificationEngineServiceTest {
     ArgumentCaptor<List<NotificationEventRecord>> recordsCaptor = ArgumentCaptor.captor();
     verify(eventRecordRepository, times(1)).saveAll(recordsCaptor.capture());
     assertEquals(2, recordsCaptor.getValue().size());
+    verify(tenantTx).execute(any(TxCtx.class), ArgumentMatchers.<Runnable>any());
     verify(dispatchService)
         .dispatch(
             eq(trigger),
