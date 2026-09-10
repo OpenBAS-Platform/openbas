@@ -76,37 +76,29 @@ public class NotificationEngineService {
         if (entityTenantId == null || !entityTenantId.equals(trigger.tenantId())) {
           continue;
         }
-        // The whole matched-trigger processing (filter re-check, outbox records, dispatch)
-        // runs with the trigger's tenant so the Hibernate tenant filter (enabled by
-        // HibernateFilterTransactionAspect) scopes every query correctly.
+        // Run with both scopes on the async thread: TenantContext keeps v1 paths correct,
+        // TenantScopedTransaction/TX ctx scopes v2-active reads.
         TenantContext.setCurrentTenant(trigger.tenantId());
         try {
-          // The filter re-check is the one step that reads the catalog entity itself, and the
-          // catalog now spans v2-activated tables (assets, asset_groups, findings). Those no longer
-          // carry the v1 @Filter the comment above relies on, and this runs on an @Async thread
-          // after commit, so there is no ambient transaction and no scope: without this the count
-          // is filtered by can_access_tenant against an empty app.current_tenants, comes back zero,
-          // and every filtered LIVE trigger on those resources silently stops firing.
-          //
-          // Only the re-check is wrapped. recordEvents writes notification_event_records, which is
-          // not activated, and dispatch performs external delivery that must not sit inside a
-          // transaction.
-          boolean matched =
-              tenantTx.execute(
-                  TxCtx.forTenant(trigger.tenantId()),
-                  () -> matchingService.matches(trigger, entry, entityId));
-          if (!matched) {
-            continue;
-          }
-          recordEvents(trigger, entry, entityId, eventType, message);
-          NotificationContent.Group group =
-              new NotificationContent.Group(
-                  trigger.name(),
-                  List.of(
-                      new NotificationContent.Event(
-                          eventType, message, entry.getResourceType(), entityId)));
-          dispatchService.dispatch(
-              trigger, NotificationTriggerType.LIVE, trigger.recipientUserIds(), List.of(group));
+          tenantTx.execute(
+              TxCtx.forTenant(trigger.tenantId()),
+              () -> {
+                if (!matchingService.matches(trigger, entry, entityId)) {
+                  return;
+                }
+                recordEvents(trigger, entry, entityId, eventType, message);
+                NotificationContent.Group group =
+                    new NotificationContent.Group(
+                        trigger.name(),
+                        List.of(
+                            new NotificationContent.Event(
+                                eventType, message, entry.getResourceType(), entityId)));
+                dispatchService.dispatch(
+                    trigger,
+                    NotificationTriggerType.LIVE,
+                    trigger.recipientUserIds(),
+                    List.of(group));
+              });
         } finally {
           TenantContext.clearCurrentTenant();
         }

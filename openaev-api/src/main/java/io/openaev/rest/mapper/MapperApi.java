@@ -6,6 +6,7 @@ import static io.openaev.utils.pagination.PaginationUtils.buildPaginationJPA;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.openaev.aop.AccessControl;
 import io.openaev.aop.LogExecutionTime;
+import io.openaev.config.RequireTenantSelector;
 import io.openaev.config.TenantWriteScopeResolver;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.Action;
@@ -254,12 +255,11 @@ public class MapperApi extends RestBehavior {
   @LogExecutionTime
   @Transactional(rollbackFor = Exception.class)
   public void importEndpoints(
-      TxCtx ctx, @RequestParam CsvType csvType, @RequestPart("file") @NotNull MultipartFile file)
+      @RequireTenantSelector TxCtx ctx,
+      @RequestParam CsvType csvType,
+      @RequestPart("file") @NotNull MultipartFile file)
       throws Exception {
-    // Same resolution as the other create paths on this controller: an ambiguous multi-tenant
-    // scope is refused with a 400 rather than resolved by the v1 thread-local.
-    String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
-    mapperService.importMappersCsv(file, csvType, tenantId);
+    mapperService.importMappersCsv(ctx, file, csvType);
   }
 
   private void validateUploadedFile(MultipartFile file) {
