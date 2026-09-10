@@ -40,12 +40,14 @@ public class NotificationTriggerMapper {
     trigger.setInstanceId(input.getInstanceId());
     trigger.setPeriod(input.getPeriod());
     trigger.setTriggerTime(input.getTriggerTime());
+    // TODO v2: once notification_triggers gets v2 activated
+    // (https://github.com/OpenBAS-Platform/openbas/issues/6393), drop this tenantId and the
+    // AndTenantId lookup below; the inspector will scope the child-trigger read on its own.
     String tenantId = TenantContext.getCurrentTenant();
+    // notifiers is v2-active: the inspector scopes this lookup, so an id from another tenant
+    // simply does not resolve and resolveAll reports it as not found.
     trigger.setNotifiers(
-        resolveAll(
-            input.getNotifierIds(),
-            ids -> notifierRepository.findAllByIdInAndTenantId(ids, tenantId),
-            "Notifier"));
+        resolveAll(input.getNotifierIds(), notifierRepository::findAllById, "Notifier"));
     trigger.setChildTriggers(
         resolveAll(
             input.getChildTriggerIds(),

@@ -10,6 +10,7 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 import io.openaev.api.chaining.InjectExecutionStep;
 import io.openaev.api.notification.NotificationApi;
+import io.openaev.api.notification_trigger.NotificationTriggerMapper;
 import io.openaev.api.notifier.NotifierApi;
 import io.openaev.database.model.Article;
 import io.openaev.database.model.AttackPattern;
@@ -18,6 +19,7 @@ import io.openaev.database.model.Document;
 import io.openaev.database.model.Exercise;
 import io.openaev.database.model.Inject;
 import io.openaev.database.model.InjectorContract;
+import io.openaev.database.model.NotificationTrigger;
 import io.openaev.database.model.Scenario;
 import io.openaev.database.model.SecurityPlatform;
 import io.openaev.database.model.Vulnerability;
@@ -36,6 +38,7 @@ import io.openaev.database.repository.KillChainPhaseRepository;
 import io.openaev.database.repository.LessonsTemplateRepository;
 import io.openaev.database.repository.MitigationRepository;
 import io.openaev.database.repository.NotificationRepository;
+import io.openaev.database.repository.NotifierRepository;
 import io.openaev.database.repository.SecurityCoverageRepository;
 import io.openaev.database.repository.TagRepository;
 import io.openaev.database.repository.attackpath.AttackPathExecutionRepository;
@@ -67,6 +70,8 @@ import io.openaev.integration.impl.injectors.challenge.ChallengeInjectorIntegrat
 import io.openaev.integration.impl.injectors.challenge.ChallengeInjectorIntegrationFactory;
 import io.openaev.integration.migration.ConfigurationMigration;
 import io.openaev.notification.engine.NotificationDispatchService;
+import io.openaev.notification.engine.NotificationTriggerLoader;
+import io.openaev.notification.engine.ResolvedNotificationTrigger;
 import io.openaev.processor.core.V20260420_Migrate_rabbitmq_queues;
 import io.openaev.processor.datapack.V20260330_Default_tenant_data;
 import io.openaev.processor.datapack.V20260708_Dynamic_injectors_base_url;
@@ -148,6 +153,8 @@ import io.openaev.service.connector_instances.ConnectorInstanceService;
 import io.openaev.service.connectors.ConnectorOrchestrationService;
 import io.openaev.service.expectation.ChallengeBehavior;
 import io.openaev.service.notification.NotificationService;
+import io.openaev.service.notification.NotificationTriggerService;
+import io.openaev.service.notification.NotifierService;
 import io.openaev.service.scenario.ScenarioService;
 import io.openaev.service.stix.SecurityCoverageService;
 import io.openaev.service.targets.search.AgentTargetSearchAdaptor;
@@ -221,7 +228,8 @@ class TenantActiveTableAccessArchTest {
           "challenges",
           "asset_groups",
           "findings",
-          "assets");
+          "assets",
+          "notifiers");
 
   @ArchTest
   static void every_active_table_is_guarded(JavaClasses classes) throws Exception {
@@ -489,6 +497,48 @@ class TenantActiveTableAccessArchTest {
           .because(
               "notifications is tenant-active: an accessor without a tenant scope silently reads"
                   + " zero rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule notifiers_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // TxCtx-carrying notifier handlers, pinned by TenantScopedEntrypointsTxCtxArchTest.
+              NotifierApi.class,
+              // Service behind NotifierApi: reads are scoped by the entrypoint transaction, creates
+              // are attributed through TenantWriteScopeResolver, and the built-in backfill runs
+              // only under a single-tenant scope.
+              NotifierService.class,
+              // Resolves a trigger's notifier ids inside the TxCtx-scoped NotificationTriggerApi
+              // transaction; the inspector scopes the lookup.
+              NotificationTriggerMapper.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(NotifierRepository.class)
+          .because(
+              "notifiers is tenant-active: an accessor without a tenant scope silently reads zero"
+                  + " rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule notifiers_association_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // Resolves the association inside the API transaction to build the output DTO.
+              NotificationTriggerMapper.class,
+              // Validates that a trigger has at least one notifier, inside its own transaction.
+              NotificationTriggerService.class,
+              // Detaches the association into ResolvedNotifier records; runs under the
+              // allTenants() scope NotificationTriggerLoader opens (#7864).
+              ResolvedNotificationTrigger.class,
+              NotificationTriggerLoader.class)
+          .should()
+          .callMethod(NotificationTrigger.class, "getNotifiers")
+          .because(
+              "notifiers is reached through NotificationTrigger's lazy @ManyToMany WITHOUT touching"
+                  + " the repository: resolving it in an unscoped context silently yields an empty"
+                  + " notifier list, and the dispatch pipeline then delivers nothing at all. New"
+                  + " callers must carry a scope and be allowlisted here");
 
   @ArchTest
   static final ArchRule channels_repository_access_is_reviewed =

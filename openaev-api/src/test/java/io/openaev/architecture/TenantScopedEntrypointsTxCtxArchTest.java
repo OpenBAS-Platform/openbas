@@ -97,6 +97,19 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.api.notification.NotificationApi#deleteNotification",
           // notifications write-through from the notifier test endpoint
           "io.openaev.api.notifier.NotifierApi#testNotifier",
+          // notifiers (v2)
+          "io.openaev.api.notifier.NotifierApi#notifiers",
+          "io.openaev.api.notifier.NotifierApi#notifier",
+          "io.openaev.api.notifier.NotifierApi#searchNotifiers",
+          "io.openaev.api.notifier.NotifierApi#createNotifier",
+          "io.openaev.api.notifier.NotifierApi#updateNotifier",
+          "io.openaev.api.notifier.NotifierApi#deleteNotifier",
+          // reaches notifiers through NotificationTrigger's association (NotificationTriggerMapper)
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#notificationTrigger",
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#searchNotificationTriggers",
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#createNotificationTrigger",
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#updateNotificationTrigger",
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#deleteNotificationTrigger",
           // channels (v2)
           "io.openaev.rest.channel.ChannelApi#channels",
           "io.openaev.rest.channel.ChannelApi#channel",
