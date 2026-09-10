@@ -55,6 +55,4 @@ public interface CustomDashboardRepository
       value = "DELETE FROM custom_dashboards cd WHERE cd.custom_dashboard_id = :customDashboardId",
       nativeQuery = true)
   int deleteByIdNative(@Param("customDashboardId") String customDashboardId);
-
-  Optional<CustomDashboard> findByIdAndTenantId(String id, String tenantId);
 }
