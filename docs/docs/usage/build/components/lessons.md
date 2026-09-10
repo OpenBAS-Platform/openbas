@@ -8,9 +8,26 @@ Lessons let you create customizable surveys that collect qualitative feedback fr
 - Identify gaps in processes, communication, or awareness that technical metrics alone cannot reveal.
 - Automate the lessons-learned step that is often overlooked in Breach and Attack Simulations.
 
-## Use Lessons with Scenarios and Simulations
+## Enable the Lessons module
 
-Enable Lessons on the Scenario or Simulation details page to expose the Lessons learned tab.
+Lessons are an optional module. On a new Scenario or Simulation the module is **disabled**, and the **Lessons learned** tab is not displayed.
+
+To enable it:
+
+1. Open the Scenario or the Simulation.
+2. Click **Update**.
+3. In the **Modules** section, turn on **Enable lessons learned**.
+4. The **Lessons learned** tab appears on the Scenario or Simulation.
+
+!!! note
+
+    Scenarios and Simulations created before the module became optional keep Lessons enabled when they already had lesson categories, objectives, or an anonymised questionnaire. All others start disabled.
+
+!!! tip
+
+    Managing lesson templates in **Settings > Customization > Lessons learned** requires the lessons-learned access capability. Without it the menu entry and the template picker are hidden, even when the module is enabled.
+
+## Use Lessons with Scenarios and Simulations
 
 - **Time-based Scenarios and Simulations** use the Teams already configured on the Scenario or Simulation.
 - **Chained Scenarios and Simulations** use the teams defined in the run scope, so the Lessons target picker shows the same audience you selected for the chain.
