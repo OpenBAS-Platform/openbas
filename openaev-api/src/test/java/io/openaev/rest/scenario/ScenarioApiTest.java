@@ -171,6 +171,7 @@ public class ScenarioApiTest extends IntegrationTest {
     // -- PREPARE --
     CustomDashboard defaultDashboard = new CustomDashboard();
     defaultDashboard.setName("Default scenario dashboard");
+    defaultDashboard.setTenant(new Tenant(Tenant.DEFAULT_TENANT_UUID));
     CustomDashboard customDashboardSaved = customDashboardRepository.save(defaultDashboard);
 
     ScenarioInput scenarioInput = new ScenarioInput();
