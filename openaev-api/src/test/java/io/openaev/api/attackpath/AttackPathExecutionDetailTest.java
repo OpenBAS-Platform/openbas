@@ -220,12 +220,12 @@ class AttackPathExecutionDetailTest extends IntegrationTest {
     assertThat(d.endpointKey()).isEqualTo("dc-01");
     assertThat(d.preventionStatus()).isEqualTo("Not Prevented");
     assertThat(d.detectionStatus()).isEqualTo("Detected");
-    // the credential is masked (username kept), the cve is untouched
+    // the credential is masked whole (username included), the cve is untouched
     assertThat(d.findings())
         .satisfiesExactlyInAnyOrder(
             item -> {
               assertThat(item.type()).isEqualTo("credentials");
-              assertThat(item.value()).startsWith("admin:").doesNotContain("secret123");
+              assertThat(item.value()).isEqualTo("ad******:se******");
             },
             item -> {
               assertThat(item.type()).isEqualTo("cve");

@@ -107,7 +107,6 @@ public class AttackPathGraphService {
   private static final String RED = "RED";
 
   private static final String CATEGORY_CREDENTIALS = "credentials";
-  private static final String CREDENTIAL_MASK = "••••";
 
   /**
    * Maps a redacted command-line flag to the inject content field it was resolved from, for {@link
@@ -238,7 +237,7 @@ public class AttackPathGraphService {
                 r ->
                     new AttackPathFindingItemDTO(
                         r.type(),
-                        maskValue ? maskCredential(r.value()) : r.value(),
+                        maskValue ? SensitiveValueMaskingUtils.mask(r.value()) : r.value(),
                         r.endpointKey(),
                         AttackPathIds.endpointNode(r.endpointKey()),
                         links.executionIds().getOrDefault(r.id(), List.of()),
@@ -273,7 +272,9 @@ public class AttackPathGraphService {
       boolean credential = CATEGORY_CREDENTIALS.equals(f.type());
       findings.add(
           new AttackPathExecutionFindingItemDTO(
-              f.type(), credential ? maskCredential(f.value()) : f.value(), executionVerdicts));
+              f.type(),
+              credential ? SensitiveValueMaskingUtils.mask(f.value()) : f.value(),
+              executionVerdicts));
     }
     // Mask, in the free-text command and output, the secrets of every credential discovered on this
     // endpoint: an execution's command references its endpoint's credentials, not only the ones it
@@ -447,7 +448,12 @@ public class AttackPathGraphService {
     return separator >= 0 ? value.substring(separator + 1) : null;
   }
 
-  /** Replaces each known credential secret with the fixed mask wherever it appears in free text. */
+  /**
+   * Replaces each known credential secret with {@link SensitiveValueMaskingUtils#MASK} wherever it
+   * appears in free text. Structured values are masked through {@link
+   * SensitiveValueMaskingUtils#mask(String)} instead; here there is nothing to split, so only the
+   * secret substrings are substituted, with the same mask so the rendering stays consistent.
+   */
   private static String maskSecrets(String text, Set<String> secrets) {
     if (text == null || secrets.isEmpty()) {
       return text;
@@ -457,7 +463,7 @@ public class AttackPathGraphService {
     // one before it is masked (e.g. "pass" must not break "password").
     for (String secret :
         secrets.stream().sorted(Comparator.comparingInt(String::length).reversed()).toList()) {
-      masked = masked.replace(secret, CREDENTIAL_MASK);
+      masked = masked.replace(secret, SensitiveValueMaskingUtils.MASK);
     }
     return masked;
   }
@@ -514,22 +520,6 @@ public class AttackPathGraphService {
       // so the "Text fields"/etc. cards open a populated drawer instead of an empty one.
       default -> Set.of(category.toLowerCase(Locale.ROOT));
     };
-  }
-
-  /**
-   * Masks a credential for the drawer: for a {@code username:password} pair, keep the username and
-   * mask only the secret; otherwise mask the whole value. The mask is fixed-length so it never
-   * reveals the secret's length, and the clear secret never leaves the server.
-   */
-  private static String maskCredential(String value) {
-    if (value == null || value.isEmpty()) {
-      return value;
-    }
-    int separator = value.indexOf(':');
-    if (separator >= 0) {
-      return value.substring(0, separator + 1) + CREDENTIAL_MASK;
-    }
-    return CREDENTIAL_MASK;
   }
 
   private List<DetectionRemediationOutput> toDetectionRemediationOutputsFromSnapshot(
