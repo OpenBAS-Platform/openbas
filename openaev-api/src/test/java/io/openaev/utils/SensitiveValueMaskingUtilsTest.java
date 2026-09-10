@@ -134,7 +134,9 @@ class SensitiveValueMaskingUtilsTest {
 
       // -------- Assert --------
       // The username is the actionable half - which account is compromised - and is not a secret.
-      assertThat(masked).isEqualTo("jdoe:" + MASK);
+      // The secret keeps the same two character fragment as anywhere else: masking selectively is
+      // not masking harder.
+      assertThat(masked).isEqualTo("jdoe:Su" + MASK);
       assertThat(masked).doesNotContain("Sup3rS3cret");
     }
 
@@ -148,8 +150,9 @@ class SensitiveValueMaskingUtilsTest {
 
       // -------- Assert --------
       // The split is limited to the declared segment count: without that limit the parts would
-      // shift and the tail of the password would be handed out in the clear as a username.
-      assertThat(masked).isEqualTo("jdoe:" + MASK);
+      // shift and the tail of the password would be handed out in the clear as a username. The
+      // whole "pa:ss" is one segment, so it is masked as one unit and its tail never surfaces.
+      assertThat(masked).isEqualTo("jdoe:pa" + MASK);
       assertThat(masked).doesNotContain("ss");
     }
 
@@ -163,7 +166,7 @@ class SensitiveValueMaskingUtilsTest {
 
       // -------- Assert --------
       // Only the membership of TYPE_TO_MASK matters, and Hash belongs to it just like Password.
-      assertThat(masked).isEqualTo("administrator:" + MASK);
+      assertThat(masked).isEqualTo("administrator:aa" + MASK);
     }
 
     @Test
@@ -214,6 +217,34 @@ class SensitiveValueMaskingUtilsTest {
               SensitiveValueMaskingUtils.maskIfNeeded(
                   ContractOutputType.Credentials, "administrator:pwd"))
           .isEqualTo("administrator:" + MASK);
+    }
+
+    @Test
+    @DisplayName("Should mask a secret segment too short to keep a fragment entirely")
+    void given_aShortSecretSegment_should_maskThatSegmentEntirely() {
+      // -------- Act --------
+      String masked =
+          SensitiveValueMaskingUtils.maskIfNeeded(ContractOutputType.Credentials, "admin:abcd");
+
+      // -------- Assert --------
+      // Selective masking runs each secret segment through the very same maskPart as mask() does,
+      // so a segment too short to keep a fragment without disclosing most of it loses it entirely.
+      assertThat(masked).isEqualTo("admin:" + MASK);
+    }
+
+    @Test
+    @DisplayName("Should degenerate into whole-value masking if every segment becomes sensitive")
+    void given_everySegmentSensitive_should_behaveExactlyLikeMask() {
+      // -------- Arrange --------
+      // Selective masking is mask() restricted to the secret segments, not a second mechanism: were
+      // Username ever added to TYPE_TO_MASK, the two would produce the same string. Asserting the
+      // non-secret segment is the only difference keeps that equivalence visible.
+      String value = "administrator:Sup3rS3cret";
+
+      // -------- Act & Assert --------
+      assertThat(SensitiveValueMaskingUtils.mask(value)).isEqualTo("ad" + MASK + ":Su" + MASK);
+      assertThat(SensitiveValueMaskingUtils.maskIfNeeded(ContractOutputType.Credentials, value))
+          .isEqualTo("administrator:Su" + MASK);
     }
 
     @Test

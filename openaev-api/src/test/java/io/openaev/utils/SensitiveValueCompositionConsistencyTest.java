@@ -123,7 +123,7 @@ class SensitiveValueCompositionConsistencyTest {
       // -- ASSERT --
       assertSplitsInto(ContractOutputType.Credentials, value, List.of(USERNAME, HASH));
       assertThat(SensitiveValueMaskingUtils.maskIfNeeded(ContractOutputType.Credentials, value))
-          .isEqualTo(USERNAME + ":" + SensitiveValueMaskingUtils.MASK);
+          .isEqualTo(USERNAME + ":" + HASH.substring(0, 2) + SensitiveValueMaskingUtils.MASK);
     }
 
     @Test

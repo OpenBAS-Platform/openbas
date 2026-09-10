@@ -40,19 +40,23 @@ Some Finding types carry secret material: their value is masked everywhere the p
 
 | Sensitive type | Value shape | Masked as |
 | --- | --- | --- |
-| Credentials | `admin:motdepasse` | `admin:******` |
+| Credentials | `admin:motdepasse` | `admin:mo******` |
 
 Sensitivity is **derived from the Finding type**, not stored: a type is sensitive as soon as its
 value is made of a password, a hash or a key.
 
 Masking is applied **segment by segment**. The platform knows how each Finding value is composed, so
-it masks only the segments that are actually secret: a credential is returned as `admin:******`,
+it masks only the segments that are actually secret: a credential is returned as `admin:mo******`,
 keeping the account name - which tells you *which* account is compromised, and is not itself a
-secret - and withholding only the password or the hash.
+secret - and masking only the password or the hash.
 
-The mask has a fixed width, so the length of the secret is not leaked either. When the composition
-of a value is unknown, or when a value does not match the expected shape, the whole value is masked
-instead: an omission can only ever hide too much, never disclose a secret.
+A masked segment keeps its first two characters, so you can still tell which secret was discovered
+when you already know it, without the platform ever disclosing it. A segment too short to keep a
+fragment safely is masked entirely (`admin:abcd` becomes `admin:******`), and the mask has a fixed
+width, so the length of the secret is not leaked either.
+
+When the composition of a value is unknown, or when a value does not match the expected shape, every
+segment is masked instead: an omission can only ever hide too much, never disclose a secret.
 
 **Password policy** Findings are an explicit exception and are never masked: their `key` is the name
 of a policy setting (`MinimumPasswordLength`...), not a secret.

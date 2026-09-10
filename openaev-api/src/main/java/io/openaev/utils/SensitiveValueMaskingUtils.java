@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  *
  * <p>Masking is applied <b>per segment</b> rather than to the whole value whenever the composition
  * of that value is known (see {@link #VALUE_COMPOSITIONS}): a credential is handed out as {@code
- * jdoe:******}, keeping the identity of the compromised account - the actionable half - and
+ * jdoe:Su******}, keeping the identity of the compromised account - the actionable half - and
  * withholding only the secret. Where the composition is unknown, the whole value is masked, so an
  * omission can only ever over-mask.
  *
@@ -216,9 +216,9 @@ public final class SensitiveValueMaskingUtils {
    * otherwise.
    *
    * <p>When the composition of the value is known, only the segments whose primitive type is secret
-   * material are masked, so {@code jdoe:Sup3rS3cret} becomes {@code jdoe:******}: the identity of
-   * the compromised account stays readable, which is what the analyst acts on, and only the secret
-   * is withheld.
+   * material are masked, so {@code jdoe:Sup3rS3cret} becomes {@code jdoe:Su******}: the identity of
+   * the compromised account stays readable, which is what the analyst acts on, while the secret
+   * keeps only the two character fragment every mask leaves.
    *
    * @param type the contract output type of the value
    * @param value the cleartext value
@@ -236,6 +236,16 @@ public final class SensitiveValueMaskingUtils {
    * Masks the secret segments of a value whose composition is known, keeping the others as they
    * are.
    *
+   * <p>This is exactly {@link #mask(String)}, made selective: the value is cut on the same
+   * separator and each part goes through the same {@link #maskPart(String)}, but only the parts
+   * whose declared {@link PrimitiveType} belongs to {@link #TYPE_TO_MASK} are masked. Were {@link
+   * PrimitiveType#Username} ever added to that set, this would degenerate into {@link
+   * #mask(String)} itself - which is the measure of the rule being one rule rather than two.
+   *
+   * <p>A masked segment therefore keeps its two character fragment, as everywhere else: an operator
+   * who already knows a secret can still tell it is the one that was discovered, without the
+   * platform disclosing it.
+   *
    * <p>Every departure from the declared shape falls back to masking the whole value: an omission
    * can then only over-mask, never leak. That is why the split is <b>limited</b> to the number of
    * declared segments - a password containing the separator, as in {@code jdoe:pa:ss}, must yield
@@ -245,7 +255,9 @@ public final class SensitiveValueMaskingUtils {
   private static String maskSegments(final ValueComposition composition, final String value) {
     List<PrimitiveType> segments = composition.segments();
     if (composition.separator() == null || segments.size() == 1) {
-      return isSensitive(segments.getFirst()) ? mask(value) : value;
+      // maskPart, not mask: a lone secret segment is one unit, and splitting it on ':' would give
+      // back a readable fragment of each of its parts.
+      return isSensitive(segments.getFirst()) ? maskPart(value) : value;
     }
 
     String[] parts =
@@ -259,7 +271,7 @@ public final class SensitiveValueMaskingUtils {
       if (i > 0) {
         masked.append(composition.separator());
       }
-      masked.append(isSensitive(segments.get(i)) ? MASK : parts[i]);
+      masked.append(isSensitive(segments.get(i)) ? maskPart(parts[i]) : parts[i]);
     }
     return masked.toString();
   }
@@ -276,7 +288,7 @@ public final class SensitiveValueMaskingUtils {
    *
    * <p>Resolving the label to its type rather than masking outright is what makes the graph and the
    * findings page agree down to the character: the composition of the resolved type applies here
-   * too, so the drawer shows the same {@code jdoe:******}.
+   * too, so the drawer shows the same {@code jdoe:Su******}.
    *
    * @param typeLabel the {@link ContractOutputType#getLabel() label} of the type, case insensitive
    * @param value the cleartext value
