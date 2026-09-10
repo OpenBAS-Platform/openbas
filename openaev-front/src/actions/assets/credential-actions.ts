@@ -27,6 +27,10 @@ export const deleteCredential = (credentialId: string) => {
   return simpleDelCall(`${CREDENTIAL_URI}/${credentialId}`);
 };
 
+export const verifyCredential = (credentialId: string) => {
+  return simplePostCall(`${CREDENTIAL_URI}/${credentialId}/verify`, undefined, undefined, true, false);
+};
+
 // Bulk processing input shape mirrors the backend CredentialBulkProcessingInput DTO.
 export interface CredentialBulkProcessingInput {
   search_pagination_input?: SearchPaginationInput;

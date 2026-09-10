@@ -3,6 +3,7 @@ import { type FunctionComponent, useContext, useState } from 'react';
 import {
   deleteCredential,
   updateCredential,
+  verifyCredential,
 } from '../../../../actions/assets/credential-actions';
 import ButtonPopover, { type PopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
@@ -20,6 +21,7 @@ import CredentialForm from './CredentialForm';
 interface CredentialPopoverProps {
   credentialId: string;
   credentialName: string;
+  credentialType?: CredentialOutput['credential_type'];
   resolveInitialValues?: () => Promise<CredentialInput>;
   onUpdate: (result: CredentialOutput) => void;
   onDelete: (credentialId: string) => void;
@@ -29,6 +31,7 @@ interface CredentialPopoverProps {
 const CredentialPopover: FunctionComponent<CredentialPopoverProps> = ({
   credentialId,
   credentialName,
+  credentialType,
   resolveInitialValues,
   onUpdate,
   onDelete,
@@ -78,12 +81,25 @@ const CredentialPopover: FunctionComponent<CredentialPopoverProps> = ({
     });
   };
 
+  const handleTestConnection = () => {
+    verifyCredential(credentialId).then((result: { data: CredentialOutput }) => {
+      onUpdate?.(result.data);
+    });
+  };
+
   const entries: PopoverEntry[] = [
     {
       label: 'Update',
       action: handleOpenEdit,
       userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.CREDENTIALS),
     },
+    ...(credentialType === 'CLOUD_AWS'
+      ? [{
+          label: 'Test connection',
+          action: handleTestConnection,
+          userRight: ability.can(ACTIONS.MANAGE, SUBJECTS.CREDENTIALS),
+        }]
+      : []),
     {
       label: 'Delete',
       action: handleOpenDelete,

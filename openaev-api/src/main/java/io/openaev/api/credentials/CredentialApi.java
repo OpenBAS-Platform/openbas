@@ -87,6 +87,21 @@ public class CredentialApi extends RestBehavior {
     return credentialService.updateCredential(credentialId, input);
   }
 
+  @PostMapping("/{credentialId}/verify")
+  @Transactional
+  @AccessControl(
+      resourceId = "#credentialId",
+      actionPerformed = Action.WRITE,
+      resourceType = ResourceType.CREDENTIAL)
+  @Operation(
+      summary = "Test a credential against the live service it authenticates against",
+      description =
+          "Only cloud credentials (AWS) support an on-demand test today; refreshes the "
+              + "credential's status (ACTIVE/INACTIVE) and last verification timestamp.")
+  public CredentialFullOutput verifyCredential(TxCtx ctx, @PathVariable String credentialId) {
+    return credentialService.verifyCredential(credentialId);
+  }
+
   @DeleteMapping("/{credentialId}")
   @Transactional
   @AccessControl(

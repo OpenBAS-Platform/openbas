@@ -21,6 +21,8 @@ import io.openaev.secrets.provider.SecretStoreRequest;
 import io.openaev.secrets.provider.SecretsProvider;
 import io.openaev.secrets.provider.SecretsProviderType;
 import io.openaev.secrets.provider.impl.LocalSecretsProvider;
+import io.openaev.secrets.provider.impl.validators.AwsCredentialValidator;
+import io.openaev.secrets.service.SecretService;
 import io.openaev.service.UserService;
 import io.openaev.utils.FilterUtilsJpa;
 import io.openaev.utils.TxCtxScopeUtils;
@@ -28,6 +30,7 @@ import io.openaev.utils.pagination.SearchPaginationInput;
 import io.openaev.utils.pagination.SearchPaginationInputMapper;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +70,8 @@ public class CredentialService {
   private final ManagerFactory managerFactory;
   private final UserService userService;
   private final TenantScopedTransaction tenantTx;
+  private final SecretService secretService;
+  private final AwsCredentialValidator awsCredentialValidator;
 
   @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
   public long globalCount() {
@@ -326,6 +331,38 @@ public class CredentialService {
 
     SecretMetadata secretMetadata = secretProvider.getSecretMetadata(credential);
 
+    return credentialMapper.toFullOutput(credential, secretMetadata);
+  }
+
+  /**
+   * Re-tests a stored credential against the live service it authenticates against and refreshes
+   * its status. Only cloud credentials (AWS today) support an on-demand live test: for those, a
+   * lightweight, side-effect-free call is made (STS {@code GetCallerIdentity}, or an assume-role
+   * exchange followed by the same call). IDENTITY credentials (username/password, hash) have no
+   * single system to test against, so their status is left untouched.
+   *
+   * @param credentialId credential identifier
+   * @return updated credential full output, reflecting the new status and verification timestamp
+   */
+  public CredentialFullOutput verifyCredential(String credentialId) {
+    CredentialSecretReference credential = getCredentialById(credentialId);
+    SecretsProvider secretProvider =
+        resolveProviderByConnectorInstanceId(
+            credential.getConnectorInstanceId(), credential.getTenant().getId());
+
+    if (credential.getCredentialType() != CredentialSecretReference.CREDENTIAL_TYPE.CLOUD_AWS) {
+      throw new BadRequestException("Only cloud credentials support an on-demand connection test");
+    }
+
+    Secret secret = secretService.findByIdOrThrow(credential.getLocation());
+    boolean isActive = awsCredentialValidator.isActive(secret);
+
+    credential.setStatus(
+        isActive ? SecretReference.SECRET_STATUS.ACTIVE : SecretReference.SECRET_STATUS.INACTIVE);
+    credential.setLastVerifiedAt(Instant.now());
+    credentialSecretReferenceRepository.save(credential);
+
+    SecretMetadata secretMetadata = secretProvider.getSecretMetadata(credential);
     return credentialMapper.toFullOutput(credential, secretMetadata);
   }
 

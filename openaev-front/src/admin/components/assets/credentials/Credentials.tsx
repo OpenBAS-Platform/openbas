@@ -1,5 +1,5 @@
 import { PlayCircleOutlineOutlined, TrackChangesOutlined } from '@mui/icons-material';
-import { Box, Checkbox, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Box, Button, Checkbox, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { type CSSProperties, useContext, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 
@@ -183,6 +183,14 @@ const Credentials = () => {
         queryableHelpers={queryableHelpers}
         topBarButtons={(
           <Box display="flex" gap={1} alignItems="center">
+            <Button
+              component={Link}
+              to="/admin/credentials-prevalidation-demo"
+              variant="outlined"
+              size="small"
+            >
+              {t('Prevalidation UI preview (US4)')}
+            </Button>
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.CREDENTIALS}>
               <CredentialCreation
                 onCreate={result => setCredentials(current => [result, ...current])}
@@ -253,6 +261,7 @@ const Credentials = () => {
                   <CredentialPopover
                     credentialId={credential.credential_id ?? ''}
                     credentialName={credential.credential_name ?? ''}
+                    credentialType={credential.credential_type}
                     resolveInitialValues={() => resolveCredentialInitialValues(credential.credential_id ?? '')}
                     onUpdate={(updated) => {
                       setCredentials(current => current.map(item => (

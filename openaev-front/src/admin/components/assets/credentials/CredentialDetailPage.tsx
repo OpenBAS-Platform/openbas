@@ -1,8 +1,9 @@
+import { LoadingButton } from '@mui/lab';
 import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
-import { fetchCredential } from '../../../../actions/assets/credential-actions';
+import { fetchCredential, verifyCredential } from '../../../../actions/assets/credential-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import {
   DetailHero,
@@ -28,6 +29,7 @@ const CredentialDetailPage = () => {
 
   const [credential, setCredential] = useState<CredentialFullOutput | null>(null);
   const [loading, setLoading] = useState(true);
+  const [testing, setTesting] = useState(false);
 
   const resolveCredentialInitialValues = async (): Promise<CredentialInput> => {
     if (!credential) {
@@ -35,6 +37,16 @@ const CredentialDetailPage = () => {
     }
 
     return convertCredentialFullOutputToCredentialInput(credential);
+  };
+
+  const handleTestConnection = () => {
+    if (!credential) {
+      return;
+    }
+    setTesting(true);
+    verifyCredential(credential.credential_id)
+      .then((result: { data: CredentialFullOutput }) => setCredential(result.data))
+      .finally(() => setTesting(false));
   };
 
   useEffect(() => {
@@ -136,13 +148,30 @@ const CredentialDetailPage = () => {
           }}
           >
             <Field label={t('Status')}>
-              {(credential.credential_status == 'ACTIVE' || credential.credential_status == 'INACTIVE')
-                ? (
-                    <AssetStatus
-                      variant="list"
-                      status={credential?.credential_status?.toUpperCase() == 'ACTIVE' ? 'Active' : 'Inactive'}
-                    />
-                  ) : '-'}
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+              }}
+              >
+                {(credential.credential_status == 'ACTIVE' || credential.credential_status == 'INACTIVE')
+                  ? (
+                      <AssetStatus
+                        variant="list"
+                        status={credential?.credential_status?.toUpperCase() == 'ACTIVE' ? 'Active' : 'Inactive'}
+                      />
+                    ) : '-'}
+                {credential.credential_type === 'CLOUD_AWS' && (
+                  <LoadingButton
+                    size="small"
+                    variant="outlined"
+                    loading={testing}
+                    onClick={handleTestConnection}
+                  >
+                    {t('Test connection')}
+                  </LoadingButton>
+                )}
+              </Box>
             </Field>
             <Field label={t('Created by')}>{credential.credential_created_by?.user_name || '-'}</Field>
             <Field label={t('Creation date')}>{fldt(credential?.credential_created_at)}</Field>

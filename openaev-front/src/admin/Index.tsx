@@ -71,6 +71,7 @@ const IndexSettings = lazy(() => import('./components/settings/Index'));
 const ThreatArsenal = lazy(() => import('./components/threat_arsenal/ThreatArsenal'));
 const Credentials = lazy(() => import('./components/assets/credentials/Credentials'));
 const CredentialDetail = lazy(() => import('./components/assets/credentials/CredentialDetailPage'));
+const CredentialPrevalidationDemo = lazy(() => import('./components/assets/credentials/CredentialPrevalidationDemo'));
 
 // Param-preserving redirects for the legacy nested asset URLs
 // (/admin/assets/details/:id, /admin/assets/endpoints/:id,
@@ -401,6 +402,18 @@ const Index = () => {
                         subject: SUBJECTS.CREDENTIALS,
                       }]}
                       Component={errorWrapper(CredentialDetail)()}
+                    />
+                  )}
+                />
+                <Route
+                  path="credentials-prevalidation-demo"
+                  element={(
+                    <ProtectedRoute
+                      checks={[{
+                        action: ACTIONS.ACCESS,
+                        subject: SUBJECTS.CREDENTIALS,
+                      }]}
+                      Component={errorWrapper(CredentialPrevalidationDemo)()}
                     />
                   )}
                 />
