@@ -97,6 +97,8 @@ public class SecurityCoverageService {
    * @param securityCoverageStixId the STIX ID of the security-coverage object in the bundle
    * @param securityCoverageObj the SDO representing the security coverage
    * @param bundle the full bundle, also containing the security coverage SDO
+   * @param ctx the scope of this transaction, and the sole source of the tenant every row written
+   *     here is attributed to
    * @throws ParsingException if the STIX bundle is malformed
    * @throws BundleValidationError if the STIX bundle is obsolete or already stored
    * @throws ConnectorError there was an issue communicating with the connector
@@ -105,13 +107,26 @@ public class SecurityCoverageService {
   @Lock(type = LockResourceType.SECURITY_COVERAGE, key = "#securityCoverageStixId")
   @Transactional(rollbackFor = Exception.class)
   public Scenario handleSecurityCoverageProcessing(
-      String securityCoverageStixId,
-      ObjectBase securityCoverageObj,
-      Bundle bundle,
-      TxCtx ctx,
-      String tenantId)
+      String securityCoverageStixId, ObjectBase securityCoverageObj, Bundle bundle, TxCtx ctx)
       throws ParsingException, BundleValidationError, ConnectorError, IOException {
-    Objects.requireNonNull(tenantId, "security coverage processing requires transaction scope");
+    // The transaction's scope and the tenant of the rows it writes are one value; carrying both let
+    // them disagree, and the coverage row would then be inserted for one tenant and dirty-updated
+    // under another's scope, where can_access_tenant matches nothing.
+    // Resolving here also refuses an unattributable bundle before any row exists: a scope-less one
+    // used to fail only at the tag lookup, coverage and scenario already persisted.
+    String tenantId =
+        switch (ctx) {
+          case TxCtx.Restricted restricted when restricted.tenantIds().size() == 1 ->
+              restricted.tenantIds().get(0);
+          default ->
+              throw new IllegalStateException(
+                  "Cannot process security coverage "
+                      + securityCoverageStixId
+                      + " without a single-tenant scope: the coverage row and everything derived"
+                      + " from it are attributed to the transaction's tenant, and"
+                      + " security_coverages.tenant_id is NOT NULL. The caller must resolve a"
+                      + " single tenant for this bundle.");
+        };
     // Telemetry: one CTI security coverage bundle processed (attempts semantics).
     resultsMetricCollector.recordSecurityCoverageProcessed();
     String bundleHash = md5Hex(bundle.toStix(objectMapper).toString());
