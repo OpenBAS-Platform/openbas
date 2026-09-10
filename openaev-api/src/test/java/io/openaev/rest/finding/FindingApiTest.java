@@ -5,6 +5,7 @@ import static io.openaev.utils.JsonTestUtils.asJsonString;
 import static io.openaev.utils.fixtures.FindingFixture.createDefaultTextFindingWithRandomValue;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -244,6 +245,16 @@ class FindingApiTest extends IntegrationTest {
                 .map(findingMapper::toRelatedFindingOutput)
                 .toList();
 
+        // The expectation is read through the SAME transaction the request just scoped: the aspect
+        // is
+        // @Before-only, set_config(..., true) is transaction-local, and this class is
+        // @Transactional, so
+        // the scope the handler resolved is still set here. If the search ever fails closed, the
+        // response AND this expectation both come back empty and the comparison holds on [] == [].
+        // Asserting the expectation is non-empty is what breaks that coupling.
+        assertFalse(
+            expectedFindings.isEmpty(), "the expectation must not be empty, or it proves nothing");
+
         assertThatJson(response)
             .when(Option.IGNORING_ARRAY_ORDER)
             .node("content")
@@ -306,6 +317,16 @@ class FindingApiTest extends IntegrationTest {
                 .map(findingMapper::toRelatedFindingOutput)
                 .toList();
 
+        // The expectation is read through the SAME transaction the request just scoped: the aspect
+        // is
+        // @Before-only, set_config(..., true) is transaction-local, and this class is
+        // @Transactional, so
+        // the scope the handler resolved is still set here. If the search ever fails closed, the
+        // response AND this expectation both come back empty and the comparison holds on [] == [].
+        // Asserting the expectation is non-empty is what breaks that coupling.
+        assertFalse(
+            expectedFindings.isEmpty(), "the expectation must not be empty, or it proves nothing");
+
         assertThatJson(response)
             .when(Option.IGNORING_ARRAY_ORDER)
             .node("content")
@@ -358,6 +379,21 @@ class FindingApiTest extends IntegrationTest {
                 .map(findingMapper::toRelatedFindingOutput)
                 .toList();
 
+        // The expectation is read through the SAME transaction the request just scoped: the aspect
+        // is
+
+        // @Before-only, set_config(..., true) is transaction-local, and this class is
+        // @Transactional, so
+
+        // the scope the handler resolved is still set here. If the search ever fails closed, the
+
+        // response AND this expectation both come back empty and the comparison holds on [] == [].
+
+        // Asserting the expectation is non-empty is what breaks that coupling.
+
+        assertFalse(
+            expectedFindings.isEmpty(), "the expectation must not be empty, or it proves nothing");
+
         assertThatJson(response)
             .when(Option.IGNORING_ARRAY_ORDER)
             .node("content")
@@ -409,6 +445,21 @@ class FindingApiTest extends IntegrationTest {
                 .limit(input.getSize())
                 .toList();
 
+        // The expectation is read through the SAME transaction the request just scoped: the aspect
+        // is
+
+        // @Before-only, set_config(..., true) is transaction-local, and this class is
+        // @Transactional, so
+
+        // the scope the handler resolved is still set here. If the search ever fails closed, the
+
+        // response AND this expectation both come back empty and the comparison holds on [] == [].
+
+        // Asserting the expectation is non-empty is what breaks that coupling.
+
+        assertFalse(
+            expectedFindings.isEmpty(), "the expectation must not be empty, or it proves nothing");
+
         assertThatJson(response)
             .when(Option.IGNORING_ARRAY_ORDER)
             .node("content")
@@ -446,6 +497,21 @@ class FindingApiTest extends IntegrationTest {
                 .map(findingMapper::toRelatedFindingOutput)
                 .limit(input.getSize())
                 .toList();
+
+        // The expectation is read through the SAME transaction the request just scoped: the aspect
+        // is
+
+        // @Before-only, set_config(..., true) is transaction-local, and this class is
+        // @Transactional, so
+
+        // the scope the handler resolved is still set here. If the search ever fails closed, the
+
+        // response AND this expectation both come back empty and the comparison holds on [] == [].
+
+        // Asserting the expectation is non-empty is what breaks that coupling.
+
+        assertFalse(
+            expectedFindings.isEmpty(), "the expectation must not be empty, or it proves nothing");
 
         assertThatJson(response)
             .when(Option.IGNORING_ARRAY_ORDER)
@@ -524,6 +590,21 @@ class FindingApiTest extends IntegrationTest {
                 .map(findingMapper::toRelatedFindingOutput)
                 .toList();
 
+        // The expectation is read through the SAME transaction the request just scoped: the aspect
+        // is
+
+        // @Before-only, set_config(..., true) is transaction-local, and this class is
+        // @Transactional, so
+
+        // the scope the handler resolved is still set here. If the search ever fails closed, the
+
+        // response AND this expectation both come back empty and the comparison holds on [] == [].
+
+        // Asserting the expectation is non-empty is what breaks that coupling.
+
+        assertFalse(
+            expectedFindings.isEmpty(), "the expectation must not be empty, or it proves nothing");
+
         assertThatJson(response)
             .when(Option.IGNORING_ARRAY_ORDER)
             .node("content")
@@ -587,6 +668,21 @@ class FindingApiTest extends IntegrationTest {
             fromIterable(findingRepository.findAllById(expectedFindingIds)).stream()
                 .map(findingMapper::toRelatedFindingOutput)
                 .toList();
+
+        // The expectation is read through the SAME transaction the request just scoped: the aspect
+        // is
+
+        // @Before-only, set_config(..., true) is transaction-local, and this class is
+        // @Transactional, so
+
+        // the scope the handler resolved is still set here. If the search ever fails closed, the
+
+        // response AND this expectation both come back empty and the comparison holds on [] == [].
+
+        // Asserting the expectation is non-empty is what breaks that coupling.
+
+        assertFalse(
+            expectedFindings.isEmpty(), "the expectation must not be empty, or it proves nothing");
 
         assertThatJson(response)
             .when(Option.IGNORING_ARRAY_ORDER)
@@ -675,6 +771,21 @@ class FindingApiTest extends IntegrationTest {
             fromIterable(findingRepository.findAllById(expectedFindingIds)).stream()
                 .map(findingMapper::toRelatedFindingOutput)
                 .toList();
+
+        // The expectation is read through the SAME transaction the request just scoped: the aspect
+        // is
+
+        // @Before-only, set_config(..., true) is transaction-local, and this class is
+        // @Transactional, so
+
+        // the scope the handler resolved is still set here. If the search ever fails closed, the
+
+        // response AND this expectation both come back empty and the comparison holds on [] == [].
+
+        // Asserting the expectation is non-empty is what breaks that coupling.
+
+        assertFalse(
+            expectedFindings.isEmpty(), "the expectation must not be empty, or it proves nothing");
 
         assertThatJson(response)
             .when(Option.IGNORING_ARRAY_ORDER)
