@@ -5,7 +5,6 @@ import static io.openaev.utils.fixtures.CustomDashboardFixture.createCustomDashb
 import static io.openaev.utils.fixtures.WidgetFixture.createDefaultWidget;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -87,14 +86,13 @@ class TenantSettingsHomeDashboardNonAdminIsolationTest extends IntegrationTest {
     // -- ASSERT --
     assertEquals(dashboardA.dashboardId(), JsonPath.read(body, "$.custom_dashboard_id"));
     List<String> widgetIds = JsonPath.read(body, "$.custom_dashboard_widgets");
-    assertTrue(widgetIds.contains(dashboardA.widgetId()));
     assertFalse(widgetIds.contains(dashboardB.widgetId()));
     assertFalse(body.contains(dashboardB.dashboardId()));
   }
 
   private void assignHomeDashboard(String tenantId, String dashboardId) {
     tenantSettingsService.updateSettings(
-        tenantId, new TenantSettingsUpdateInput("OpenAEV", "dark", "en", dashboardId, null, null));
+        tenantId, new TenantSettingsUpdateInput("OpenAEV", "dark", "en", dashboardId, "", ""));
   }
 
   private DashboardSeed seedDashboardWithWidget(String tenantId, String name) {

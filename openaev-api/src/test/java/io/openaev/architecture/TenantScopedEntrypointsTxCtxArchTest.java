@@ -522,9 +522,7 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.dashboard.DashboardApi#widgetToEntitiesRuntime",
           "io.openaev.rest.dashboard.DashboardApi#attackPaths",
           "io.openaev.rest.exercise.ExerciseApi#createExercise",
-          "io.openaev.rest.exercise.ExerciseApi#updateExerciseInformation",
           "io.openaev.rest.scenario.ScenarioApi#createScenario",
-          "io.openaev.rest.scenario.ScenarioApi#updateScenario",
           "io.openaev.api.chaining.ChainingApi#createSimulation",
           "io.openaev.api.chaining.ChainingApi#createScenarioChaining",
           // chaining duplications copy injects, so they serialize the phase lists

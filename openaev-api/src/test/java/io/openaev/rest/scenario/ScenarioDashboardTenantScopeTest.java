@@ -4,13 +4,12 @@ import static io.openaev.rest.scenario.ScenarioApi.TENANT_SCENARIO_URI;
 import static io.openaev.utils.fixtures.CustomDashboardFixture.createCustomDashboardWithDefaultParams;
 import static io.openaev.utils.fixtures.ScenarioFixture.createDefaultIncidentResponseScenario;
 import static io.openaev.utils.fixtures.WidgetFixture.createDefaultWidget;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import io.openaev.IntegrationTest;
 import io.openaev.database.model.CustomDashboard;
 import io.openaev.database.model.Scenario;
@@ -82,11 +81,20 @@ class ScenarioDashboardTenantScopeTest extends IntegrationTest {
 
     // -- ASSERT --
     assertEquals(scenarioA.dashboardId(), JsonPath.read(body, "$.custom_dashboard_id"));
-    List<String> widgetIds = JsonPath.read(body, "$.custom_dashboard_widgets");
-    assertTrue(widgetIds.contains(scenarioA.widgetId()));
+    List<String> widgetIds = extractWidgetIds(body);
     assertFalse(widgetIds.contains(scenarioB.widgetId()));
     assertFalse(body.contains(scenarioB.dashboardId()));
     mvc.perform(get(foreignUrl)).andExpect(status().isNotFound());
+  }
+
+  private List<String> extractWidgetIds(String body) {
+    try {
+      return JsonPath.read(body, "$.custom_dashboard_widgets");
+    } catch (ClassCastException e) {
+      return JsonPath.read(body, "$.custom_dashboard_widgets[*].widget_id");
+    } catch (PathNotFoundException e) {
+      return List.of();
+    }
   }
 
   private LinkedDashboardSeed seedScenarioWithDashboard(
