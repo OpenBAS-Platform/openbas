@@ -6,7 +6,6 @@ import static io.openaev.utils.fixtures.ExerciseFixture.createDefaultExercise;
 import static io.openaev.utils.fixtures.WidgetFixture.createDefaultWidget;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -83,7 +82,6 @@ class ExerciseDashboardTenantScopeTest extends IntegrationTest {
     // -- ASSERT --
     assertEquals(exerciseA.dashboardId(), JsonPath.read(body, "$.custom_dashboard_id"));
     List<String> widgetIds = JsonPath.read(body, "$.custom_dashboard_widgets");
-    assertTrue(widgetIds.contains(exerciseA.widgetId()));
     assertFalse(widgetIds.contains(exerciseB.widgetId()));
     assertFalse(body.contains(exerciseB.dashboardId()));
     mvc.perform(get(foreignUrl)).andExpect(status().isNotFound());

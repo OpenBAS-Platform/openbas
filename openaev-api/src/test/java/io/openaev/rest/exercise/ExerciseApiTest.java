@@ -94,7 +94,7 @@ public class ExerciseApiTest extends IntegrationTest {
 
   @DisplayName("Create simulation succeed with default dashboard")
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   void given_exercise_creation_should_set_default_custom_dashboard() throws Exception {
     // -- PREPARE --
     CustomDashboard defaultDashboard = new CustomDashboard();
@@ -146,7 +146,9 @@ public class ExerciseApiTest extends IntegrationTest {
 
   @DisplayName("Create chained exercise fails without enterprise edition")
   @Test
-  @WithMockUser(withCapabilities = {Capability.MANAGE_ASSESSMENT})
+  @WithMockUser(
+      withCapabilities = {Capability.MANAGE_ASSESSMENT},
+      autoJoinDefaultTenant = true)
   void given_chainedExerciseCreationWithoutEE_should_fail() throws Exception {
     // Arrange
     CreateExerciseInput exerciseInput = new CreateExerciseInput();
