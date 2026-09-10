@@ -43,14 +43,18 @@ public class FindingWriter {
     // them disagree: the transaction scoped to one tenant while the row carried another's id, so
     // the upsert's conflict branch could never match. A scope naming anything but exactly one
     // tenant cannot attribute a row, and findings.tenant_id is NOT NULL.
-    if (!(ctx instanceof TxCtx.Restricted restricted) || restricted.tenantIds().size() != 1) {
-      throw new IllegalStateException(
-          "Cannot write a finding for inject "
-              + injectId
-              + " without a single-tenant scope: findings.tenant_id is NOT NULL and the row would"
-              + " be unattributed. The caller must resolve the tenant from the inject.");
-    }
-    String tenantId = restricted.tenantIds().get(0);
+    String tenantId =
+        switch (ctx) {
+          case TxCtx.Restricted restricted when restricted.tenantIds().size() == 1 ->
+              restricted.tenantIds().get(0);
+          default ->
+              throw new IllegalStateException(
+                  "Cannot write a finding for inject "
+                      + injectId
+                      + " without a single-tenant scope: findings.tenant_id is NOT NULL and the row"
+                      + " would be unattributed. The caller must resolve the tenant from the"
+                      + " inject.");
+        };
     String findingId =
         findingRepository.upsertFinding(
             findingField, findingType, findingValue, findingLabels, injectId, name, tenantId);
