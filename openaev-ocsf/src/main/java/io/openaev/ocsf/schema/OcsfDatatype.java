@@ -1,14 +1,16 @@
 package io.openaev.ocsf.schema;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openaev.ocsf.parsing.OcsfSerialisable;
 import java.util.Objects;
 import lombok.Getter;
 
-@Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class OcsfDatatype<T> implements OcsfSerialisable {
-  private final T value;
+  @Getter @JsonValue private final T value;
 
   public OcsfDatatype(T value) {
     this.value = value;
@@ -39,6 +41,11 @@ public abstract class OcsfDatatype<T> implements OcsfSerialisable {
   @Override
   public int hashCode() {
     return Objects.hashCode(value);
+  }
+
+  @Override
+  public String toString() {
+    return this.value.toString();
   }
 
   @Override
