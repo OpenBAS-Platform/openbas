@@ -1,6 +1,5 @@
 package io.openaev.api.notification_trigger;
 
-import io.openaev.context.TenantContext;
 import io.openaev.database.model.Base;
 import io.openaev.database.model.Group;
 import io.openaev.database.model.NotificationTrigger;
@@ -47,18 +46,11 @@ public class NotificationTriggerMapper {
     trigger.setInstanceId(input.getInstanceId());
     trigger.setPeriod(input.getPeriod());
     trigger.setTriggerTime(input.getTriggerTime());
-    // notifiers is still v1: it resolves from the thread-local, which is the default tenant on any
-    // route without a {tenantId}. Corrected by the notifiers activation (#7864), not here.
+    // notifiers is v2-active since #7864, so the inspector scopes this lookup. The endpoint
+    // resolves tenantForWrite first and refuses a multi-tenant scope with a 400, so the scope
+    // reaching here always names exactly the tenant the trigger is written into.
     trigger.setNotifiers(
-        resolveAll(
-            input.getNotifierIds(),
-            // Left on the v1 thread-local on purpose: notifiers is still v1-filtered, and
-            // HibernateFilterTransactionAspect binds that filter from TenantContext BEFORE the
-            // endpoint body runs, so a lookup constrained to any other tenant can never match.
-            // Switches to the write tenant when notifiers is activated (#7864).
-            ids ->
-                notifierRepository.findAllByIdInAndTenantId(ids, TenantContext.getCurrentTenant()),
-            "Notifier"));
+        resolveAll(input.getNotifierIds(), notifierRepository::findAllById, "Notifier"));
     trigger.setChildTriggers(
         resolveAll(
             input.getChildTriggerIds(),
