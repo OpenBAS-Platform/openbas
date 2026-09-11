@@ -5,6 +5,8 @@ import static io.openaev.config.TenantUriUtils.TENANT_PREFIX;
 import io.openaev.aop.AccessControl;
 import io.openaev.aop.LogExecutionTime;
 import io.openaev.aop.UserRoleDescription;
+import io.openaev.config.TenantWriteScopeResolver;
+import io.openaev.context.TenantContext;
 import io.openaev.context.TxCtx;
 import io.openaev.rest.exception.ElementNotFoundException;
 import io.openaev.service.notification.NotificationTriggerService;
@@ -16,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -39,6 +42,7 @@ public class NotificationTriggerApi {
 
   private final NotificationTriggerService notificationTriggerService;
   private final NotificationTriggerMapper notificationTriggerMapper;
+  private final TenantWriteScopeResolver writeScopeResolver;
 
   @LogExecutionTime
   @GetMapping({
@@ -92,7 +96,11 @@ public class NotificationTriggerApi {
   public NotificationTriggerOutput createNotificationTrigger(
       TxCtx ctx, @Valid @RequestBody final NotificationTriggerInput input) {
     return notificationTriggerMapper.toNotificationTriggerOutput(
-        notificationTriggerService.create(notificationTriggerMapper.toNotificationTrigger(input)));
+        onTheRequestTenant(
+            ctx,
+            () ->
+                notificationTriggerService.create(
+                    notificationTriggerMapper.toNotificationTrigger(input))));
   }
 
   @LogExecutionTime
@@ -114,8 +122,11 @@ public class NotificationTriggerApi {
       @PathVariable @NotBlank @Schema(description = "ID of the trigger") final String triggerId,
       @Valid @RequestBody final NotificationTriggerInput input) {
     return notificationTriggerMapper.toNotificationTriggerOutput(
-        notificationTriggerService.update(
-            triggerId, notificationTriggerMapper.toNotificationTrigger(input)));
+        onTheRequestTenant(
+            ctx,
+            () ->
+                notificationTriggerService.update(
+                    triggerId, notificationTriggerMapper.toNotificationTrigger(input))));
   }
 
   @LogExecutionTime
@@ -136,5 +147,31 @@ public class NotificationTriggerApi {
       TxCtx ctx,
       @PathVariable @NotBlank @Schema(description = "ID of the trigger") final String triggerId) {
     notificationTriggerService.delete(triggerId);
+  }
+
+  /**
+   * Runs a trigger write with the v1 thread-local pinned to the request's tenant.
+   *
+   * <p>{@code notification_triggers} is still v1: TenantBaseListener stamps it from TenantContext,
+   * which TenantInterceptor only sets on the /api/tenants/{tenantId}/ route. Its notifiers are v2
+   * and resolve from the request scope. On the header route the two disagree - the notifier comes
+   * from the selected tenant while the trigger is stamped with the default one - which would build
+   * a cross-tenant association. Both sides read one tenant here. This goes away when
+   * notification_triggers is activated.
+   */
+  private <T> T onTheRequestTenant(TxCtx ctx, Supplier<T> write) {
+    String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
+    String previousTenant =
+        TenantContext.hasCurrentTenant() ? TenantContext.getCurrentTenant() : null;
+    TenantContext.setCurrentTenant(tenantId);
+    try {
+      return write.get();
+    } finally {
+      if (previousTenant == null) {
+        TenantContext.clearCurrentTenant();
+      } else {
+        TenantContext.setCurrentTenant(previousTenant);
+      }
+    }
   }
 }

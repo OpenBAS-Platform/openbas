@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Properties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -241,6 +242,26 @@ class ImportMapperActivationConfigTest {
         active.contains("tags"),
         "tags must stay in openaev.tenant.active-tables: its v1 @Filter was removed, so dropping it"
             + " would leave the table with no tenant isolation. Found: '"
+            + active
+            + "'");
+  }
+
+  @Test
+  @DisplayName("openaev.tenant.active-tables in application.properties contains notifiers")
+  void prodConfigActivatesNotifiers() throws Exception {
+    Properties props = new Properties();
+    try (InputStream in = new FileInputStream("src/main/resources/application.properties")) {
+      props.load(in);
+    }
+    String active = props.getProperty("openaev.tenant.active-tables", "");
+    // Entry match, not contains: contains() on the raw property also passes on any table name that
+    // merely embeds this one (e.g. "webhook_notifiers"), so it can report an activation that is
+    // not there.
+    assertTrue(
+        Arrays.stream(active.split(",")).map(String::trim).anyMatch("notifiers"::equals),
+        "notifiers must stay in openaev.tenant.active-tables: its v1 @Filter and TenantBaseListener"
+            + " were removed, so dropping it would leave the table with no read isolation and no"
+            + " write attribution at all. Found: '"
             + active
             + "'");
   }
