@@ -34,10 +34,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The tenant a security coverage row is attributed to is the tenant its transaction is scoped to,
- * and a scope that names anything but one tenant is refused before any row is written. The
- * signature used to carry a tenant id alongside the {@code TxCtx}, which permitted the two to
- * disagree, and an unattributable bundle only failed later from the tag lookup, with the coverage
- * and its scenario already persisted.
+ * and a scope that names anything but one tenant is refused before any row is written.
+ *
+ * <p>These call the service directly rather than through {@code StixApi}, which resolves the tenant
+ * from the scope itself and would refuse first. That is the point: the guard has to hold for the
+ * next caller, not only for the one endpoint that happens to check today.
  */
 @Transactional
 @TestPropertySource(properties = "openaev.tenant.active-tables=security_coverages")

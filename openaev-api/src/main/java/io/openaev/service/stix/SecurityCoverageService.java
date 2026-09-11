@@ -109,11 +109,13 @@ public class SecurityCoverageService {
   public Scenario handleSecurityCoverageProcessing(
       String securityCoverageStixId, ObjectBase securityCoverageObj, Bundle bundle, TxCtx ctx)
       throws ParsingException, BundleValidationError, ConnectorError, IOException {
-    // The transaction's scope and the tenant of the rows it writes are one value; carrying both let
-    // them disagree, and the coverage row would then be inserted for one tenant and dirty-updated
-    // under another's scope, where can_access_tenant matches nothing.
-    // Resolving here also refuses an unattributable bundle before any row exists: a scope-less one
-    // used to fail only at the tag lookup, coverage and scenario already persisted.
+    // The transaction's scope and the tenant of the rows written here are one value; taking both
+    // from the caller let them disagree, and the coverage row would then be inserted for one tenant
+    // and dirty-updated under another's scope, where can_access_tenant matches nothing.
+    //
+    // The only caller today, StixApi, resolves the tenant from ctx and so refuses an unattributable
+    // bundle before reaching this method. Guarding here makes that a property of the write itself
+    // rather than of one endpoint remembering to check.
     String tenantId =
         switch (ctx) {
           case TxCtx.Restricted restricted when restricted.tenantIds().size() == 1 ->
