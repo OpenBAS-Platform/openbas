@@ -283,6 +283,7 @@ public class ExerciseApiTest extends IntegrationTest {
     TagRule tagRule = new TagRule();
     tagRule.setTag(tag2);
     tagRule.setAssetGroups(List.of(assetGroup));
+    tagRule.setTenant(new Tenant(Tenant.DEFAULT_TENANT_UUID));
     this.tagRuleRepository.save(tagRule);
 
     Exercise exercise = this.exerciseRepository.save(ExerciseFixture.createDefaultCrisisExercise());
