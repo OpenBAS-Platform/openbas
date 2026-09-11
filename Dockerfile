@@ -5,6 +5,10 @@ COPY openaev-front/packages ./packages
 COPY openaev-front/patches ./patches
 COPY openaev-front/package.json openaev-front/yarn.lock openaev-front/.yarnrc.yml ./
 RUN npm install -g corepack
+# git resolves @filigran/design-system, which openaev-front consumes as a direct
+# git dependency. The Alpine node images do not ship it, and without it the
+# failure reads as an authentication error rather than a missing binary.
+RUN apk --no-cache add git
 # The design system lives in a private repository, so the install needs a
 # credential. It is mounted as a BuildKit secret for this RUN only and is
 # stored in no layer — `docker history` and /root/.gitconfig stay clean.
