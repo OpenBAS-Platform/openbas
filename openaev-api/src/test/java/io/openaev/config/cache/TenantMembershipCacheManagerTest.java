@@ -235,7 +235,7 @@ class TenantMembershipCacheManagerTest {
   }
 
   @Nested
-  @DisplayName("immediate-plus-after-commit double eviction")
+  @DisplayName("immediate-plus-after-commit double eviction (via CommitAwareCacheManager)")
   class DoubleEviction {
 
     @AfterEach

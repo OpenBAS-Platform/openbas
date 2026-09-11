@@ -6,11 +6,11 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * Caches tenant membership checks to avoid hitting the database on every HTTP request. The cache
@@ -21,6 +21,12 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * other request-scoped callers) do not open a Hibernate session. Combined with open-in-view, a
  * Hibernate query here would hold a pool connection for the whole HTTP request and trip Hikari leak
  * detection on long POSTs.
+ *
+ * <p>Eviction here is plain declarative {@code @CacheEvict}/{@code @Caching} — transaction safety
+ * (evict immediately, then again after commit) is handled once, for every cache, by the {@link
+ * CacheManager} bean itself ({@code CommitAwareCacheManager}, wired in {@code CachingConfig}), not
+ * by this class. See that class's javadoc for why a plain {@code @CacheEvict} alone is not
+ * transaction-safe.
  */
 @Service
 @RequiredArgsConstructor
@@ -70,61 +76,25 @@ public class TenantMembershipCacheManager {
   /**
    * Evicts a specific user-tenant membership entry and the user's cached tenant-id list after
    * membership changes.
-   *
-   * <p>Evicted immediately (so a subsequent read in the same transaction — or from an entirely
-   * non-transactional caller — never sees the stale entry), and evicted again after the enclosing
-   * transaction commits, if any: a membership row that is inserted or removed is not visible to
-   * other connections until commit (READ COMMITTED), so a concurrent request could still repopulate
-   * the cache from the pre-commit state during the window before commit. The post-commit eviction
-   * busts that possibly-stale repopulation, forcing the next read to go back to the database once
-   * the row is actually visible everywhere. Every caller that mutates {@code users_tenants} must go
-   * through this method (or {@link #evictForUser}) instead of evicting the caches directly, so both
-   * guarantees apply uniformly regardless of which service triggered the membership change.
    */
+  @Caching(
+      evict = {
+        @CacheEvict(value = TENANT_MEMBERSHIP_CACHE, key = "#userId + ':' + #tenantId"),
+        @CacheEvict(value = USER_TENANT_IDS_CACHE, key = "#userId")
+      })
   public void evict(String userId, String tenantId) {
-    evictNow(userId, tenantId);
-    evictAgainAfterCommit(() -> evictNow(userId, tenantId));
+    // eviction only
   }
 
   /**
    * Evicts all cached tenant membership entries for a given user, including the cached tenant-id
-   * list. Same immediate-plus-after-commit double eviction as {@link #evict(String, String)}.
+   * list. Goes through {@link CacheManager} directly, rather than calling {@link #evict(String,
+   * String)} in a loop, because that would be a self-invocation and skip the {@code @CacheEvict}
+   * interceptor entirely (Spring's declarative caching only intercepts calls made through the
+   * proxy). The caches themselves are still transaction-safe, since that guarantee lives in the
+   * {@link CacheManager} bean, not in how eviction is triggered.
    */
   public void evictForUser(String userId, List<String> tenantIds) {
-    evictForUserNow(userId, tenantIds);
-    evictAgainAfterCommit(() -> evictForUserNow(userId, tenantIds));
-  }
-
-  /**
-   * Registers {@code eviction} to run again after the enclosing transaction commits. No-op if no
-   * transaction is active — the immediate eviction the caller already performed is the only one
-   * needed in that case.
-   */
-  private void evictAgainAfterCommit(Runnable eviction) {
-    if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-      return;
-    }
-    TransactionSynchronizationManager.registerSynchronization(
-        new TransactionSynchronization() {
-          @Override
-          public void afterCommit() {
-            eviction.run();
-          }
-        });
-  }
-
-  private void evictNow(String userId, String tenantId) {
-    Cache membershipCache = cacheManager.getCache(TENANT_MEMBERSHIP_CACHE);
-    if (membershipCache != null) {
-      membershipCache.evict(userId + ":" + tenantId);
-    }
-    Cache tenantIdsCache = cacheManager.getCache(USER_TENANT_IDS_CACHE);
-    if (tenantIdsCache != null) {
-      tenantIdsCache.evict(userId);
-    }
-  }
-
-  private void evictForUserNow(String userId, List<String> tenantIds) {
     Cache tenantIdsCache = cacheManager.getCache(USER_TENANT_IDS_CACHE);
     if (tenantIdsCache != null) {
       tenantIdsCache.evict(userId);
