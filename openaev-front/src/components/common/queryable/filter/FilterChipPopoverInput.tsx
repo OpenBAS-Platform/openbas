@@ -46,6 +46,7 @@ export const BasicTextInput: FunctionComponent<Props> = ({
   };
   return (
     <Combobox<string>
+      labelPosition="none"
       multiple
       allowCustomValue
       createValueFromInput={input => input}
@@ -64,6 +65,7 @@ export const BasicTextInput: FunctionComponent<Props> = ({
       <ComboboxField>
         <ComboboxChips />
         <ComboboxInput
+          aria-label={t(filter.key)}
           placeholder={t(filter.key)}
           autoFocus
           onBlur={() => {
@@ -165,6 +167,7 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
 
   return (
     <Combobox<GroupOption | Option>
+      labelPosition="none"
       multiple
       selectOnFocus
       openOnFocus
@@ -201,7 +204,10 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
       }}
     >
       <ComboboxField>
-        <ComboboxInput placeholder={t(propertySchema.schema_property_name)} />
+        <ComboboxInput
+          placeholder={t(propertySchema.schema_property_name)}
+          aria-label={t(propertySchema.schema_property_name)}
+        />
         <ComboboxControls>
           <ComboboxClear />
           <ComboboxTrigger />

@@ -73,6 +73,7 @@ const FilterAutocomplete: FunctionComponent<Props> = ({
     <div className={classes.container} style={style}>
       <div style={{ width: domains ? '95%' : 200 }}>
         <Combobox
+          labelPosition="none"
           options={options}
           value={null}
           onValueChange={(selectOptionValue) => {
@@ -98,6 +99,7 @@ const FilterAutocomplete: FunctionComponent<Props> = ({
         >
           <ComboboxField>
             <ComboboxInput
+              aria-label={t('Add filter')}
               placeholder={domains
                 ? t('Please choose a scenario or simulation, or leave this field blank to include all scenarios and atomic tests')
                 : t('Add filter')}

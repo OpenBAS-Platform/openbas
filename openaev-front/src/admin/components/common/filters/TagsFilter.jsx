@@ -62,6 +62,7 @@ const TagsFilter = (props) => {
       }}
       >
         <Combobox
+          labelPosition="none"
           openOnFocus
           options={tagsOptions}
           value={selected}
@@ -99,7 +100,10 @@ const TagsFilter = (props) => {
           )}
         >
           <ComboboxField>
-            <ComboboxInput placeholder={t('Tags')} />
+            <ComboboxInput
+              placeholder={t('Tags')}
+              aria-label={t('Tags')}
+            />
             <ComboboxControls>
               <ComboboxTrigger />
             </ComboboxControls>

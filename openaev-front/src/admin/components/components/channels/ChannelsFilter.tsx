@@ -90,6 +90,7 @@ const ChannelsFilter: FunctionComponent<Props> = (props) => {
     >
       <div style={{ width: fullWidth ? '100%' : 250 }}>
         <Combobox<ChannelTransformed>
+          labelPosition="none"
           multiple
           openOnFocus
           options={channelsOptions}
@@ -117,7 +118,10 @@ const ChannelsFilter: FunctionComponent<Props> = (props) => {
         >
           <ComboboxField>
             <ComboboxChips />
-            <ComboboxInput placeholder={t('Channels')} />
+            <ComboboxInput
+              placeholder={t('Channels')}
+              aria-label={t('Channels')}
+            />
             <ComboboxControls>
               <ComboboxClear />
               <ComboboxTrigger />

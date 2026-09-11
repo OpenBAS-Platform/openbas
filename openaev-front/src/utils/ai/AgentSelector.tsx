@@ -38,6 +38,7 @@ const AgentSelector: FunctionComponent<AgentSelectorProps> = ({
   return (
     <div style={{ width }}>
       <Combobox<AgentOption>
+        labelPosition="none"
         options={options}
         value={value}
         onValueChange={newValue => onChange(newValue as AgentOption | null)}
@@ -48,7 +49,10 @@ const AgentSelector: FunctionComponent<AgentSelectorProps> = ({
         clearable={false}
       >
         <ComboboxField>
-          <ComboboxInput placeholder={noAgents ? t('No agent available') : t('Select agent')} />
+          <ComboboxInput
+            placeholder={noAgents ? t('No agent available') : t('Select agent')}
+            aria-label={t('Select agent')}
+          />
           <ComboboxControls>
             <ComboboxTrigger />
           </ComboboxControls>

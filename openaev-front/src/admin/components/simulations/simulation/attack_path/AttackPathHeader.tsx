@@ -569,6 +569,7 @@ const AttackPathHeader: FunctionComponent<Props> = ({
 
       <div style={{ width: 240 }}>
         <Combobox<SearchOption>
+          labelPosition="none"
           options={searchOptions}
           value={null}
           inputValue={searchInput}
@@ -621,7 +622,10 @@ const AttackPathHeader: FunctionComponent<Props> = ({
           clearable={false}
         >
           <ComboboxField startIcon={<SearchOutlined fontSize="small" />}>
-            <ComboboxInput placeholder={t('Search endpoint, injector, finding…')} />
+            <ComboboxInput
+              placeholder={t('Search endpoint, injector, finding…')}
+              aria-label={t('Search endpoint, injector, finding…')}
+            />
             <ComboboxControls>
               <ComboboxTrigger />
             </ComboboxControls>
