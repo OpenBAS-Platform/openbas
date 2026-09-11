@@ -28,6 +28,7 @@ import io.openaev.utils.fixtures.DocumentFixture;
 import io.openaev.utils.fixtures.InjectorFixture;
 import io.openaev.utils.fixtures.KillChainPhaseFixture;
 import io.openaev.utils.fixtures.PayloadFixture;
+import io.openaev.utils.fixtures.TagFixture;
 import io.openaev.utils.fixtures.files.AttackPatternFixture;
 import io.openaev.utils.fixtures.tenants.TenantFixture;
 import io.openaev.utils.mockUser.WithMockUser;
@@ -150,6 +151,48 @@ class V1_DataImporterTest extends IntegrationTest {
     List<Tag> tag = this.tagRepository.findByNameIgnoreCase(TAG_NAME);
     assertFalse(tag.isEmpty());
     assertEquals(TAG_NAME, tag.getFirst().getName());
+  }
+
+  @Test
+  @Transactional
+  void testScenario_import_preserves_lessons_flags() {
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode root = mapper.createObjectNode();
+    ObjectNode scenarioNode = root.putObject("scenario_information");
+    scenarioNode.put("scenario_name", "Lessons scenario");
+    scenarioNode.put("scenario_description", "Lessons scenario");
+    scenarioNode.put("scenario_subtitle", "Lessons scenario");
+    scenarioNode.put("scenario_category", "crisis-communication");
+    scenarioNode.put("scenario_main_focus", "crisis-communication");
+    scenarioNode.put("scenario_message_header", "HEADER");
+    scenarioNode.put("scenario_message_footer", "FOOTER");
+    scenarioNode.put("scenario_mail_from", "scenario@mail.fr");
+    scenarioNode.put("scenario_lessons_enabled", true);
+    scenarioNode.put("scenario_lessons_anonymized", true);
+    root.putArray("scenario_tags");
+    root.putArray("scenario_documents");
+    root.putArray("scenario_organizations");
+    root.putArray("scenario_users");
+    root.putArray("scenario_teams");
+    root.putArray("scenario_challenges");
+    root.putArray("scenario_channels");
+    root.putArray("scenario_articles");
+    root.putArray("scenario_objectives");
+    root.putArray("scenario_lessons_categories");
+    root.putArray("scenario_lessons_questions");
+    root.putArray("scenario_variables");
+    root.putArray("scenario_injects");
+
+    this.importer.importData(
+        txCtx(), root, Map.of(), null, null, null, null, Constants.IMPORTED_OBJECT_NAME_SUFFIX);
+
+    Scenario imported =
+        this.scenarioRepository.findAll().stream()
+            .filter(s -> s.getName().startsWith("Lessons scenario"))
+            .findFirst()
+            .orElseThrow();
+    assertTrue(imported.isLessonsEnabled());
+    assertTrue(imported.isLessonsAnonymized());
   }
 
   @Test
@@ -1136,10 +1179,7 @@ class V1_DataImporterTest extends IntegrationTest {
     // source id to the existing target tag, and the nested injector_contract_tags / inject_tags in
     // step_data must be rewritten to that existing tag id (no duplicate tag created).
     String tagName = "v1-import-shared-tag-" + UUID.randomUUID();
-    Tag existingTag = new Tag();
-    existingTag.setName(tagName);
-    existingTag.setColor("#112233");
-    existingTag = tagRepository.save(existingTag);
+    Tag existingTag = tagRepository.save(TagFixture.getTagWithTextAndColour(tagName, "#112233"));
     String targetTagId = existingTag.getId();
     String sourceTagId = UUID.randomUUID().toString();
     assertNotEquals(targetTagId, sourceTagId);
@@ -1410,10 +1450,7 @@ class V1_DataImporterTest extends IntegrationTest {
     // importTags expects a PREFIX (ending with '_'). For contract_output_element tags, the correct
     // prefix is "contract_output_element_", which resolves "contract_output_element_tags".
     String tagName = "contract-output-element-import-tag-" + UUID.randomUUID();
-    Tag existingTag = new Tag();
-    existingTag.setName(tagName);
-    existingTag.setColor("#00AAFF");
-    existingTag = tagRepository.save(existingTag);
+    Tag existingTag = tagRepository.save(TagFixture.getTagWithTextAndColour(tagName, "#00AAFF"));
 
     String sourceTagId = UUID.randomUUID().toString();
     ObjectMapper om = new ObjectMapper();
@@ -1430,7 +1467,7 @@ class V1_DataImporterTest extends IntegrationTest {
 
     // -- Act --
     ReflectionTestUtils.invokeMethod(
-        importer, "importTags", outputElementNode, "contract_output_element_", baseIds);
+        importer, "importTags", txCtx(), outputElementNode, "contract_output_element_", baseIds);
 
     // -- Assert --
     assertTrue(baseIds.containsKey(sourceTagId), "source tag id must be resolved in baseIds");
@@ -2127,10 +2164,10 @@ class V1_DataImporterTest extends IntegrationTest {
     // Re-import on the same instance: injector_contract_tags references a tag that exists on the
     // target but is NOT carried as a root tag object (so importTags never seeds baseIds with it).
     // The id must be kept as a safe fallback (it exists), not dropped as if unresolvable.
-    Tag existing = new Tag();
-    existing.setName("v1-import-existing-not-in-export-" + UUID.randomUUID());
-    existing.setColor("#778899");
-    existing = tagRepository.save(existing);
+    Tag existing =
+        tagRepository.save(
+            TagFixture.getTagWithTextAndColour(
+                "v1-import-existing-not-in-export-" + UUID.randomUUID(), "#778899"));
     String existingTagId = existing.getId();
 
     ObjectMapper om = new ObjectMapper();
@@ -3528,10 +3565,10 @@ class V1_DataImporterTest extends IntegrationTest {
     // bare tag ids (no root tag object seeds baseIds on this path); an id that already exists on
     // the target tenant must land on the recreated payload's contract instead of being dropped.
     openaevInjectorIntegrationFactory.registerConnectorForTenant(TenantContext.getCurrentTenant());
-    Tag existing = new Tag();
-    existing.setName("v1-import-recreated-payload-tag-" + UUID.randomUUID());
-    existing.setColor("#127796");
-    existing = tagRepository.save(existing);
+    Tag existing =
+        tagRepository.save(
+            TagFixture.getTagWithTextAndColour(
+                "v1-import-recreated-payload-tag-" + UUID.randomUUID(), "#127796"));
     String existingTagId = existing.getId();
 
     ObjectMapper om = new ObjectMapper();

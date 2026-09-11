@@ -27,7 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.JsonPath;
 import io.openaev.IntegrationTest;
-import io.openaev.context.TenantContext;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.*;
 import io.openaev.execution.ExecutableInject;
@@ -140,8 +139,8 @@ class InjectApiTest extends IntegrationTest {
 
   @BeforeEach
   void beforeEach() throws Exception {
-    emailInjectorIntegrationFactory.registerConnectorForTenant(TenantContext.getCurrentTenant());
-    openaevInjectorIntegrationFactory.registerConnectorForTenant(TenantContext.getCurrentTenant());
+    emailInjectorIntegrationFactory.registerConnectorForTenant(Tenant.DEFAULT_TENANT_UUID);
+    openaevInjectorIntegrationFactory.registerConnectorForTenant(Tenant.DEFAULT_TENANT_UUID);
     managerFactory.getManager(Tenant.DEFAULT_TENANT_UUID).monitorIntegrations();
     // The manager bootstrap above joins this test's transaction and pins its scope to the default
     // tenant (ManagerCreator.setScopeOnCurrentTransaction). Inject endpoints carrying a TxCtx then
@@ -3393,10 +3392,10 @@ class InjectApiTest extends IntegrationTest {
 
         List<Endpoint> endpointsA =
             endpointRepository.findByExternalReference(
-                "https://shodan.io/.../assetA", TenantContext.getCurrentTenant());
+                "https://shodan.io/.../assetA", Tenant.DEFAULT_TENANT_UUID);
         List<Endpoint> endpointsB =
             endpointRepository.findByExternalReference(
-                "https://shodan.io/.../assetB", TenantContext.getCurrentTenant());
+                "https://shodan.io/.../assetB", Tenant.DEFAULT_TENANT_UUID);
         assertEquals(1, endpointsA.size());
         assertEquals(1, endpointsB.size());
         assertEquals("test.if", endpointsA.getFirst().getHostname());
@@ -3487,7 +3486,7 @@ class InjectApiTest extends IntegrationTest {
 
         List<Endpoint> endpointsA =
             endpointRepository.findByExternalReference(
-                "https://shodan.io/.../assetA", TenantContext.getCurrentTenant());
+                "https://shodan.io/.../assetA", Tenant.DEFAULT_TENANT_UUID);
         assertEquals(1, endpointsA.size());
         assertEquals("test.if", endpointsA.getFirst().getHostname());
       }
@@ -3618,7 +3617,7 @@ class InjectApiTest extends IntegrationTest {
                 () -> {
                   List<Endpoint> endpointsA =
                       endpointRepository.findByExternalReference(
-                          "https://shodan.io/.../assetA", TenantContext.getCurrentTenant());
+                          "https://shodan.io/.../assetA", Tenant.DEFAULT_TENANT_UUID);
                   return endpointsA.isEmpty();
                 });
       }
@@ -3691,7 +3690,7 @@ class InjectApiTest extends IntegrationTest {
 
         List<Endpoint> endpointsA =
             endpointRepository.findByExternalReference(
-                "https://shodan.io/.../assetC", TenantContext.getCurrentTenant());
+                "https://shodan.io/.../assetC", Tenant.DEFAULT_TENANT_UUID);
         assertEquals(1, endpointsA.size());
         assertEquals("", endpointsA.getFirst().getHostname());
         assertEquals(Endpoint.PLATFORM_TYPE.Unknown, endpointsA.getFirst().getPlatform());
