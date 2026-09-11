@@ -17,7 +17,10 @@ import io.openaev.utils.mockUser.WithMockUser;
 import io.openaev.xtmhub.XtmHubClient;
 import io.openaev.xtmhub.XtmHubRegistrationStatus;
 import java.time.LocalDateTime;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.UUID;
+import org.hibernate.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -222,97 +225,136 @@ class XtmHubApiHttpIsolationTest extends IntegrationTest {
     registration.setLastConnectivityCheck(LocalDateTime.now());
     registration.setConnectivityEmailEligible(true);
     entityManager
-        .createNativeQuery(
-            """
-            INSERT INTO tenant_xtmhub_registrations (
-              registration_id,
-              tenant_id,
-              registration_token,
-              registration_date,
-              registration_status,
-              registration_user_id,
-              registration_user_name,
-              registration_last_connectivity_check,
-              registration_connectivity_email_eligible
-            ) VALUES (
-              :id,
-              :tenantId,
-              :token,
-              :registrationDate,
-              :registrationStatus,
-              :registrationUserId,
-              :registrationUserName,
-              :lastConnectivityCheck,
-              :connectivityEmailEligible
-            )
-            """)
-        .setParameter("id", registration.getId())
-        .setParameter("tenantId", tenantId)
-        .setParameter("token", token)
-        .setParameter("registrationDate", registration.getRegistrationDate())
-        .setParameter("registrationStatus", registration.getRegistrationStatus().name())
-        .setParameter("registrationUserId", registration.getRegistrationUserId())
-        .setParameter("registrationUserName", registration.getRegistrationUserName())
-        .setParameter("lastConnectivityCheck", registration.getLastConnectivityCheck())
-        .setParameter("connectivityEmailEligible", registration.isConnectivityEmailEligible())
-        .executeUpdate();
+        .unwrap(Session.class)
+        .doWork(
+            connection -> {
+              try (PreparedStatement statement =
+                  connection.prepareStatement(
+                      """
+                      INSERT INTO tenant_xtmhub_registrations (
+                        registration_id,
+                        tenant_id,
+                        registration_token,
+                        registration_date,
+                        registration_status,
+                        registration_user_id,
+                        registration_user_name,
+                        registration_last_connectivity_check,
+                        registration_connectivity_email_eligible
+                      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                      """)) {
+                statement.setString(1, registration.getId());
+                statement.setString(2, tenantId);
+                statement.setString(3, token);
+                statement.setObject(4, registration.getRegistrationDate());
+                statement.setString(5, registration.getRegistrationStatus().name());
+                statement.setString(6, registration.getRegistrationUserId());
+                statement.setString(7, registration.getRegistrationUserName());
+                statement.setObject(8, registration.getLastConnectivityCheck());
+                statement.setBoolean(9, registration.isConnectivityEmailEligible());
+                statement.executeUpdate();
+              }
+            });
   }
 
   private void deleteByTenantId(String tenantId) {
+    entityManager.flush();
     entityManager
-        .createNativeQuery("DELETE FROM tenant_xtmhub_registrations WHERE tenant_id = :tenantId")
-        .setParameter("tenantId", tenantId)
-        .executeUpdate();
+        .unwrap(Session.class)
+        .doWork(
+            connection -> {
+              try (PreparedStatement statement =
+                  connection.prepareStatement(
+                      "DELETE FROM tenant_xtmhub_registrations WHERE tenant_id = ?")) {
+                statement.setString(1, tenantId);
+                statement.executeUpdate();
+              }
+            });
   }
 
   private String rawTenantId(String registrationId) {
     entityManager.flush();
-    return (String)
-        entityManager
-            .createNativeQuery(
-                "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_id = :id")
-            .setParameter("id", registrationId)
-            .getSingleResult();
+    return entityManager
+        .unwrap(Session.class)
+        .doReturningWork(
+            connection -> {
+              try (PreparedStatement statement =
+                  connection.prepareStatement(
+                      "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_id = ?")) {
+                statement.setString(1, registrationId);
+                try (ResultSet rows = statement.executeQuery()) {
+                  return rows.next() ? rows.getString(1) : null;
+                }
+              }
+            });
   }
 
   private String rawSingleRegistrationTenant(String token) {
     entityManager.flush();
-    return (String)
-        entityManager
-            .createNativeQuery(
-                "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_token = :token")
-            .setParameter("token", token)
-            .getSingleResult();
+    return entityManager
+        .unwrap(Session.class)
+        .doReturningWork(
+            connection -> {
+              try (PreparedStatement statement =
+                  connection.prepareStatement(
+                      "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_token = ?")) {
+                statement.setString(1, token);
+                try (ResultSet rows = statement.executeQuery()) {
+                  return rows.next() ? rows.getString(1) : null;
+                }
+              }
+            });
   }
 
   private String registrationIdForTenant(String tenantId) {
-    return (String)
-        entityManager
-            .createNativeQuery(
-                "SELECT registration_id FROM tenant_xtmhub_registrations WHERE tenant_id = :tenantId")
-            .setParameter("tenantId", tenantId)
-            .getSingleResult();
+    entityManager.flush();
+    return entityManager
+        .unwrap(Session.class)
+        .doReturningWork(
+            connection -> {
+              try (PreparedStatement statement =
+                  connection.prepareStatement(
+                      "SELECT registration_id FROM tenant_xtmhub_registrations WHERE tenant_id = ?")) {
+                statement.setString(1, tenantId);
+                try (ResultSet rows = statement.executeQuery()) {
+                  return rows.next() ? rows.getString(1) : null;
+                }
+              }
+            });
   }
 
   private long rawCountForTenant(String tenantId) {
     entityManager.flush();
-    Number count =
-        (Number)
-            entityManager
-                .createNativeQuery(
-                    "SELECT count(*) FROM tenant_xtmhub_registrations WHERE tenant_id = :tenantId")
-                .setParameter("tenantId", tenantId)
-                .getSingleResult();
-    return count.longValue();
+    return entityManager
+        .unwrap(Session.class)
+        .doReturningWork(
+            connection -> {
+              try (PreparedStatement statement =
+                  connection.prepareStatement(
+                      "SELECT count(*) FROM tenant_xtmhub_registrations WHERE tenant_id = ?")) {
+                statement.setString(1, tenantId);
+                try (ResultSet rows = statement.executeQuery()) {
+                  rows.next();
+                  return rows.getLong(1);
+                }
+              }
+            });
   }
 
   private String rawTokenForTenant(String tenantId) {
     entityManager.flush();
-    return (String)
-        entityManager
-            .createNativeQuery(
-                "SELECT registration_token FROM tenant_xtmhub_registrations WHERE tenant_id = :tenantId")
-            .setParameter("tenantId", tenantId)
-            .getSingleResult();
+    return entityManager
+        .unwrap(Session.class)
+        .doReturningWork(
+            connection -> {
+              try (PreparedStatement statement =
+                  connection.prepareStatement(
+                      "SELECT registration_token FROM tenant_xtmhub_registrations WHERE tenant_id = ?")) {
+                statement.setString(1, tenantId);
+                try (ResultSet rows = statement.executeQuery()) {
+                  return rows.next() ? rows.getString(1) : null;
+                }
+              }
+            });
   }
 }
