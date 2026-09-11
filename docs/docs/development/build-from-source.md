@@ -82,7 +82,7 @@ OpenAEV is a Spring Boot application and thus can be built and started
 in one (two) fell swoop(s) with
 ```shell
 mvn clean install -DskipTests=true
-java -jar openaev-api/target/openaev-api.jar --spring.config.import=file:openaev-api/src/main/resources/application-dev.properties
+java -jar openaev-api/target/openaev-api.jar --spring.config.import=file:openaev-api/target/classes/application-dev.properties
 ```
 
 !!! tip "IntelliJ IDEA run configuration"
