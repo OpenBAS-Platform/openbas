@@ -16,6 +16,9 @@ import java.util.stream.Collectors;
  */
 public record TenantTables(Set<String> strict, Set<String> dualScope) {
 
+  /** Activation allowlist entry meaning "every strict table"; see {@link #restrictTo}. */
+  public static final String ALL_STRICT = "*";
+
   public enum Family {
     NONE,
     STRICT,
@@ -94,9 +97,25 @@ public record TenantTables(Set<String> strict, Set<String> dualScope) {
    * table-by-table rollout knob; an empty allowlist activates nothing, so the inspector stays
    * inert. An entry that is not a known tenant table fails fast, to surface a typo at startup
    * rather than silently leave a table unprotected.
+   *
+   * <p>The single entry {@value #ALL_STRICT} activates every strict table and no dual-scope one:
+   * the rollout's terminal state, and what the nightly shadow run passes to surface what activating
+   * everything would break. Dual-scope tables stay out because a platform row is written with no
+   * tenant, which this mechanism does not cover. It is rejected alongside other entries, so a list
+   * always reads as either "these tables" or "all of them", never both.
    */
   public TenantTables restrictTo(Collection<String> allowlist) {
     Set<String> allowed = lowercase(new HashSet<>(allowlist));
+    if (allowed.contains(ALL_STRICT)) {
+      if (allowed.size() > 1) {
+        throw new IllegalArgumentException(
+            "active-tables is either '"
+                + ALL_STRICT
+                + "' or a list of tables, not both: "
+                + allowed);
+      }
+      return new TenantTables(strict, Set.of());
+    }
     Set<String> known = new HashSet<>(strict);
     known.addAll(dualScope);
     Set<String> unknown = new HashSet<>(allowed);
