@@ -1,6 +1,7 @@
 package io.openaev.ocsf.parser.generator.utility;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openaev.ocsf.parser.generator.emission.ClassMetadata;
@@ -31,7 +32,9 @@ public class OcsfConverterEmitter implements Emitter {
             .withPackage(packageName)
             .withField(
                 new FieldMeta(Modifier.PRIVATE, ObjectMapper.class.getTypeName(), "mapper")
-                    .withInitialiser("new ObjectMapper()"));
+                    .withInitialiser(
+                        "new ObjectMapper().configure(%s.FAIL_ON_UNKNOWN_PROPERTIES, false)"
+                            .formatted(DeserializationFeature.class.getCanonicalName())));
     for (ClassMetadata md : tracker.values()) {
       switch (md.dimension()) {
         case SINGLE_OBJECT, SINGLE_CLASS ->

@@ -16,8 +16,8 @@ public class RoundTripSerdeTest {
   private final ObjectMapper mapper = new ObjectMapper();
 
   @Test
-  @DisplayName("Deserialised OCSF class object is serialised correctly")
-  void deserialisedOcsfClassObject_isSerialisedCorrectly() throws IOException {
+  @DisplayName("Deserialised OCSF class object is serialised back correctly")
+  void deserialisedOcsfClassObject_isSerialisedBackCorrectly() throws IOException {
     List<OcsfClassDetectionFinding> findings =
         new OcsfFilter()
             .filterOcsfClassDetectionFindings(ProwlerOcsfOutputFixture.getProwlerOcsfOutputTrace());

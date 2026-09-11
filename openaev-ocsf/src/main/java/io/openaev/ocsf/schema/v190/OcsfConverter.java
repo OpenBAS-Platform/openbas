@@ -4,7 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class OcsfConverter {
 
-  private com.fasterxml.jackson.databind.ObjectMapper mapper = new ObjectMapper();
+  private com.fasterxml.jackson.databind.ObjectMapper mapper =
+      new ObjectMapper()
+          .configure(
+              com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+              false);
 
   public io.openaev.ocsf.schema.v190.classes.OcsfClassAccountChange toOcsfClassAccountChange(
       com.fasterxml.jackson.databind.JsonNode node)
