@@ -6,11 +6,11 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * Caches tenant membership checks to avoid hitting the database on every HTTP request. The cache
@@ -70,23 +70,57 @@ public class TenantMembershipCacheManager {
   /**
    * Evicts a specific user-tenant membership entry and the user's cached tenant-id list after
    * membership changes.
+   *
+   * <p>Deferred to run only after the enclosing transaction commits, if any: a membership row that
+   * is inserted or removed is not visible to other connections until commit (READ COMMITTED), so
+   * evicting before commit would let a concurrent request for the same user repopulate the cache
+   * from the pre-commit state, poisoning it for its full TTL. Every caller that mutates {@code
+   * users_tenants} must go through this method (or {@link #evictForUser}) instead of evicting the
+   * caches directly, so this guarantee applies uniformly regardless of which service triggered the
+   * membership change.
    */
-  @Caching(
-      evict = {
-        @CacheEvict(value = TENANT_MEMBERSHIP_CACHE, key = "#userId + ':' + #tenantId"),
-        @CacheEvict(value = USER_TENANT_IDS_CACHE, key = "#userId")
-      })
   public void evict(String userId, String tenantId) {
-    // eviction only
+    deferUntilCommit(() -> evictNow(userId, tenantId));
   }
 
   /**
    * Evicts all cached tenant membership entries for a given user, including the cached tenant-id
-   * list. Membership keys are evicted through {@link CacheManager} because calling {@link
-   * #evict(String, String)} from this method would be a self-invocation and skip the cache
-   * interceptor.
+   * list. Same after-commit deferral as {@link #evict(String, String)}.
    */
   public void evictForUser(String userId, List<String> tenantIds) {
+    deferUntilCommit(() -> evictForUserNow(userId, tenantIds));
+  }
+
+  /**
+   * Runs {@code eviction} immediately if no transaction is active (nothing to wait for), otherwise
+   * registers it to run after the enclosing transaction commits.
+   */
+  private void deferUntilCommit(Runnable eviction) {
+    if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+      eviction.run();
+      return;
+    }
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            eviction.run();
+          }
+        });
+  }
+
+  private void evictNow(String userId, String tenantId) {
+    Cache membershipCache = cacheManager.getCache(TENANT_MEMBERSHIP_CACHE);
+    if (membershipCache != null) {
+      membershipCache.evict(userId + ":" + tenantId);
+    }
+    Cache tenantIdsCache = cacheManager.getCache(USER_TENANT_IDS_CACHE);
+    if (tenantIdsCache != null) {
+      tenantIdsCache.evict(userId);
+    }
+  }
+
+  private void evictForUserNow(String userId, List<String> tenantIds) {
     Cache tenantIdsCache = cacheManager.getCache(USER_TENANT_IDS_CACHE);
     if (tenantIdsCache != null) {
       tenantIdsCache.evict(userId);

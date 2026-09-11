@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * Tests for {@link TenantMembershipCacheManager} verifying that caching and eviction work correctly
@@ -230,6 +231,90 @@ class TenantMembershipCacheManagerTest {
       verify(tenantRepository, times(2)).existsByUserIdAndTenantId(USER_ID, TENANT_ID);
       verify(jdbcTemplate, times(2))
           .queryForList(TenantMembershipCacheManager.USER_TENANT_IDS_SQL, String.class, USER_ID);
+    }
+  }
+
+  @Nested
+  @DisplayName("after-commit deferral")
+  class AfterCommitDeferral {
+
+    @AfterEach
+    void tearDown() {
+      // Never leave synchronization active for the next test in the same thread.
+      if (TransactionSynchronizationManager.isSynchronizationActive()) {
+        TransactionSynchronizationManager.clearSynchronization();
+      }
+    }
+
+    @Test
+    @DisplayName("given_activeTransaction_evict_should_deferCacheEvictionUntilAfterCommit")
+    void given_activeTransaction_evict_should_deferCacheEvictionUntilAfterCommit() {
+      // Arrange
+      when(tenantRepository.existsByUserIdAndTenantId(USER_ID, TENANT_ID))
+          .thenReturn(true)
+          .thenReturn(false);
+      tenantMembershipCacheManager.existsByUserIdAndTenantId(USER_ID, TENANT_ID);
+      TransactionSynchronizationManager.initSynchronization();
+
+      // Act
+      tenantMembershipCacheManager.evict(USER_ID, TENANT_ID);
+
+      // Assert — evicting here, before commit, would let a concurrent reader repopulate the
+      // cache from data that predates the commit, so the cached value must survive until then.
+      assertThat(tenantMembershipCacheManager.existsByUserIdAndTenantId(USER_ID, TENANT_ID))
+          .isTrue();
+      verify(tenantRepository, times(1)).existsByUserIdAndTenantId(USER_ID, TENANT_ID);
+
+      // Simulate the transaction committing: only then must the eviction fire.
+      TransactionSynchronizationManager.getSynchronizations().forEach(sync -> sync.afterCommit());
+
+      assertThat(tenantMembershipCacheManager.existsByUserIdAndTenantId(USER_ID, TENANT_ID))
+          .isFalse();
+      verify(tenantRepository, times(2)).existsByUserIdAndTenantId(USER_ID, TENANT_ID);
+    }
+
+    @Test
+    @DisplayName("given_activeTransaction_evictForUser_should_deferCacheEvictionUntilAfterCommit")
+    void given_activeTransaction_evictForUser_should_deferCacheEvictionUntilAfterCommit() {
+      // Arrange
+      when(tenantRepository.existsByUserIdAndTenantId(USER_ID, TENANT_ID))
+          .thenReturn(true)
+          .thenReturn(false);
+      tenantMembershipCacheManager.existsByUserIdAndTenantId(USER_ID, TENANT_ID);
+      TransactionSynchronizationManager.initSynchronization();
+
+      // Act
+      tenantMembershipCacheManager.evictForUser(USER_ID, List.of(TENANT_ID));
+
+      // Assert
+      assertThat(tenantMembershipCacheManager.existsByUserIdAndTenantId(USER_ID, TENANT_ID))
+          .isTrue();
+      verify(tenantRepository, times(1)).existsByUserIdAndTenantId(USER_ID, TENANT_ID);
+
+      TransactionSynchronizationManager.getSynchronizations().forEach(sync -> sync.afterCommit());
+
+      assertThat(tenantMembershipCacheManager.existsByUserIdAndTenantId(USER_ID, TENANT_ID))
+          .isFalse();
+      verify(tenantRepository, times(2)).existsByUserIdAndTenantId(USER_ID, TENANT_ID);
+    }
+
+    @Test
+    @DisplayName("given_noActiveTransaction_evict_should_evictImmediately")
+    void given_noActiveTransaction_evict_should_evictImmediately() {
+      // Arrange
+      when(tenantRepository.existsByUserIdAndTenantId(USER_ID, TENANT_ID))
+          .thenReturn(true)
+          .thenReturn(false);
+      tenantMembershipCacheManager.existsByUserIdAndTenantId(USER_ID, TENANT_ID);
+      // No TransactionSynchronizationManager.initSynchronization(): nothing to defer to.
+
+      // Act
+      tenantMembershipCacheManager.evict(USER_ID, TENANT_ID);
+
+      // Assert
+      assertThat(tenantMembershipCacheManager.existsByUserIdAndTenantId(USER_ID, TENANT_ID))
+          .isFalse();
+      verify(tenantRepository, times(2)).existsByUserIdAndTenantId(USER_ID, TENANT_ID);
     }
   }
 }

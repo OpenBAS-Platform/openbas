@@ -35,8 +35,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @RequiredArgsConstructor
@@ -75,7 +73,7 @@ public class TenantUserService implements DependenciesManager {
 
   public void attachToTenant(@NotBlank String userId, @NotBlank String tenantId) {
     tenantRepository.addUserToTenant(userId, tenantId);
-    evictMembershipAfterCommit(userId, tenantId);
+    tenantMembershipCacheManager.evict(userId, tenantId);
   }
 
   // -- READ --
@@ -155,7 +153,7 @@ public class TenantUserService implements DependenciesManager {
     // Before the membership row goes away, so the groups it granted go with it.
     userService.revokeTenantGroups(userId, List.of(tenantId()));
     tenantRepository.removeUserFromTenant(userId, tenantId());
-    evictMembershipAfterCommit(userId, tenantId());
+    tenantMembershipCacheManager.evict(userId, tenantId());
   }
 
   // -- DEPENDENCIES MANAGER --
@@ -182,27 +180,5 @@ public class TenantUserService implements DependenciesManager {
       throw new IllegalStateException("TenantUserService requires a tenant context");
     }
     return tenantId;
-  }
-
-  /**
-   * Defers a membership-cache eviction to run only after the enclosing transaction commits. A
-   * membership row that is inserted or removed is not visible to other connections until commit
-   * (READ COMMITTED); evicting before commit lets a concurrent request for the same user repopulate
-   * {@link TenantMembershipCacheManager#findTenantIdsByUserId} from the pre-commit state, poisoning
-   * the cache for its full 5-minute TTL. If no transaction is active, there is nothing to wait for,
-   * so the eviction runs immediately.
-   */
-  private void evictMembershipAfterCommit(String userId, String tenantId) {
-    if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-      tenantMembershipCacheManager.evict(userId, tenantId);
-      return;
-    }
-    TransactionSynchronizationManager.registerSynchronization(
-        new TransactionSynchronization() {
-          @Override
-          public void afterCommit() {
-            tenantMembershipCacheManager.evict(userId, tenantId);
-          }
-        });
   }
 }
