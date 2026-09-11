@@ -538,6 +538,7 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.organization.OrganizationApi#searchInjectsForOrganization",
           "io.openaev.rest.scenario.ScenarioApi#assetGroupsByIds",
           "io.openaev.rest.tag_rule.TagRuleApi#createTagRule",
+          "io.openaev.rest.tag_rule.TagRuleApi#deleteTagRule",
           "io.openaev.rest.tag_rule.TagRuleApi#findTagRule",
           "io.openaev.rest.tag_rule.TagRuleApi#searchTagRules",
           "io.openaev.rest.tag_rule.TagRuleApi#tags",
