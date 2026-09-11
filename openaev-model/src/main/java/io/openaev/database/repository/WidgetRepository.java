@@ -5,17 +5,12 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface WidgetRepository
     extends CrudRepository<Widget, String>, JpaSpecificationExecutor<Widget> {
-
-  @Query("SELECT w FROM Widget w WHERE w.id = :id")
-  Optional<Widget> findById(@Param("id") String id);
 
   List<Widget> findAllByCustomDashboardId(@NotBlank final String id);
 

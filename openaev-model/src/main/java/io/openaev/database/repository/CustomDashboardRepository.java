@@ -16,9 +16,6 @@ import org.springframework.stereotype.Repository;
 public interface CustomDashboardRepository
     extends CrudRepository<CustomDashboard, String>, JpaSpecificationExecutor<CustomDashboard> {
 
-  @Query("SELECT cd FROM CustomDashboard cd WHERE cd.id = :id")
-  Optional<CustomDashboard> findById(@Param("id") String id);
-
   Optional<CustomDashboard> findByName(@NotBlank final String name);
 
   /**
