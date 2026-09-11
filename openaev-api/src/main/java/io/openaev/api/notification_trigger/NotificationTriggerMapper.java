@@ -52,6 +52,10 @@ public class NotificationTriggerMapper {
     trigger.setNotifiers(
         resolveAll(
             input.getNotifierIds(),
+            // Left on the v1 thread-local on purpose: notifiers is still v1-filtered, and
+            // HibernateFilterTransactionAspect binds that filter from TenantContext BEFORE the
+            // endpoint body runs, so a lookup constrained to any other tenant can never match.
+            // Switches to the write tenant when notifiers is activated (#7864).
             ids ->
                 notifierRepository.findAllByIdInAndTenantId(ids, TenantContext.getCurrentTenant()),
             "Notifier"));
