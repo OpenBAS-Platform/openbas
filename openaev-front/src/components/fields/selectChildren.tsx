@@ -37,8 +37,11 @@ export const toSelectItems = (children: ReactNode): ReactNode =>
       return child;
     }
     const { value, disabled, children: inner } = (child as ReactElement<ItemLikeProps>).props;
+    // Dropped, as `toOptions` drops it: an option list cannot express a child
+    // that is not an option, so rendering one here would make the same children
+    // produce two different lists.
     if (value === undefined) {
-      return child;
+      return null;
     }
     return (
       <SelectItem value={String(value)} disabled={disabled}>
@@ -63,7 +66,12 @@ export const toOptions = (children: ReactNode): {
       return node.map(flatten).join('');
     }
     if (isValidElement(node)) {
-      return flatten((node.props as { children?: ReactNode }).children);
+      // Through `unwrapLabel`, so a `ListItemText` carrying only `primary`
+      // reads the same here as it does on the other path.
+      const unwrapped = unwrapLabel(node);
+      return unwrapped === node
+        ? flatten((node.props as { children?: ReactNode }).children)
+        : flatten(unwrapped);
     }
     return '';
   };
