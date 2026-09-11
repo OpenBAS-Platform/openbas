@@ -26,6 +26,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -48,6 +49,7 @@ class XtmHubApiHttpIsolationTest extends IntegrationTest {
   private static final String UNREGISTER_URI = XtmHubApi.TENANT_XTMHUB_URI + "/unregister";
 
   @Autowired private MockMvc mvc;
+  @Autowired private JdbcTemplate jdbcTemplate;
   @Autowired private TenantIsolationTestHelper tenantHelper;
 
   @MockitoBean private XtmHubClient xtmHubClient;
@@ -162,8 +164,8 @@ class XtmHubApiHttpIsolationTest extends IntegrationTest {
 
     // Assert
     assertEquals(
-        tenantC,
-        rawSingleRegistrationTenant("auto-token-c"),
+        1L,
+        rawCountForTokenInTenant("auto-token-c", tenantC),
         "auto-register must attribute the row to the header-selected tenant");
   }
 
@@ -258,6 +260,7 @@ class XtmHubApiHttpIsolationTest extends IntegrationTest {
   }
 
   private void deleteByTenantId(String tenantId) {
+<<<<<<< HEAD
     entityManager.flush();
     entityManager
         .unwrap(Session.class)
@@ -356,5 +359,49 @@ class XtmHubApiHttpIsolationTest extends IntegrationTest {
                 }
               }
             });
+=======
+    jdbcTemplate.update("DELETE FROM tenant_xtmhub_registrations WHERE tenant_id = ?", tenantId);
+  }
+
+  private String rawTenantId(String registrationId) {
+    return jdbcTemplate.queryForObject(
+        "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_id = ?",
+        String.class,
+        registrationId);
+  }
+
+  private long rawCountForTokenInTenant(String token, String tenantId) {
+    Long count =
+        jdbcTemplate.queryForObject(
+            "SELECT count(*) FROM tenant_xtmhub_registrations"
+                + " WHERE registration_token = ? AND tenant_id = ?",
+            Long.class,
+            token,
+            tenantId);
+    return count != null ? count : 0L;
+  }
+
+  private String registrationIdForTenant(String tenantId) {
+    return jdbcTemplate.queryForObject(
+        "SELECT registration_id FROM tenant_xtmhub_registrations WHERE tenant_id = ?",
+        String.class,
+        tenantId);
+  }
+
+  private long rawCountForTenant(String tenantId) {
+    Long count =
+        jdbcTemplate.queryForObject(
+            "SELECT count(*) FROM tenant_xtmhub_registrations WHERE tenant_id = ?",
+            Long.class,
+            tenantId);
+    return count != null ? count : 0L;
+  }
+
+  private String rawTokenForTenant(String tenantId) {
+    return jdbcTemplate.queryForObject(
+        "SELECT registration_token FROM tenant_xtmhub_registrations WHERE tenant_id = ?",
+        String.class,
+        tenantId);
+>>>>>>> 2a5b14f6e637b252fb898d1357cc963808309f21
   }
 }

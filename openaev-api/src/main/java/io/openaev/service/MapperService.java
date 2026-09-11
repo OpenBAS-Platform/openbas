@@ -22,6 +22,7 @@ import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+import io.openaev.config.TenantWriteScopeResolver;
 import io.openaev.context.TenantContext;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
@@ -74,6 +75,7 @@ public class MapperService {
   private final InjectorContractRepository injectorContractRepository;
   private final EndpointRepository endpointRepository;
   private final EndpointService endpointService;
+  private final TenantWriteScopeResolver writeScopeResolver;
 
   private final TagService tagService;
   private final ObjectMapper objectMapper;
@@ -630,7 +632,13 @@ public class MapperService {
       }
       endpoint.setTags(iterableToSet(tagsForCreation));
       endpoint.setEoL(endpointExportImport.isEol());
-      endpointService.createEndpoint(endpoint);
+      // CSV import writes into the tenant the request selected, never the thread-local.
+      // main plumbs the TxCtx down to this method; lot B made the tenant a REQUIRED argument of
+      // createEndpoint, so a forgotten attribution is a compile error rather than a silent write
+      // into whatever the v1 thread-local held. Keep both: resolve from the request scope,
+      // attribute
+      // explicitly. tenantForWrite refuses an ambiguous multi-tenant scope with a 400.
+      endpointService.createEndpoint(endpoint, writeScopeResolver.tenantForWrite(ctx, null));
     }
   }
 
