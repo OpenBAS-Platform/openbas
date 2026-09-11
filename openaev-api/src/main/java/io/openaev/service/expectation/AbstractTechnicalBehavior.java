@@ -76,7 +76,7 @@ public abstract class AbstractTechnicalBehavior
     // take
     // this path (see requiresCollectorToInitialize).
     List<Collector> collectors = resolveCollectors(inject.getTenant().getId(), expectationTemplate);
-    boolean collectorRequiredButMissing = requiresCollectorToInitialize() && collectors.isEmpty();
+    boolean requiresCollectorToInitialize = computeCollectorMissingAtInit(collectors);
 
     List<TechnicalInjectExpectation> allExpectations = new ArrayList<>();
 
@@ -132,7 +132,7 @@ public abstract class AbstractTechnicalBehavior
                 isAgentExpectation(e) || isAgentlessAssetExpectationNecessary(e.getAsset(), inject))
         .forEach(
             e -> {
-              if (!collectorRequiredButMissing) {
+              if (!requiresCollectorToInitialize) {
                 initializeResults(e, collectors);
               }
               String agentId = e.getAgent() != null ? e.getAgent().getId() : null;
@@ -145,10 +145,12 @@ public abstract class AbstractTechnicalBehavior
                       injectService.getValueTargetedAssetMap(inject));
               e.setSignatures(convertToInjectExpectationSignatures(expectationSignatures, e));
             });
-    if (collectorRequiredButMissing) {
-      // Parent (asset / asset-group) rows aggregate their leaves, which are all definitive failures
-      // here, so resolve them to the same failure score immediately for a consistent verdict.
-      allExpectations.forEach(e -> e.setScore(FAILED_SCORE_VALUE));
+    if (requiresCollectorToInitialize) {
+      allExpectations.forEach(
+          e -> {
+            e.setScore(FAILED_SCORE_VALUE);
+            e.setCollectorMissingAtInit(true);
+          });
     }
     injectExpectationRepository.saveAll(allExpectations);
   }
@@ -188,6 +190,10 @@ public abstract class AbstractTechnicalBehavior
     List<Collector> tenantCollectors = collectorService.securityPlatformCollectors(tenantId);
     return filterCollectorsForExpectation(
         tenantCollectors, expectation.getExpectedSecurityPlatforms());
+  }
+
+  private boolean computeCollectorMissingAtInit(List<Collector> resolvedCollectors) {
+    return requiresCollectorToInitialize() && resolvedCollectors.isEmpty();
   }
 
   /**

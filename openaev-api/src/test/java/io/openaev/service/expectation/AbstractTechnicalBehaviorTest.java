@@ -234,17 +234,66 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
       // Assert — expectations are still created (1 agent + 1 asset) and resolved as failure
       assertThat(saved).hasSize(2);
       assertThat(saved).allSatisfy(e -> assertThat(e.getScore()).isEqualTo(FAILED_SCORE_VALUE));
+      // Every row is stamped with the frozen no-collector marker so the verdict stays explainable.
+      assertThat(saved)
+          .allSatisfy(
+              e ->
+                  assertThat(((TechnicalInjectExpectation) e).isCollectorMissingAtInit()).isTrue());
 
+      // Leaves keep empty results so they stay manually fillable: the failure is carried by the
+      // score alone, not by a synthetic result row.
       TechnicalInjectExpectation agentExpectation =
           (TechnicalInjectExpectation)
               saved.stream()
                   .filter(e -> ((TechnicalInjectExpectation) e).getAgent() != null)
                   .findFirst()
                   .orElseThrow();
-      assertThat(agentExpectation.getResults()).hasSize(1);
-      InjectExpectationResult failedResult = agentExpectation.getResults().getFirst();
-      assertThat(failedResult.getResult()).isEqualTo(agentExpectation.getFailureLabel());
-      assertThat(failedResult.getSourceType()).isEqualTo(NO_COLLECTOR_SOURCE_TYPE);
+      assertThat(agentExpectation.getResults()).isEmpty();
+    }
+
+    @Test
+    @DisplayName(
+        "given a matching collector is connected, should not flag the expectation as"
+            + " collector-missing-at-init")
+    void given_matching_collector_should_not_flag_collector_missing_at_init() {
+      // Arrange
+      Endpoint endpoint =
+          endpointComposer
+              .forEndpoint(EndpointFixture.createEndpoint())
+              .withAgent(agentComposer.forAgent(AgentFixture.createDefaultAgentService()))
+              .persist()
+              .get();
+
+      Exercise exercise = persistDefaultExercise();
+
+      Inject inject =
+          injectComposer
+              .forInject(InjectFixture.getDefaultInject())
+              .withEndpoint(endpointComposer.forEndpoint(endpoint))
+              .withExercise(exerciseComposer.forExercise(exercise))
+              .persist()
+              .get();
+
+      DetectionInjectExpectation template = createTemplate(inject);
+      // An EDR collector is persisted in setUp, so an EDR-restricted detection expectation can be
+      // answered: the gate must not trip.
+      template.setExpectedSecurityPlatforms(List.of(SecurityPlatform.SECURITY_PLATFORM_TYPE.EDR));
+
+      ExecutableInject executableInject =
+          new ExecutableInject(
+              false, false, inject, List.of(), List.of(endpoint), List.of(), List.of());
+
+      // Act
+      List<BaseInjectExpectation> saved =
+          actAndGetSavedExpectations(executableInject, template, "oaev");
+
+      // Assert — the frozen marker stays false, so a later collector removal cannot fabricate the
+      // "no automated security platform" state after the fact.
+      assertThat(saved)
+          .allSatisfy(
+              e ->
+                  assertThat(((TechnicalInjectExpectation) e).isCollectorMissingAtInit())
+                      .isFalse());
     }
 
     @Test
