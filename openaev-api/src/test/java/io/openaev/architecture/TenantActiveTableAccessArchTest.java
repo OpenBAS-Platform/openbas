@@ -316,7 +316,10 @@ class TenantActiveTableAccessArchTest {
    * is {@code AttackPathFindingRepository} (7 joined queries, none correlated).
    */
   private static final Set<Class<?>> REPOSITORIES_WITH_REVIEWED_JOINED_QUERIES =
-      Set.of(CustomDashboardRepository.class, KillChainPhaseRepository.class, TenantXtmHubRegistrationRepository.class);
+      Set.of(
+          CustomDashboardRepository.class,
+          KillChainPhaseRepository.class,
+          TenantXtmHubRegistrationRepository.class);
 
   @ArchTest
   static void joined_queries_on_active_tables_correlate_the_tenant(JavaClasses classes) {
