@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openaev.aop.lock.Lock;
 import io.openaev.aop.lock.LockResourceType;
 import io.openaev.config.OpenAEVConfig;
+import io.openaev.context.TenantContext;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.ScenarioRepository;
@@ -107,7 +108,7 @@ public class SecurityCoverageService {
   @Lock(type = LockResourceType.SECURITY_COVERAGE, key = "#securityCoverageStixId")
   @Transactional(rollbackFor = Exception.class)
   public Scenario handleSecurityCoverageProcessing(
-      String securityCoverageStixId, ObjectBase securityCoverageObj, Bundle bundle, TxCtx ctx)
+      TxCtx ctx, String securityCoverageStixId, ObjectBase securityCoverageObj, Bundle bundle)
       throws ParsingException, BundleValidationError, ConnectorError, IOException {
     // The transaction's scope and the tenant of the rows written here are one value; taking both
     // from the caller let them disagree, and the coverage row would then be inserted for one tenant
@@ -129,20 +130,37 @@ public class SecurityCoverageService {
                       + " security_coverages.tenant_id is NOT NULL. The caller must resolve a"
                       + " single tenant for this bundle.");
         };
-    // Telemetry: one CTI security coverage bundle processed (attempts semantics).
-    resultsMetricCollector.recordSecurityCoverageProcessed();
-    String bundleHash = md5Hex(bundle.toStix(objectMapper).toString());
+    // The scenario, its injects and their tags are still v1 tables: TenantBaseListener stamps them
+    // from TenantContext, which TenantInterceptor only sets on the /api/tenants/{tenantId}/ route.
+    // On the header route it is unset and falls back to the default tenant, so the coverage landed
+    // in the requested tenant while everything derived from it landed in the default one. Bridging
+    // the resolved tenant onto v1 for this transaction keeps the whole bundle in one tenant; the
+    // bridge goes away when scenarios and injects are activated.
+    String previousTenant =
+        TenantContext.hasCurrentTenant() ? TenantContext.getCurrentTenant() : null;
+    TenantContext.setCurrentTenant(tenantId);
+    try {
+      // Telemetry: one CTI security coverage bundle processed (attempts semantics).
+      resultsMetricCollector.recordSecurityCoverageProcessed();
+      String bundleHash = md5Hex(bundle.toStix(objectMapper).toString());
 
-    SecurityCoverage securityCoverage =
-        buildSecurityCoverageFromStix(
-            securityCoverageObj, bundle, securityCoverageStixId, bundleHash, tenantId);
-    Scenario scenario = buildScenarioFromSecurityCoverage(ctx, securityCoverage);
-    // Telemetry: a scenario was generated from the coverage.
-    resultsMetricCollector.recordCoverageScenarioGenerated();
+      SecurityCoverage securityCoverage =
+          buildSecurityCoverageFromStix(
+              securityCoverageObj, bundle, securityCoverageStixId, bundleHash, tenantId);
+      Scenario scenario = buildScenarioFromSecurityCoverage(ctx, securityCoverage);
+      // Telemetry: a scenario was generated from the coverage.
+      resultsMetricCollector.recordCoverageScenarioGenerated();
 
-    // FIXME: extract this behaviour into an async worker
-    pushSecurityCoverageBundleWithExternalURI(scenario);
-    return scenario;
+      // FIXME: extract this behaviour into an async worker
+      pushSecurityCoverageBundleWithExternalURI(scenario);
+      return scenario;
+    } finally {
+      if (previousTenant == null) {
+        TenantContext.clearCurrentTenant();
+      } else {
+        TenantContext.setCurrentTenant(previousTenant);
+      }
+    }
   }
 
   /**

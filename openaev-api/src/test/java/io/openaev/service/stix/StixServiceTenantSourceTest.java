@@ -90,6 +90,12 @@ class StixServiceTenantSourceTest extends IntegrationTest {
         .as(
             "the coverage must belong to the tenant the transaction was scoped to, not the ambient one")
         .containsExactly(tenantA);
+    // The scenario is a still-v1 row, stamped by TenantBaseListener from TenantContext. Without the
+    // bridge it took the ambient tenant and the bundle split across two tenants: a v2 coverage in A
+    // owning a v1 scenario in B.
+    assertThat(tenantsOwningScenarioOf(externalId))
+        .as("everything derived from the coverage must land in the same tenant as the coverage")
+        .containsExactly(tenantA);
   }
 
   @Test
@@ -119,6 +125,17 @@ class StixServiceTenantSourceTest extends IntegrationTest {
   }
 
   /** Raw SQL: the inspector must not hide a row written for the wrong tenant. */
+  private List<String> tenantsOwningScenarioOf(String externalId) {
+    return jdbcTemplate.queryForList(
+        """
+        SELECT s.tenant_id FROM scenarios s
+        JOIN security_coverages c ON c.security_coverage_scenario = s.scenario_id
+        WHERE c.security_coverage_external_id = ?
+        """,
+        String.class,
+        externalId);
+  }
+
   private List<String> tenantsOwning(String externalId) {
     return jdbcTemplate.queryForList(
         "SELECT tenant_id FROM security_coverages WHERE security_coverage_external_id = ?",
