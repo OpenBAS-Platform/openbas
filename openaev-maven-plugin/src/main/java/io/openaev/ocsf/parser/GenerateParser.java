@@ -50,7 +50,7 @@ public class GenerateParser extends AbstractMojo {
     PluginContext ctx =
         new PluginContext(
             path.resolve("openaev-maven-plugin/src/main/resources"),
-            path.resolve("openaev-model").resolve(subLocation));
+            path.resolve("openaev-ocsf").resolve(subLocation));
     try {
       SchemaSource schemaSource = Ocsf.schema(OcsfSchemaVersion.fromString(version), ctx);
       Generator generator = new Generator(schemaSource, ctx);

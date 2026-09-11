@@ -11,7 +11,8 @@ import io.openaev.ocsf.schema.v190.classes.OcsfClassDetectionFinding;
 import io.openaev.ocsf.schema.v190.datatypes.OcsfDatatypeStringT;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
