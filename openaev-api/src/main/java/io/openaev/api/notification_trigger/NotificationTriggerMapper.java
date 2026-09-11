@@ -29,7 +29,14 @@ public class NotificationTriggerMapper {
   private final UserRepository userRepository;
   private final GroupRepository groupRepository;
 
-  public NotificationTrigger toNotificationTrigger(final NotificationTriggerInput input) {
+  /**
+   * @param tenantId the tenant the trigger is written into, resolved from the request scope by
+   *     {@code TenantWriteScopeResolver}. Child triggers are looked up inside it rather than under
+   *     the request's read scope: the scope can hold several tenants while the row belongs to one,
+   *     and composing a digest with another tenant's trigger would replay that tenant's outbox.
+   */
+  public NotificationTrigger toNotificationTrigger(
+      final String tenantId, final NotificationTriggerInput input) {
     NotificationTrigger trigger = new NotificationTrigger();
     trigger.setName(input.getName());
     trigger.setType(input.getType());
@@ -40,11 +47,13 @@ public class NotificationTriggerMapper {
     trigger.setInstanceId(input.getInstanceId());
     trigger.setPeriod(input.getPeriod());
     trigger.setTriggerTime(input.getTriggerTime());
-    String tenantId = TenantContext.getCurrentTenant();
+    // notifiers is still v1: it resolves from the thread-local, which is the default tenant on any
+    // route without a {tenantId}. Corrected by the notifiers activation (#7864), not here.
     trigger.setNotifiers(
         resolveAll(
             input.getNotifierIds(),
-            ids -> notifierRepository.findAllByIdInAndTenantId(ids, tenantId),
+            ids ->
+                notifierRepository.findAllByIdInAndTenantId(ids, TenantContext.getCurrentTenant()),
             "Notifier"));
     trigger.setChildTriggers(
         resolveAll(

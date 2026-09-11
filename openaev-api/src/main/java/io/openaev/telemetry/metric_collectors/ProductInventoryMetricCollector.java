@@ -130,7 +130,7 @@ public class ProductInventoryMetricCollector {
     metricRegistry.registerGauge(
         "notification_triggers_total",
         "Number of notification triggers",
-        () -> safeCount(notificationTriggerRepository::count));
+        () -> safeCount(this::countNotificationTriggers));
     metricRegistry.registerGauge(
         "workflows_total",
         "Number of chaining workflows",
@@ -291,6 +291,13 @@ public class ProductInventoryMetricCollector {
   /** Counts challenges across the whole platform (challenges is v2-active, #6416). */
   long countChallenges() {
     return countAcrossAllTenants(challengeRepository::count);
+  }
+
+  /**
+   * Counts notification triggers across the whole platform (notification_triggers is v2-active).
+   */
+  long countNotificationTriggers() {
+    return countAcrossAllTenants(notificationTriggerRepository::count);
   }
 
   /** Counts XLS import mappers across the whole platform (import_mappers is v2-active). */

@@ -87,6 +87,12 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.domain.DomainApi#upsertDomain",
           "io.openaev.rest.domain.DomainApi#findAllAsOptionsByName",
           "io.openaev.rest.domain.DomainApi#findAllAsOptionsById",
+          // notification_triggers (v2)
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#notificationTrigger",
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#searchNotificationTriggers",
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#createNotificationTrigger",
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#updateNotificationTrigger",
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#deleteNotificationTrigger",
           // notifications (v2)
           "io.openaev.api.notification.NotificationApi#searchMyNotifications",
           "io.openaev.api.notification.NotificationApi#unreadNotificationsCount",
