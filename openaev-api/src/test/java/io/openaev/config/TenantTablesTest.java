@@ -105,6 +105,19 @@ class TenantTablesTest {
   }
 
   @Test
+  @DisplayName("'*' leaves out a strict table that is deliberately outside v2")
+  void restrictToAllStrictSkipsTablesOutsideV2() {
+    TenantTables model =
+        new TenantTables(Set.of("documents", "attackpath_graph_version"), Set.of("groups"));
+    TenantTables active = model.restrictTo(Set.of(TenantTables.ALL_STRICT));
+    assertEquals(Set.of("documents"), active.strict());
+    assertEquals(
+        TenantTables.Family.NONE,
+        active.family("attackpath_graph_version"),
+        "its upsert is a shape the inspector cannot rewrite; it isolates itself by explicit predicate");
+  }
+
+  @Test
   @DisplayName("'*' alongside a table name fails fast rather than guessing which one wins")
   void restrictToRejectsAllStrictMixedWithTableNames() {
     assertThrows(

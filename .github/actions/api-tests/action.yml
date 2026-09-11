@@ -40,9 +40,16 @@ inputs:
       Multi-tenancy v2 shadow mode. Empty (default) leaves the run exactly as it was: the test
       profile declares no active tables, so the statement inspector never fires. "production" runs
       the suite under the active-tables list main ships, which catches a regression on a table that
-      is already live. "all" runs it with every strict tenant table active, which surfaces what
-      activating the rest would break. Both turn the fail-closed detector on, so an unscoped
-      production read fails its test instead of silently returning zero rows.
+      is already live. "all" runs it with every strict tenant table active except those deliberately
+      outside v2, which surfaces what activating the rest would break. Both turn the fail-closed
+      detector on, so an unscoped production read fails its test instead of silently returning zero
+      rows.
+      Scope, exactly: the list is a JVM system property, and a class carrying
+      @TestPropertySource(properties = "openaev.tenant.active-tables=...") keeps its own narrower
+      list, because inlined test properties win over system properties. Those classes are the
+      isolation suites, which already run with their table active; the shadow's new information
+      comes from every other class, which has never run under activation. Making the shadow win over
+      per-class activation needs a context customizer and is tracked separately.
     required: false
     default: ""
 
@@ -277,6 +284,10 @@ runs:
         {
           echo "## 🔐 Tenant shadow \`$MODE\` — shard $SHARD"
           echo
+          echo "_Classes carrying their own \`@TestPropertySource\` activation keep it: inlined test"
+          echo "properties win over the system property this mode sets. Those are the isolation suites,"
+          echo "already running with their table active._"
+          echo
         } >> "$S"
         if [ ! -d "$REPORTS" ]; then
           echo "No surefire reports: the suite did not start." >> "$S"
@@ -318,8 +329,10 @@ runs:
 
         # Everything else that went red: the exception type is what tells a refused query shape from
         # a GROUP BY error from a plain assertion.
+        # || true: a clean run has no failure line, grep exits 1, and the composite action's shell
+        # is `bash -e -o pipefail`, so without this a green shadow run would fail its own summary.
         OTHER=$(grep -h '<<< \(FAILURE\|ERROR\)!' -A1 "$REPORTS"/*.txt 2>/dev/null \
-          | grep -oE '^[a-z][a-zA-Z0-9.]*\.[A-Za-z0-9_]*(Exception|Error)' | sort | uniq -c | sort -rn)
+          | grep -oE '^[a-z][a-zA-Z0-9.]*\.[A-Za-z0-9_]*(Exception|Error)' | sort | uniq -c | sort -rn || true)
         if [ -n "$OTHER" ]; then
           {
             echo "### Failures by exception type"

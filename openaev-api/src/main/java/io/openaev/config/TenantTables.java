@@ -19,6 +19,23 @@ public record TenantTables(Set<String> strict, Set<String> dualScope) {
   /** Activation allowlist entry meaning "every strict table"; see {@link #restrictTo}. */
   public static final String ALL_STRICT = "*";
 
+  /**
+   * Strict tables deliberately and permanently outside v2, so {@link #ALL_STRICT} leaves them
+   * alone. Each one isolates itself, and activating it would break the mechanism it isolates itself
+   * with.
+   *
+   * <ul>
+   *   <li>{@code attackpath_graph_version}: its version counter is bumped by a single native {@code
+   *       INSERT ... ON CONFLICT DO UPDATE ... RETURNING}, a shape the inspector cannot rewrite.
+   *       Every statement on that table carries its own tenant predicate instead and the counter is
+   *       keyed by {@code (simulation_id, tenant_id)}; see {@code
+   *       AttackPathGraphVersionRepository}.
+   * </ul>
+   *
+   * A table belongs here only with that kind of written reason. "Not activated yet" is not one.
+   */
+  private static final Set<String> OUTSIDE_V2 = Set.of("attackpath_graph_version");
+
   public enum Family {
     NONE,
     STRICT,
@@ -98,11 +115,12 @@ public record TenantTables(Set<String> strict, Set<String> dualScope) {
    * inert. An entry that is not a known tenant table fails fast, to surface a typo at startup
    * rather than silently leave a table unprotected.
    *
-   * <p>The single entry {@value #ALL_STRICT} activates every strict table and no dual-scope one:
-   * the rollout's terminal state, and what the nightly shadow run passes to surface what activating
-   * everything would break. Dual-scope tables stay out because a platform row is written with no
-   * tenant, which this mechanism does not cover. It is rejected alongside other entries, so a list
-   * always reads as either "these tables" or "all of them", never both.
+   * <p>The single entry {@value #ALL_STRICT} activates every strict table except those listed in
+   * {@code OUTSIDE_V2}, and no dual-scope one: the rollout's terminal state, and what the nightly
+   * shadow run passes to surface what activating everything would break. Dual-scope tables stay out
+   * because a platform row is written with no tenant, which this mechanism does not cover. It is
+   * rejected alongside other entries, so a list always reads as either "these tables" or "all of
+   * them", never both.
    */
   public TenantTables restrictTo(Collection<String> allowlist) {
     Set<String> allowed = lowercase(new HashSet<>(allowlist));
@@ -114,7 +132,9 @@ public record TenantTables(Set<String> strict, Set<String> dualScope) {
                 + "' or a list of tables, not both: "
                 + allowed);
       }
-      return new TenantTables(strict, Set.of());
+      Set<String> activable = new HashSet<>(strict);
+      activable.removeAll(OUTSIDE_V2);
+      return new TenantTables(activable, Set.of());
     }
     Set<String> known = new HashSet<>(strict);
     known.addAll(dualScope);
