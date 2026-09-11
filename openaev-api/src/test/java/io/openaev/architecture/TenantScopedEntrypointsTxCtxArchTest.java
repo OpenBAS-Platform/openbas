@@ -258,6 +258,14 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.payload.PayloadApi#createPayload",
           "io.openaev.rest.payload.PayloadApi#updatePayload",
           "io.openaev.rest.payload.PayloadApi#duplicatePayload",
+          // tenant_xtmhub_registrations (v2): singleton registration endpoints and the explicit
+          // default-tenant contact-us lookup
+          "io.openaev.api.xtmhub.XtmHubApi#getRegistration",
+          "io.openaev.api.xtmhub.XtmHubApi#register",
+          "io.openaev.api.xtmhub.XtmHubApi#unregister",
+          "io.openaev.api.xtmhub.XtmHubApi#refreshConnectivity",
+          "io.openaev.api.xtmhub.XtmHubApi#autoRegister",
+          "io.openaev.api.xtmhub.XtmHubApi#contactUs",
           // threat arsenal: create/update/duplicate go through PayloadCreationService/
           // PayloadUpdateService into the same synchroniseInjectorContractBasedOnPayload path
           "io.openaev.api.threat_arsenal.ThreatArsenalApi#createAction",
@@ -523,6 +531,7 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.organization.OrganizationApi#searchInjectsForOrganization",
           "io.openaev.rest.scenario.ScenarioApi#assetGroupsByIds",
           "io.openaev.rest.tag_rule.TagRuleApi#createTagRule",
+          "io.openaev.rest.tag_rule.TagRuleApi#deleteTagRule",
           "io.openaev.rest.tag_rule.TagRuleApi#findTagRule",
           "io.openaev.rest.tag_rule.TagRuleApi#searchTagRules",
           "io.openaev.rest.tag_rule.TagRuleApi#tags",
