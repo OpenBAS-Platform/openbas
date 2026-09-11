@@ -68,14 +68,15 @@ public abstract class AbstractTechnicalBehavior
 
     Inject inject = executableInject.getInjection().getInject();
     // Detection / prevention expectations can only ever be fulfilled by a security platform
-    // collector: with none able to answer this template's expected platforms, nothing would fill
-    // the expectation, so we create none (neither leaves nor parents). Vulnerability expectations
-    // are fulfilled by the assessment injector itself (e.g. Nuclei), not a collector, so they are
-    // always created regardless (see requiresCollectorToInitialize).
+    // collector. When none is able to answer this template's expected platforms, nothing could ever
+    // fill the expectation, so instead of leaving it pending forever we still create the full tree
+    // but resolve every leaf immediately as a definitive failure (score 0, failure label): nothing
+    // can be detected/prevented when nothing is able to observe it. Vulnerability expectations are
+    // fulfilled by the assessment injector itself (e.g. Nuclei), not a collector, so they never
+    // take
+    // this path (see requiresCollectorToInitialize).
     List<Collector> collectors = resolveCollectors(inject.getTenant().getId(), expectationTemplate);
-    if (requiresCollectorToInitialize() && collectors.isEmpty()) {
-      return;
-    }
+    boolean collectorRequiredButMissing = requiresCollectorToInitialize() && collectors.isEmpty();
 
     List<TechnicalInjectExpectation> allExpectations = new ArrayList<>();
 
@@ -131,7 +132,9 @@ public abstract class AbstractTechnicalBehavior
                 isAgentExpectation(e) || isAgentlessAssetExpectationNecessary(e.getAsset(), inject))
         .forEach(
             e -> {
-              initializeResults(e, collectors);
+              if (!collectorRequiredButMissing) {
+                initializeResults(e, collectors);
+              }
               String agentId = e.getAgent() != null ? e.getAgent().getId() : null;
               List<ExpectationSignature> expectationSignatures =
                   computeSignatures(
@@ -142,6 +145,11 @@ public abstract class AbstractTechnicalBehavior
                       injectService.getValueTargetedAssetMap(inject));
               e.setSignatures(convertToInjectExpectationSignatures(expectationSignatures, e));
             });
+    if (collectorRequiredButMissing) {
+      // Parent (asset / asset-group) rows aggregate their leaves, which are all definitive failures
+      // here, so resolve them to the same failure score immediately for a consistent verdict.
+      allExpectations.forEach(e -> e.setScore(FAILED_SCORE_VALUE));
+    }
     injectExpectationRepository.saveAll(allExpectations);
   }
 

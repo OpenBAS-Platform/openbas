@@ -1,5 +1,6 @@
 package io.openaev.service.expectation;
 
+import static io.openaev.service.InjectExpectationUtils.FAILED_SCORE_VALUE;
 import static io.openaev.utils.ExpectationSignatureUtils.EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME;
 import static io.openaev.utils.ExpectationSignatureUtils.EXPECTATION_SIGNATURE_TYPE_SOURCE_IPV4_ADDRESS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -193,6 +194,57 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
       assertThat(saved).hasSize(3);
       assertThat(countAgentExpectations(saved)).isEqualTo(2);
       assertThat(countAssetOnlyExpectations(saved)).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName(
+        "given no security platform collector can answer, should create leaves resolved as failed")
+    void given_no_matching_collector_should_create_failed_leaves() {
+      // Arrange
+      Endpoint endpoint =
+          endpointComposer
+              .forEndpoint(EndpointFixture.createEndpoint())
+              .withAgent(agentComposer.forAgent(AgentFixture.createDefaultAgentService()))
+              .persist()
+              .get();
+
+      Exercise exercise = persistDefaultExercise();
+
+      Inject inject =
+          injectComposer
+              .forInject(InjectFixture.getDefaultInject())
+              .withEndpoint(endpointComposer.forEndpoint(endpoint))
+              .withExercise(exerciseComposer.forExercise(exercise))
+              .persist()
+              .get();
+
+      DetectionInjectExpectation template = createTemplate(inject);
+      // Only an EDR collector is persisted (see setUp), so an XDR-restricted detection expectation
+      // can never be answered by any collector on this tenant.
+      template.setExpectedSecurityPlatforms(List.of(SecurityPlatform.SECURITY_PLATFORM_TYPE.XDR));
+
+      ExecutableInject executableInject =
+          new ExecutableInject(
+              false, false, inject, List.of(), List.of(endpoint), List.of(), List.of());
+
+      // Act
+      List<BaseInjectExpectation> saved =
+          actAndGetSavedExpectations(executableInject, template, "oaev");
+
+      // Assert — expectations are still created (1 agent + 1 asset) and resolved as failure
+      assertThat(saved).hasSize(2);
+      assertThat(saved).allSatisfy(e -> assertThat(e.getScore()).isEqualTo(FAILED_SCORE_VALUE));
+
+      TechnicalInjectExpectation agentExpectation =
+          (TechnicalInjectExpectation)
+              saved.stream()
+                  .filter(e -> ((TechnicalInjectExpectation) e).getAgent() != null)
+                  .findFirst()
+                  .orElseThrow();
+      assertThat(agentExpectation.getResults()).hasSize(1);
+      InjectExpectationResult failedResult = agentExpectation.getResults().getFirst();
+      assertThat(failedResult.getResult()).isEqualTo(agentExpectation.getFailureLabel());
+      assertThat(failedResult.getSourceType()).isEqualTo(NO_COLLECTOR_SOURCE_TYPE);
     }
 
     @Test
