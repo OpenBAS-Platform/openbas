@@ -26,6 +26,15 @@ import org.springframework.stereotype.Service;
  *
  * <p>Runs on the shared {@code threadPoolTaskScheduler} (20 threads), so a dependency timing out
  * does not starve the other scheduled tasks.
+ *
+ * <p>Every dependency gets its own scheduled task, all on the same interval — the one {@link
+ * io.openaev.service.HealthCheckService} derives its staleness threshold from. Probing them in a
+ * single pass would couple them: {@code fixedDelay} never overlaps a task with itself, so one slow
+ * probe delays the dependencies queued behind it past that threshold. The engine makes this
+ * concrete, as it is the one probe without a short-timeout client — it reuses the shared engine
+ * client and its 60s socket timeout, which outlives the staleness budget. A hung engine would
+ * therefore stale out the liveness dependencies and 503 the endpoint, the exact outcome {@link
+ * PlatformDependency#ENGINE} is declared non-liveness-gating to prevent.
  */
 @Service
 @RequiredArgsConstructor
@@ -42,15 +51,30 @@ public class DependencyProbeService {
   private final RabbitmqService rabbitmqService;
   private final EngineService engineService;
 
+  /** Database connectivity, on a connection borrowed from the shared pool. */
+  @Scheduled(fixedDelayString = "${openaev.healthcheck.connectivity-probe-interval:PT10S}")
+  public void probePostgresql() {
+    probe(POSTGRESQL, healthCheckRepository::healthCheck);
+  }
+
+  /** Broker connectivity, on a dedicated factory with a short connection timeout. */
+  @Scheduled(fixedDelayString = "${openaev.healthcheck.connectivity-probe-interval:PT10S}")
+  public void probeRabbitmq() {
+    probe(RABBITMQ, rabbitmqService::checkHealth);
+  }
+
+  /** Object storage connectivity, on a dedicated client with short timeouts. */
+  @Scheduled(fixedDelayString = "${openaev.healthcheck.connectivity-probe-interval:PT10S}")
+  public void probeObjectStorage() {
+    probe(OBJECT_STORAGE, () -> minioService.checkStorageAccessible(healthCheckMinioClient));
+  }
+
   /**
-   * Connectivity of every dependency. Each probe is a single round trip on a client configured with
-   * short timeouts, so the whole pass stays bounded even when a dependency is down.
+   * Engine connectivity. Reuses the shared engine client, so this probe can hang for a full socket
+   * timeout; it is observability only and gates nothing, hence its own task.
    */
   @Scheduled(fixedDelayString = "${openaev.healthcheck.connectivity-probe-interval:PT10S}")
-  public void probeConnectivity() {
-    probe(POSTGRESQL, healthCheckRepository::healthCheck);
-    probe(RABBITMQ, rabbitmqService::checkHealth);
-    probe(OBJECT_STORAGE, () -> minioService.checkStorageAccessible(healthCheckMinioClient));
+  public void probeEngine() {
     probe(ENGINE, engineService::ping);
   }
 

@@ -7,6 +7,7 @@ import static io.openaev.health.PlatformDependency.RABBITMQ;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import io.minio.MinioClient;
@@ -14,7 +15,6 @@ import io.openaev.database.repository.HealthCheckRepository;
 import io.openaev.engine.EngineService;
 import io.openaev.service.MinioService;
 import io.openaev.service.RabbitmqService;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
@@ -71,7 +71,11 @@ class DependencyProbeServiceTest {
     @Test
     void given_reachable_dependencies_should_record_every_one_as_up() throws Exception {
       // -- EXECUTE --
-      probeService().probeConnectivity();
+      DependencyProbeService probeService = probeService();
+      probeService.probePostgresql();
+      probeService.probeRabbitmq();
+      probeService.probeObjectStorage();
+      probeService.probeEngine();
 
       // -- ASSERT --
       verify(healthCheckRepository).healthCheck();
@@ -90,7 +94,9 @@ class DependencyProbeServiceTest {
       doThrow(new TimeoutException("broker unreachable")).when(rabbitmqService).checkHealth();
 
       // -- EXECUTE --
-      probeService().probeConnectivity();
+      DependencyProbeService probeService = probeService();
+      probeService.probeRabbitmq();
+      probeService.probePostgresql();
 
       // -- ASSERT --
       assertThat(store.get(RABBITMQ))
@@ -103,20 +109,21 @@ class DependencyProbeServiceTest {
       assertThat(store.get(POSTGRESQL)).get().extracting(DependencyHealth::up).isEqualTo(true);
     }
 
-    @DisplayName("Given a failing dependency, should keep probing the other ones")
+    @DisplayName("Given one probe task, should leave every other dependency untouched")
     @Test
-    void given_a_failing_dependency_should_keep_probing_the_other_ones() throws Exception {
-      // -- PREPARE --
-      doThrow(new IOException("boom")).when(rabbitmqService).checkHealth();
-
+    void given_one_probe_task_should_leave_every_other_dependency_untouched() throws Exception {
+      // Guards the per-dependency scheduling: probing them in one pass lets a slow dependency
+      // delay the others past the staleness threshold, which 503s the endpoint.
       // -- EXECUTE --
-      probeService().probeConnectivity();
+      probeService().probeRabbitmq();
 
       // -- ASSERT --
-      verify(minioService).checkStorageAccessible(healthCheckMinioClient);
-      verify(engineService).ping();
-      assertThat(store.get(OBJECT_STORAGE)).get().extracting(DependencyHealth::up).isEqualTo(true);
-      assertThat(store.get(ENGINE)).get().extracting(DependencyHealth::up).isEqualTo(true);
+      verify(rabbitmqService).checkHealth();
+      assertThat(store.get(RABBITMQ)).isPresent();
+      assertThat(store.get(POSTGRESQL)).isEmpty();
+      assertThat(store.get(OBJECT_STORAGE)).isEmpty();
+      assertThat(store.get(ENGINE)).isEmpty();
+      verifyNoInteractions(healthCheckRepository, minioService, engineService);
     }
 
     @DisplayName("Given a failure without a message, should record the exception type instead")
@@ -126,7 +133,7 @@ class DependencyProbeServiceTest {
       doThrow(new TimeoutException()).when(rabbitmqService).checkHealth();
 
       // -- EXECUTE --
-      probeService().probeConnectivity();
+      probeService().probeRabbitmq();
 
       // -- ASSERT --
       assertThat(store.get(RABBITMQ))
