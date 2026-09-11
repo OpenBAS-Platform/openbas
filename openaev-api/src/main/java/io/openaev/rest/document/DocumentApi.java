@@ -250,26 +250,32 @@ public class DocumentApi extends RestBehavior {
             .findById(documentId)
             .orElseThrow(() -> new ElementNotFoundException("Document not found"));
     document.setUpdateAttributes(input);
-    document.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+
+    List<String> requestedTagIds = Optional.ofNullable(input.getTagIds()).orElse(List.of());
+    replaceAssociationContents(document.getTags(), tagRepository.findAllById(requestedTagIds));
+
+    User user =
+        userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
+    List<String> requestedExerciseIds =
+        Optional.ofNullable(input.getExerciseIds()).orElse(List.of());
+    List<String> requestedScenarioIds =
+        Optional.ofNullable(input.getScenarioIds()).orElse(List.of());
 
     // Get removed exercises
     Stream<String> askExerciseIdsStream =
         document.getExercises().stream()
-            .filter(
-                exercise ->
-                    !exercise.isUserHasAccess(
-                        userRepository
-                            .findById(currentUser().getId())
-                            .orElseThrow(
-                                () -> new ElementNotFoundException("Current user not found"))))
+            .filter(exercise -> !exercise.isUserHasAccess(user))
             .map(Exercise::getId);
     List<String> askExerciseIds =
-        Stream.concat(askExerciseIdsStream, input.getExerciseIds().stream()).distinct().toList();
+        Stream.concat(askExerciseIdsStream, requestedExerciseIds.stream()).distinct().toList();
     List<Exercise> removedExercises =
         document.getExercises().stream()
             .filter(exercise -> !askExerciseIds.contains(exercise.getId()))
             .toList();
-    document.setExercises(iterableToSet(exerciseRepository.findAllById(askExerciseIds)));
+    replaceAssociationContents(
+        document.getExercises(), exerciseRepository.findAllById(askExerciseIds));
     // In case of exercise removal, all inject doc attachment for exercise
     removedExercises.forEach(
         exercise -> injectService.cleanInjectsDocExercise(exercise.getId(), documentId));
@@ -277,21 +283,16 @@ public class DocumentApi extends RestBehavior {
     // Get removed scenarios
     Stream<String> askScenarioIdsStream =
         document.getScenarios().stream()
-            .filter(
-                scenario ->
-                    !scenario.isUserHasAccess(
-                        userRepository
-                            .findById(currentUser().getId())
-                            .orElseThrow(
-                                () -> new ElementNotFoundException("Current user not found"))))
+            .filter(scenario -> !scenario.isUserHasAccess(user))
             .map(Scenario::getId);
     List<String> askScenarioIds =
-        Stream.concat(askScenarioIdsStream, input.getScenarioIds().stream()).distinct().toList();
+        Stream.concat(askScenarioIdsStream, requestedScenarioIds.stream()).distinct().toList();
     List<Scenario> removedScenarios =
         document.getScenarios().stream()
             .filter(scenario -> !askScenarioIds.contains(scenario.getId()))
             .toList();
-    document.setScenarios(iterableToSet(scenarioRepository.findAllById(askScenarioIds)));
+    replaceAssociationContents(
+        document.getScenarios(), scenarioRepository.findAllById(askScenarioIds));
     // In case of scenario removal, all inject doc attachment for scenario
     removedScenarios.forEach(
         scenario -> injectService.cleanInjectsDocScenario(scenario.getId(), documentId));
@@ -324,6 +325,21 @@ public class DocumentApi extends RestBehavior {
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + encodedFilename)
         .header(HttpHeaders.CONTENT_TYPE, document.getType())
         .body(new InputStreamResource(in));
+  }
+
+  private <T extends Base> void replaceAssociationContents(
+      Set<T> managedCollection, Iterable<T> requestedEntities) {
+    Set<T> requestedCollection = iterableToSet(requestedEntities);
+    Set<String> requestedIds = new HashSet<>();
+    requestedCollection.forEach(requested -> requestedIds.add(requested.getId()));
+
+    managedCollection.removeIf(entity -> !requestedIds.contains(entity.getId()));
+
+    Set<String> managedIds = new HashSet<>();
+    managedCollection.forEach(entity -> managedIds.add(entity.getId()));
+    requestedCollection.stream()
+        .filter(entity -> !managedIds.contains(entity.getId()))
+        .forEach(managedCollection::add);
   }
 
   public ResponseEntity<InputStreamResource> downloadCollectorImage(

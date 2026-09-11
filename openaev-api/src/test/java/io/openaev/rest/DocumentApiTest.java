@@ -18,6 +18,7 @@ import io.openaev.database.repository.DocumentRepository;
 import io.openaev.rest.document.DocumentService;
 import io.openaev.rest.document.form.DocumentCreateInput;
 import io.openaev.rest.document.form.DocumentRelationsOutput;
+import io.openaev.rest.document.form.DocumentUpdateInput;
 import io.openaev.rest.document.form.RelatedEntityOutput;
 import io.openaev.utils.fixtures.*;
 import io.openaev.utils.fixtures.composers.*;
@@ -49,6 +50,7 @@ class DocumentApiTest extends IntegrationTest {
   @Autowired DomainComposer domainComposer;
   @Autowired ScenarioComposer scenarioComposer;
   @Autowired ExerciseComposer exerciseComposer;
+  @Autowired TagComposer tagComposer;
   @Autowired SecurityPlatformComposer securityPlatformComposer;
   @Autowired private MockMvc mvc;
   @Autowired private DocumentRepository documentRepository;
@@ -348,6 +350,58 @@ class DocumentApiTest extends IntegrationTest {
       assertEquals("My test document", JsonPath.read(response, "$.document_description"));
       assertEquals(scenario.getId(), JsonPath.read(response, "$.document_scenarios[0]"));
       assertEquals(exercise.getId(), JsonPath.read(response, "$.document_exercises[0]"));
+    }
+
+    @Test
+    @DisplayName("Should clear document metadata relations idempotently")
+    void updateDocumentInformationShouldClearMetadataRelationsIdempotently() throws Exception {
+      // -- PREPARE
+      Scenario scenario =
+          scenarioComposer.forScenario(ScenarioFixture.getScenario()).persist().get();
+      Exercise exercise =
+          exerciseComposer.forExercise(ExerciseFixture.createDefaultExercise()).persist().get();
+      Tag tag =
+          tagComposer.forTag(TagFixture.getTagWithText("document-update-tag")).persist().get();
+
+      Document document =
+          documentComposer
+              .forDocument(DocumentFixture.getDocument(FileFixture.getPlainTextFileContent()))
+              .persist()
+              .get();
+      document.setDescription("Initial description");
+      document.setExercises(new HashSet<>(Set.of(exercise)));
+      document.setScenarios(new HashSet<>(Set.of(scenario)));
+      document.setTags(new HashSet<>(Set.of(tag)));
+      documentRepository.save(document);
+      entityManager.flush();
+      entityManager.clear();
+
+      DocumentUpdateInput input = new DocumentUpdateInput();
+      input.setDescription("Updated description");
+      input.setTagIds(List.of());
+      input.setExerciseIds(List.of());
+      input.setScenarioIds(List.of());
+
+      // -- EXECUTE
+      mvc.perform(
+              put(DOCUMENT_API + "/" + document.getId())
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(mapper.writeValueAsBytes(input))
+                  .with(csrf()))
+          .andExpect(status().isOk());
+      mvc.perform(
+              put(DOCUMENT_API + "/" + document.getId())
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(mapper.writeValueAsBytes(input))
+                  .with(csrf()))
+          .andExpect(status().isOk());
+
+      // -- VERIFY
+      Document updated = documentRepository.findById(document.getId()).orElseThrow();
+      assertEquals("Updated description", updated.getDescription());
+      assertTrue(updated.getTags().isEmpty());
+      assertTrue(updated.getExercises().isEmpty());
+      assertTrue(updated.getScenarios().isEmpty());
     }
   }
 
