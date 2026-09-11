@@ -11,6 +11,7 @@ import com.tngtech.archunit.lang.ArchRule;
 import io.openaev.api.chaining.InjectExecutionStep;
 import io.openaev.api.notification.NotificationApi;
 import io.openaev.api.notifier.NotifierApi;
+import io.openaev.api.xtmhub.XtmHubApi;
 import io.openaev.database.model.Article;
 import io.openaev.database.model.AttackPattern;
 import io.openaev.database.model.CatalogConnector;
@@ -39,6 +40,7 @@ import io.openaev.database.repository.NotificationRepository;
 import io.openaev.database.repository.SecurityCoverageRepository;
 import io.openaev.database.repository.TagRepository;
 import io.openaev.database.repository.TagRuleRepository;
+import io.openaev.database.repository.TenantXtmHubRegistrationRepository;
 import io.openaev.database.repository.attackpath.AttackPathExecutionRepository;
 import io.openaev.database.repository.attackpath.AttackPathFindingRepository;
 import io.openaev.database.repository.autonomous.AutonomousDirectiveRepository;
@@ -154,6 +156,7 @@ import io.openaev.service.stix.SecurityCoverageService;
 import io.openaev.service.targets.search.AgentTargetSearchAdaptor;
 import io.openaev.service.threat_arsenal.ThreatArsenalImportService;
 import io.openaev.telemetry.metric_collectors.InventoryMetricCollector;
+import io.openaev.telemetry.metric_collectors.PlatformAdoptionMetricCollector;
 import io.openaev.telemetry.metric_collectors.ProductInventoryMetricCollector;
 import io.openaev.utils.ExpectationUtils;
 import io.openaev.utils.InjectUtils;
@@ -161,6 +164,7 @@ import io.openaev.utils.mapper.DocumentMapper;
 import io.openaev.utils.mapper.FindingMapper;
 import io.openaev.utils.mapper.InjectMapper;
 import io.openaev.utils.mapper.VulnerabilityMapper;
+import io.openaev.xtmhub.XtmHubService;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -219,6 +223,7 @@ class TenantActiveTableAccessArchTest {
           "autonomous_directives",
           "kill_chain_phases",
           "security_coverages",
+          "tenant_xtmhub_registrations",
           "notifications",
           "challenges",
           "asset_groups",
@@ -292,7 +297,7 @@ class TenantActiveTableAccessArchTest {
    * is {@code AttackPathFindingRepository} (7 joined queries, none correlated).
    */
   private static final Set<Class<?>> REPOSITORIES_WITH_REVIEWED_JOINED_QUERIES =
-      Set.of(KillChainPhaseRepository.class);
+      Set.of(KillChainPhaseRepository.class, TenantXtmHubRegistrationRepository.class);
 
   @ArchTest
   static void joined_queries_on_active_tables_correlate_the_tenant(JavaClasses classes) {
@@ -400,6 +405,26 @@ class TenantActiveTableAccessArchTest {
           .because(
               "mitigations is tenant-active: an accessor without a tenant scope silently reads"
                   + " zero rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule tenant_xtmhub_registrations_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // TxCtx-carrying XTM Hub API entrypoints, pinned by
+              // TenantScopedEntrypointsTxCtxArchTest:
+              XtmHubApi.class,
+              // Service behind the scoped handlers and the scoped background refresh:
+              XtmHubService.class,
+              // Background telemetry reader scoped via tenantTx.execute(TxCtx.allTenants()):
+              PlatformAdoptionMetricCollector.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(TenantXtmHubRegistrationRepository.class)
+          .because(
+              "tenant_xtmhub_registrations is tenant-active: an accessor without a tenant scope"
+                  + " silently reads zero rows. New accessors must carry a scope and be"
+                  + " allowlisted here");
 
   @ArchTest
   static final ArchRule tags_repository_access_is_reviewed =
