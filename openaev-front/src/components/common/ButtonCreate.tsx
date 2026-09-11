@@ -37,39 +37,39 @@ const ButtonCreate: FunctionComponent<Props> = ({ onClick, style, label, disable
 
   const button = size === 'sm'
     ? (
-      <FdsButton
-        onClick={onClick}
-        size="sm"
-        data-testid="button-create"
-        startIcon={<Add fontSize="small" />}
-        style={{
-          whiteSpace: 'nowrap',
-          flexShrink: 0,
-          ...style,
-        }}
-        disabled={disabled}
-      >
-        {content}
-      </FdsButton>
+        <FdsButton
+          onClick={onClick}
+          size="sm"
+          data-testid="button-create"
+          startIcon={<Add fontSize="small" />}
+          style={{
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            ...style,
+          }}
+          disabled={disabled}
+        >
+          {content}
+        </FdsButton>
       )
     : (
-    <Button
-      onClick={onClick}
-      color="primary"
-      variant="contained"
-      size="small"
-      data-testid="button-create"
-      startIcon={<Add />}
-      style={style}
-      disabled={disabled}
-      sx={{
-        whiteSpace: 'nowrap',
-        flexShrink: 0,
-        minHeight: INLINE_CONTROL_HEIGHT,
-      }}
-    >
-      {content}
-    </Button>
+        <Button
+          onClick={onClick}
+          color="primary"
+          variant="contained"
+          size="small"
+          data-testid="button-create"
+          startIcon={<Add />}
+          style={style}
+          disabled={disabled}
+          sx={{
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            minHeight: INLINE_CONTROL_HEIGHT,
+          }}
+        >
+          {content}
+        </Button>
       );
 
   // A disabled MUI button fires no pointer event, so the tooltip needs an
