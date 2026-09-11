@@ -161,8 +161,8 @@ class XtmHubApiHttpIsolationTest extends IntegrationTest {
 
     // Assert
     assertEquals(
-        tenantC,
-        rawSingleRegistrationTenant("auto-token-c"),
+        1L,
+        rawCountForTokenInTenant("auto-token-c", tenantC),
         "auto-register must attribute the row to the header-selected tenant");
   }
 
@@ -271,11 +271,15 @@ class XtmHubApiHttpIsolationTest extends IntegrationTest {
         registrationId);
   }
 
-  private String rawSingleRegistrationTenant(String token) {
-    return jdbcTemplate.queryForObject(
-        "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_token = ?",
-        String.class,
-        token);
+  private long rawCountForTokenInTenant(String token, String tenantId) {
+    Long count =
+        jdbcTemplate.queryForObject(
+            "SELECT count(*) FROM tenant_xtmhub_registrations"
+                + " WHERE registration_token = ? AND tenant_id = ?",
+            Long.class,
+            token,
+            tenantId);
+    return count != null ? count : 0L;
   }
 
   private String registrationIdForTenant(String tenantId) {
