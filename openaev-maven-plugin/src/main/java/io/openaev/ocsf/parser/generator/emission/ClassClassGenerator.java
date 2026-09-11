@@ -25,7 +25,7 @@ public class ClassClassGenerator extends ClassGenerator {
       String name,
       JsonNode source,
       OcsfSchemaExtension extension,
-      String ocsfClassUid) {
+      Integer ocsfClassUid) {
     return new ClassMetadata(
         name,
         ocsfClassUid,

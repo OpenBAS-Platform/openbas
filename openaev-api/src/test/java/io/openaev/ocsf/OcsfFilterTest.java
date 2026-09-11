@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openaev.ocsf.schema.v190.OcsfClassUid;
 import io.openaev.ocsf.schema.v190.OcsfFilter;
 import io.openaev.ocsf.schema.v190.classes.OcsfClassDetectionFinding;
+import io.openaev.ocsf.schema.v190.datatypes.OcsfDatatypeStringT;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -44,10 +45,12 @@ public class OcsfFilterTest {
             finding ->
                 assertThat(finding)
                     .satisfies(
-                        f -> assertThat(f.getMetadataField().getVersionField()).isEqualTo("1.5.0"))
+                        f ->
+                            assertThat(f.getMetadataField().getVersionField())
+                                .isEqualTo(new OcsfDatatypeStringT("1.5.0")))
                     .satisfies(
                         f ->
-                            assertThat(f.getClassUidField().getValue().toString())
+                            assertThat(f.getClassUidField().getValue())
                                 .isEqualTo(OcsfClassUid.DETECTION_FINDING.getValue())));
   }
 }

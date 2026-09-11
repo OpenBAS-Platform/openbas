@@ -33,11 +33,12 @@ public class OcsfClassUidEmitter implements Emitter {
             .withPackage(packageName)
             .withImport(Getter.class.getCanonicalName())
             .withField(
-                new FieldMeta(Modifier.PRIVATE, "final " + String.class.getCanonicalName(), "value")
+                new FieldMeta(
+                        Modifier.PRIVATE, "final " + Integer.class.getCanonicalName(), "value")
                     .withAnnotation(new AnnotationMeta(Getter.class)))
             .withMethod(
                 new MethodMeta(Modifier.NONE, "OcsfClassUid", "", "this.value = value;")
-                    .withArgument(new ArgumentMeta(String.class, "value")))
+                    .withArgument(new ArgumentMeta(Integer.class, "value")))
             .withMethod(
                 new MethodMeta(
                         Modifier.PUBLIC,
@@ -51,7 +52,7 @@ public class OcsfClassUidEmitter implements Emitter {
                                             }
                                             throw new IllegalArgumentException("No such class UID: %s".formatted(value));
                                             """)
-                    .withArgument(new ArgumentMeta(String.class, "value")));
+                    .withArgument(new ArgumentMeta(Integer.class, "value")));
     for (ClassMetadata md : tracker.values()) {
       if (SINGLE_CLASS.equals(Objects.requireNonNull(md.dimension()))) {
         classIdMeta =

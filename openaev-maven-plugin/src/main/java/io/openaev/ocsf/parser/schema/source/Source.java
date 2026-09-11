@@ -18,7 +18,7 @@ public class Source {
   @Getter private final Version version;
   @Getter private final SchemaDimension dimension;
   @Getter private final String name;
-  @Getter private final String ocsfClassUid;
+  @Getter private final Integer ocsfClassUid;
   @Getter private final OcsfSchemaExtension extension;
 
   private static final Map<SchemaDimension, OcsfSchemaEndpoints> dimensionToEndpointMap =
@@ -40,7 +40,7 @@ public class Source {
       PluginContext ctx,
       String name,
       OcsfSchemaExtension extension,
-      String ocsfClassUid)
+      Integer ocsfClassUid)
       throws IOException {
     this.version = version;
     this.dimension = dimension;

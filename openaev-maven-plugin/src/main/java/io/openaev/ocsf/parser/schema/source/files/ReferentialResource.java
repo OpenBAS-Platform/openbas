@@ -24,7 +24,7 @@ public abstract class ReferentialResource extends Resource {
                   new ResourceKey(
                       element.get("name").asText(),
                       element.has("extension") ? element.get("extension").asText() : null,
-                      element.has("uid") ? element.get("uid").asText() : null);
+                      element.has("uid") ? element.get("uid").asInt() : null);
               keys.add(resourceKey);
             });
     return keys;

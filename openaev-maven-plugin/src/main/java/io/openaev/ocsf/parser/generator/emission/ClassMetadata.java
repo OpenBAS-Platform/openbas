@@ -6,7 +6,7 @@ import io.openaev.ocsf.parser.schema.SchemaDimension;
 
 public record ClassMetadata(
     String ocsfIdentifier,
-    String ocsfClassUid,
+    Integer ocsfClassUid,
     SchemaDimension dimension,
     OcsfSchemaExtension extension,
     String className,

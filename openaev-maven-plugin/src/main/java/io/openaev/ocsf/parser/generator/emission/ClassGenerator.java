@@ -16,7 +16,7 @@ public abstract class ClassGenerator {
       String name,
       JsonNode source,
       OcsfSchemaExtension extension,
-      String ocsfClassUid);
+      Integer ocsfClassUid);
 
   public abstract String emit(ClassMetadata metadata, DictionaryHelper helper) throws IOException;
 }
