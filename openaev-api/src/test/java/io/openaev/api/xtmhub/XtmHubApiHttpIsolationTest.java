@@ -23,6 +23,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -45,6 +46,7 @@ class XtmHubApiHttpIsolationTest extends IntegrationTest {
   private static final String UNREGISTER_URI = XtmHubApi.TENANT_XTMHUB_URI + "/unregister";
 
   @Autowired private MockMvc mvc;
+  @Autowired private JdbcTemplate jdbcTemplate;
   @Autowired private TenantIsolationTestHelper tenantHelper;
 
   @MockitoBean private XtmHubClient xtmHubClient;
@@ -259,60 +261,43 @@ class XtmHubApiHttpIsolationTest extends IntegrationTest {
   }
 
   private void deleteByTenantId(String tenantId) {
-    entityManager
-        .createNativeQuery("DELETE FROM tenant_xtmhub_registrations WHERE tenant_id = :tenantId")
-        .setParameter("tenantId", tenantId)
-        .executeUpdate();
+    jdbcTemplate.update("DELETE FROM tenant_xtmhub_registrations WHERE tenant_id = ?", tenantId);
   }
 
   private String rawTenantId(String registrationId) {
-    entityManager.flush();
-    return (String)
-        entityManager
-            .createNativeQuery(
-                "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_id = :id")
-            .setParameter("id", registrationId)
-            .getSingleResult();
+    return jdbcTemplate.queryForObject(
+        "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_id = ?",
+        String.class,
+        registrationId);
   }
 
   private String rawSingleRegistrationTenant(String token) {
-    entityManager.flush();
-    return (String)
-        entityManager
-            .createNativeQuery(
-                "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_token = :token")
-            .setParameter("token", token)
-            .getSingleResult();
+    return jdbcTemplate.queryForObject(
+        "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_token = ?",
+        String.class,
+        token);
   }
 
   private String registrationIdForTenant(String tenantId) {
-    return (String)
-        entityManager
-            .createNativeQuery(
-                "SELECT registration_id FROM tenant_xtmhub_registrations WHERE tenant_id = :tenantId")
-            .setParameter("tenantId", tenantId)
-            .getSingleResult();
+    return jdbcTemplate.queryForObject(
+        "SELECT registration_id FROM tenant_xtmhub_registrations WHERE tenant_id = ?",
+        String.class,
+        tenantId);
   }
 
   private long rawCountForTenant(String tenantId) {
-    entityManager.flush();
-    Number count =
-        (Number)
-            entityManager
-                .createNativeQuery(
-                    "SELECT count(*) FROM tenant_xtmhub_registrations WHERE tenant_id = :tenantId")
-                .setParameter("tenantId", tenantId)
-                .getSingleResult();
-    return count.longValue();
+    Long count =
+        jdbcTemplate.queryForObject(
+            "SELECT count(*) FROM tenant_xtmhub_registrations WHERE tenant_id = ?",
+            Long.class,
+            tenantId);
+    return count != null ? count : 0L;
   }
 
   private String rawTokenForTenant(String tenantId) {
-    entityManager.flush();
-    return (String)
-        entityManager
-            .createNativeQuery(
-                "SELECT registration_token FROM tenant_xtmhub_registrations WHERE tenant_id = :tenantId")
-            .setParameter("tenantId", tenantId)
-            .getSingleResult();
+    return jdbcTemplate.queryForObject(
+        "SELECT registration_token FROM tenant_xtmhub_registrations WHERE tenant_id = ?",
+        String.class,
+        tenantId);
   }
 }

@@ -51,11 +51,6 @@ class XtmHubBackgroundIsolationTest extends IntegrationTest {
 
   @BeforeEach
   void setUp() throws Exception {
-    tenantA = tenantHelper.createTenantWithCurrentUser("xtmhub-bg-a").getId();
-    tenantB = tenantHelper.createTenantWithCurrentUser("xtmhub-bg-b").getId();
-    seedRegistration(tenantA, "bg-token-a");
-    seedRegistration(tenantB, "bg-token-b");
-
     PlatformSettings settings = new PlatformSettings();
     settings.setPlatformId("platform-id");
     settings.setPlatformVersion("1.0.0");
@@ -64,6 +59,11 @@ class XtmHubBackgroundIsolationTest extends IntegrationTest {
     when(platformSettingsService.findSettings()).thenReturn(settings);
     when(tenantSettingsService.buildTenantUrl(anyString()))
         .thenAnswer(invocation -> "http://localhost/" + invocation.getArgument(0));
+
+    tenantA = tenantHelper.createTenantWithCurrentUser("xtmhub-bg-a").getId();
+    tenantB = tenantHelper.createTenantWithCurrentUser("xtmhub-bg-b").getId();
+    seedRegistration(tenantA, "bg-token-a");
+    seedRegistration(tenantB, "bg-token-b");
   }
 
   @AfterEach
