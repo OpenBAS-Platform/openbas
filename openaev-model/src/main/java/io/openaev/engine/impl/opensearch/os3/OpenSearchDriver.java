@@ -1,7 +1,6 @@
 package io.openaev.engine.impl.opensearch.os3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es9.co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import io.openaev.config.EngineConfig;
 import io.openaev.database.model.IndexingStatus;
 import io.openaev.database.repository.IndexingStatusRepository;
@@ -519,7 +518,7 @@ public class OpenSearchDriver {
       try {
         client.indices().delete(d -> d.index(idxName));
         log.info("Deleted index: {}", idxName);
-      } catch (ElasticsearchException e) {
+      } catch (OpenSearchException e) {
         log.warn("Index {} could not be deleted: {}", idxName, e.getMessage());
       }
     }
