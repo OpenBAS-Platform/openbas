@@ -71,33 +71,37 @@ public class TenantMembershipCacheManager {
    * Evicts a specific user-tenant membership entry and the user's cached tenant-id list after
    * membership changes.
    *
-   * <p>Deferred to run only after the enclosing transaction commits, if any: a membership row that
-   * is inserted or removed is not visible to other connections until commit (READ COMMITTED), so
-   * evicting before commit would let a concurrent request for the same user repopulate the cache
-   * from the pre-commit state, poisoning it for its full TTL. Every caller that mutates {@code
-   * users_tenants} must go through this method (or {@link #evictForUser}) instead of evicting the
-   * caches directly, so this guarantee applies uniformly regardless of which service triggered the
-   * membership change.
+   * <p>Evicted immediately (so a subsequent read in the same transaction — or from an entirely
+   * non-transactional caller — never sees the stale entry), and evicted again after the enclosing
+   * transaction commits, if any: a membership row that is inserted or removed is not visible to
+   * other connections until commit (READ COMMITTED), so a concurrent request could still repopulate
+   * the cache from the pre-commit state during the window before commit. The post-commit eviction
+   * busts that possibly-stale repopulation, forcing the next read to go back to the database once
+   * the row is actually visible everywhere. Every caller that mutates {@code users_tenants} must go
+   * through this method (or {@link #evictForUser}) instead of evicting the caches directly, so both
+   * guarantees apply uniformly regardless of which service triggered the membership change.
    */
   public void evict(String userId, String tenantId) {
-    deferUntilCommit(() -> evictNow(userId, tenantId));
+    evictNow(userId, tenantId);
+    evictAgainAfterCommit(() -> evictNow(userId, tenantId));
   }
 
   /**
    * Evicts all cached tenant membership entries for a given user, including the cached tenant-id
-   * list. Same after-commit deferral as {@link #evict(String, String)}.
+   * list. Same immediate-plus-after-commit double eviction as {@link #evict(String, String)}.
    */
   public void evictForUser(String userId, List<String> tenantIds) {
-    deferUntilCommit(() -> evictForUserNow(userId, tenantIds));
+    evictForUserNow(userId, tenantIds);
+    evictAgainAfterCommit(() -> evictForUserNow(userId, tenantIds));
   }
 
   /**
-   * Runs {@code eviction} immediately if no transaction is active (nothing to wait for), otherwise
-   * registers it to run after the enclosing transaction commits.
+   * Registers {@code eviction} to run again after the enclosing transaction commits. No-op if no
+   * transaction is active — the immediate eviction the caller already performed is the only one
+   * needed in that case.
    */
-  private void deferUntilCommit(Runnable eviction) {
+  private void evictAgainAfterCommit(Runnable eviction) {
     if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-      eviction.run();
       return;
     }
     TransactionSynchronizationManager.registerSynchronization(
