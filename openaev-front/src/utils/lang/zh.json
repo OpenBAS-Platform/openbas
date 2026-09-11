@@ -2475,6 +2475,7 @@
   "No attack-path data for this simulation. Seed data (POST /attack-path/seed) or enter a seeded simulation id above.": "No attack-path data for this simulation. Seed data (POST /attack-path/seed) or enter a seeded simulation id above.",
   "No attack-path data for this simulation. Select a simulation with attack-path data above.": "此模拟没有攻击路径数据。请在上方选择包含攻击路径数据的模拟。",
   "No author": "无作者",
+  "No automated security platform detected": "未检测到任何自动化安全平台",
   "No available options": "无可用选项",
   "No capability granted by this role.": "该角色未授予任何能力。",
   "No categories yet": "暂无类别",
