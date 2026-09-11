@@ -219,12 +219,18 @@ class CustomDashboardHttpIsolationTest extends IntegrationTest {
     Widget widget = createDefaultWidget();
     widget.setTenant(new Tenant(tenantId));
 
-    return customDashboardComposer
-        .forCustomDashboard(dashboard)
-        .withWidget(widgetComposer.forWidget(widget))
-        .persist()
-        .get()
-        .getId();
+    CustomDashboard persisted =
+        customDashboardComposer
+            .forCustomDashboard(dashboard)
+            .withWidget(widgetComposer.forWidget(widget))
+            .persist()
+            .get();
+    // Detach the seeded aggregate so the endpoint's findById goes to the database instead of
+    // being served from this transaction's persistence context: a first-level cache hit emits no
+    // SQL, so TenantStatementInspector never sees the read and cannot scope it.
+    entityManager.flush();
+    entityManager.detach(persisted);
+    return persisted.getId();
   }
 
   private MockMultipartFile createImportZipFile(String dashboardName) throws Exception {

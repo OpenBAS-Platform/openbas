@@ -82,13 +82,17 @@ class DashboardApiTenantScopeTest extends IntegrationTest {
     Widget widget = createNumberWidgetWithEntity("asset");
     widget.setTenant(new Tenant(tenantId));
 
-    return customDashboardComposer
-        .forCustomDashboard(dashboard)
-        .withWidget(widgetComposer.forWidget(widget))
-        .persist()
-        .get()
-        .getWidgets()
-        .getFirst()
-        .getId();
+    CustomDashboard persisted =
+        customDashboardComposer
+            .forCustomDashboard(dashboard)
+            .withWidget(widgetComposer.forWidget(widget))
+            .persist()
+            .get();
+    String widgetId = persisted.getWidgets().getFirst().getId();
+    // See CustomDashboardHttpIsolationTest: a first-level cache hit emits no SQL, so the inspector
+    // never sees the read. Detaching the seeded aggregate forces the endpoint to query it.
+    entityManager.flush();
+    entityManager.detach(persisted);
+    return widgetId;
   }
 }
