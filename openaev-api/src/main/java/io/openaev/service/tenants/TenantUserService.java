@@ -73,18 +73,6 @@ public class TenantUserService implements DependenciesManager {
     return UserMapper.toOutput(reloaded);
   }
 
-  /**
-   * Attaches a user to the specified tenant. Does nothing if already attached.
-   *
-   * <p>The membership cache eviction is deferred to run only after the enclosing transaction
-   * commits (see {@link #evictMembershipAfterCommit}): evicting immediately, while the {@code
-   * users_tenants} INSERT is still uncommitted, lets a concurrent request for the same user
-   * repopulate {@link TenantMembershipCacheManager#findTenantIdsByUserId} with the pre-commit
-   * (missing) tenant list under READ COMMITTED — poisoning the 5-minute cache and causing every
-   * subsequent tenant-scoped call from that user (including the caller's own follow-up requests,
-   * e.g. deleting the tenant it just created) to be wrongly refused with {@code
-   * TENANT_ACCESS_DENIED} until the cache entry expires.
-   */
   public void attachToTenant(@NotBlank String userId, @NotBlank String tenantId) {
     tenantRepository.addUserToTenant(userId, tenantId);
     evictMembershipAfterCommit(userId, tenantId);

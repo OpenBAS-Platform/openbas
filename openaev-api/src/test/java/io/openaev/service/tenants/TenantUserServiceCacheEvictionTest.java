@@ -19,15 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-/**
- * Unit test for the membership-cache eviction ordering in {@link TenantUserService}. Deliberately a
- * plain Mockito unit test rather than an {@code IntegrationTest}: the bug this guards against is a
- * cross-connection race (a concurrent request repopulating the cache from pre-commit data), and a
- * single JDBC connection/transaction always sees its own uncommitted writes, so an integration test
- * asserting on the same connection cannot distinguish "evicted immediately" from "evicted after
- * commit" — the {@link TransactionSynchronizationManager} plumbing itself is the thing under test
- * here, independent of any real database interaction.
- */
 @ExtendWith(MockitoExtension.class)
 class TenantUserServiceCacheEvictionTest {
 
