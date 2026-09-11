@@ -9,7 +9,7 @@ public class OcsfDatatypeEmailT extends OcsfDatatype<java.lang.String> {
   }
 
   @java.lang.Override
-  protected boolean validate() {
+  public boolean validate() {
     return getValue().matches("^[a-zA-Z0-9!#$%&'*+-/=?^_`{|}~.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$");
   }
 }

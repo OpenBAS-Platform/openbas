@@ -9,7 +9,7 @@ public class OcsfDatatypeBytestringT extends OcsfDatatype<java.lang.String> {
   }
 
   @java.lang.Override
-  protected boolean validate() {
+  public boolean validate() {
     return getValue()
         .matches(
             "^(?:(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)|(?:[A-Za-z0-9_-]{4})*(?:[A-Za-z0-9_-]{2}==|[A-Za-z0-9_-]{3}=))?$");

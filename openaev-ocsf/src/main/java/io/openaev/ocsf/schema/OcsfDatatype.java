@@ -22,7 +22,7 @@ public abstract class OcsfDatatype<T> implements OcsfSerialisable {
    *
    * @return true if the underlying data fragment clears the validation rules
    */
-  protected boolean validate() {
+  public boolean validate() {
     return true; // default to always valid
   }
 

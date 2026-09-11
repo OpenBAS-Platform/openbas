@@ -58,7 +58,7 @@ public class DatatypeClassGenerator extends ClassGenerator {
     if (metadata.source().get("regex") != null) {
       meta.withMethod(
           new MethodMeta(
-                  Modifier.PROTECTED,
+                  Modifier.PUBLIC,
                   "boolean",
                   "validate",
                   """

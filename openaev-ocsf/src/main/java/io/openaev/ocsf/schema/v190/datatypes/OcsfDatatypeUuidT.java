@@ -9,7 +9,7 @@ public class OcsfDatatypeUuidT extends OcsfDatatype<java.lang.String> {
   }
 
   @java.lang.Override
-  protected boolean validate() {
+  public boolean validate() {
     return getValue()
         .matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
   }
