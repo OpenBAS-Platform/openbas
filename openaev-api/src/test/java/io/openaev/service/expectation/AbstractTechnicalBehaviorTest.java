@@ -215,6 +215,9 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
               .forInject(InjectFixture.getDefaultInject())
               .withEndpoint(endpointComposer.forEndpoint(endpoint))
               .withExercise(exerciseComposer.forExercise(exercise))
+              .withInjectorContract(
+                  injectorContractComposer.forInjectorContract(
+                      InjectorContractFixture.createDefaultInjectorContract()))
               .persist()
               .get();
 
@@ -271,6 +274,9 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
               .forInject(InjectFixture.getDefaultInject())
               .withEndpoint(endpointComposer.forEndpoint(endpoint))
               .withExercise(exerciseComposer.forExercise(exercise))
+              .withInjectorContract(
+                  injectorContractComposer.forInjectorContract(
+                      InjectorContractFixture.createDefaultInjectorContract()))
               .persist()
               .get();
 
