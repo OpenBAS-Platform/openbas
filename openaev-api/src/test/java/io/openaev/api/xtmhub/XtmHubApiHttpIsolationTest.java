@@ -16,9 +16,8 @@ import io.openaev.utils.TenantIsolationTestHelper;
 import io.openaev.utils.mockUser.WithMockUser;
 import io.openaev.xtmhub.XtmHubClient;
 import io.openaev.xtmhub.XtmHubRegistrationStatus;
-import java.time.LocalDateTime;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import org.hibernate.Session;
 import org.junit.jupiter.api.BeforeEach;
@@ -260,110 +259,12 @@ class XtmHubApiHttpIsolationTest extends IntegrationTest {
   }
 
   private void deleteByTenantId(String tenantId) {
-<<<<<<< HEAD
     entityManager.flush();
-    entityManager
-        .unwrap(Session.class)
-        .doWork(
-            connection -> {
-              try (PreparedStatement statement =
-                  connection.prepareStatement(
-                      "DELETE FROM tenant_xtmhub_registrations WHERE tenant_id = ?")) {
-                statement.setString(1, tenantId);
-                statement.executeUpdate();
-              }
-            });
-  }
-
-  private String rawTenantId(String registrationId) {
-    entityManager.flush();
-    return entityManager
-        .unwrap(Session.class)
-        .doReturningWork(
-            connection -> {
-              try (PreparedStatement statement =
-                  connection.prepareStatement(
-                      "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_id = ?")) {
-                statement.setString(1, registrationId);
-                try (ResultSet rows = statement.executeQuery()) {
-                  return rows.next() ? rows.getString(1) : null;
-                }
-              }
-            });
-  }
-
-  private String rawSingleRegistrationTenant(String token) {
-    entityManager.flush();
-    return entityManager
-        .unwrap(Session.class)
-        .doReturningWork(
-            connection -> {
-              try (PreparedStatement statement =
-                  connection.prepareStatement(
-                      "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_token = ?")) {
-                statement.setString(1, token);
-                try (ResultSet rows = statement.executeQuery()) {
-                  return rows.next() ? rows.getString(1) : null;
-                }
-              }
-            });
-  }
-
-  private String registrationIdForTenant(String tenantId) {
-    entityManager.flush();
-    return entityManager
-        .unwrap(Session.class)
-        .doReturningWork(
-            connection -> {
-              try (PreparedStatement statement =
-                  connection.prepareStatement(
-                      "SELECT registration_id FROM tenant_xtmhub_registrations WHERE tenant_id = ?")) {
-                statement.setString(1, tenantId);
-                try (ResultSet rows = statement.executeQuery()) {
-                  return rows.next() ? rows.getString(1) : null;
-                }
-              }
-            });
-  }
-
-  private long rawCountForTenant(String tenantId) {
-    entityManager.flush();
-    return entityManager
-        .unwrap(Session.class)
-        .doReturningWork(
-            connection -> {
-              try (PreparedStatement statement =
-                  connection.prepareStatement(
-                      "SELECT count(*) FROM tenant_xtmhub_registrations WHERE tenant_id = ?")) {
-                statement.setString(1, tenantId);
-                try (ResultSet rows = statement.executeQuery()) {
-                  rows.next();
-                  return rows.getLong(1);
-                }
-              }
-            });
-  }
-
-  private String rawTokenForTenant(String tenantId) {
-    entityManager.flush();
-    return entityManager
-        .unwrap(Session.class)
-        .doReturningWork(
-            connection -> {
-              try (PreparedStatement statement =
-                  connection.prepareStatement(
-                      "SELECT registration_token FROM tenant_xtmhub_registrations WHERE tenant_id = ?")) {
-                statement.setString(1, tenantId);
-                try (ResultSet rows = statement.executeQuery()) {
-                  return rows.next() ? rows.getString(1) : null;
-                }
-              }
-            });
-=======
     jdbcTemplate.update("DELETE FROM tenant_xtmhub_registrations WHERE tenant_id = ?", tenantId);
   }
 
   private String rawTenantId(String registrationId) {
+    entityManager.flush();
     return jdbcTemplate.queryForObject(
         "SELECT tenant_id FROM tenant_xtmhub_registrations WHERE registration_id = ?",
         String.class,
@@ -371,6 +272,7 @@ class XtmHubApiHttpIsolationTest extends IntegrationTest {
   }
 
   private long rawCountForTokenInTenant(String token, String tenantId) {
+    entityManager.flush();
     Long count =
         jdbcTemplate.queryForObject(
             "SELECT count(*) FROM tenant_xtmhub_registrations"
@@ -382,6 +284,7 @@ class XtmHubApiHttpIsolationTest extends IntegrationTest {
   }
 
   private String registrationIdForTenant(String tenantId) {
+    entityManager.flush();
     return jdbcTemplate.queryForObject(
         "SELECT registration_id FROM tenant_xtmhub_registrations WHERE tenant_id = ?",
         String.class,
@@ -389,6 +292,7 @@ class XtmHubApiHttpIsolationTest extends IntegrationTest {
   }
 
   private long rawCountForTenant(String tenantId) {
+    entityManager.flush();
     Long count =
         jdbcTemplate.queryForObject(
             "SELECT count(*) FROM tenant_xtmhub_registrations WHERE tenant_id = ?",
@@ -398,10 +302,10 @@ class XtmHubApiHttpIsolationTest extends IntegrationTest {
   }
 
   private String rawTokenForTenant(String tenantId) {
+    entityManager.flush();
     return jdbcTemplate.queryForObject(
         "SELECT registration_token FROM tenant_xtmhub_registrations WHERE tenant_id = ?",
         String.class,
         tenantId);
->>>>>>> 2a5b14f6e637b252fb898d1357cc963808309f21
   }
 }
