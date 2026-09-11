@@ -153,7 +153,7 @@ const EventConditionRow: FunctionComponent<Props> = ({
           disabled={isArgumentTypesUnavailable}
         >
           <SelectLabel>{t('Field to Check')}</SelectLabel>
-          <SelectTrigger className="w-full">
+          <SelectTrigger style={{ minWidth: 140 }}>
             <span>{formatConditionKeyLabel(condition.field)}</span>
           </SelectTrigger>
           <SelectContent>
@@ -198,7 +198,7 @@ const EventConditionRow: FunctionComponent<Props> = ({
           onValueChange={value => handleOperatorChange(value as ComparisonOperator)}
         >
           <SelectLabel>{t('Operator')}</SelectLabel>
-          <SelectTrigger className="w-full">
+          <SelectTrigger style={{ minWidth: 130 }}>
             <SelectValue placeholder={t('Operator')} />
           </SelectTrigger>
           <SelectContent>

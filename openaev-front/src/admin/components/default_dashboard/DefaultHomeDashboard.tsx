@@ -195,7 +195,7 @@ const DefaultHomeDashboard = () => {
           value={timeRange}
           onValueChange={next => setTimeRange(next as DefaultTimeRange)}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger style={{ minWidth: 160 }}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

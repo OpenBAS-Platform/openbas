@@ -38,7 +38,7 @@ const PageSizeSelect = ({ value, onChange }: {
       value={String(value)}
       onValueChange={next => onChange(Number(next))}
     >
-      <SelectTrigger className="w-full">
+      <SelectTrigger>
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

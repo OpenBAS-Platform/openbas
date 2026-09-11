@@ -179,7 +179,7 @@ const ScopeExecutionLimits = ({ workflowConfiguration, onUpdate, autonomous = fa
         <div>
           <Select value={String(hours)} onValueChange={handleHoursChange} disabled={!timeoutEnabled}>
             <SelectLabel>{t('Hours')}</SelectLabel>
-            <SelectTrigger className="w-full">
+            <SelectTrigger>
               <SelectValue placeholder={t('Hours')} />
             </SelectTrigger>
             <SelectContent>
@@ -192,7 +192,7 @@ const ScopeExecutionLimits = ({ workflowConfiguration, onUpdate, autonomous = fa
         <div>
           <Select value={String(minutes)} onValueChange={handleTimeoutMinutesChange} disabled={!timeoutEnabled}>
             <SelectLabel>{t('Minutes')}</SelectLabel>
-            <SelectTrigger className="w-full">
+            <SelectTrigger>
               <SelectValue placeholder={t('Minutes')} />
             </SelectTrigger>
             <SelectContent>
@@ -220,7 +220,7 @@ const ScopeExecutionLimits = ({ workflowConfiguration, onUpdate, autonomous = fa
             <div>
               <Select value={String(maxAttempts)} onValueChange={handleMaxAttemptsChange} disabled={!rateLimitEnabled}>
                 <SelectLabel>{t('Max Attempts')}</SelectLabel>
-                <SelectTrigger className="w-full">
+                <SelectTrigger>
                   <SelectValue placeholder={t('Max Attempts')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -233,7 +233,7 @@ const ScopeExecutionLimits = ({ workflowConfiguration, onUpdate, autonomous = fa
             <div>
               <Select value={String(rateMinutes)} onValueChange={handleRateMinutesChange} disabled={!rateLimitEnabled}>
                 <SelectLabel>{t('Minutes')}</SelectLabel>
-                <SelectTrigger className="w-full">
+                <SelectTrigger>
                   <SelectValue placeholder={t('Minutes')} />
                 </SelectTrigger>
                 <SelectContent>
