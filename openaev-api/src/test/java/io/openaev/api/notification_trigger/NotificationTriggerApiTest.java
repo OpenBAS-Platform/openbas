@@ -71,7 +71,7 @@ public class NotificationTriggerApiTest extends IntegrationTest {
   }
 
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   @DisplayName("A live trigger can be created, updated and deleted")
   void liveTriggerLifecycle() throws Exception {
     NotificationTriggerInput input =
@@ -129,7 +129,7 @@ public class NotificationTriggerApiTest extends IntegrationTest {
   }
 
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   @DisplayName("A live trigger without event types is rejected")
   void liveTriggerRequiresEventTypes() throws Exception {
     NotificationTriggerInput input =
@@ -151,7 +151,7 @@ public class NotificationTriggerApiTest extends IntegrationTest {
   }
 
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   @DisplayName("A digest trigger requires composed triggers and a valid trigger time")
   void digestTriggerValidation() throws Exception {
     // No composed triggers -> rejected
@@ -237,7 +237,7 @@ public class NotificationTriggerApiTest extends IntegrationTest {
   }
 
   @Test
-  @WithMockUser(isAdmin = true)
+  @WithMockUser(isAdmin = true, autoJoinDefaultTenant = true)
   @DisplayName(
       "Triggers are strictly per-user: another user's trigger is invisible, even to admins")
   void triggersAreScopedToTheirOwner() throws Exception {
