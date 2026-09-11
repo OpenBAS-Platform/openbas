@@ -42,9 +42,7 @@ jobs:
       # buckets plus a catch-all that picks up any newly added spec.
       #
       # PRs run the arm64/chromium half only (5 cells); push to main/tags runs
-      # both arches (10 cells). Selected inline rather than by a resolver job so
-      # that `pipeline` — and with it the required "✅ Pipeline Gate" check — can
-      # never be skipped by an upstream failure.
+      # both arches (10 cells).
       e2e-matrix: >-
         ${{ github.event_name == 'pull_request' && '[
         {"browser":"chromium","project":"chromium","docker_image":"openaev-image-arm64","variant":"std-arm64","runner":"ubuntu-24.04-arm","search_engine":"elasticsearch","shard_name":"arsenals","includes":"tests_e2e/tests/threat-arsenals","excludes":"","artifact_suffix":"-std-arm64-arsenals"},
