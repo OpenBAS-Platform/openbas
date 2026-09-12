@@ -1,6 +1,6 @@
-import { Checkbox } from '@filigran/design-system';
+import { Checkbox, IconButton } from '@filigran/design-system';
 import { CloudUploadOutlined, HelpOutlineOutlined, TrackChangesOutlined } from '@mui/icons-material';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButton, Tooltip } from '@mui/material';
+import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { type CSSProperties, type FunctionComponent, type ReactElement, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -295,17 +295,13 @@ const InjectResultList: FunctionComponent<Props> = ({
           <Box display="flex" gap={1} alignItems="center">
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSESSMENT}>
               <Tooltip title={t('inject_import_json_action')}>
-                <ToggleButton
-                  value="import"
-                  aria-label="import"
-                  size="small"
+                <IconButton
+                  priority="secondary"
+                  size="md"
+                  aria-label={t('inject_import_json_action')}
+                  icon={<CloudUploadOutlined fontSize="small" />}
                   onClick={handleOpenJsonImportDialog}
-                >
-                  <CloudUploadOutlined
-                    color="primary"
-                    fontSize="small"
-                  />
-                </ToggleButton>
+                />
               </Tooltip>
             </Can>
             {createButton}

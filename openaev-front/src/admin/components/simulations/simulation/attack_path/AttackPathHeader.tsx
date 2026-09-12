@@ -8,6 +8,7 @@ import {
   ComboboxInput,
   ComboboxLabel,
   ComboboxTrigger,
+  IconButton,
 } from '@filigran/design-system';
 import {
   AccountTreeOutlined,
@@ -27,11 +28,9 @@ import {
   Button,
   ButtonBase,
   CircularProgress,
-  IconButton,
   ListItemButton,
   Paper,
   Popover,
-  ToggleButton,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -669,41 +668,37 @@ const AttackPathHeader: FunctionComponent<Props> = ({
           <ButtonGroupItem value="table" aria-label={t('Table')} icon={<TableRowsOutlined fontSize="small" />} />
         </Tooltip>
       </ButtonGroup>
-      {/* Action, not a state: an IconButton with the segmented controls' outline so the band still
-          reads as one family. Only the graph can be rasterized — the table has its own CSV export. */}
+      {/* Action, not a state — the library's secondary outline is the band's own,
+          so it no longer has to be hand-rolled. Only the graph can be rasterized:
+          the table has its own CSV export. */}
       {view === 'graph' && onExportPng && (
         <Tooltip title={t('Export as PNG')}>
           <span>
             <IconButton
-              size="small"
+              priority="secondary"
+              size="md"
               aria-label={t('Export as PNG')}
+              icon={exportingPng ? <CircularProgress size={16} /> : <ImageOutlined fontSize="small" />}
               onClick={onExportPng}
               disabled={exportingPng}
-              sx={{
-                width: CONTROL_HEIGHT,
-                height: CONTROL_HEIGHT,
-                borderRadius: 1,
-                border: `1px solid ${theme.palette.divider}`,
-              }}
-            >
-              {exportingPng ? <CircularProgress size={16} /> : <ImageOutlined fontSize="small" />}
-            </IconButton>
+            />
           </span>
         </Tooltip>
       )}
-      {/* Standalone ToggleButton so fullscreen reads as part of the same segmented family. */}
-      <ToggleButton
-        size="small"
-        value="fullscreen"
-        selected={fullscreen}
-        onChange={onToggleFullscreen}
-        aria-label={fullscreen ? t('Exit fullscreen') : t('Fullscreen')}
-        sx={{ height: CONTROL_HEIGHT }}
-      >
-        <Tooltip title={fullscreen ? t('Exit fullscreen') : t('Fullscreen')}>
-          {fullscreen ? <FullscreenExitOutlined fontSize="small" /> : <FullscreenOutlined fontSize="small" />}
-        </Tooltip>
-      </ToggleButton>
+      {/* An on/off control, not a segment of a group: the pressed state travels
+          as `active`, and the name follows it the way the tooltip does. */}
+      <Tooltip title={fullscreen ? t('Exit fullscreen') : t('Fullscreen')}>
+        <span style={{ display: 'inline-flex' }}>
+          <IconButton
+            priority="secondary"
+            size="md"
+            active={fullscreen}
+            aria-label={fullscreen ? t('Exit fullscreen') : t('Fullscreen')}
+            icon={fullscreen ? <FullscreenExitOutlined fontSize="small" /> : <FullscreenOutlined fontSize="small" />}
+            onClick={onToggleFullscreen}
+          />
+        </span>
+      </Tooltip>
     </Paper>
   );
 };

@@ -1,5 +1,6 @@
+import { IconButton as FdsIconButton } from '@filigran/design-system';
 import { CloudUploadOutlined } from '@mui/icons-material';
-import { Button, CircularProgress, type CircularProgressProps, IconButton, ToggleButton, Tooltip } from '@mui/material';
+import { Button, CircularProgress, type CircularProgressProps, IconButton, Tooltip } from '@mui/material';
 import { type ChangeEvent, type FunctionComponent, useRef, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -77,23 +78,18 @@ const ImportUploader: FunctionComponent<Props> = ({
         }}
       />
       {isIconButton ? (
-        <ToggleButton
-          value="import"
-          aria-label="import"
-          size="small"
-          onClick={handleOpenUpload}
-          disabled={disabled}
-        >
-          <Tooltip
-            title={t(title)}
-            aria-label={title}
-          >
-            <CloudUploadOutlined
-              color="primary"
-              fontSize="small"
+        <Tooltip title={t(title)}>
+          <span style={{ display: 'inline-flex' }}>
+            <FdsIconButton
+              priority="secondary"
+              size="md"
+              aria-label={t(title)}
+              icon={<CloudUploadOutlined fontSize="small" />}
+              onClick={handleOpenUpload}
+              disabled={disabled}
             />
-          </Tooltip>
-        </ToggleButton>
+          </span>
+        </Tooltip>
       ) : (
         <Tooltip
           title={t(title)}

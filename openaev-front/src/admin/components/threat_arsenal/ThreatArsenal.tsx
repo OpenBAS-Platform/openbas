@@ -12,7 +12,6 @@ import {
   ListItemIcon,
   ListItemText,
   Skeleton,
-  ToggleButtonGroup,
   Tooltip,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -444,7 +443,13 @@ const ThreatArsenal = () => {
         </Tooltip>
       </ButtonGroup>
 
-      <ToggleButtonGroup value="fake" exclusive>
+      {/* A plain row of actions: this was a ToggleButtonGroup used as a frame,
+          which announced a group of choices that never existed. */}
+      <Box sx={{
+        display: 'flex',
+        gap: 1,
+      }}
+      >
         <ExportButton
           totalElements={totalElements}
           exportProps={exportProps}
@@ -455,7 +460,7 @@ const ThreatArsenal = () => {
             onImport={results => setThreatArsenalActions(prev => [...results, ...prev])}
           />
         </Can>
-      </ToggleButtonGroup>
+      </Box>
 
       {/* The create button used to ride the pagination row, which the card view
           makes 180px wider than the list view (it adds the sort select there) —
