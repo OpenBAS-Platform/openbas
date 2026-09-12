@@ -1,5 +1,6 @@
+import { Paper } from '@filigran/design-system';
 import { CloseOutlined, FullscreenOutlined } from '@mui/icons-material';
-import { Box, Dialog, DialogContent, DialogTitle, IconButton, Paper, Tooltip, Typography } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle, IconButton, Tooltip, Typography } from '@mui/material';
 import { type ReactNode, useCallback, useState } from 'react';
 
 import { SECTION_LABEL_SX } from '../../../../components/common/detail/detailStyles';
@@ -138,11 +139,10 @@ const PhishingHtmlPreview = ({ title, iframeTitle, srcDoc, chrome, height = 560 
             </IconButton>
           </Tooltip>
         </Box>
+        {/* `padding={0}`: the surface frames an iframe that must reach its edges. */}
         <Paper
-          variant="outlined"
-          sx={{
-            padding: 0,
-            borderRadius: 1,
+          padding={0}
+          style={{
             flex: 1,
             overflow: 'hidden',
             display: 'flex',

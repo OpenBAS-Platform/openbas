@@ -1,3 +1,4 @@
+import { ButtonGroup, ButtonGroupItem, Checkbox } from '@filigran/design-system';
 import {
   GridViewOutlined,
   LinkOffOutlined,
@@ -5,15 +6,12 @@ import {
 } from '@mui/icons-material';
 import {
   Box,
-  Checkbox,
   IconButton,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   Skeleton,
-  ToggleButton,
-  ToggleButtonGroup,
   Tooltip,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -82,8 +80,8 @@ const ThreatArsenal = () => {
   const [threatArsenalActions, setThreatArsenalActions] = useState<ThreatArsenalAction[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>(readViewMode);
 
-  const handleViewModeChange = (_: unknown, value: ViewMode | null) => {
-    if (!value) return;
+  const handleViewModeChange = (next: string) => {
+    const value = next as ViewMode;
     setViewMode(value);
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(VIEW_MODE_STORAGE_KEY, value);
@@ -431,27 +429,27 @@ const ThreatArsenal = () => {
 
   const headerRightSlot = (
     <>
-      <ToggleButtonGroup
+      <ButtonGroup
         value={viewMode}
-        exclusive
-        size="small"
-        onChange={handleViewModeChange}
+        size="md"
+        onValueChange={handleViewModeChange}
         aria-label={t('View mode')}
-        sx={{ '& .MuiToggleButton-root.Mui-selected .MuiSvgIcon-root': { color: 'primary.main' } }}
       >
-        <ToggleButton value="grid" aria-label={t('Grid view')}>
-          <Tooltip title={t('Grid view')}>
-            <GridViewOutlined fontSize="small" />
-          </Tooltip>
-        </ToggleButton>
-        <ToggleButton value="list" aria-label={t('List view')}>
-          <Tooltip title={t('List view')}>
-            <ViewListOutlined fontSize="small" />
-          </Tooltip>
-        </ToggleButton>
-      </ToggleButtonGroup>
+        <Tooltip title={t('Grid view')}>
+          <ButtonGroupItem value="grid" aria-label={t('Grid view')} icon={<GridViewOutlined fontSize="small" />} />
+        </Tooltip>
+        <Tooltip title={t('List view')}>
+          <ButtonGroupItem value="list" aria-label={t('List view')} icon={<ViewListOutlined fontSize="small" />} />
+        </Tooltip>
+      </ButtonGroup>
 
-      <ToggleButtonGroup value="fake" exclusive>
+      {/* A plain row of actions: this was a ToggleButtonGroup used as a frame,
+          which announced a group of choices that never existed. */}
+      <Box sx={{
+        display: 'flex',
+        gap: 1,
+      }}
+      >
         <ExportButton
           totalElements={totalElements}
           exportProps={exportProps}
@@ -462,7 +460,22 @@ const ThreatArsenal = () => {
             onImport={results => setThreatArsenalActions(prev => [...results, ...prev])}
           />
         </Can>
-      </ToggleButtonGroup>
+      </Box>
+
+      {/* The create button used to ride the pagination row, which the card view
+          makes 180px wider than the list view (it adds the sort select there) —
+          measured at 1400px wide: 47px of the button visible in list view, 0 in
+          card view, with no way to scroll to it. Here it sits beside the import
+          icons, one instance, rendered in both views. */}
+      {/* No margin here: the header's own row already puts 8px between its
+          children — adding one made the gap 16. */}
+      <Can I={ACTIONS.MANAGE} a={SUBJECTS.THREAT_ARSENALS}>
+        <CreateThreatArsenalAction
+          onCreate={(result: ThreatArsenalAction) => {
+            setThreatArsenalActions(prev => [result, ...prev]);
+          }}
+        />
+      </Can>
     </>
   );
 
@@ -532,15 +545,6 @@ const ThreatArsenal = () => {
                       <ThreatArsenalSortSelect sortHelpers={queryableHelpers.sortHelpers} />
                     )
                   : null}
-                topBarButtons={(
-                  <Can I={ACTIONS.MANAGE} a={SUBJECTS.THREAT_ARSENALS}>
-                    <CreateThreatArsenalAction
-                      onCreate={(result: ThreatArsenalAction) => {
-                        setThreatArsenalActions(prev => [result, ...prev]);
-                      }}
-                    />
-                  </Can>
-                )}
                 leftSlot={(
                   <Box sx={{
                     display: 'flex',
@@ -559,16 +563,20 @@ const ThreatArsenal = () => {
                         the list view (the toolbar is shared by the two). */}
                     <Tooltip title={selectAllLabel}>
                       <span>
+                        {/* The library box is 16x16 with no padding, so it no
+                            longer sets the row's height — the 36px is the row's
+                            own now. The mixed state travels as the `checked`
+                            value, which is where Radix reads it. */}
                         <Checkbox
-                          size="small"
-                          checked={selectAll}
-                          indeterminate={
+                          aria-label={selectAllLabel}
+                          checked={
                             (!selectAll && numberOfSelectedElements > 0)
                             || (selectAll && Object.keys(deSelectedElements ?? {}).length > 0)
+                              ? 'indeterminate'
+                              : selectAll
                           }
-                          onChange={handleToggleSelectAll}
+                          onCheckedChange={handleToggleSelectAll}
                           disabled={threatArsenalActions.length === 0}
-                          inputProps={{ 'aria-label': selectAllLabel }}
                         />
                       </span>
                     </Tooltip>

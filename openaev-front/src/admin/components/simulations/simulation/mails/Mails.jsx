@@ -1,3 +1,8 @@
+import {
+  ButtonGroup,
+  ButtonGroupItem,
+  Paper,
+} from '@filigran/design-system';
 import { BarChartOutlined, KeyboardArrowRight, MailOutlined, ReorderOutlined } from '@mui/icons-material';
 import {
   Box,
@@ -8,9 +13,6 @@ import {
   ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
-  Paper,
-  ToggleButton,
-  ToggleButtonGroup,
   Tooltip,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
@@ -127,7 +129,9 @@ const Mails = () => {
   const [viewMode, setViewMode] = useState(() => localStorage.getItem(VIEW_MODE_STORAGE_KEY) ?? 'list');
   const { permissions } = useContext(PermissionsContext);
 
-  const handleViewModeChange = (_, next) => {
+  // The library ButtonGroup hands the value straight through; MUI's
+  // ToggleButtonGroup passed (event, value), so the leading argument is gone.
+  const handleViewModeChange = (next) => {
     if (next) {
       setViewMode(next);
       localStorage.setItem(VIEW_MODE_STORAGE_KEY, next);
@@ -205,25 +209,19 @@ const Mails = () => {
               <CreateQuickInject exercise={exercise} />
             </TeamContext.Provider>
           )}
-          <ToggleButtonGroup
+          <ButtonGroup
             value={viewMode}
-            exclusive
-            size="small"
-            onChange={handleViewModeChange}
+            size="md"
+            onValueChange={handleViewModeChange}
             aria-label={t('View mode')}
-            sx={{ '& .MuiToggleButton-root.Mui-selected .MuiSvgIcon-root': { color: 'primary.main' } }}
           >
-            <ToggleButton value="list" aria-label={t('List view')}>
-              <Tooltip title={t('List view')}>
-                <ReorderOutlined fontSize="small" />
-              </Tooltip>
-            </ToggleButton>
-            <ToggleButton value="distribution" aria-label={t('Distribution view')}>
-              <Tooltip title={t('Distribution view')}>
-                <BarChartOutlined fontSize="small" />
-              </Tooltip>
-            </ToggleButton>
-          </ToggleButtonGroup>
+            <Tooltip title={t('List view')}>
+              <ButtonGroupItem value="list" aria-label={t('List view')} icon={<ReorderOutlined fontSize="small" />} />
+            </Tooltip>
+            <Tooltip title={t('Distribution view')}>
+              <ButtonGroupItem value="distribution" aria-label={t('Distribution view')} icon={<BarChartOutlined fontSize="small" />} />
+            </Tooltip>
+          </ButtonGroup>
         </div>
         {viewMode === 'distribution' && (
           <>
@@ -263,7 +261,7 @@ const Mails = () => {
         {viewMode === 'list' && (
           sortedInjects.length === 0
             ? (
-                <Paper variant="outlined" sx={{ borderRadius: 1 }}>
+                <Paper padding={0}>
                   <Empty
                     icon={MailOutlined}
                     message={t('No mails have been sent yet')}

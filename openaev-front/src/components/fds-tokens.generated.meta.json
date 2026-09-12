@@ -1,0 +1,8 @@
+{
+  "__generated": "GENERATED FILE — do not edit by hand. Regenerate from the filigran-design-system repo: pnpm generate:mui-bridge --product openaev --write-to-product.",
+  "product": "openaev",
+  "themeCssHash": "sha256:3c0ef256c9d92003739f590c0d969d3aec1dcc6bcb26e00e9e5db5ca845fa20e",
+  "generator": "@filigran/design-system scripts/generate-mui-bridge.ts",
+  "tsFile": "fds-tokens.generated.ts",
+  "tsFileSha256": "sha256:a395a4773a34d5291952e0e9d74e968e4e582a4fe10dca5706f0dbca74edf340"
+}

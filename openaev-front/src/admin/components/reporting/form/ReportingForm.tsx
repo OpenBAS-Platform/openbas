@@ -1,27 +1,16 @@
+import {
+  Checkbox,
+  Paper as FdsPaper,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+} from '@filigran/design-system';
 import { DragDropContext, Draggable, Droppable, type DropResult } from '@hello-pangea/dnd';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DeleteOutlined, DragIndicatorOutlined, RestartAltOutlined } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Checkbox,
-  FormControl,
-  FormHelperText,
-  IconButton,
-  InputLabel,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  Paper,
-  Select,
-  Step,
-  StepLabel,
-  Stepper,
-  ToggleButton,
-  ToggleButtonGroup,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Box, Button, FormHelperText, IconButton, Paper, Step, StepLabel, Stepper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, type SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
@@ -405,29 +394,47 @@ const ReportingForm: FunctionComponent<Props> = ({
         control={control}
         name="reporting_context_type"
         render={({ field }) => (
-          <FormControl fullWidth>
-            <InputLabel id="reporting-context-type-label">{t('Subject type')}</InputLabel>
+          <div>
+            {/* The library Select renders no wrapper of its own; without this div
+                the column gap would separate its label from its trigger. */}
             <Select
-              labelId="reporting-context-type-label"
               value={field.value}
-              onChange={(event) => {
-                field.onChange(event.target.value);
+              onValueChange={(next) => {
+                field.onChange(next);
                 // A subject entity belongs to exactly one type.
                 setValue('reporting_context_id', '');
               }}
-              renderValue={value => t(REPORTING_CONTEXT_LABELS[value as ReportingContextType])}
+              name={field.name}
             >
-              {REPORTING_CONTEXT_TYPES.map((type) => {
-                const TypeIcon = REPORTING_CONTEXT_ICONS[type];
-                return (
-                  <MenuItem key={type} value={type}>
-                    <ListItemIcon><TypeIcon fontSize="small" color="primary" /></ListItemIcon>
-                    <ListItemText>{t(REPORTING_CONTEXT_LABELS[type])}</ListItemText>
-                  </MenuItem>
-                );
-              })}
+              <SelectLabel>{t('Subject type')}</SelectLabel>
+              {/* The trigger shows the label alone; the rows carry the icon. This
+                is what `renderValue` did, expressed as the trigger's content. */}
+              <SelectTrigger className="w-full">
+                <span>{t(REPORTING_CONTEXT_LABELS[field.value as ReportingContextType])}</span>
+              </SelectTrigger>
+              <SelectContent>
+                {REPORTING_CONTEXT_TYPES.map((type) => {
+                  const TypeIcon = REPORTING_CONTEXT_ICONS[type];
+                  return (
+                    <SelectItem key={type} value={type}>
+                      {/* Radix wraps an item's children in a single span, so the row's own
+                        flex never reaches them: without this the glyph sits on the text
+                        baseline with no gap. */}
+                      <span style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                      }}
+                      >
+                        <TypeIcon fontSize="small" color="primary" />
+                        {t(REPORTING_CONTEXT_LABELS[type])}
+                      </span>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
             </Select>
-          </FormControl>
+          </div>
         )}
       />
       {contextType !== 'PLATFORM' && (
@@ -508,10 +515,14 @@ const ReportingForm: FunctionComponent<Props> = ({
         {REPORTING_MODULE_TYPES.map((type) => {
           const selected = selectedTypes.includes(type);
           return (
+            // The card is the checkbox's own <label>, so the box is the real
+            // control and the whole card stays clickable — through the native
+            // label association rather than a handler on a div, which is what
+            // made this unreachable by keyboard.
             <Paper
               key={type}
+              component="label"
               variant="outlined"
-              onClick={() => toggleModule(type)}
               sx={{
                 display: 'flex',
                 alignItems: 'flex-start',
@@ -522,7 +533,10 @@ const ReportingForm: FunctionComponent<Props> = ({
                 borderColor: selected ? 'primary.main' : undefined,
               }}
             >
-              <Checkbox checked={selected} size="small" sx={{ padding: 0.5 }} />
+              <Checkbox
+                checked={selected}
+                onCheckedChange={() => toggleModule(type)}
+              />
               <div>
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                   {t(MODULE_TYPE_LABELS[type])}
@@ -551,17 +565,15 @@ const ReportingForm: FunctionComponent<Props> = ({
                 return (
                   <Draggable key={field.id} draggableId={field.id} index={index}>
                     {draggableProvided => (
-                      <Paper
+                      <FdsPaper
                         ref={draggableProvided.innerRef}
                         {...draggableProvided.draggableProps}
-                        variant="outlined"
-                        sx={{
+                        padding={8}
+                        style={{
                           display: 'flex',
                           flexDirection: 'column',
-                          gap: 1,
-                          padding: 1,
-                          marginBottom: 1,
-                          borderRadius: 1,
+                          gap: 8,
+                          marginBottom: 8,
                         }}
                       >
                         <Box sx={{
@@ -634,7 +646,7 @@ const ReportingForm: FunctionComponent<Props> = ({
                             )}
                           />
                         )}
-                      </Paper>
+                      </FdsPaper>
                     )}
                   </Draggable>
                 );

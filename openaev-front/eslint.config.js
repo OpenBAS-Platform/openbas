@@ -180,6 +180,11 @@ export default [
     plugins: { vitest },
     rules: {
       ...vitest.configs.recommended.rules,
+      // The design system assertions live in shared helpers, which the rule cannot see by itself.
+      'vitest/expect-expect': [
+        'error',
+        { assertFunctionNames: ['expect', 'expectLibrary*', 'expectNoMuiControls'] },
+      ],
       'import/no-extraneous-dependencies': [
         'error',
         {
@@ -222,6 +227,11 @@ export default [
       'builder/prod/build',
       'builder/dev/build',
       '__generated__',
+      // fds-migration bridge (filigran-design-system pnpm generate:mui-bridge) —
+      // pure generated data, regenerate upstream instead of hand-fixing lint
+      // errors here (OpenCTI pilot hit 1216 avoidable errors by skipping this).
+      'src/components/fds-tokens.generated.ts',
+      'src/components/fds-tokens.generated.meta.json',
       'test-results',
       'playwright-report',
       'blob-report',

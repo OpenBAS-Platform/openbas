@@ -1,5 +1,6 @@
+import { IconButton } from '@filigran/design-system';
 import { FileDownloadOutlined } from '@mui/icons-material';
-import { ToggleButton, Tooltip } from '@mui/material';
+import { Tooltip } from '@mui/material';
 import { CSVLink } from 'react-csv';
 
 import { exportCsvMapper } from '../../actions/mapper/mapper-actions';
@@ -50,12 +51,14 @@ const ExportButton = <T extends object>({ totalElements, exportProps, exportCsvM
   const exportBtn = (enableOnClick: boolean) => (
     <Tooltip title={t('Export this list')}>
       <span style={{ display: 'inline-flex' }}>
-        <ToggleButton value="export" aria-label="export" size="small" disabled={totalElements === 0} onClick={enableOnClick ? exportCsvMapperAction : undefined}>
-          <FileDownloadOutlined
-            color={totalElements === 0 ? 'disabled' : 'primary'}
-            fontSize="small"
-          />
-        </ToggleButton>
+        <IconButton
+          priority="secondary"
+          size="md"
+          aria-label={t('Export this list')}
+          icon={<FileDownloadOutlined fontSize="small" />}
+          disabled={totalElements === 0}
+          onClick={enableOnClick ? exportCsvMapperAction : undefined}
+        />
       </span>
     </Tooltip>
   );
