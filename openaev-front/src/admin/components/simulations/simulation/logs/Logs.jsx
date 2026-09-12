@@ -1,6 +1,6 @@
 import { Paper } from '@filigran/design-system';
 import { ExpandMoreOutlined, NoteAltOutlined, RateReviewOutlined } from '@mui/icons-material';
-import { Box, ButtonBase, Collapse, Paper as MuiPaper, Typography } from '@mui/material';
+import { Box, ButtonBase, Collapse, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -207,7 +207,9 @@ const Logs = () => {
 
         {/* Composer: collapsed one-line trigger, expands into the entry form. */}
         {permissions.canManage && (
-          <MuiPaper variant="outlined" sx={{ borderRadius: 1 }}>
+          // `padding={0}`: the ButtonBase inside is the whole hit area and carries
+          // its own 16px, so the surface must not add a second one.
+          <Paper padding={0}>
             <ButtonBase
               onClick={handleToggleWrite}
               sx={{
@@ -249,7 +251,7 @@ const Logs = () => {
                 />
               </Box>
             </Collapse>
-          </MuiPaper>
+          </Paper>
         )}
 
         <div ref={bottomRef} />

@@ -1,12 +1,6 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@filigran/design-system';
+import { Paper, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@filigran/design-system';
 import { Close } from '@mui/icons-material';
-import { Alert, Box, Button, IconButton, Pagination, Paper, Typography } from '@mui/material';
+import { Alert, Box, Button, IconButton, Pagination, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
 
@@ -138,8 +132,11 @@ const EndpointDetailPanel = ({
   const [findingsPageSize, setFindingsPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   return (
+    // `padding={0}`: the padding lives in the header and body rows below, which
+    // also carry the full-width divider between them — moving it up to the
+    // surface would pull that divider in (PAPER-GAP-INVENTORY §5.5).
     <Paper
-      variant="outlined"
+      padding={0}
       style={{
         flex: 1,
         minWidth: 0,

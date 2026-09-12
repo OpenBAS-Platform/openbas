@@ -286,6 +286,10 @@ const AttackPathHeader: FunctionComponent<Props> = ({
   const collapsedActive = collapsedExtras.some(c => c.key === activeCard);
 
   return (
+    // Stays on MUI: the live state paints a success-tinted linear gradient over
+    // the strip, and the library Paper paints no gradient
+    // (fds-migration/LIBRARY-FEEDBACK.md 29). The gradient is conditional but
+    // the implementation cannot be: one surface, one component.
     <Paper
       variant="outlined"
       sx={{
