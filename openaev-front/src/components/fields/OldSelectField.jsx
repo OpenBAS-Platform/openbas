@@ -18,7 +18,7 @@ import {
 } from '@filigran/design-system';
 import { Field } from 'react-final-form';
 
-import { toOptions, toSelectItems } from './selectChildren';
+import { hasEmptyOption, toFieldValue, toItemValue, toOptions, toSelectItems } from './selectChildren';
 
 const renderSelectField = ({
   name,
@@ -92,8 +92,13 @@ const renderSelectField = ({
   return (
     <div style={wrapperStyle}>
       <Select
-        value={value ?? ''}
-        onValueChange={(next) => {
+        // An empty-valued option travels under a sentinel (Radix forbids
+        // `value=""`), translated back here so the form value is unchanged. Only
+        // for lists that carry one: elsewhere an empty value must keep showing
+        // the placeholder.
+        value={hasEmptyOption(children) ? toItemValue(value) : (value ?? '')}
+        onValueChange={(selected) => {
+          const next = hasEmptyOption(children) ? toFieldValue(selected) : selected;
           onChange(next);
           if (typeof onChangePassed === 'function') {
             onChangePassed({ target: { value: next } });

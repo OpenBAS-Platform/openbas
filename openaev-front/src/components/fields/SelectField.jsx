@@ -8,7 +8,7 @@ import {
 } from '@filigran/design-system';
 import { Controller } from 'react-hook-form';
 
-import { toSelectItems } from './selectChildren';
+import { hasEmptyOption, toFieldValue, toItemValue, toSelectItems } from './selectChildren';
 
 const SelectField = (props) => {
   const {
@@ -37,6 +37,8 @@ const SelectField = (props) => {
         ...style,
       }
     : style;
+  const emptyOption = hasEmptyOption(children);
+
   return (
     <div style={wrapperStyle}>
       <Controller
@@ -45,8 +47,12 @@ const SelectField = (props) => {
         control={control}
         render={({ field }) => (
           <Select
-            value={field.value ?? ''}
-            onValueChange={field.onChange}
+            // An empty-valued option travels under a sentinel (Radix forbids
+            // `value=""`), so the field value is translated on both edges — and
+            // only for lists that actually carry one, otherwise an empty value
+            // must keep showing the placeholder.
+            value={emptyOption ? toItemValue(field.value) : (field.value ?? '')}
+            onValueChange={value => field.onChange(emptyOption ? toFieldValue(value) : value)}
             name={field.name}
             disabled={disabled}
             required={required ?? InputLabelProps?.required}

@@ -129,7 +129,9 @@ const Mails = () => {
   const [viewMode, setViewMode] = useState(() => localStorage.getItem(VIEW_MODE_STORAGE_KEY) ?? 'list');
   const { permissions } = useContext(PermissionsContext);
 
-  const handleViewModeChange = (_, next) => {
+  // The library ButtonGroup hands the value straight through; MUI's
+  // ToggleButtonGroup passed (event, value), so the leading argument is gone.
+  const handleViewModeChange = (next) => {
     if (next) {
       setViewMode(next);
       localStorage.setItem(VIEW_MODE_STORAGE_KEY, next);

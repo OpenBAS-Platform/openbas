@@ -7,6 +7,33 @@ import {
   type ReactNode,
 } from 'react';
 
+/**
+ * Radix reserves the empty string for "no value" and therefore forbids
+ * `SelectItem value=""` — the library says so in its own source. But the legacy
+ * MUI lists express "no choice" exactly that way: `<MenuItem value="">` carrying
+ * a label such as "Automatic" on the default kill chain. Rendering one would
+ * throw and take the whole form down.
+ *
+ * So an empty option travels through the list under this sentinel, and the two
+ * field wrappers translate it back at their boundary — the form value stays the
+ * empty string it has always been.
+ */
+export const EMPTY_OPTION_VALUE = '__fds_empty_option__';
+
+/** Form value -> item value. */
+export const toItemValue = (value: unknown): string =>
+  value === '' || value === undefined || value === null ? EMPTY_OPTION_VALUE : String(value);
+
+/** Item value -> form value. */
+export const toFieldValue = (value: string): string =>
+  value === EMPTY_OPTION_VALUE ? '' : value;
+
+/** Whether these children carry an empty-valued option at all. */
+export const hasEmptyOption = (children: ReactNode): boolean =>
+  Children.toArray(children).some(
+    child => isValidElement<ItemLikeProps>(child) && child.props.value === '',
+  );
+
 interface ItemLikeProps {
   value?: string;
   disabled?: boolean;
@@ -44,7 +71,7 @@ export const toSelectItems = (children: ReactNode): ReactNode =>
       return null;
     }
     return (
-      <SelectItem value={String(value)} disabled={disabled}>
+      <SelectItem value={toItemValue(value)} disabled={disabled}>
         {Children.map(inner, unwrapLabel)}
       </SelectItem>
     );

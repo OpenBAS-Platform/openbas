@@ -157,14 +157,6 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
     }
   }, []);
 
-  const onClick = (optionId: string) => {
-    const isIncluded = filter.values?.includes(optionId);
-    const newValues = isIncluded
-      ? (filter.values?.filter(v => v !== optionId) ?? [])
-      : [...(filter.values ?? []), optionId];
-    helpers.handleUpdateValuesById(filter.id, newValues);
-  };
-
   return (
     <Combobox<GroupOption | Option>
       labelPosition="none"
@@ -186,21 +178,14 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
         debouncedSearchOptions(search);
       }}
       onValueChange={(next) => {
-        // Was: every row owned its own click and called `onClick(option.id)`. The
-        // library owns the row, so the new selection is diffed against the old one
-        // and the same helper is replayed for whatever moved.
-        const before = new Set(filter.values ?? []);
-        const after = new Set((next as (GroupOption | Option)[]).map(o => o.id));
-        for (const id of after) {
-          if (!before.has(id)) {
-            onClick(id);
-          }
-        }
-        for (const id of before) {
-          if (!after.has(id)) {
-            onClick(id);
-          }
-        }
+        // The library hands over the whole new selection, so the filter is
+        // written once from it. Replaying the old per-row toggle for each moved
+        // id re-read the same, already stale `filter.values` on every call, so
+        // clearing several values at once only ever removed the last one.
+        helpers.handleUpdateValuesById(
+          filter.id,
+          (next as (GroupOption | Option)[]).map(option => option.id),
+        );
       }}
     >
       <ComboboxField>
