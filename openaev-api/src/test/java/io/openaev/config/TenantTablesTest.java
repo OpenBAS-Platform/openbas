@@ -93,6 +93,38 @@ class TenantTablesTest {
         IllegalArgumentException.class, () -> MODEL.restrictTo(Set.of("not_a_tenant_table")));
   }
 
+  @Test
+  @DisplayName("'*' activates every strict table and no dual-scope one")
+  void restrictToAllStrictActivatesStrictTablesOnly() {
+    TenantTables active = MODEL.restrictTo(Set.of(TenantTables.ALL_STRICT));
+    assertEquals(Set.of("documents", "findings"), active.strict());
+    assertTrue(
+        active.dualScope().isEmpty(),
+        "a platform row is written with no tenant, which this mechanism does not cover");
+    assertEquals(TenantTables.Family.NONE, active.family("groups"));
+  }
+
+  @Test
+  @DisplayName("'*' leaves out a strict table that is deliberately outside v2")
+  void restrictToAllStrictSkipsTablesOutsideV2() {
+    TenantTables model =
+        new TenantTables(Set.of("documents", "attackpath_graph_version"), Set.of("groups"));
+    TenantTables active = model.restrictTo(Set.of(TenantTables.ALL_STRICT));
+    assertEquals(Set.of("documents"), active.strict());
+    assertEquals(
+        TenantTables.Family.NONE,
+        active.family("attackpath_graph_version"),
+        "its upsert is a shape the inspector cannot rewrite; it isolates itself by explicit predicate");
+  }
+
+  @Test
+  @DisplayName("'*' alongside a table name fails fast rather than guessing which one wins")
+  void restrictToRejectsAllStrictMixedWithTableNames() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> MODEL.restrictTo(Set.of(TenantTables.ALL_STRICT, "documents")));
+  }
+
   /** A tenant-aware entity missing its {@code @Table} mapping. */
   static final class NoTableTenant implements TenantBase {
     @Override
