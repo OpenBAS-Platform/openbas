@@ -97,7 +97,8 @@ const BulkOperationsIndicator: FunctionComponent = () => {
             <IconButton
               priority="tertiary"
               aria-haspopup="true"
-              aria-label="bulk-operations-menu"
+              aria-label={t('Massive operations')}
+              data-testid="bulk-operations-menu"
               onClick={handleOpen}
               active={Boolean(anchorEl)}
               // The spinner overlays the glyph, and the library's icon slot is not a positioning context.

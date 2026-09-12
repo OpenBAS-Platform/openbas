@@ -31,7 +31,7 @@ const TopBarNotifications = () => {
         {/* The Badge wraps the LINK, not the glyph: it describes its child, and the glyph slot is aria-hidden. */}
         <Badge content={unreadCount} dot invisible={unreadCount === 0}>
           <TopBarIconLink
-            aria-label="notifications"
+            aria-label={t('Notifications')}
             to="/admin/profile/notifications"
             active={location.pathname.startsWith('/admin/profile/notifications')}
             icon={<NotificationsOutlined fontSize="medium" />}

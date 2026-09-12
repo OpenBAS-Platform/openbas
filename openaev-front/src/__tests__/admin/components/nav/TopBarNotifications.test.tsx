@@ -30,7 +30,7 @@ const renderBell = () => render(
   </MemoryRouter>,
 );
 
-const bell = () => screen.getByRole('link', { name: 'notifications' });
+const bell = () => screen.getByRole('link', { name: 'Notifications' });
 
 describe('TopBarNotifications unread marker', () => {
   afterEach(() => {
@@ -55,13 +55,13 @@ describe('TopBarNotifications unread marker', () => {
     renderBell();
     await waitFor(() => expect(bell()).toHaveAccessibleDescription('7'));
     // And the description must not have leaked into the control's NAME.
-    expect(bell()).toHaveAccessibleName('notifications');
+    expect(bell()).toHaveAccessibleName('Notifications');
   });
 
   it('says nothing when everything is read', async () => {
     unread = 0;
     const { container } = renderBell();
-    await waitFor(() => expect(bell()).toHaveAccessibleName('notifications'));
+    await waitFor(() => expect(bell()).toHaveAccessibleName('Notifications'));
     expect(bell()).toHaveAccessibleDescription('');
     expectNoMuiControls(container, 'the notifications bell with nothing unread');
   });

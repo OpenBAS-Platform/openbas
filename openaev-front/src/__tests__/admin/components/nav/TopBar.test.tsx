@@ -182,7 +182,7 @@ describe('Admin TopBar built on the design system Header', () => {
 
   it('keeps the account menu reachable', () => {
     renderTopBar();
-    expect(screen.getByLabelText('account-menu')).toBeTruthy();
+    expect(screen.getByTestId('account-menu')).toBeTruthy();
   });
 
   // Scope rule (designer, round 2): where the library ships a component, the
@@ -200,7 +200,7 @@ describe('Admin TopBar built on the design system Header', () => {
 
     it('uses the library icon button for the account menu', () => {
       renderTopBar();
-      expectLibraryIconButton(screen.getByLabelText('account-menu'), 'account menu');
+      expectLibraryIconButton(screen.getByTestId('account-menu'), 'account menu');
     });
 
     it('leaves no MUI control anywhere in the bar', () => {

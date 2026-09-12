@@ -41,7 +41,7 @@ const renderIndicator = () => render(
   </ThemeProvider>,
 );
 
-const trigger = () => screen.getByRole('button', { name: 'bulk-operations-menu' });
+const trigger = () => screen.getByTestId('bulk-operations-menu');
 
 /** The library's counter badge is 20px square minimum (`h-5 min-w-5`). */
 const LIBRARY_COUNTER_SIZE = ['h-5', 'min-w-5'];
@@ -71,7 +71,7 @@ describe('BulkOperationsIndicator running counter', () => {
     running = 5;
     renderIndicator();
     expect(trigger()).toHaveAccessibleDescription('5');
-    expect(trigger()).toHaveAccessibleName('bulk-operations-menu');
+    expect(trigger()).toHaveAccessibleName('Massive operations');
   });
 
   it('shows progress with the library components, not MUI ones', async () => {

@@ -18,7 +18,7 @@ const MadeByFiligran: FunctionComponent<Props> = ({ collapsed }) => {
     <NavbarItem asChild tooltipLabel={t('By Filigran')}>
       <button
         type="button"
-        aria-label="By Filigran"
+        aria-label={t('By Filigran')}
         onClick={() => window.open('https://filigran.io/', '_blank', 'noopener,noreferrer')}
       >
         {!collapsed && (

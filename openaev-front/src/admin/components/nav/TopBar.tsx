@@ -147,7 +147,7 @@ const TopBar: FunctionComponent = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <TopBarIconLink
-                  aria-label="triggers"
+                  aria-label={t('Triggers')}
                   to="/admin/profile/triggers"
                   active={location.pathname === '/admin/profile/triggers'}
                   icon={<AlarmOnOutlined fontSize="medium" />}
@@ -172,7 +172,8 @@ const TopBar: FunctionComponent = () => {
               <MenuTrigger asChild>
                 <IconButton
                   priority="tertiary"
-                  aria-label="account-menu"
+                  aria-label={t('Profile')}
+                  data-testid="account-menu"
                   id="profile-menu-button"
                   active={location.pathname === '/admin/profile'}
                   icon={<AccountCircleOutlined fontSize="medium" />}
@@ -182,7 +183,7 @@ const TopBar: FunctionComponent = () => {
                 <MenuItem asChild onSelect={handleCloseMenu}>
                   <Link to="/admin/profile">{t('Profile')}</Link>
                 </MenuItem>
-                <MenuItem aria-label="logout-item" onSelect={handleLogout}>
+                <MenuItem aria-label={t('Logout')} data-testid="logout-item" onSelect={handleLogout}>
                   {t('Logout')}
                 </MenuItem>
               </MenuContent>
