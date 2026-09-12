@@ -242,9 +242,15 @@ runs:
           production)
             # Read the list main ships rather than restating it here, so the two can never drift.
             PROPS=openaev-api/src/main/resources/application.properties
+            # Exactly one definition, or fail: sed prints every match, so a second definition would
+            # make LIST multi-line and silently corrupt the -D below.
+            COUNT=$(grep -c '^openaev\.tenant\.active-tables=' "$PROPS" || true)
+            if [ "$COUNT" != "1" ]; then
+              echo "❌ expected exactly one openaev.tenant.active-tables in $PROPS, found $COUNT"; exit 1
+            fi
             LIST=$(sed -n 's/^openaev\.tenant\.active-tables=//p' "$PROPS")
             if [ -z "$LIST" ]; then
-              echo "❌ no openaev.tenant.active-tables in $PROPS"; exit 1
+              echo "❌ openaev.tenant.active-tables is empty in $PROPS"; exit 1
             fi
             ;;
           all)

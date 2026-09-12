@@ -10,6 +10,7 @@ import io.openaev.database.model.Setting;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.model.TenantBase;
 import io.openaev.database.model.Token;
+import io.openaev.database.model.attackpath.AttackPathGraphVersion;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
@@ -104,17 +105,34 @@ class TenantTablesTest {
     assertEquals(TenantTables.Family.NONE, active.family("groups"));
   }
 
+  /**
+   * The table each entity is mapped to, read from the entity itself. Writing the name as a literal
+   * here would make the test pass after a rename while the exclusion silently stopped matching,
+   * which is the whole protection gone with nothing red.
+   */
+  private static String tableOf(Class<?> entity) {
+    return entity.getAnnotation(jakarta.persistence.Table.class).name();
+  }
+
   @Test
-  @DisplayName("'*' leaves out a strict table that is deliberately outside v2")
+  @DisplayName("'*' leaves out every strict table that is deliberately outside v2")
   void restrictToAllStrictSkipsTablesOutsideV2() {
+    String graphVersion = tableOf(AttackPathGraphVersion.class);
+    String tenants = tableOf(Tenant.class);
     TenantTables model =
-        new TenantTables(Set.of("documents", "attackpath_graph_version"), Set.of("groups"));
+        new TenantTables(Set.of("documents", graphVersion, tenants), Set.of("groups"));
+
     TenantTables active = model.restrictTo(Set.of(TenantTables.ALL_STRICT));
+
     assertEquals(Set.of("documents"), active.strict());
     assertEquals(
         TenantTables.Family.NONE,
-        active.family("attackpath_graph_version"),
+        active.family(graphVersion),
         "its upsert is a shape the inspector cannot rewrite; it isolates itself by explicit predicate");
+    assertEquals(
+        TenantTables.Family.NONE,
+        active.family(tenants),
+        "the tenant registry is not tenant-scoped data; gating it stops the platform from bootstrapping");
   }
 
   @Test
