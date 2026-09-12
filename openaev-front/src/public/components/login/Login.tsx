@@ -1,5 +1,5 @@
-import { Paper } from '@filigran/design-system';
-import { Box, Checkbox, Stack, Typography } from '@mui/material';
+import { Checkbox, Paper } from '@filigran/design-system';
+import { Box, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
 
@@ -84,11 +84,10 @@ const Login = () => {
               <Markdown>{consentConfirmText}</Markdown>
               <Checkbox
                 name="consent"
-                edge="start"
-                onChange={handleChange}
-                style={{ margin: 0 }}
-              >
-              </Checkbox>
+                checked={checked}
+                onCheckedChange={handleChange}
+                aria-label={typeof consentConfirmText === 'string' ? consentConfirmText : undefined}
+              />
             </Box>
           </Paper>
         )}

@@ -2311,3 +2311,43 @@ email or landing page, the chrome of that preview, and the channel post preview.
 Those render a recipient's view, not the operator's, so they must not follow the
 product theme and must not be tokenised. Recorded here so a later sweep does not
 mistake them for erosion.
+
+
+---
+
+## 48. `Checkbox` has no presentational mode, so a decorative echo cannot use it
+
+**Measured at pin `3426fc3`**, on the product's own test run.
+
+**What the product needed.** Two checkboxes that are not controls at all. In
+`AutocompleteField` the option row already carries `aria-selected`, so the box
+beside the label is a visual echo, taken out of the accessibility tree and the
+tab order on purpose. In `SelectListPicker` the row is a `ListItemButton` and
+the box mirrors its state, again at `tabIndex={-1}`.
+
+**What the library offers today.** `Checkbox` warns on every render when it has
+neither `label`, `aria-label` nor `aria-labelledby`:
+
+> [Checkbox] rendered without a `label` prop, an `aria-label`, or an
+> `aria-labelledby`. The control will still render and function, but has no
+> accessible name (WCAG 1.3.1, 4.1.2).
+
+The warning is right for a control and wrong for a decoration — an
+`aria-hidden` element has no accessible name BY DESIGN. Adopting it printed six
+warnings for a single six-option list, and would print them for every multi
+-select option row in the product, forever. Naming the box instead would
+announce the same state twice, once on the row and once on the box.
+
+It also changes the DOM contract: the MUI control renders a real
+`input[type=checkbox]`, which an existing product test asserts on
+(`AutocompleteField.test.tsx`). The library's renders a `button[role=checkbox]`.
+
+**What the product did instead.** Both sites were converted, measured, and
+reverted. They stay on MUI, and this entry is the reason.
+
+**The request.** A way to say "this box is a picture, the row is the control" —
+a `presentational` (or `decorative`) prop that suppresses the name warning and
+lets the component render `aria-hidden` without claiming a defect. The
+alternative — a library that refuses decorative use outright — is a fine answer
+too, as long as it is stated, since the product then knows to keep drawing
+these echoes itself.
