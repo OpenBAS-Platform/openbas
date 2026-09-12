@@ -87,6 +87,13 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.rest.domain.DomainApi#upsertDomain",
           "io.openaev.rest.domain.DomainApi#findAllAsOptionsByName",
           "io.openaev.rest.domain.DomainApi#findAllAsOptionsById",
+          // notification_triggers (v2), which also reach notifiers through the trigger's
+          // association in NotificationTriggerMapper
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#notificationTrigger",
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#searchNotificationTriggers",
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#createNotificationTrigger",
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#updateNotificationTrigger",
+          "io.openaev.api.notification_trigger.NotificationTriggerApi#deleteNotificationTrigger",
           // notifications (v2)
           "io.openaev.api.notification.NotificationApi#searchMyNotifications",
           "io.openaev.api.notification.NotificationApi#unreadNotificationsCount",
@@ -104,12 +111,6 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.api.notifier.NotifierApi#createNotifier",
           "io.openaev.api.notifier.NotifierApi#updateNotifier",
           "io.openaev.api.notifier.NotifierApi#deleteNotifier",
-          // reaches notifiers through NotificationTrigger's association (NotificationTriggerMapper)
-          "io.openaev.api.notification_trigger.NotificationTriggerApi#notificationTrigger",
-          "io.openaev.api.notification_trigger.NotificationTriggerApi#searchNotificationTriggers",
-          "io.openaev.api.notification_trigger.NotificationTriggerApi#createNotificationTrigger",
-          "io.openaev.api.notification_trigger.NotificationTriggerApi#updateNotificationTrigger",
-          "io.openaev.api.notification_trigger.NotificationTriggerApi#deleteNotificationTrigger",
           // channels (v2)
           "io.openaev.rest.channel.ChannelApi#channels",
           "io.openaev.rest.channel.ChannelApi#channel",

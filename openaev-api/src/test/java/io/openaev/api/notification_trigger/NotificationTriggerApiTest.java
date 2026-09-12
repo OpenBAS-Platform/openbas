@@ -249,6 +249,9 @@ public class NotificationTriggerApiTest extends IntegrationTest {
     otherTrigger.setWatchedResourceType(ResourceType.SCENARIO);
     otherTrigger.setEventTypes(List.of(NotificationTriggerEventType.CREATE));
     otherTrigger.setOwner(otherUser);
+    // Attributed explicitly: TenantBaseListener no longer stamps notification_triggers, and the
+    // mock user of this test belongs to the default tenant (autoJoinDefaultTenant).
+    otherTrigger.setTenant(new Tenant(Tenant.DEFAULT_TENANT_UUID));
     String otherTriggerId = notificationTriggerRepository.save(otherTrigger).getId();
 
     // Search: the admin's self-service view never lists it
@@ -273,7 +276,7 @@ public class NotificationTriggerApiTest extends IntegrationTest {
   }
 
   @Test
-  @WithMockUser
+  @WithMockUser(autoJoinDefaultTenant = true)
   @DisplayName("A non-admin user cannot target other recipients")
   void nonAdminCannotTargetOthers() throws Exception {
     NotificationTriggerInput input =
