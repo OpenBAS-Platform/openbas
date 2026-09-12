@@ -23,20 +23,20 @@ import org.springframework.data.repository.Repository;
 /**
  * Runs every {@code @Query(nativeQuery = true)} in the repository layer through {@link
  * TenantStatementInspector} with every tenant table active, and fails naming the repository method
- * of any query the inspector refuses. Activating a table then stops being the moment a refused query
- * shape is discovered in production (the {@code #7007} / {@code #6438} class of regression): the
- * shape is pinned here, before go-live, on the real SQL read reflectively off the annotation.
+ * of any query the inspector refuses. Activating a table then stops being the moment a refused
+ * query shape is discovered in production (the {@code #7007} / {@code #6438} class of regression):
+ * the shape is pinned here, before go-live, on the real SQL read reflectively off the annotation.
  *
  * <p>The active set is derived from the entity model with {@link TenantTables#fromEntities}, which
- * is a plain unit-test path needing no database. It misses tables that carry a {@code tenant_id} but
- * have no entity class (join and link tables); those are only visible to the schema-derived
+ * is a plain unit-test path needing no database. It misses tables that carry a {@code tenant_id}
+ * but have no entity class (join and link tables); those are only visible to the schema-derived
  * production path ({@code TenantFilteringConfig#deriveFromSchema}), which needs a live schema. The
  * inspector's gate keys on table names, so a query that touches only such a name is not exercised
  * here; the tables it names are still covered whenever they are entity-backed.
  *
- * <p>A query whose SpEL or parameter syntax cannot be parsed even before the inspector touches it is
- * not a failure of the inspector: it is reported separately (parse gate below) and skipped, because
- * the probe checks the rewrite shape, not parameter binding.
+ * <p>A query whose SpEL or parameter syntax cannot be parsed even before the inspector touches it
+ * is not a failure of the inspector: it is reported separately (parse gate below) and skipped,
+ * because the probe checks the rewrite shape, not parameter binding.
  */
 @DisplayName("Native queries survive the tenant inspector with every table active")
 class NativeQueryTenantInspectorProbeTest {
@@ -71,7 +71,8 @@ class NativeQueryTenantInspectorProbeTest {
       } catch (Exception parseFailure) {
         // A parse failure is NOT a free pass. TenantStatementInspector.inspect uses the same parser
         // and refuses what it cannot parse, fail-closed, so a query that does not parse here is a
-        // query that breaks once its table is active. It is tracked separately only to give a clearer
+        // query that breaks once its table is active. It is tracked separately only to give a
+        // clearer
         // message (make it parseable, or carry a reason), and the assertion below fails on it.
         unparseable.add(query.method() + " :: " + parseFailure.getMessage());
         continue;
@@ -122,7 +123,8 @@ class NativeQueryTenantInspectorProbeTest {
       for (Method method : repository.getDeclaredMethods()) {
         Query query = method.getAnnotation(Query.class);
         if (query != null && query.nativeQuery() && !query.value().isBlank()) {
-          found.add(new NativeQuery(repository.getSimpleName() + "#" + method.getName(), query.value()));
+          found.add(
+              new NativeQuery(repository.getSimpleName() + "#" + method.getName(), query.value()));
         }
       }
     }

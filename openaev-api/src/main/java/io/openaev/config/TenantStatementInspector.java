@@ -39,8 +39,8 @@ import org.hibernate.resource.jdbc.spi.StatementInspector;
  * SELECT table (and any sub-query or CTE) is wrapped in a filtered sub-query; the primary FROM
  * table of a select, when it is a plain tenant table not NULL-extended by a RIGHT/FULL join, is
  * filtered through the select's WHERE instead of being wrapped, so it stays a base table and keeps
- * the primary key's functional dependency (wrapping it breaks {@code GROUP BY id}). The target of an
- * UPDATE or DELETE also gets the filter added to its WHERE (a written table cannot be wrapped).
+ * the primary key's functional dependency (wrapping it breaks {@code GROUP BY id}). The target of
+ * an UPDATE or DELETE also gets the filter added to its WHERE (a written table cannot be wrapped).
  * Completeness comes from visiting every select; a statement, FROM or join shape that is not
  * understood is rejected (fail-closed) rather than passed through unfiltered, which would leak rows
  * across tenants.
@@ -251,12 +251,12 @@ public class TenantStatementInspector implements StatementInspector {
   }
 
   /**
-   * Filters the FROM and join tenant tables of a single select level. Joined tables are wrapped in a
-   * filtered sub-query. The primary FROM item, when it is a plain tenant table, is instead filtered
-   * through the select's WHERE: wrapping it in a derived table would strip the primary key's
-   * functional dependency, so a {@code GROUP BY id} projecting other columns becomes invalid SQL in
-   * PostgreSQL. Moving the predicate to the WHERE is equivalent only while the primary table is
-   * never NULL-extended, so a RIGHT or FULL join anywhere in the join list forces a fallback to
+   * Filters the FROM and join tenant tables of a single select level. Joined tables are wrapped in
+   * a filtered sub-query. The primary FROM item, when it is a plain tenant table, is instead
+   * filtered through the select's WHERE: wrapping it in a derived table would strip the primary
+   * key's functional dependency, so a {@code GROUP BY id} projecting other columns becomes invalid
+   * SQL in PostgreSQL. Moving the predicate to the WHERE is equivalent only while the primary table
+   * is never NULL-extended, so a RIGHT or FULL join anywhere in the join list forces a fallback to
    * wrapping (a WHERE predicate on the NULL-extended side would drop those rows and silently turn
    * the outer join into an inner one). Every other primary shape is wrapped exactly as before.
    */
@@ -278,8 +278,9 @@ public class TenantStatementInspector implements StatementInspector {
 
   /**
    * Whether the join list NULL-extends the accumulated left side, which is what makes moving the
-   * primary table's predicate into the WHERE unsafe. A RIGHT join NULL-extends the left side, a FULL
-   * join both sides; either anywhere in the list rules out the narrowing for this select level.
+   * primary table's predicate into the WHERE unsafe. A RIGHT join NULL-extends the left side, a
+   * FULL join both sides; either anywhere in the list rules out the narrowing for this select
+   * level.
    */
   private static boolean hasRightOrFullJoin(List<Join> joins) {
     if (joins == null) {

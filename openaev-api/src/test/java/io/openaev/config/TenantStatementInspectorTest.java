@@ -253,7 +253,8 @@ class TenantStatementInspectorTest {
     String out = inspect("SELECT d.id, d.name FROM documents d GROUP BY d.id");
     // The primary table stays a base table, so PostgreSQL keeps the primary key's functional
     // dependency and GROUP BY d.id over other projected columns is legal.
-    assertFalse(out.contains("(SELECT * FROM documents"), "primary table must not be wrapped: " + out);
+    assertFalse(
+        out.contains("(SELECT * FROM documents"), "primary table must not be wrapped: " + out);
     assertTrue(out.contains("can_access_tenant(d.tenant_id)"), out);
     assertTrue(out.contains("WHERE can_access_tenant(d.tenant_id)"), out);
     assertTrue(out.contains("GROUP BY d.id"), out);
@@ -266,7 +267,8 @@ class TenantStatementInspectorTest {
     // drop the NULL-extended rows and silently turn the RIGHT join into an INNER one. It must stay
     // wrapped. This fallback is not optional: a refactor that drops it is a silent semantic change.
     String out = inspect("SELECT * FROM documents d RIGHT JOIN findings f ON f.doc_id = d.id");
-    assertTrue(out.contains("(SELECT * FROM documents d WHERE can_access_tenant(d.tenant_id))"), out);
+    assertTrue(
+        out.contains("(SELECT * FROM documents d WHERE can_access_tenant(d.tenant_id))"), out);
   }
 
   @Test
@@ -274,7 +276,8 @@ class TenantStatementInspectorTest {
   void fullJoinFallsBackToWrappingPrimary() {
     // Both sides of a FULL join are NULL-extended, so the same reasoning as the RIGHT join applies.
     String out = inspect("SELECT * FROM documents d FULL JOIN findings f ON f.doc_id = d.id");
-    assertTrue(out.contains("(SELECT * FROM documents d WHERE can_access_tenant(d.tenant_id))"), out);
+    assertTrue(
+        out.contains("(SELECT * FROM documents d WHERE can_access_tenant(d.tenant_id))"), out);
   }
 
   @Test
@@ -286,7 +289,8 @@ class TenantStatementInspectorTest {
         inspect(
             "SELECT * FROM documents d JOIN groups g ON g.id = d.gid"
                 + " RIGHT JOIN findings f ON f.doc_id = d.id");
-    assertTrue(out.contains("(SELECT * FROM documents d WHERE can_access_tenant(d.tenant_id))"), out);
+    assertTrue(
+        out.contains("(SELECT * FROM documents d WHERE can_access_tenant(d.tenant_id))"), out);
   }
 
   @Test
@@ -295,11 +299,13 @@ class TenantStatementInspectorTest {
     String out = inspect("SELECT * FROM documents d JOIN findings f ON f.doc_id = d.id");
     assertFalse(out.contains("(SELECT * FROM documents"), "primary must be narrowed: " + out);
     assertTrue(out.contains("can_access_tenant(d.tenant_id)"), out);
-    assertTrue(out.contains("(SELECT * FROM findings f WHERE can_access_tenant(f.tenant_id))"), out);
+    assertTrue(
+        out.contains("(SELECT * FROM findings f WHERE can_access_tenant(f.tenant_id))"), out);
   }
 
   @Test
-  @DisplayName("the narrowed predicate is added once, not twice, when the select already has a WHERE")
+  @DisplayName(
+      "the narrowed predicate is added once, not twice, when the select already has a WHERE")
   void narrowedPredicateAddedOnceWithExistingWhere() {
     String out = inspect("SELECT * FROM documents d WHERE d.id = ?");
     assertEquals(
@@ -320,8 +326,7 @@ class TenantStatementInspectorTest {
   @Test
   @DisplayName("the narrowed output is valid, re-parsable SQL")
   void narrowedOutputIsValidSql() {
-    String out =
-        inspector.inspect("SELECT d.id, d.name FROM documents d GROUP BY d.id");
+    String out = inspector.inspect("SELECT d.id, d.name FROM documents d GROUP BY d.id");
     assertDoesNotThrow(() -> CCJSqlParserUtil.parse(out));
   }
 

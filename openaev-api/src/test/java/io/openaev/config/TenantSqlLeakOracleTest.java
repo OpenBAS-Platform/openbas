@@ -144,7 +144,8 @@ class TenantSqlLeakOracleTest {
   @Test
   @DisplayName("a predicate on a different alias does not guard the reference (still a leak)")
   void guardOnDifferentAliasIsStillLeak() {
-    // The guard must bind to the reference's own alias. can_access_tenant on some other alias in the
+    // The guard must bind to the reference's own alias. can_access_tenant on some other alias in
+    // the
     // statement must not launder an otherwise-unguarded FROM.
     String sql = "SELECT * FROM documents d WHERE can_access_tenant(x.tenant_id)";
     assertEquals(List.of("documents"), oracle.unwrappedTenantTables(sql));
@@ -154,7 +155,8 @@ class TenantSqlLeakOracleTest {
   @DisplayName("a guard in another scope does not cover a same-alias reference (still a leak)")
   void guardInAnotherScopeIsStillLeak() {
     // Aliases repeat constantly across nested selects: everyone writes d, f, i. Searching the whole
-    // statement for can_access_tenant(d.tenant_id) lets a guarded reference in one sub-query launder
+    // statement for can_access_tenant(d.tenant_id) lets a guarded reference in one sub-query
+    // launder
     // an unguarded one in another that happens to reuse the alias. The guard must be found in the
     // reference's own scope.
     String sql =
