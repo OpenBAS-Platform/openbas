@@ -259,6 +259,12 @@ type AlertType = {
 };
 
 type AlertPalette = {
+  /**
+   * The library's neutral feedback tone. `secondaryTransparency30` is the only
+   * transparent member of the family and the one a subtle overlay should read,
+   * rather than a hand-rolled white at 30%.
+   */
+  neutral: AlertType & { secondaryTransparency30: string };
   info: AlertType;
   success: AlertType & { tertiary: string };
   alert: AlertType;

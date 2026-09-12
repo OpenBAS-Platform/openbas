@@ -218,6 +218,11 @@ const ThemeDark = (
         focus: 'linear-gradient(90deg, #0FBCFF -3.68%, #00F1BD 106.62%)',
       },
       alert: {
+        neutral: {
+          primary: FDS.colors.dark['--color-feedback-neutral-primary'],
+          secondary: FDS.colors.dark['--color-feedback-neutral-secondary'],
+          secondaryTransparency30: FDS.colors.dark['--color-feedback-neutral-secondary-transparency-30'],
+        },
         info: {
           primary: '#4DCCFF',
           secondary: '#004C66',

@@ -1,4 +1,5 @@
 import {
+  Checkbox,
   Paper as FdsPaper,
   Select,
   SelectContent,
@@ -9,7 +10,7 @@ import {
 import { DragDropContext, Draggable, Droppable, type DropResult } from '@hello-pangea/dnd';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DeleteOutlined, DragIndicatorOutlined, RestartAltOutlined } from '@mui/icons-material';
-import { Box, Button, Checkbox, FormHelperText, IconButton, Paper, Step, StepLabel, Stepper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
+import { Box, Button, FormHelperText, IconButton, Paper, Step, StepLabel, Stepper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, type SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
@@ -514,10 +515,14 @@ const ReportingForm: FunctionComponent<Props> = ({
         {REPORTING_MODULE_TYPES.map((type) => {
           const selected = selectedTypes.includes(type);
           return (
+            // The card is the checkbox's own <label>, so the box is the real
+            // control and the whole card stays clickable — through the native
+            // label association rather than a handler on a div, which is what
+            // made this unreachable by keyboard.
             <Paper
               key={type}
+              component="label"
               variant="outlined"
-              onClick={() => toggleModule(type)}
               sx={{
                 display: 'flex',
                 alignItems: 'flex-start',
@@ -528,7 +533,10 @@ const ReportingForm: FunctionComponent<Props> = ({
                 borderColor: selected ? 'primary.main' : undefined,
               }}
             >
-              <Checkbox checked={selected} size="small" sx={{ padding: 0.5 }} />
+              <Checkbox
+                checked={selected}
+                onCheckedChange={() => toggleModule(type)}
+              />
               <div>
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                   {t(MODULE_TYPE_LABELS[type])}

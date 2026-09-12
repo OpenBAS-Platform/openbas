@@ -295,7 +295,9 @@ const ExecutionHero: FunctionComponent<Props> = ({
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    background: `linear-gradient(90deg, transparent, ${alpha('#ffffff', 0.3)}, transparent)`,
+                    // The sweep reads the library's neutral feedback tone at 30%
+                    // instead of a hand-rolled white, so it resolves per mode.
+                    background: `linear-gradient(90deg, transparent, ${theme.palette.designSystem.alert.neutral.secondaryTransparency30}, transparent)`,
                     animation: 'execution-progress-shimmer 2.4s ease-in-out infinite',
                   },
                   '@keyframes execution-progress-shimmer': {
