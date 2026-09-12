@@ -270,6 +270,23 @@ type ScaleLevels = 50 | 100 | 150 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 90
 type ColorScale = Partial<Record<ScaleLevels, string>>;
 type TertiaryPalette = Record<string, ColorScale>;
 
+/**
+ * The library's categorical ramp (`--color-entities-*`): a taxonomy hue, not a
+ * feedback or a brand colour. It distinguishes categories that carry no
+ * severity of their own, so nothing is implied by which hue lands where.
+ */
+export type EntitiesPalette = {
+  allThreats: string;
+  analyses: string;
+  arsenal: string;
+  cases: string;
+  events: string;
+  location: string;
+  observations: string;
+  techniques: string;
+  victimology: string;
+};
+
 export type DesignSystemPalette = {
   primary: MainPalette;
   secondary: MainPalette;
@@ -280,6 +297,7 @@ export type DesignSystemPalette = {
   gradient: GradientPalette;
   alert: AlertPalette;
   tertiary: TertiaryPalette;
+  entities: EntitiesPalette;
 };
 
 // Re-export Theme type for convenience

@@ -17,6 +17,11 @@ import ItemTags from '../../../../components/ItemTags';
 import type { Challenge, PublicChallenge } from '../../../../utils/api-types';
 
 const useStyles = makeStyles()(theme => ({
+  // A challenge is a category, not a severity: the hue comes from the library's
+  // categorical ramp. The token's name belongs to a sibling taxonomy and means
+  // nothing here — it was picked for perceptual distance from the value it
+  // replaces, and unlike that value it resolves per mode.
+  avatar: { backgroundColor: theme.palette.designSystem.entities.events },
   cardContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -66,7 +71,7 @@ const ChallengeCard = ({ challenge, showTags = false, clickable = false, onClick
     >
       <CardHeader
         avatar={(
-          <Avatar sx={{ backgroundColor: '#e91e63' }} aria-label="challenge-icon">
+          <Avatar className={classes.avatar} aria-label="challenge-icon">
             <EmojiEventsOutlined />
           </Avatar>
         )}

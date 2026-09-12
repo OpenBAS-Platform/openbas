@@ -8,6 +8,7 @@ import {
   ComboboxInput,
   ComboboxTrigger,
 } from '@filigran/design-system';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useContext, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -52,6 +53,7 @@ const ChannelsFilter: FunctionComponent<Props> = (props) => {
   // so the field's own selection now lives here — it is what the uncontrolled
   // MUI Autocomplete used to keep internally.
   const [selected, setSelected] = useState<ChannelTransformed[]>([]);
+  const theme = useTheme();
   const { fetchChannels } = useContext(ArticleContext);
 
   useDataLoader(() => fetchChannels());
@@ -59,16 +61,21 @@ const ChannelsFilter: FunctionComponent<Props> = (props) => {
   const { channels } = useHelper((helper: ChannelsHelper) => ({ channels: helper.getChannels() }));
   const { onChannelsChange, onClearChannels = () => { }, fullWidth } = props;
 
+  // A channel kind carries no severity, so its colour comes from the library's
+  // categorical ramp rather than from feedback or brand. The hue names belong to
+  // a sibling product's taxonomy and mean nothing here — they were picked for
+  // perceptual distance from the values these four replaced, and unlike those
+  // they resolve per mode.
   const channelColor = (type?: string) => {
     switch (type) {
       case 'newspaper':
-        return '#3f51b5';
+        return theme.palette.designSystem.entities.victimology;
       case 'microblogging':
-        return '#00bcd4';
+        return theme.palette.designSystem.entities.location;
       case 'tv':
-        return '#ff9800';
+        return theme.palette.designSystem.entities.allThreats;
       default:
-        return '#ef41e1';
+        return theme.palette.designSystem.entities.cases;
     }
   };
   const channelTransform = (n: Channel) => ({

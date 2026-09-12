@@ -2275,6 +2275,23 @@ wrong, and a second pass over the delivered set found a candidate for each:
 | `AtomicTesting` scrim `rgba(105,103,103,0.45)` | `--bg-elevation-default-layer-0-transparency-70` | `#070d18b3` / `#f2f2f3b3` |
 | `ChannelsFilter` channel kinds, `ChallengeCard` avatar | the `--color-entities-*` ramp (9 hues, each with a `-transparency-20`) | per hue |
 
+**Product decision, 2026-09-12.** The categorical mapping was shown as a
+measured before/after (perceptual distance in CIELAB, both modes) and accepted:
+`tv` takes `all-threats` — the same value to the digit, ΔE 0 — `microblogging`
+takes `location` (ΔE 6, imperceptible), and `newspaper`, the default kind and
+the challenge avatar take `victimology`, `cases` and `events` at ΔE 24 to 32,
+a visible change accepted because the ramp holds neither indigo nor magenta.
+The ramp is now wired into the product theme as
+`palette.designSystem.entities`, since only the theme files may read `FDS`
+directly. The gauge's fourth rung took `palette.warn.main` in the same pass.
+
+One item from the first draft was **withdrawn for a second reason**: what it
+called an overlay scrim is nothing of the kind. `AtomicTesting` draws a 2px
+vertical divider and `ScenarioAssistant` a drop shadow. A divider's token would
+be `--border-elevation-subtle`, which is `#1f3965` in dark — a blue where the
+product draws a grey, so it is a hue change rather than a substitution, and it
+was left alone.
+
 Nothing here is a library defect, so nothing is asked of the library. Two
 product-side facts came out of the same pass and are recorded because they
 explain why the sweep looked like a gap:

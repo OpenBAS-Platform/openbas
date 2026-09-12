@@ -199,6 +199,17 @@ const ThemeLight = (
         bg4: FDS.colors.light['--bg-elevation-default-layer-3'],
         disabled: FDS.colors.light['--bg-elevation-disabled'],
       },
+      entities: {
+        allThreats: FDS.colors.light['--color-entities-all-threats'],
+        analyses: FDS.colors.light['--color-entities-analyses'],
+        arsenal: FDS.colors.light['--color-entities-arsenal'],
+        cases: FDS.colors.light['--color-entities-cases'],
+        events: FDS.colors.light['--color-entities-events'],
+        location: FDS.colors.light['--color-entities-location'],
+        observations: FDS.colors.light['--color-entities-observations'],
+        techniques: FDS.colors.light['--color-entities-techniques'],
+        victimology: FDS.colors.light['--color-entities-victimology'],
+      },
       border: {
         main: FDS.colors.light['--border-elevation-default'],
         border1: FDS.colors.light['--border-elevation-subtle'],
