@@ -69,9 +69,11 @@ class NativeQueryTenantInspectorProbeTest {
       try {
         CCJSqlParserUtil.parse(sql);
       } catch (Exception parseFailure) {
-        // Unparseable before the inspector runs: a parameter or dialect shape JSqlParser cannot
-        // read. Not a refusal; reported, not failed.
-        unparseable.add(query.method());
+        // A parse failure is NOT a free pass. TenantStatementInspector.inspect uses the same parser
+        // and refuses what it cannot parse, fail-closed, so a query that does not parse here is a
+        // query that breaks once its table is active. It is tracked separately only to give a clearer
+        // message (make it parseable, or carry a reason), and the assertion below fails on it.
+        unparseable.add(query.method() + " :: " + parseFailure.getMessage());
         continue;
       }
       try {
@@ -89,6 +91,12 @@ class NativeQueryTenantInspectorProbeTest {
             + " unparseable-before-rewrite="
             + unparseable.size());
     System.out.println("[native-query-probe] unparseable: " + unparseable);
+
+    assertTrue(
+        unparseable.isEmpty(),
+        "native queries JSqlParser cannot read, which the inspector refuses fail-closed in production"
+            + " exactly as it does here, so activating their table breaks them:\n  "
+            + String.join("\n  ", unparseable));
 
     assertTrue(
         refused.isEmpty(),

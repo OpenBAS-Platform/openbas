@@ -151,6 +151,28 @@ class TenantSqlLeakOracleTest {
   }
 
   @Test
+  @DisplayName("a guard in another scope does not cover a same-alias reference (still a leak)")
+  void guardInAnotherScopeIsStillLeak() {
+    // Aliases repeat constantly across nested selects: everyone writes d, f, i. Searching the whole
+    // statement for can_access_tenant(d.tenant_id) lets a guarded reference in one sub-query launder
+    // an unguarded one in another that happens to reuse the alias. The guard must be found in the
+    // reference's own scope.
+    String sql =
+        "SELECT * FROM (SELECT * FROM documents d WHERE can_access_tenant(d.tenant_id)) x,"
+            + " (SELECT * FROM documents d) y";
+    assertEquals(List.of("documents"), oracle.unwrappedTenantTables(sql));
+  }
+
+  @Test
+  @DisplayName("each nested reference guarded in its own scope is clean")
+  void guardsInEachOwnScopeAreClean() {
+    String sql =
+        "SELECT * FROM (SELECT * FROM documents d WHERE can_access_tenant(d.tenant_id)) x,"
+            + " (SELECT * FROM documents d WHERE can_access_tenant(d.tenant_id)) y";
+    assertTrue(oracle.unwrappedTenantTables(sql).isEmpty());
+  }
+
+  @Test
   @DisplayName("a DELETE target guarded by a WHERE predicate is not a read leak")
   void deleteTargetGuardedByPredicateIsClean() {
     String sql = "DELETE FROM documents WHERE id = ? AND (can_access_tenant(documents.tenant_id))";

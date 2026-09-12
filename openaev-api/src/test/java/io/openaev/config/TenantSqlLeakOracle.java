@@ -119,11 +119,37 @@ final class TenantSqlLeakOracle {
         Pattern guard =
             Pattern.compile(
                 "(?i)can_access_tenant\\(\\s*" + Pattern.quote(ref) + "\\.tenant_id");
-        if (!guard.matcher(text).find()) {
+        // Search the reference's own scope, not the whole statement. Aliases repeat constantly across
+        // nested selects, so a guarded "documents d" in one sub-query would otherwise launder an
+        // unguarded "documents d" in another. Both guard shapes live in the same scope as their FROM:
+        // the wrapper emits the predicate inside its parentheses, the narrowed primary in that
+        // select's own WHERE.
+        if (!guard.matcher(scopeFrom(text, matcher.end())).find()) {
           return true;
         }
       }
       return false;
+    }
+
+    /**
+     * The text from a reference to the end of the parenthesis group enclosing it, or to the end of the
+     * statement when the reference sits at the top level. Quoted string literals are already blanked
+     * before the oracle runs, so a parenthesis inside a literal cannot skew the depth count.
+     */
+    private static String scopeFrom(String text, int start) {
+      int depth = 0;
+      for (int i = start; i < text.length(); i++) {
+        char c = text.charAt(i);
+        if (c == '(') {
+          depth++;
+        } else if (c == ')') {
+          if (depth == 0) {
+            return text.substring(start, i);
+          }
+          depth--;
+        }
+      }
+      return text.substring(start);
     }
 
     /** The reference the guard predicate must name: the alias, or the table name when aliasless. */
