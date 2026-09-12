@@ -6,12 +6,12 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
+  Switch,
 } from '@filigran/design-system';
 import { HourglassEmptyOutlined, InfoOutlined, SpeedOutlined } from '@mui/icons-material';
 import {
   Box,
   Divider,
-  Switch,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -79,7 +79,14 @@ const LimitSection = ({ icon, title, tooltip, enabled, onToggle, children }: Lim
             }}
           />
         </Tooltip>
-        <Switch checked={enabled} onChange={onToggle} sx={{ ml: 'auto' }} />
+        {/* The section title is a sibling Typography, not a <label> bound to
+            the control, so the switch carries its own name. */}
+        <Switch
+          aria-label={title}
+          checked={enabled}
+          onCheckedChange={onToggle}
+          style={{ marginLeft: 'auto' }}
+        />
       </Box>
       <Box sx={{
         display: 'grid',

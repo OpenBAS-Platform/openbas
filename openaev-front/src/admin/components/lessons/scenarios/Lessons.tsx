@@ -1,4 +1,4 @@
-import { Paper } from '@filigran/design-system';
+import { Paper, Switch } from '@filigran/design-system';
 import { BallotOutlined, ContentPasteGoOutlined, DeleteSweepOutlined, VisibilityOutlined } from '@mui/icons-material';
 import {
   Box,
@@ -8,8 +8,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  FormControlLabel,
-  Switch,
 } from '@mui/material';
 import { type FunctionComponent, useContext, useEffect, useState } from 'react';
 
@@ -120,21 +118,16 @@ const Lessons: FunctionComponent<Props> = ({
         <InformationGrid title={t('Parameters')} action={null}>
           {permissions.canManage && (
             <Field label={t('Questionnaire mode')}>
-              <FormControlLabel
-                control={(
-                  <Switch
-                    checked={source.lessons_anonymized}
-                    onChange={() => {
-                      if (!source.lessons_anonymized) {
-                        setOpenAnonymize(true);
-                      } else {
-                        toggleAnonymize();
-                      }
-                    }}
-                    name="anonymized"
-                    size="small"
-                  />
-                )}
+              <Switch
+                name="anonymized"
+                checked={source.lessons_anonymized}
+                onCheckedChange={() => {
+                  if (!source.lessons_anonymized) {
+                    setOpenAnonymize(true);
+                  } else {
+                    toggleAnonymize();
+                  }
+                }}
                 label={t('Anonymize answers')}
               />
             </Field>

@@ -1,5 +1,5 @@
-import { Paper } from '@filigran/design-system';
-import { ListItem, ListItemText, Switch } from '@mui/material';
+import { Paper, Switch } from '@filigran/design-system';
+import { ListItem, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useContext } from 'react';
 
@@ -172,10 +172,13 @@ const TenantParameters = () => {
                       </span>
                     )}
                     />
+                    {/* The row's text is a ListItemText sibling, not a <label>
+                        bound to the control, so the name is carried directly. */}
                     <Switch
+                      aria-label={t('Remove Filigran logos')}
                       disabled={settings.platform_license?.license_is_validated === false || ability.cannot(ACTIONS.MANAGE, SUBJECTS.PLATFORM_SETTINGS)}
                       checked={settings.platform_whitemark === 'true'}
-                      onChange={(_event, checked) => updatePlatformWhitemark({ platform_whitemark: checked.toString() })}
+                      onCheckedChange={checked => updatePlatformWhitemark({ platform_whitemark: String(checked === true) })}
                     />
                   </ListItem>
                 </>

@@ -2215,3 +2215,75 @@ in the Combobox/Select adoption wave. No product site here compensates for it.
 **The request.** Whatever fix the library takes should be validated against
 OpenCTI #17884's reproduction, not against a fresh OpenAEV one — there is no
 OpenAEV repro to point at.
+
+---
+
+## 46. `Checkbox` is 16px with no target-size affordance, so a list row cannot adopt it
+
+**Measured at pin `3426fc3`**, both controls mounted side by side in this
+product's real theme and read at the DOM:
+
+| control | rendered box | padding |
+|---|---|---|
+| MUI `Checkbox` (default, the list pattern) | **42 × 42** | 9px |
+| MUI `Checkbox size="small"` | **38 × 38** | 9px |
+| MUI `Checkbox size="small" sx={{ padding: 1 }}` | **36 × 36** | 8px |
+| library `Checkbox` | **16 × 16** | 0 |
+
+**What the product needed.** Thirteen selection checkboxes — the select-all in a
+list header and the per-row box in six list screens (`Credentials`, `Injects`,
+`Teams`, `Scenarios`, `Players`, `InjectResultList`), plus the arsenal toolbar's
+select-all — where the box IS the row's only selection affordance and nothing
+else in the row is clickable for that purpose.
+
+**What the library offers today.** `size-4` on the Root, `p-0`, and a hover ring
+that is `pointer-events-none` — decoration, not target. There is no `size` axis,
+no padding prop, and no hit-area affordance to opt into. The label wrapper
+extends the target, but these boxes have no label: the row's text is a separate
+`ListItemText`.
+
+Adopting it as-is takes a 42px pointer target down to 16px, under the 24 × 24
+floor of WCAG 2.5.8 (Target Size, Minimum). A product-side wrapper adding padding
+around the Root would be a local approximation of a missing library capability,
+which the migration contract forbids — so nothing was done, and the thirteen
+sites stay on MUI.
+
+**The request.** Either a target-size affordance on `Checkbox` itself (a larger
+pointer target around an unchanged 16px box, the way MUI's `PrivateSwitchBase`
+padding does it), or an explicit statement that a label-less checkbox is out of
+the component's scope — in which case the product needs to know what to put in a
+list row instead.
+
+---
+
+## 47 — withdrawn. The tokens exist; what is open is a mapping, not a gap
+
+**Raised and withdrawn at pin `3426fc3`.** The first draft of this entry claimed
+the library had no token for three shapes found in the colour sweep. That was
+wrong, and a second pass over the delivered set found a candidate for each:
+
+| what the product hard-codes | candidate token | dark / light |
+|---|---|---|
+| `ResilienceGaugeWidget` 4th rung `#ff7043` | `--color-feedback-warning-primary` | `#e6700f` / `#b8550a` |
+| `AtomicTesting` scrim `rgba(105,103,103,0.45)` | `--bg-elevation-default-layer-0-transparency-70` | `#070d18b3` / `#f2f2f3b3` |
+| `ChannelsFilter` channel kinds, `ChallengeCard` avatar | the `--color-entities-*` ramp (9 hues, each with a `-transparency-20`) | per hue |
+
+Nothing here is a library defect, so nothing is asked of the library. Two
+product-side facts came out of the same pass and are recorded because they
+explain why the sweep looked like a gap:
+
+- `theme.palette.warning.main` is `#ffa726`, which is no FDS token, while
+  `theme.palette.warn.main` is `#E6700F`, which is one. A ladder reading
+  `success / warning / error` from the theme is therefore only tokenised in two
+  of its three rungs. The gauge's missing fourth rung was read against that.
+- The `--color-entities-*` ramp is a taxonomy from a sibling product. Borrowing
+  four of its hues for media channel kinds is a product decision about whether a
+  categorical ramp may be reused across taxonomies — not an equivalence the
+  library asserts.
+
+**Explicitly NOT erosion.** Thirty-three of the fifty-nine literals the sweep
+found live in simulated external surfaces: the `srcdoc` of a previewed phishing
+email or landing page, the chrome of that preview, and the channel post preview.
+Those render a recipient's view, not the operator's, so they must not follow the
+product theme and must not be tokenised. Recorded here so a later sweep does not
+mistake them for erosion.

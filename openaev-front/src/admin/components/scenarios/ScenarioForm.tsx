@@ -1,4 +1,5 @@
 import {
+  Checkbox,
   Combobox,
   ComboboxChips,
   ComboboxField,
@@ -7,7 +8,7 @@ import {
   ComboboxLabel,
 } from '@filigran/design-system';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Checkbox, FormControlLabel, MenuItem, TextField as MuiTextField, Typography } from '@mui/material';
+import { Button, MenuItem, TextField as MuiTextField, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -226,13 +227,9 @@ const ScenarioForm: FunctionComponent<Props> = ({
         )}
       />
       {isCreation && (
-        <FormControlLabel
-          control={(
-            <Checkbox
-              checked={isScenarioAssistantChecked}
-              onChange={() => setIsScenarioAssistantChecked(!isScenarioAssistantChecked)}
-            />
-          )}
+        <Checkbox
+          checked={isScenarioAssistantChecked}
+          onCheckedChange={() => setIsScenarioAssistantChecked(!isScenarioAssistantChecked)}
           label={t('Use the scenario assistant')}
         />
       )}

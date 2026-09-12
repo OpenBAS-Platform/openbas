@@ -6,13 +6,13 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
+  Switch,
 } from '@filigran/design-system';
 import { type DraggableProvidedDragHandleProps } from '@hello-pangea/dnd';
 import { DeleteOutline, DragHandleOutlined, InfoOutlined } from '@mui/icons-material';
 import {
   Box,
   IconButton,
-  Switch,
   TextField,
   Tooltip,
   Typography,
@@ -283,11 +283,13 @@ const EventConditionRow: FunctionComponent<Props> = ({
               gap: 2,
             }}
             >
+              {/* The visible "Aa" is a caption beside the control, and the
+                  tooltip text follows the state — neither can be the name, so
+                  the switch carries a stable one of its own. */}
               <Switch
-                size="small"
+                aria-label={t('Case-sensitive')}
                 checked={condition.caseSensitive}
-                onChange={handleCaseSensitiveToggle}
-                color="primary"
+                onCheckedChange={handleCaseSensitiveToggle}
                 disabled={readOnly}
               />
               <Typography

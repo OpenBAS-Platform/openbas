@@ -3,9 +3,10 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
+  Switch,
 } from '@filigran/design-system';
 import { AddOutlined, InfoOutlined, OpenInNewOutlined, SmartToyOutlined } from '@mui/icons-material';
-import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Skeleton, Stack, Switch, Tooltip, Typography, useMediaQuery } from '@mui/material';
+import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Skeleton, Stack, Tooltip, Typography, useMediaQuery } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import { type CSSProperties, type FunctionComponent, type ReactNode, useMemo, useState } from 'react';
 
@@ -484,7 +485,7 @@ const AutonomousAgentsSelector: FunctionComponent<Props> = ({
                 trailing: (
                   <Tooltip title={t('The orchestrator is always active - it plans and drives the attack and cannot be disabled.')}>
                     <span>
-                      <Switch edge="end" size="small" checked disabled inputProps={{ 'aria-label': orchestrator.name }} />
+                      <Switch checked disabled aria-label={orchestrator.name} />
                     </span>
                   </Tooltip>
                 ),
@@ -521,12 +522,10 @@ const AutonomousAgentsSelector: FunctionComponent<Props> = ({
                   modeNode,
                   trailing: (
                     <Switch
-                      edge="end"
-                      size="small"
                       checked={enabled}
                       disabled={disabled}
-                      onChange={event => onToggle(agent.id, event.target.checked)}
-                      inputProps={{ 'aria-label': agentName(agent) }}
+                      onCheckedChange={checked => onToggle(agent.id, checked === true)}
+                      aria-label={agentName(agent)}
                     />
                   ),
                 });
