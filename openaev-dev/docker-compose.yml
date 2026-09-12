@@ -29,7 +29,7 @@ services:
   # Credentials: minioadmin/minioadmin
   openaev-dev-minio:
     container_name: openaev-dev-minio
-    image: minio/minio:RELEASE.2025-06-13T11-33-47Z
+    image: quay.io/minio/minio:RELEASE.2025-06-13T11-33-47Z
     ports:
       - "10000:9000"
       - "10001:9001"
@@ -113,7 +113,7 @@ services:
   # Test MinIO object storage (S3-compatible)
   openaev-test-minio:
     container_name: openaev-test-minio
-    image: minio/minio:RELEASE.2025-06-13T11-33-47Z
+    image: quay.io/minio/minio:RELEASE.2025-06-13T11-33-47Z
     ports:
       - "11000:9000"
       - "11001:9001"
