@@ -118,6 +118,7 @@ const AttackPatternFieldController = ({ name, label, hideAddButton = false, requ
       render={({ field: { onChange, value }, fieldState: { error } }) => (
         <>
           <Combobox<Option>
+            required={required}
             multiple
             options={attackPatternsOptions}
             openOnFocus
@@ -138,10 +139,7 @@ const AttackPatternFieldController = ({ name, label, hideAddButton = false, requ
               </>
             )}
           >
-            <ComboboxLabel>
-              {label}
-              {required ? ' *' : ''}
-            </ComboboxLabel>
+            <ComboboxLabel required={required}>{label}</ComboboxLabel>
             <ComboboxField
               adornment={ability.can(ACTIONS.MANAGE, SUBJECTS.TENANT_SETTINGS) && !hideAddButton
                 ? (

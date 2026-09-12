@@ -198,6 +198,7 @@ const AutocompleteField: FunctionComponent<Props> = (props) => {
   return (
     <div className={className} style={props.style}>
       <Combobox<AutocompleteOption>
+        required={required}
         disabled={disabled}
         multiple={multiple}
         open={props.open}
@@ -219,10 +220,7 @@ const AutocompleteField: FunctionComponent<Props> = (props) => {
         onValueChange={newValue => handleValue(newValue)}
         renderOption={renderRow}
       >
-        <ComboboxLabel>
-          {label}
-          {required ? ' *' : ''}
-        </ComboboxLabel>
+        <ComboboxLabel required={required}>{label}</ComboboxLabel>
         <ComboboxField>
           {multiple && <ComboboxChips />}
           <ComboboxInput autoFocus={autoFocus} placeholder={placeholder} />

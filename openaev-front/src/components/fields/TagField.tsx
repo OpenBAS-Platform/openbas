@@ -121,6 +121,7 @@ const TagField: FunctionComponent<Props> = ({
     }}
     >
       <Combobox<TagOption>
+        required={required}
         multiple
         value={values()}
         options={tagsOptions}
@@ -143,10 +144,7 @@ const TagField: FunctionComponent<Props> = ({
           </>
         )}
       >
-        <ComboboxLabel>
-          {label}
-          {required ? ' *' : ''}
-        </ComboboxLabel>
+        <ComboboxLabel required={required}>{label}</ComboboxLabel>
         <ComboboxField
           adornment={(
             // `<Can>` renders nothing without the ability; the slot is `empty:hidden`,

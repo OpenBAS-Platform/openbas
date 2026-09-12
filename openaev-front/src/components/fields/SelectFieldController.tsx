@@ -77,6 +77,7 @@ const SelectFieldController = ({
           return (
             <div style={wrapperStyle}>
               <Combobox<Item>
+                required={required}
                 multiple
                 options={items}
                 value={selected}
@@ -86,10 +87,7 @@ const SelectFieldController = ({
                 disabled={disabled}
                 error={!!error}
               >
-                <ComboboxLabel>
-                  {label}
-                  {required ? ' *' : ''}
-                </ComboboxLabel>
+                <ComboboxLabel required={required}>{label}</ComboboxLabel>
                 <ComboboxField>
                   <ComboboxChips />
                   <ComboboxInput name={field.name} onBlur={field.onBlur} />
