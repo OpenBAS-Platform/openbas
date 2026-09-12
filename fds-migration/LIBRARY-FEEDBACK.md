@@ -2245,8 +2245,15 @@ extends the target, but these boxes have no label: the row's text is a separate
 Adopting it as-is takes a 42px pointer target down to 16px, under the 24 × 24
 floor of WCAG 2.5.8 (Target Size, Minimum). A product-side wrapper adding padding
 around the Root would be a local approximation of a missing library capability,
-which the migration contract forbids — so nothing was done, and the thirteen
-sites stay on MUI.
+which the migration contract forbids.
+
+**Product decision, 2026-09-12.** The thirteen sites were converted anyway: the
+measured before/after was shown and the smaller box accepted. The target-size
+loss is therefore carried knowingly, and this entry stays open as a library
+request rather than as a blocked conversion. Verified at the same time, on the
+real nesting (an `<a>` row whose `ListItemIcon` calls `stopPropagation()` and
+`preventDefault()`): clicking the library checkbox toggles the selection and
+does NOT navigate — the row's link is not reached.
 
 **The request.** Either a target-size affordance on `Checkbox` itself (a larger
 pointer target around an unchanged 16px box, the way MUI's `PrivateSwitchBase`

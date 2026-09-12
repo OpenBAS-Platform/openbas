@@ -1,4 +1,4 @@
-import { ButtonGroup, ButtonGroupItem } from '@filigran/design-system';
+import { ButtonGroup, ButtonGroupItem, Checkbox } from '@filigran/design-system';
 import {
   GridViewOutlined,
   LinkOffOutlined,
@@ -6,7 +6,6 @@ import {
 } from '@mui/icons-material';
 import {
   Box,
-  Checkbox,
   IconButton,
   List,
   ListItem,
@@ -559,21 +558,20 @@ const ThreatArsenal = () => {
                         the list view (the toolbar is shared by the two). */}
                     <Tooltip title={selectAllLabel}>
                       <span>
+                        {/* The library box is 16x16 with no padding, so it no
+                            longer sets the row's height — the 36px is the row's
+                            own now. The mixed state travels as the `checked`
+                            value, which is where Radix reads it. */}
                         <Checkbox
-                          size="small"
-                          // MUI's own padding makes this control 38 tall, which
-                          // was the second thing holding the row above 36. The
-                          // click target stays 36x36 — well above the 24x24
-                          // minimum, so nothing is traded for the height.
-                          sx={{ padding: 1 }}
-                          checked={selectAll}
-                          indeterminate={
+                          aria-label={selectAllLabel}
+                          checked={
                             (!selectAll && numberOfSelectedElements > 0)
                             || (selectAll && Object.keys(deSelectedElements ?? {}).length > 0)
+                              ? 'indeterminate'
+                              : selectAll
                           }
-                          onChange={handleToggleSelectAll}
+                          onCheckedChange={handleToggleSelectAll}
                           disabled={threatArsenalActions.length === 0}
-                          inputProps={{ 'aria-label': selectAllLabel }}
                         />
                       </span>
                     </Tooltip>
