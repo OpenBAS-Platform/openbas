@@ -111,6 +111,7 @@ public class InjectService {
   static final String AGENT_ACCESS_DENIED = "Agent is not allowed to act on this inject";
 
   private final TeamRepository teamRepository;
+  private final SecretReferenceRepository secretReferenceRepository;
   private final ExecutionTraceRepository executionTraceRepository;
   private final AssetService assetService;
   private final AssetGroupService assetGroupService;
@@ -199,6 +200,8 @@ public class InjectService {
     inject.setUser(this.userService.currentUser());
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
+    inject.setSecretReferences(
+        fromIterable(secretReferenceRepository.findAllById(input.getSecretReferences())));
     inject.setTags(tagService.tagSet(input.getTagIds()));
     List<InjectDocument> injectDocuments =
         input.getDocuments().stream()
@@ -998,6 +1001,8 @@ public class InjectService {
       inject.setAssets(fromIterable(this.assetService.assets(input.getAssets())));
     }
     inject.setAssetGroups(fromIterable(this.assetGroupService.assetGroups(input.getAssetGroups())));
+    inject.setSecretReferences(
+        fromIterable(this.secretReferenceRepository.findAllById(input.getSecretReferences())));
     inject.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
 
     // Set documents
