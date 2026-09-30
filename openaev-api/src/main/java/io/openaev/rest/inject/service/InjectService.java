@@ -133,7 +133,7 @@ public class InjectService {
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
   private final PayloadRepository payloadRepository;
-  private final AgentRepository agentRepository;
+  private final AgentService agentService;
   private final SmtpService smtpService;
   private final ImapService imapService;
   private final HealthCheckUtils healthCheckUtils;
@@ -301,10 +301,7 @@ public class InjectService {
    */
   public Inject resolveInjectTargetingAgent(String injectId, String agentId) {
     Inject inject = findInjectOrNull(injectId);
-    Agent agent =
-        agentId == null
-            ? null
-            : agentRepository.findById(agentId).filter(found -> isPrimaryAgent(found)).orElse(null);
+    Agent agent = agentId == null ? null : agentService.findPrimaryAgent(agentId).orElse(null);
     if (inject == null
         || agent == null
         || agent.getAsset() == null
@@ -323,7 +320,7 @@ public class InjectService {
   private boolean isInjectTarget(Inject inject, Agent agent) {
     // Static membership is checked in a single query so the (potentially large) asset group member
     // lists are never materialized; dynamic membership costs one id-constrained query per group.
-    return agentRepository.isAgentAssetStaticallyTargetedByInject(agent.getId(), inject.getId())
+    return agentService.isAgentAssetStaticallyTargetedByInject(agent.getId(), inject.getId())
         || inject.getAssetGroups().stream()
             .filter(group -> !isEmptyFilterGroup(group.getDynamicFilter()))
             .anyMatch(group -> assetGroupService.isAssetInDynamicGroup(agent.getAsset(), group));
