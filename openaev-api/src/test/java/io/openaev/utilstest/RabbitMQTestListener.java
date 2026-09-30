@@ -22,7 +22,7 @@ public class RabbitMQTestListener implements TestExecutionListener {
     if (testClass.isAnnotationPresent(KeepRabbit.class)) {
       ApplicationContext context = testContext.getApplicationContext();
       // Reinitialize consumers that were stopped by a previous test class
-      context.getBean(InjectApi.class).init();
+      context.getBean(InjectService.class).initInjectTraceQueue();
       context.getBean(QueueChainingService.class).init();
       // Purge stale messages that were requeued by RabbitMQ after the previous connection close
       // Safe because the scheduler's initial delay (workerFrequency) hasn't elapsed yet
@@ -42,7 +42,7 @@ public class RabbitMQTestListener implements TestExecutionListener {
     if (testClass.isAnnotationPresent(KeepRabbit.class)) {
       ApplicationContext context = testContext.getApplicationContext();
       BatchQueueService<?> queueService =
-          context.getBean(InjectApi.class).getInjectTraceQueueService();
+          context.getBean(InjectService.class).getInjectTraceQueueService();
       if (queueService != null) {
         queueService.purge();
       }
