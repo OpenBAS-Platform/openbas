@@ -24,6 +24,7 @@ import io.openaev.ee.EnterpriseEditionService;
 import io.openaev.ee.License;
 import io.openaev.engine.facade.EngineService;
 import io.openaev.expectation.ExpectationPropertiesConfig;
+import io.openaev.notification.engine.WebhookTargetValidator;
 import io.openaev.rest.exception.BadRequestException;
 import io.openaev.rest.settings.PreviewFeature;
 import io.openaev.rest.settings.form.*;
@@ -75,6 +76,7 @@ public class PlatformSettingsService {
   private final XtmOneConfig xtmOneConfig;
   private final XtmOneIdentity xtmOneIdentity;
   private final OpenTelemetry openTelemetry;
+  private final WebhookTargetValidator webhookTargetValidator;
 
   @Value("${server.servlet.session.timeout:1440m}")
   private java.time.Duration sessionTimeout;
@@ -532,6 +534,11 @@ public class PlatformSettingsService {
   }
 
   private PlatformSettings updateTheme(ThemeInput input, String themeType) {
+    validateThemeUrl(input.getLogoUrl());
+    validateThemeUrl(input.getLogoUrlCollapsed());
+    validateThemeUrl(input.getLogoLoginUrl());
+    validateThemeUrl(input.getLoginAsideImage());
+
     Map<String, Setting> dbSettings = mapOfSettings(this.settingRepository.findAllByTenantIsNull());
     List<Setting> settingsToSave = new ArrayList<>();
 
@@ -616,6 +623,16 @@ public class PlatformSettingsService {
     settingRepository.deleteAllById(delete);
     settingRepository.saveAll(update);
     return findSettings();
+  }
+
+  /**
+   * Rejects theme image/logo urls that are not well-formed http(s) urls pointing at a public
+   * target, to prevent SSRF via platform-level theme configuration.
+   */
+  private void validateThemeUrl(String url) {
+    if (StringUtils.hasText(url)) {
+      webhookTargetValidator.validateUrl(url);
+    }
   }
 
   /**
