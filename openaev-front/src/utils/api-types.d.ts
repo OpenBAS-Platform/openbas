@@ -8354,6 +8354,7 @@ export interface NotificationTriggerInput {
     | "SECURITY_PLATFORM"
     | "CREDENTIAL"
     | "MARKING_DEFINITION"
+    | "MARKING_ASSIGNMENT"
     | "DOCUMENT"
     | "CHANNEL"
     | "PHISHING_LANDING_PAGE"
@@ -8393,6 +8394,7 @@ export interface NotificationTriggerInput {
     | "PLATFORM_GROUP"
     | "PLATFORM_USER"
     | "XTM_HUB_REGISTRATION"
+    | "NEWS_FEED"
     | "SNAPSHOT_OBSERVATION"
     | "UNKNOWN"
     | "SIMULATION_OR_SCENARIO"
@@ -8464,6 +8466,7 @@ export interface NotificationTriggerOutput {
     | "SECURITY_PLATFORM"
     | "CREDENTIAL"
     | "MARKING_DEFINITION"
+    | "MARKING_ASSIGNMENT"
     | "DOCUMENT"
     | "CHANNEL"
     | "PHISHING_LANDING_PAGE"
@@ -8503,6 +8506,7 @@ export interface NotificationTriggerOutput {
     | "PLATFORM_GROUP"
     | "PLATFORM_USER"
     | "XTM_HUB_REGISTRATION"
+    | "NEWS_FEED"
     | "SNAPSHOT_OBSERVATION"
     | "UNKNOWN"
     | "SIMULATION_OR_SCENARIO"
@@ -8689,7 +8693,7 @@ export interface PageAggregatedFindingOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8708,7 +8712,7 @@ export interface PageAsset {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8727,7 +8731,7 @@ export interface PageAssetGroupOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8746,7 +8750,7 @@ export interface PageAssetOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8765,7 +8769,7 @@ export interface PageAttackPatternOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8784,7 +8788,7 @@ export interface PageConnectorInstanceLog {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8803,7 +8807,7 @@ export interface PageCredentialOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8822,7 +8826,7 @@ export interface PageCustomDashboard {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8841,7 +8845,7 @@ export interface PageCustomDomain {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8860,7 +8864,7 @@ export interface PageEndpointOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8879,7 +8883,7 @@ export interface PageEndpointTargetOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8898,7 +8902,7 @@ export interface PageExerciseSimple {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8917,7 +8921,7 @@ export interface PageFullTextSearchResult {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8936,7 +8940,7 @@ export interface PageGroup {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8955,7 +8959,7 @@ export interface PageInjectResultOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8974,7 +8978,7 @@ export interface PageInjectTarget {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -8993,7 +8997,7 @@ export interface PageInjectTestStatusOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9012,7 +9016,7 @@ export interface PageInjectorContractBaseOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9031,7 +9035,7 @@ export interface PageKillChainPhase {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9050,7 +9054,7 @@ export interface PageLessonsTemplate {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9069,7 +9073,7 @@ export interface PageMarkingDefinitionOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9088,7 +9092,7 @@ export interface PageMitigation {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9107,7 +9111,7 @@ export interface PageNotificationOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9126,7 +9130,7 @@ export interface PageNotificationTriggerOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9145,7 +9149,7 @@ export interface PageNotifierOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9164,7 +9168,7 @@ export interface PageOrganization {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9183,7 +9187,7 @@ export interface PagePayload {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9202,7 +9206,7 @@ export interface PagePhishingEmailTemplate {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9221,7 +9225,7 @@ export interface PagePhishingLandingPage {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9240,7 +9244,7 @@ export interface PagePlatformGroupOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9259,7 +9263,7 @@ export interface PagePlayerOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9278,7 +9282,7 @@ export interface PageRawPaginationDocument {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9297,7 +9301,7 @@ export interface PageRawPaginationImportMapper {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9316,7 +9320,7 @@ export interface PageRawPaginationScenario {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9335,7 +9339,7 @@ export interface PageRelatedFindingOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9354,7 +9358,7 @@ export interface PageReporting {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9373,7 +9377,7 @@ export interface PageRoleOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9392,7 +9396,7 @@ export interface PageSecurityPlatform {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9411,7 +9415,7 @@ export interface PageTag {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9430,7 +9434,7 @@ export interface PageTagRuleOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9449,7 +9453,7 @@ export interface PageTeamOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9468,7 +9472,7 @@ export interface PageTenantOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9487,7 +9491,7 @@ export interface PageUserOutput {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -9506,7 +9510,7 @@ export interface PageVulnerabilitySimple {
   pageable?: PageableObject;
   /** @format int32 */
   size?: number;
-  sort?: SortObject[];
+  sort?: SortObject;
   /** @format int64 */
   totalElements?: number;
   /** @format int32 */
@@ -10975,6 +10979,8 @@ export interface RoleInput {
     | "ACCESS_MARKING_DEFINITION"
     | "MANAGE_MARKING_DEFINITION"
     | "DELETE_MARKING_DEFINITION"
+    | "ASSIGN_MARKING"
+    | "DELETE_MARKING_ASSIGNMENT"
     | "ACCESS_PLATFORM_USERS_GROUPS_AND_ROLES"
     | "MANAGE_PLATFORM_USERS_GROUPS_AND_ROLES"
     | "DELETE_PLATFORM_USERS_GROUPS_AND_ROLES"
@@ -11059,6 +11065,8 @@ export interface RoleOutput {
     | "ACCESS_MARKING_DEFINITION"
     | "MANAGE_MARKING_DEFINITION"
     | "DELETE_MARKING_DEFINITION"
+    | "ASSIGN_MARKING"
+    | "DELETE_MARKING_ASSIGNMENT"
     | "ACCESS_PLATFORM_USERS_GROUPS_AND_ROLES"
     | "MANAGE_PLATFORM_USERS_GROUPS_AND_ROLES"
     | "DELETE_PLATFORM_USERS_GROUPS_AND_ROLES"
@@ -12696,15 +12704,30 @@ export interface TenantSettingsUpdateInput {
 }
 
 export interface ThemeInput {
-  /** Accent color of the theme */
+  /**
+   * Accent color of the theme
+   * @pattern ^$|^#[0-9a-fA-F]{6}$
+   */
   accent_color?: string;
-  /** Background color of the theme */
+  /**
+   * Background color of the theme
+   * @pattern ^$|^#[0-9a-fA-F]{6}$
+   */
   background_color?: string;
-  /** Solid color of the login page aside */
+  /**
+   * Solid color of the login page aside
+   * @pattern ^$|^#[0-9a-fA-F]{6}$
+   */
   login_aside_color?: string;
-  /** Gradient end color of the login page aside */
+  /**
+   * Gradient end color of the login page aside
+   * @pattern ^$|^#[0-9a-fA-F]{6}$
+   */
   login_aside_gradient_end?: string;
-  /** Gradient start color of the login page aside */
+  /**
+   * Gradient start color of the login page aside
+   * @pattern ^$|^#[0-9a-fA-F]{6}$
+   */
   login_aside_gradient_start?: string;
   /** Url of the login page aside background image */
   login_aside_image?: string;
@@ -12714,15 +12737,30 @@ export interface ThemeInput {
   logo_url?: string;
   /** 'true' if the logo needs to be collapsed */
   logo_url_collapsed?: string;
-  /** Navigation color of the theme */
+  /**
+   * Navigation color of the theme
+   * @pattern ^$|^#[0-9a-fA-F]{6}$
+   */
   navigation_color?: string;
-  /** Paper color of the theme */
+  /**
+   * Paper color of the theme
+   * @pattern ^$|^#[0-9a-fA-F]{6}$
+   */
   paper_color?: string;
-  /** Primary color of the theme */
+  /**
+   * Primary color of the theme
+   * @pattern ^$|^#[0-9a-fA-F]{6}$
+   */
   primary_color?: string;
-  /** Secondary color of the theme */
+  /**
+   * Secondary color of the theme
+   * @pattern ^$|^#[0-9a-fA-F]{6}$
+   */
   secondary_color?: string;
-  /** Text color of the theme */
+  /**
+   * Text color of the theme
+   * @pattern ^$|^#[0-9a-fA-F]{6}$
+   */
   text_color?: string;
 }
 
@@ -13322,6 +13360,8 @@ export interface User {
     | "ACCESS_MARKING_DEFINITION"
     | "MANAGE_MARKING_DEFINITION"
     | "DELETE_MARKING_DEFINITION"
+    | "ASSIGN_MARKING"
+    | "DELETE_MARKING_ASSIGNMENT"
     | "ACCESS_PLATFORM_USERS_GROUPS_AND_ROLES"
     | "MANAGE_PLATFORM_USERS_GROUPS_AND_ROLES"
     | "DELETE_PLATFORM_USERS_GROUPS_AND_ROLES"
@@ -13866,6 +13906,16 @@ export interface Workflow {
    * @max 5940
    */
   workflow_max_temporal_rate_seconds?: number;
+  /**
+   * Timestamp when the workflow has been paused
+   * @format date-time
+   */
+  workflow_pause_at?: string;
+  /**
+   * Total pause duration in seconds, incremented at each pause/resume cycle
+   * @format int64
+   */
+  workflow_pause_second?: number;
   workflow_rate_limit_enabled?: boolean;
   workflow_safe_mode_enabled?: boolean;
   workflow_scope_rules?: WorkflowScopeRule[];
