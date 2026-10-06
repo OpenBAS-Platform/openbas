@@ -2340,5 +2340,97 @@
       "region": "us-east-1",
       "provider": "aws"
     }
+  },
+  {
+    "message": "Maintain current contact details: manual verification required.",
+    "status_code": "MANUAL",
+    "status_detail": "Maintain current contact details: manual verification required.",
+    "severity": "Medium",
+    "severity_id": 3,
+    "category_name": "Findings",
+    "class_name": "Detection Finding",
+    "activity_name": "Create",
+    "metadata": {
+      "event_code": "account_maintain_current_contact_details",
+      "product": {
+        "name": "Prowler",
+        "uid": "prowler",
+        "vendor_name": "Prowler",
+        "version": "5.35.0"
+      },
+      "version": "1.5.0"
+    },
+    "finding_info": {
+      "title": "Maintain current contact details",
+      "desc": "Ensure contact email and telephone details for AWS accounts are current and map to more than one individual in your organization.",
+      "types": [
+        "IAM"
+      ],
+      "uid": "prowler-aws-account_maintain_current_contact_details-427648302155-us-east-1-427648302155",
+      "attacks": [
+        {
+          "tactic": {
+            "uid": "TA0040",
+            "name": "Impact"
+          },
+          "technique": {
+            "uid": "T1531",
+            "name": "Account Access Removal"
+          }
+        }
+      ]
+    },
+    "resources": [
+      {
+        "uid": "arn:aws:iam::427648302155:root",
+        "name": "427648302155",
+        "type": "Other",
+        "region": "us-east-1",
+        "cloud_partition": "aws",
+        "group": {
+          "name": "account"
+        },
+        "labels": [
+          "customer:main-ff-oaev"
+        ],
+        "data": {
+          "metadata": {
+            "arn": "arn:aws:iam::427648302155:root",
+            "name": "427648302155"
+          }
+        }
+      }
+    ],
+    "risk_details": "If an AWS account is compromised or an abuse case is reported, AWS cannot reach the right people in time.",
+    "remediation": {
+      "desc": "Using the Billing and Cost Management console complete contact details: email address and telephone number that map to more than one individual.",
+      "references": [
+        "https://hub.prowler.com/check/account_maintain_current_contact_details"
+      ]
+    },
+    "cloud": {
+      "account": {
+        "uid": "427648302155",
+        "labels": [
+          "environment:demo"
+        ]
+      },
+      "region": "us-east-1",
+      "provider": "aws"
+    },
+    "unmapped": {
+      "compliance": {
+        "CIS-2.0": [
+          "1.1"
+        ],
+        "MITRE-ATTACK": [
+          "T1531"
+        ]
+      },
+      "additional_urls": [
+        "https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-update-contact-primary.html"
+      ],
+      "demo_source": "MANUAL outcome example (US.2.0: becomes a Finding to review)"
+    }
   }
 ]

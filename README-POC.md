@@ -119,7 +119,7 @@ The cloud provider (AWS, GCP, Azure) comes from `resources[].cloud_partition` of
 
 ### Lifecycle
 
-Each stable Finding has a lifecycle derived from the latest OCSF outcome: **Active**, **Review required** (`MANUAL`) or **Muted** (`MUTED`). Since only `FAIL` records are ingested today, live Findings are always **Active**.
+Each stable Finding has a lifecycle derived from the latest OCSF outcome: **Active** (`FAIL`), **Review required** (`MANUAL`) or **Muted** (`MUTED`). `MUTED` records are not ingested, so live Findings are either **Active** or **Review required**.
 
 ## How Findings are ingested
 
@@ -140,14 +140,18 @@ The PoC adds an `OCSF` contract output type and an `OCSFOutputProcessor`. Prowle
 |---|---|
 | `metadata.event_code` | Finding value (the Prowler check id, for example `s3_bucket_public_access`) |
 | `metadata.product.uid` / `name` | Part of the source namespace |
-| `resources[]` | One `RESOURCE` Location per resource; key = `data.metadata.arn`, else `uid` |
+| `metadata.product.name` / `version` | **Scanner**, for example `Prowler 5.35.0` |
+| `resources[]` | One `RESOURCE` Location per resource: `provider/account/region/resource`, where resource is `data.metadata.arn`, else `uid`, and unknown segments are `-` |
 | `resources[].cloud_partition` | Cloud provider |
 | `severity` | Observed severity |
 | `finding_info.title`, `finding_info.desc` | Title and description |
 | `status_detail` | Evidence and status detail |
 | `risk_details` | Risk details |
 | `unmapped.compliance` | Compliance (`Framework: control, control; …`) and MITRE ATT&CK techniques |
+| `finding_info.attacks[]` | MITRE ATT&CK techniques and sub-techniques |
 | `remediation.desc`, `remediation.references` | Remediation |
+| `unmapped.additional_urls[]` | **Additional links**, under Remediation |
+| `resources[].labels[]`, `cloud.account.labels[]` | **Labels** of the occurrence, also added to the Finding's Tags |
 | `cloud.account.uid`, `cloud.region` | Cloud account and region (fallback when the resource has none) |
 | whole record | Raw response |
 
@@ -157,10 +161,10 @@ OCSF outcome and OpenAEV triage are separate concepts:
 
 | OCSF outcome (`status_code`) | Finding behavior |
 |---|---|
-| `FAIL` | Persisted as an active misconfiguration |
-| `PASS` | Compliant; not persisted |
-| `MANUAL` | Not persisted by the output processor |
-| `MUTED` | Not persisted by the output processor |
+| `FAIL` | Persisted as an active misconfiguration (**Check status: Failed**) |
+| `MANUAL` | Persisted as a Finding to review (**Check status: Manual review required**, lifecycle **Review required**) |
+| `PASS` | Compliant; not persisted (no Finding, no archive: compliance coverage is out of scope of the Finding model) |
+| `MUTED` | Not persisted |
 
 OCSF Findings are labeled **Misconfig** in the list, the cards and the sidebar.
 
@@ -406,6 +410,7 @@ All endpoints also exist under `/api/tenants/{tenantId}/…`.
 | `V6_20260819150900000__Add_finding_location_asset` | Location Asset on legacy Findings, merge of duplicates, new unique index |
 | `V6_20260901170000000__Add_finding_raw_data` | `finding_raw_data` |
 | `V6_20260917091900000__Add_triforce_finding_persistence` | `stable_findings`, `finding_occurrences` and their join tables, backfill of every legacy Finding with validation |
+| `V6_20261006120000000__Add_ocsf_occurrence_context` | Scanner product/version, additional links and labels on occurrences; cloud Locations rewritten as `provider/account/region/resource`, context backfilled from the raw OCSF payload |
 
 ### Configuration
 

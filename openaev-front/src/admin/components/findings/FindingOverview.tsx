@@ -62,6 +62,11 @@ type FindingDetailOutput = Omit<FindingOutput, 'finding_type'> & {
   finding_compliance?: string;
   finding_remediation?: string;
   finding_raw_data?: string;
+  finding_outcome?: string;
+  finding_source_product?: string;
+  finding_source_version?: string;
+  finding_additional_urls?: string[];
+  finding_labels?: string[];
 };
 
 // finding_raw_data is stored as a compact single-line JSON string (see
@@ -310,6 +315,12 @@ const FindingOverview = () => {
         <>
           <InformationGrid title={t('Cloud details')}>
             <Field label={t('Rule ID')}>{finding.finding_value}</Field>
+            <Field label={t('Check status')}>
+              {finding.finding_outcome?.toUpperCase() === 'MANUAL' ? t('Manual review required') : emptyFilled(finding.finding_outcome && t('Failed'))}
+            </Field>
+            <Field label={t('Scanner')}>
+              {emptyFilled([finding.finding_source_product, finding.finding_source_version].filter(Boolean).join(' '))}
+            </Field>
             <Field label={t('Resource')}>{finding.finding_resource_name ?? emptyFilled(finding.finding_resource)}</Field>
             <Field label={t('Resource UID')}>{emptyFilled(finding.finding_resource)}</Field>
             <Field label={t('Resource type')}>{emptyFilled(finding.finding_resource_type)}</Field>
@@ -318,6 +329,20 @@ const FindingOverview = () => {
             <Field label={t('Cloud account')}>{emptyFilled(finding.finding_cloud_account)}</Field>
             <Field label={t('Cloud region')}>{emptyFilled(finding.finding_cloud_region)}</Field>
             <Field label={t('Compliance')}>{emptyFilled(finding.finding_compliance)}</Field>
+            <Field label={t('Labels')}>
+              {(finding.finding_labels ?? []).length > 0
+                ? (
+                    <Box sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 0.5,
+                    }}
+                    >
+                      {(finding.finding_labels ?? []).map(label => <Chip key={label} label={label} />)}
+                    </Box>
+                  )
+                : '-'}
+            </Field>
           </InformationGrid>
           <InformationGrid title={t('Evidence')}>
             <Field label={t('Description')}>{emptyFilled(finding.finding_description)}</Field>
@@ -359,7 +384,7 @@ const FindingOverview = () => {
               action={isEE ? undefined : <EEChip clickable featureDetectedInfo={t('Remediation')} />}
             >
               {isEE
-                ? <OCSFRemediationTab remediation={finding.finding_remediation} />
+                ? <OCSFRemediationTab remediation={finding.finding_remediation} additionalUrls={finding.finding_additional_urls} />
                 : (
                     <Typography variant="body2" color="textSecondary">
                       {t('Remediation guidance is available with the Enterprise Edition.')}

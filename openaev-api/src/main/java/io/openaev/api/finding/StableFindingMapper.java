@@ -172,6 +172,10 @@ public class StableFindingMapper {
         .attackPatterns(latest == null ? List.of() : toList(latest.getAttackPatterns()))
         .remediation(latest == null ? null : latest.getRemediation())
         .compliance(latest == null ? null : latest.getCompliance())
+        .sourceProduct(latest == null ? null : latest.getSourceProduct())
+        .sourceVersion(latest == null ? null : latest.getSourceVersion())
+        .additionalUrls(latest == null ? List.of() : toList(latest.getAdditionalUrls()))
+        .labels(latest == null ? List.of() : toList(latest.getLabels()))
         .rawData(latest == null ? null : latest.getRawPayload())
         .build();
   }
@@ -218,6 +222,10 @@ public class StableFindingMapper {
         .attackPatterns(toList(occurrence.getAttackPatterns()))
         .remediation(occurrence.getRemediation())
         .compliance(occurrence.getCompliance())
+        .sourceProduct(occurrence.getSourceProduct())
+        .sourceVersion(occurrence.getSourceVersion())
+        .additionalUrls(toList(occurrence.getAdditionalUrls()))
+        .labels(toList(occurrence.getLabels()))
         .resource(occurrence.getResource())
         .resourceSnapshot(occurrence.getResourceSnapshot())
         .resourceName(occurrence.getResourceName())

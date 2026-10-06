@@ -1,6 +1,7 @@
 package io.openaev.service.finding;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.Asset;
 import io.openaev.database.model.ContractOutputType;
 import io.openaev.database.model.Finding;
@@ -19,6 +20,7 @@ import io.openaev.database.model.User;
 import io.openaev.database.repository.FindingOccurrenceRepository;
 import io.openaev.database.repository.StableFindingRepository;
 import io.openaev.rest.inject.service.ContractOutputContext;
+import io.openaev.rest.tag.TagService;
 import jakarta.validation.constraints.NotNull;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -57,6 +59,7 @@ public class StableFindingIngestionService {
 
   private final StableFindingRepository stableFindingRepository;
   private final FindingOccurrenceRepository findingOccurrenceRepository;
+  private final TagService tagService;
 
   /** Dual-writes injector callback findings and their raw source records. */
   public void ingest(
@@ -106,6 +109,7 @@ public class StableFindingIngestionService {
                     createStableFinding(
                         inject, output, finding, namespace, key, observedAt, lifecycle));
     mergeTags(stable, finding);
+    mergeLabelTags(stable, tenantId, labels(source, null));
 
     List<Location> locations = locations(finding, source);
     for (Location location : locations) {
@@ -209,6 +213,10 @@ public class StableFindingIngestionService {
     occurrence.setAttackPatterns(attackPatterns(inject, source));
     occurrence.setRemediation(finding.getRemediation());
     occurrence.setCompliance(finding.getCompliance());
+    occurrence.setSourceProduct(text(source, "metadata", "product", "name"));
+    occurrence.setSourceVersion(text(source, "metadata", "product", "version"));
+    occurrence.setAdditionalUrls(additionalUrls(source));
+    occurrence.setLabels(labels(source, location.snapshot()).toArray(String[]::new));
     occurrence.setScanId(firstNonBlank(text(source, "metadata", "uid"), text(source, "scan_id")));
     occurrence.setLocationType(location.type());
     occurrence.setLocationKey(location.key());
@@ -240,24 +248,28 @@ public class StableFindingIngestionService {
         for (JsonNode resource : resources) {
           String identifier =
               firstNonBlank(text(resource, "data", "metadata", "arn"), text(resource, "uid"));
-          String key =
+          String resourceKey =
               firstNonBlank(
                   identifier,
                   sha256("", "resource", ContractOutputType.OCSF.name(), resource.toString()));
+          String provider = normalized(text(resource, "cloud_partition"));
+          String account =
+              firstNonBlank(
+                  text(resource, "account", "uid"), text(source, "cloud", "account", "uid"));
+          String region = firstNonBlank(text(resource, "region"), text(source, "cloud", "region"));
           result.add(
               new Location(
                   FindingLocationType.RESOURCE,
-                  normalize(key),
-                  identifier,
+                  normalize(cloudLocation(provider, account, region, resourceKey)),
+                  identifier == null ? null : cloudLocation(provider, account, region, identifier),
                   null,
                   null,
                   null,
                   identifier,
                   resource.toString(),
-                  normalized(text(resource, "cloud_partition")),
-                  firstNonBlank(
-                      text(resource, "account", "uid"), text(source, "cloud", "account", "uid")),
-                  firstNonBlank(text(resource, "region"), text(source, "cloud", "region")),
+                  provider,
+                  account,
+                  region,
                   text(resource, "name"),
                   text(resource, "type"),
                   text(resource, "group", "name")));
@@ -441,7 +453,65 @@ public class StableFindingIngestionService {
     JsonNode mitre = source.path("unmapped").path("compliance").get("MITRE-ATTACK");
     addStructuredValues(values, mitre);
     addStructuredValues(values, source.get("mitre_attack"));
+    JsonNode attacks = source.path("finding_info").get("attacks");
+    if (attacks != null && attacks.isArray()) {
+      attacks.forEach(
+          attack -> {
+            addNonBlank(values, text(attack, "technique", "uid"));
+            addNonBlank(values, text(attack, "sub_technique", "uid"));
+          });
+    }
     return values.toArray(String[]::new);
+  }
+
+  /**
+   * Cloud Location as {@code provider/account/region/resource} (US.2.0), so one resource id seen in
+   * two accounts or regions is two Locations. Unknown segments are written as {@code -}.
+   */
+  static String cloudLocation(String provider, String account, String region, String resource) {
+    return String.join(
+        "/",
+        provider == null ? "-" : provider,
+        account == null ? "-" : account,
+        region == null ? "-" : region,
+        resource);
+  }
+
+  private String[] additionalUrls(JsonNode source) {
+    Set<String> values = new LinkedHashSet<>();
+    addStructuredValues(values, source.path("unmapped").get("additional_urls"));
+    return values.toArray(String[]::new);
+  }
+
+  /**
+   * Scanner labels of the account and of one resource (the one serialized as {@code
+   * resourceSnapshot}), or of every resource when no snapshot is given.
+   */
+  private Set<String> labels(JsonNode source, String resourceSnapshot) {
+    Set<String> values = new LinkedHashSet<>();
+    addStructuredValues(values, source.path("cloud").path("account").get("labels"));
+    JsonNode resources = source.get("resources");
+    if (resources != null && resources.isArray()) {
+      resources.forEach(
+          resource -> {
+            if (resourceSnapshot == null || resourceSnapshot.equals(resource.toString())) {
+              addStructuredValues(values, resource.get("labels"));
+            }
+          });
+    }
+    return values;
+  }
+
+  /** Scanner labels feed the stable Finding's Tags, alongside the human-owned ones. */
+  private void mergeLabelTags(StableFinding stable, String tenantId, Set<String> labels) {
+    if (labels.isEmpty()) {
+      return;
+    }
+    if (stable
+        .getTags()
+        .addAll(tagService.findOrCreateTagsFromNames(TxCtx.forTenant(tenantId), labels))) {
+      stableFindingRepository.save(stable);
+    }
   }
 
   private FindingTargetRole targetRole(Finding finding, JsonNode source, Location location) {

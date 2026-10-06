@@ -114,6 +114,22 @@ public class FindingOccurrence implements TenantBase, Auditable {
   @Column(name = "finding_occurrence_compliance", columnDefinition = "text")
   private String compliance;
 
+  // Scanner that produced the record (OCSF metadata.product), e.g. "Prowler" / "5.35.0".
+  @Column(name = "finding_occurrence_source_product")
+  private String sourceProduct;
+
+  @Column(name = "finding_occurrence_source_version")
+  private String sourceVersion;
+
+  @Type(StringArrayType.class)
+  @Column(name = "finding_occurrence_additional_urls", columnDefinition = "text[]")
+  private String[] additionalUrls;
+
+  // Scanner labels (resources[].labels, cloud.account.labels), also consolidated as Tags.
+  @Type(StringArrayType.class)
+  @Column(name = "finding_occurrence_labels", columnDefinition = "text[]")
+  private String[] labels;
+
   @Column(name = "finding_occurrence_resource", columnDefinition = "text")
   private String resource;
 

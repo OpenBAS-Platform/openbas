@@ -61,8 +61,10 @@ continues to create Assets rather than Findings.
 ### Prowler and OCSF findings
 
 Prowler results enter OpenAEV through the standard Inject execution callback as unmodified OCSF
-records. OpenAEV uses `metadata.event_code` as the rule value and each `resources[]` UID as its
-occurrence location. Repeated scans and additional resources for the same rule remain occurrences
+records. OpenAEV uses `metadata.event_code` as the rule value and each `resources[]` entry as an
+occurrence Location, written `provider/account/region/resource` (the resource is its ARN, otherwise
+its UID; unknown segments are `-`), so the same resource id in two accounts or regions is two
+Locations. Repeated scans and additional resources for the same rule remain occurrences
 of the same stable Finding. The source product participates in the stable identity, preventing
 similarly named rules from unrelated scanners from being merged.
 
@@ -76,13 +78,18 @@ OCSF outcome and OpenAEV triage are separate concepts:
 | OCSF outcome | Finding behavior |
 |---|---|
 | `FAIL` | Active misconfiguration |
-| `MANUAL` | Review result; not persisted as a Finding |
+| `MANUAL` | Finding to review: its check status is **Manual review required** |
 | `MUTED` | Muted result; not persisted as a Finding |
 | `PASS` | Compliant result; not persisted as a Finding |
 
-The detail view preserves the raw OCSF response and shows the rule title and description, evidence,
-risk, categories, MITRE ATT&CK mappings, resource metadata, remediation, Inject source, and
-re-detection timeline.
+PASS results are never kept: their only use would be measuring compliance coverage, which is not
+an action and therefore not a Finding.
+
+The detail view preserves the raw OCSF response and shows the rule title and description, check
+status, scanner and version (`metadata.product`), scanner labels, evidence, risk, categories, MITRE
+ATT&CK mappings (from the compliance mapping and `finding_info.attacks[]`), resource metadata,
+remediation with its additional links, Inject source, and re-detection timeline. Scanner labels are
+also added to the Finding's Tags.
 
 ## Sensitive Findings
 

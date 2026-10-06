@@ -79,4 +79,8 @@ public record StableFindingOutput(
     @JsonProperty("finding_mitre_attack") List<String> attackPatterns,
     @JsonProperty("finding_remediation") String remediation,
     @JsonProperty("finding_compliance") String compliance,
+    @JsonProperty("finding_source_product") String sourceProduct,
+    @JsonProperty("finding_source_version") String sourceVersion,
+    @JsonProperty("finding_additional_urls") List<String> additionalUrls,
+    @JsonProperty("finding_labels") List<String> labels,
     @JsonProperty("finding_raw_data") String rawData) {}

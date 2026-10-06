@@ -6210,6 +6210,10 @@ export interface FindingOccurrenceOutput {
   finding_cloud_provider?: string;
   finding_cloud_region?: string;
   finding_compliance?: string;
+  finding_additional_urls?: string[];
+  finding_labels?: string[];
+  finding_source_product?: string;
+  finding_source_version?: string;
   /** @format date-time */
   finding_created_at?: string;
   finding_description?: string;
@@ -12613,6 +12617,10 @@ export interface StableFindingOutput {
   finding_cloud_provider?: string;
   finding_cloud_region?: string;
   finding_compliance?: string;
+  finding_additional_urls?: string[];
+  finding_labels?: string[];
+  finding_source_product?: string;
+  finding_source_version?: string;
   /** @format date-time */
   finding_created_at?: string;
   finding_description?: string;

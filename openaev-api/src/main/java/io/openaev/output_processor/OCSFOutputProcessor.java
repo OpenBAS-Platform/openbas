@@ -56,6 +56,7 @@ public class OCSFOutputProcessor extends FindingCapableOutputProcessor {
   public static final String COMPLIANCE = "compliance";
   public static final String STATUS_CODE = "status_code";
   public static final String STATUS_CODE_FAIL = "FAIL";
+  public static final String STATUS_CODE_MANUAL = "MANUAL";
 
   private final AssetRepository assetRepository;
 
@@ -75,8 +76,9 @@ public class OCSFOutputProcessor extends FindingCapableOutputProcessor {
   }
 
   /**
-   * A record is a candidate Finding only if its identity and outcome are explicit. PASS is
-   * compliant and is never persisted; unknown outcomes are rejected rather than silently
+   * A record is a candidate Finding only if its identity and outcome are explicit. FAIL becomes an
+   * active Finding and MANUAL a Finding that requires review (US.2.0 ingestion rule). PASS is
+   * compliant and is never persisted; MUTED and unknown outcomes are rejected rather than silently
    * represented as an active vulnerability.
    */
   @Override
@@ -93,7 +95,8 @@ public class OCSFOutputProcessor extends FindingCapableOutputProcessor {
     if (!nonBlank(statusCode)) {
       return false;
     }
-    return STATUS_CODE_FAIL.equals(statusCode.asText().toUpperCase(Locale.ROOT));
+    String outcome = statusCode.asText().toUpperCase(Locale.ROOT);
+    return STATUS_CODE_FAIL.equals(outcome) || STATUS_CODE_MANUAL.equals(outcome);
   }
 
   /**

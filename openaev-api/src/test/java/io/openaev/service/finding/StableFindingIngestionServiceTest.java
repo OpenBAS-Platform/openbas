@@ -20,10 +20,12 @@ import io.openaev.database.model.Injector;
 import io.openaev.database.model.StableFinding;
 import io.openaev.database.model.StableFindingCategory;
 import io.openaev.database.model.StableFindingLifecycle;
+import io.openaev.database.model.Tag;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.FindingOccurrenceRepository;
 import io.openaev.database.repository.StableFindingRepository;
 import io.openaev.rest.inject.service.ContractOutputContext;
+import io.openaev.rest.tag.TagService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -54,8 +56,9 @@ class StableFindingIngestionServiceTest {
   private final List<FindingOccurrence> occurrences = new ArrayList<>();
   private final Map<String, StableFinding> stableFindings = new LinkedHashMap<>();
   private final AtomicReference<StableFinding> stable = new AtomicReference<>();
+  private final TagService tagService = mock(TagService.class);
   private final StableFindingIngestionService service =
-      new StableFindingIngestionService(stableRepository, occurrenceRepository);
+      new StableFindingIngestionService(stableRepository, occurrenceRepository, tagService);
 
   @BeforeEach
   void setup() {
@@ -168,7 +171,14 @@ class StableFindingIngestionServiceTest {
       assertThat(stableFindings).hasSize(1);
       assertThat(occurrences)
           .extracting(FindingOccurrence::getLocationKey)
-          .containsExactly("resource-a", "arn:aws:s3:::second");
+          .containsExactly(
+              "aws/account-a/eu-west-1/resource-a",
+              "aws-us-gov/account-b/us-gov-west-1/arn:aws:s3:::second");
+      assertThat(occurrences)
+          .extracting(FindingOccurrence::getLocation)
+          .containsExactly(
+              "aws/account-a/eu-west-1/RESOURCE-A",
+              "aws-us-gov/account-b/us-gov-west-1/arn:aws:s3:::second");
       assertThat(occurrences)
           .extracting(FindingOccurrence::getResourceProvider)
           .containsExactly("aws", "aws-us-gov");
@@ -182,6 +192,61 @@ class StableFindingIngestionServiceTest {
       assertThat(stable.get().getSourceNamespace()).isEqualTo("injector-1/findings/prowler");
       assertThat(stable.get().getFirstSeen()).isEqualTo(Instant.parse("2026-09-17T07:00:00Z"));
       assertThat(stable.get().getLifecycle()).isEqualTo(StableFindingLifecycle.ACTIVE);
+    }
+
+    @Test
+    @DisplayName("Should keep scanner version, links, labels and MITRE attacks of a record")
+    void given_ocsfContext_should_persistSourceLinksLabelsAndAttacks() throws Exception {
+      // Arrange
+      Inject inject = inject("tenant-a", "inject-1", "injector-1");
+      ContractOutputContext output = output();
+      JsonNode source =
+          objectMapper.readTree(
+              """
+              {
+                "time_dt": "2026-09-17T07:00:00Z",
+                "status_code": "MANUAL",
+                "finding_info": {"uid": "finding-uid", "title": "Rule title",
+                                 "attacks": [
+                                   {"tactic": {"uid": "TA0009", "name": "Collection"},
+                                    "technique": {"uid": "T1119", "name": "Automated Collection"}},
+                                   {"technique": {"uid": "T1078"},
+                                    "sub_technique": {"uid": "T1078.004"}}]},
+                "metadata": {"event_code": "rule-1",
+                             "product": {"uid": "prowler", "name": "Prowler",
+                                         "version": "5.35.0"}},
+                "unmapped": {"additional_urls": ["https://docs.example/a",
+                                                 "https://docs.example/b"]},
+                "cloud": {"provider": "aws", "region": "eu-central-1",
+                          "account": {"uid": "006621354852", "labels": ["team:cloud"]}},
+                "resources": [
+                  {"uid": "arn:aws:s3:::first", "cloud_partition": "aws",
+                   "labels": ["customer:main-ff-oaev"]},
+                  {"uid": "arn:aws:s3:::second", "cloud_partition": "aws", "labels": []}
+                ]
+              }
+              """);
+      Tag tag = new Tag();
+      tag.setId("tag-1");
+      when(tagService.findOrCreateTagsFromNames(any(), any())).thenReturn(Set.of(tag));
+
+      // Act
+      service.ingest(inject, output, List.of(finding(inject, output, "rule-1")), List.of(source));
+
+      // Assert
+      assertThat(occurrences).hasSize(2);
+      FindingOccurrence first = occurrences.getFirst();
+      assertThat(first.getLocationKey())
+          .isEqualTo("aws/006621354852/eu-central-1/arn:aws:s3:::first");
+      assertThat(first.getSourceProduct()).isEqualTo("Prowler");
+      assertThat(first.getSourceVersion()).isEqualTo("5.35.0");
+      assertThat(first.getAdditionalUrls())
+          .containsExactly("https://docs.example/a", "https://docs.example/b");
+      assertThat(first.getLabels()).containsExactly("team:cloud", "customer:main-ff-oaev");
+      assertThat(occurrences.get(1).getLabels()).containsExactly("team:cloud");
+      assertThat(first.getAttackPatterns()).containsExactly("T1119", "T1078", "T1078.004");
+      assertThat(stable.get().getLifecycle()).isEqualTo(StableFindingLifecycle.REVIEW_REQUIRED);
+      assertThat(stable.get().getTags()).containsExactly(tag);
     }
 
     @Test

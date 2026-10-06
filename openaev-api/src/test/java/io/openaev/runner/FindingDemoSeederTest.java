@@ -200,7 +200,7 @@ class FindingDemoSeederTest {
                 Set<String> checks = new HashSet<>();
                 findings.forEach(
                     finding -> {
-                      assertThat(finding.path("status_code").asText()).isEqualTo("FAIL");
+                      assertThat(finding.path("status_code").asText()).isIn("FAIL", "MANUAL");
                       assertThat(finding.path("metadata").path("product").path("uid").asText())
                           .isEqualTo("prowler");
                       assertThat(finding.path("metadata").path("uid").asText()).isNotBlank();

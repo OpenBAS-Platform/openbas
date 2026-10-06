@@ -68,8 +68,8 @@ class OCSFOutputProcessorTest {
     }
 
     @Test
-    @DisplayName("Should reject a MANUAL record because only failures become findings")
-    void shouldRejectManualRecord() throws Exception {
+    @DisplayName("Should accept a MANUAL record because it becomes a Finding to review")
+    void shouldAcceptManualRecord() throws Exception {
       JsonNode node =
           objectMapper.readTree(
               """
@@ -79,7 +79,7 @@ class OCSFOutputProcessorTest {
                 "finding_info": {"title": "Check X"}
               }
               """);
-      assertFalse(processor.validate(node));
+      assertTrue(processor.validate(node));
     }
 
     @Test
