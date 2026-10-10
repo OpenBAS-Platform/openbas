@@ -11,7 +11,7 @@ attack.
 !!! note "Where the bundle comes from"
 
     OpenAEV builds the bundle once the Simulation is finished and pushes it to the OpenCTI instance connected to the
-    Simulation's Tenant. See [Security Coverage enrichment (XTM Suite)](../../usage/evaluate/xtm-suite-connector.md)
+    Simulation's Tenant. See [Security Coverage enrichment (XTM Suite)](../../integrations/xtm-suite/xtm-suite-connector.md)
     to connect OpenCTI.
 
 ## Bundle content
@@ -220,6 +220,6 @@ the `coverage` of the covered objects it matches. A covered object matched only 
 
 ## What's next?
 
-- [Security Coverage enrichment (XTM Suite)](../../usage/evaluate/xtm-suite-connector.md) -- Connect OpenCTI and send the results automatically
+- [Security Coverage enrichment (XTM Suite)](../../integrations/xtm-suite/xtm-suite-connector.md) -- Connect OpenCTI and send the results automatically
 - [Scenario generation from OpenCTI Security Coverage](../../usage/build/scenario/security-coverage.md) -- How OpenAEV builds the Scenario from the Security Coverage
-- [Expectations](../../usage/evaluate/expectations/expectations.md) -- How Expectations are scored
+- [Expectations](../../usage/run-and-evaluate/expectations/expectations.md) -- How Expectations are scored
