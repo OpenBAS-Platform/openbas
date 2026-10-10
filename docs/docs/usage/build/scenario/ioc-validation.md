@@ -113,7 +113,7 @@ indicator-platform pairs.
 column, with the reason. A character outside the accepted set is written with its code point, so a character that
 looks like another is visible: a typographic apostrophe appears as `U+2019`. The status of the request counts the
 refused indicators. Each refusal is written to the platform log and, when audit logs are enabled
-(`openaev.audit-logs.transports`, see [Configuration](../../../deployment/configuration.md)), recorded as an
+(`openaev.audit-logs.transports`, see [Configuration](../../../reference/deployment/configuration.md)), recorded as an
 `IOC_VALUE_REFUSED` audit event.
 
 ## Configure IOC validation
@@ -132,7 +132,7 @@ IOC validation also needs an OpenCTI connection for the tenant and the IOC valid
 OpenCTI. The IOC validation settings show a warning when either is missing, with the next step:
 
 - **No OpenCTI connection**: add the OpenCTI connection of the tenant to the platform configuration (see
-  [Configure OpenAEV to connect to OpenCTI](../../evaluate/xtm-suite-connector.md#step-1-configure-openaev-to-connect-to-opencti)),
+  [Configure OpenAEV to connect to OpenCTI](../../../integrations/xtm-suite/xtm-suite-connector.md#step-1-configure-openaev-to-connect-to-opencti)),
   then restart OpenAEV. Users who cannot change the platform configuration are asked to contact their administrator.
 - **Connector not registered**: OpenAEV registers the IOC validation connector in OpenCTI with the OpenCTI account of
   the connection. OpenCTI lists it as *OpenAEV IOC Validation*, followed by the tenant name when several tenants
