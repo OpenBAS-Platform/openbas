@@ -1111,6 +1111,12 @@ public class IocValidationService {
         .filter(Objects::nonNull)
         .collect(Collectors.toCollection(() -> EnumSet.noneOf(IocValidationTestKind.class)))
         .forEach(kind -> payloadsByKind.put(kind, payloadsFor(ctx, kind, executors)));
+    // Synchronising the payload contracts clears the persistence context, and flushing an inject
+    // hashes its endpoints, which reads their lazy injects: target the endpoints of the session
+    List<Endpoint> sessionEndpoints =
+        endpoints.stream()
+            .map(endpoint -> entityManager.getReference(Endpoint.class, endpoint.getId()))
+            .toList();
     for (IocValidationIoc ioc : validation.getIocs()) {
       ioc.setInjectIds(new ArrayList<>());
       ioc.setInjectTargets(new LinkedHashMap<>());
@@ -1128,7 +1134,9 @@ public class IocValidationService {
       }
       List<PayloadTargets> payloadTargets =
           payloadsByKind.get(plan.testKind()).stream()
-              .map(payload -> new PayloadTargets(payload, endpointsRunning(payload, endpoints)))
+              .map(
+                  payload ->
+                      new PayloadTargets(payload, endpointsRunning(payload, sessionEndpoints)))
               .filter(targets -> !targets.endpoints().isEmpty())
               .toList();
       if (payloadTargets.isEmpty()) {
