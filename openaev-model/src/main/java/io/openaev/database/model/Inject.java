@@ -469,9 +469,15 @@ public class Inject implements GrantableBase, Injection, TenantBase {
   @JsonIgnore
   public void clean() {
     this.setStatus(null); // note this does not delete the status record in the db
+    this.setAuthorisation(null);
     this.communications.clear();
     this.expectations.clear();
-    this.findings.clear();
+    this.setTriggerNowDate(null);
+    if (this.findings == null) {
+      this.findings = new ArrayList<>();
+    } else {
+      this.findings.clear();
+    }
     this.setCollectExecutionStatus(COLLECTING);
   }
 
@@ -679,5 +685,17 @@ public class Inject implements GrantableBase, Injection, TenantBase {
     return this.getScenario() != null
         ? ResourceType.SCENARIO
         : this.getExercise() != null ? ResourceType.SIMULATION : ResourceType.ATOMIC_TESTING;
+  }
+
+  @JsonIgnore
+  @Override
+  public String getPermissionResourceId() {
+    return getParentResourceId();
+  }
+
+  @JsonIgnore
+  @Override
+  public ResourceType getPermissionResourceType() {
+    return getParentResourceType();
   }
 }
