@@ -91,10 +91,6 @@ class AutonomousRunServiceTest {
   @Mock private OpenAEVConfig openAEVConfig;
   @Mock private TenantWriteScopeResolver writeScopeResolver;
   @Mock private TenantScopedTransaction tenantTx;
-  // Lenient by default (void asserts are no-ops): these unit tests exercise lifecycle logic, not
-  // authorization. The deny paths are covered by AutonomousRunAccessControlTest.
-  @Mock private AutonomousRunAccessControl accessControl;
-
   @InjectMocks private AutonomousRunService service;
 
   private static final TxCtx TX = TxCtx.forTenant("tenant-1");
@@ -790,7 +786,8 @@ class AutonomousRunServiceTest {
     // simulation torn down before the fresh one is provisioned from the SAME scenario.
     verify(xtmOneClient).cancelAutonomousRun(eq("run-1"), anyString(), eq(true));
     verify(exerciseService).deleteById("sim-old");
-    verify(workflowService).startWorkflowByScenarioIdAndSimulation(eq("scenario-1"), any());
+    verify(workflowService)
+        .startWorkflowByScenarioIdAndSimulation(eq("scenario-1"), any(), eq(true));
     // Keep-alive is applied to the freshly provisioned SIMULATION, never the reusable scenario
     // template, so the scenario keeps its own "Simulation time out" config.
     verify(workflowService).markSimulationWorkflowKeepAlive("sim-new");
@@ -819,7 +816,8 @@ class AutonomousRunServiceTest {
 
     verify(xtmOneClient).cancelAutonomousRun(eq("run-1"), anyString(), eq(true));
     verify(exerciseService).deleteById("sim-old");
-    verify(workflowService).startWorkflowByScenarioIdAndSimulation(eq("scenario-1"), any());
+    verify(workflowService)
+        .startWorkflowByScenarioIdAndSimulation(eq("scenario-1"), any(), eq(true));
     assertThat(restarted.getStatus()).isEqualTo(AutonomousRunStatus.CREATED);
     assertThat(restarted.getSimulationId()).isEqualTo("sim-new");
   }
@@ -834,7 +832,8 @@ class AutonomousRunServiceTest {
     AutonomousRun restarted = service.restart("run-1");
 
     verify(exerciseService).deleteById("sim-old");
-    verify(workflowService).startWorkflowByScenarioIdAndSimulation(eq("scenario-1"), any());
+    verify(workflowService)
+        .startWorkflowByScenarioIdAndSimulation(eq("scenario-1"), any(), eq(true));
     assertThat(restarted.getStatus()).isEqualTo(AutonomousRunStatus.CREATED);
     assertThat(restarted.getSimulationId()).isEqualTo("sim-new");
   }
@@ -850,7 +849,8 @@ class AutonomousRunServiceTest {
     AutonomousRun restarted = service.restart("run-1");
 
     verify(workflowService).provisionSimulationTemplateWorkflow(eq("scenario-1"), any());
-    verify(workflowService, never()).startWorkflowByScenarioIdAndSimulation(anyString(), any());
+    verify(workflowService, never())
+        .startWorkflowByScenarioIdAndSimulation(anyString(), any(), anyBoolean());
     assertThat(restarted.getStatus()).isEqualTo(AutonomousRunStatus.CREATED);
   }
 
@@ -881,6 +881,10 @@ class AutonomousRunServiceTest {
     assertThat(result).isSameAs(duplicate);
     // The copy's chaining workflow is cloned with keep-alive forced off.
     verify(workflowService).copyScenarioChainingWorkflowAsManual("scenario-1", duplicate);
+    // ADR-007: exactly ONE workflow copy. getDuplicateScenario stays metadata-only, so this caller
+    // - which copies the workflow itself - can never end up with two TEMPLATE workflows on the
+    // duplicate.
+    verify(workflowService, never()).duplicateScenarioWorkflow(anyString(), any(Scenario.class));
     // The original run, its scenario, simulation and timeline are all untouched.
     verifyNoInteractions(xtmOneClient, exerciseService, directiveRepository, eventService);
     verify(runRepository, never()).delete(any());
