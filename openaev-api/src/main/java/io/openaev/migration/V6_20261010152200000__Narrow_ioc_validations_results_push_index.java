@@ -7,13 +7,13 @@ import org.springframework.stereotype.Component;
 
 /**
  * Rebuilds the results-push outbox index with the predicate of the outbox poll on databases where
- * an earlier version of {@link V6_20261005152100000__Add_ioc_validations_outbox_indexes} created it
+ * an earlier version of {@link V6_20261010152100000__Add_ioc_validations_outbox_indexes} created it
  * without the status condition: Flyway never runs an applied version again, and the wide index kept
  * every rejected validation forever. Idempotent; the table holds the validation history only, so
  * the rebuild is cheap.
  */
 @Component
-public class V6_20261005152200000__Narrow_ioc_validations_results_push_index
+public class V6_20261010152200000__Narrow_ioc_validations_results_push_index
     extends BaseJavaMigration {
 
   @Override
