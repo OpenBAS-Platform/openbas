@@ -42,7 +42,7 @@
         <opensaml.version>5.2.3</opensaml.version>
         <logback.version>1.6.5</logback.version>
         <log4j2.version>2.26.1</log4j2.version>
-        <httpclient5.version>5.6.4</httpclient5.version>
+        <httpclient5.version>5.6.5</httpclient5.version>
         <parsson.version>1.1.9</parsson.version>
         <kotlin.version>2.4.20</kotlin.version>
         <hikaricp.version>7.1.0</hikaricp.version>
