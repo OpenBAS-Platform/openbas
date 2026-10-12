@@ -185,7 +185,7 @@ truth — what the user may not see, and add it to the ES query as plain id filt
 ```mermaid
 sequenceDiagram
     participant API as DashboardApi
-    participant SEC as DashboardSecurityResolver (new)<br/>SQL + PermissionService, cached per user
+    participant SEC as EngineReadScopeResolver<br/>SQL + PermissionService, per request
     participant ENG as EngineService.buildQuery
     participant ES as ES / OpenSearch
 
@@ -201,7 +201,7 @@ How each dimension is resolved, reusing what exists:
 | Dimension | Resolved in SQL / Java (source of truth) | Applied in ES |
 |---|---|---|
 | **Capability** | for each index, its `ResourceType` (asset → `ASSET`, finding → `FINDING`, security-platform → `SECURITY_PLATFORM`…), checked with `PermissionService` / `Capability` READ | `terms(base_entity, readable types)` |
-| **Grant** | same rule as the scenario and simulation listings and `SnapshotObservationService.grantFilter`: admin, BYPASS or `ACCESS_ASSESSMENT` → no filter; otherwise the user's granted scenario / simulation ids (`RawUserAuth`, already loaded) | on scenario/simulation-bound types only: their `base_scenario_side` / `base_simulation_side` (or `base_id` for scenario and simulation documents) within the granted ids. **Not** on assets, tags, teams (the 2025 mistake) |
+| **Grant** | generic, per indexed type (§3.4): for a type managed by grants, `PermissionService` first checks the capability that makes grants irrelevant (e.g. `ACCESS_ASSESSMENT` for scenarios and simulations); without it, the user's grants of the matching `GRANT_RESOURCE_TYPE` (from `RawUserAuth`, already loaded) | on the fields the registry declares as grant keys for that type (today `base_scenario_side`, `base_simulation_side`, `base_id`, `base_inject_side`), within the granted ids; a document with none of these fields set is not grant-filtered. Types not managed by grants (assets, tags, teams…) are only filtered by capability: OpenAEV has no grant on an asset today. Supporting one later is a registry entry, not new code |
 | **Marking** | `SELECT asset_id FROM assets WHERE marking_ids <> '{}' AND NOT is_marking_set_allowed(marking_ids)` under the user's clearance: **the same SQL function** as the REST API, so no copy of the rule | `must_not terms` on the asset reference of each type (asset: `base_id`; expectation, observations: `base_asset_side`; finding: `base_endpoint_side`; vulnerable-endpoint: `vulnerable_endpoint_id`); aggregations on `base_assets_side` & co get `exclude: <hidden ids>`; the same ids are stripped from `*_side` arrays of returned documents |
 
 **Against the three constraints**
@@ -235,7 +235,189 @@ How each dimension is resolved, reusing what exists:
 **Effort: M.** No index change, no reindex, no handler change. A resolver service with its cache, the
 registry, the filters in three engines, and tests mirroring the tenant ones (plus one per dimension).
 
-## 3.3 The grant dimension in detail: generic, not scenario-only
+## 3.3 Classes: `EngineReadScopeResolver`, `EngineReadScope` vs `RawUserAuth`
+
+### What changes in the engine's contract
+
+Before, every engine read received the **user** (`RawUserAuth`): raw facts (admin flag, grants) that
+the engine would have had to interpret itself. It received them but used nothing (the grant filter
+was commented out). Now it receives the **decision** (`EngineReadScope`): what this reader may read,
+already resolved from the source of truth. The engine only turns it into id filters.
+
+| | `RawUserAuth` (before) | `EngineReadScope` (now) |
+|---|---|---|
+| What it is | facts about the user: `user_admin`, `user_grants` | what the reader may read, per indexed type |
+| Who interprets it | the engine (`buildQueryRestrictions`, off since 2025) | the resolver, with `PermissionService` and the SQL clearance |
+| Capabilities | not carried | `readableEntities` |
+| Grants | raw, untyped list of resource ids | `grantFilters`: per type, the fields to match and the granted ids |
+| Markings | not carried | `hiddenAssetIds` |
+| Still used for | the snapshot export of es9 / OpenSearch until they are ported (`legacyGrantUser`) | every read of es8 |
+
+```mermaid
+classDiagram
+    direction LR
+
+    class DashboardService {
+        +count / series / entities(TxCtx, widgetId, parameters)
+        +adHocCount / adHocEntities(TxCtx, configuration, parameters)
+        +search(TxCtx, search)
+    }
+    class EngineReadScopeResolver {
+        +resolve(TxCtx ctx) EngineReadScope
+        ~hiddenAssetIds(TxCtx ctx) Set~String~
+    }
+    class EngineSecurityRegistry {
+        +entities()$ Map~String, EntitySecurity~
+        +ASSET_REFERENCE_FIELDS$ Set~String~
+    }
+    class EntitySecurity {
+        <<record>>
+        requiredAccess List~ResourceAccess~
+        grantBypass ResourceAccess
+        grantKeys List~GrantKeyField~
+        assetFields List~String~
+    }
+    class EngineReadScope {
+        <<record>>
+        unrestricted boolean
+        readableEntities Set~String~
+        grantFilters Map~String, List~GrantKey~~
+        hiddenAssetIds Set~String~
+        legacyGrantUser RawUserAuth
+        +unrestricted(RawUserAuth)$ EngineReadScope
+        +stripHiddenAssets(T document) T
+    }
+    class GrantKey {
+        <<record>>
+        field String
+        ids Set~String~
+    }
+    class RawUserAuth {
+        <<interface>>
+        +getUser_id() String
+        +getUser_admin() boolean
+        +getUser_grants() Set~RawGrant~
+    }
+    class RawGrant {
+        <<interface>>
+        +getGrant_resource() String
+        +getGrant_resource_type() GRANT_RESOURCE_TYPE
+    }
+    class PermissionService {
+        +hasCapabilityPermission(User, ResourceType, Action) boolean
+    }
+    class MarkingScopeSupplier {
+        <<interface>>
+        +clearanceFor(TxCtx) MarkingCtx
+    }
+    class EngineService {
+        <<interface>>
+        +entities(TxCtx, EngineReadScope, ListRuntime) EsEntities
+        +multiTermHistogram(TxCtx, EngineReadScope, …) List~EsSeries~
+        +searchCursorPaged(EngineReadScope, Class, CursorPageQuery) List~T~
+    }
+    class ElasticService_es8 {
+        -buildQuery(TxCtx, EngineReadScope, …) Query
+        -tenantFilter(TxCtx) Query
+        -readerFilter(EngineReadScope) Query
+        -grantedQuery(List~GrantKey~) Query
+    }
+
+    DashboardService --> EngineReadScopeResolver : resolve(ctx)
+    DashboardService --> EngineService : read with scope
+    EngineReadScopeResolver ..> EngineSecurityRegistry : iterates the indexed types
+    EngineReadScopeResolver --> PermissionService : capability per type
+    EngineReadScopeResolver ..> RawUserAuth : reads the grants
+    EngineReadScopeResolver --> MarkingScopeSupplier : clearance (same as SQL)
+    EngineReadScopeResolver ..> EngineReadScope : builds
+    EngineSecurityRegistry *-- EntitySecurity
+    EngineReadScope *-- GrantKey
+    EngineReadScope --> RawUserAuth : legacyGrantUser (es9 / OpenSearch only)
+    RawUserAuth o-- RawGrant
+    ElasticService_es8 ..|> EngineService
+    ElasticService_es8 ..> EngineReadScope : applies
+    ElasticService_es8 ..> EngineSecurityRegistry : asset fields per type
+```
+
+### The scope object, on an example
+
+A user with `ACCESS_DASHBOARDS`, `ACCESS_ASSETS` and `ACCESS_FINDINGS`, **without** `ACCESS_ASSESSMENT`,
+whose group is granted on scenario `S1`, cleared `TLP:GREEN`. Asset `A-RED` is marked `TLP:RED`.
+
+```text
+EngineReadScope(
+  unrestricted     = false,
+  readableEntities = [asset, asset-group, tag, team, domain, attack-pattern,
+                      scenario, simulation, inject, expectation-inject, finding, vulnerable-endpoint],
+                     # no security-platform (no ACCESS_SECURITY_PLATFORMS), no snapshot observations
+  grantFilters     = {
+    scenario:           [GrantKey(base_id,              {S1})],
+    simulation:         [GrantKey(base_id,              {}),   GrantKey(base_scenario_side, {S1})],
+    inject:             [GrantKey(base_scenario_side,   {S1}), GrantKey(base_simulation_side, {}),
+                         GrantKey(base_id,              {})],   # atomic testing
+    expectation-inject: [... same keys, base_inject_side for atomic testing ...],
+    finding:            [... same keys ...],
+    vulnerable-endpoint:[GrantKey(base_scenario_side, {S1}), GrantKey(base_simulation_side, {})]
+  },
+  hiddenAssetIds   = {A-RED},
+  legacyGrantUser  = <the user's RawUserAuth>   # used by es9 / OpenSearch only
+)
+```
+
+An admin gets `EngineReadScope.unrestricted(…)`: no per-user filter at all. A user holding every
+capability, with no hidden asset, gets the same.
+
+### How it reaches the query
+
+```mermaid
+sequenceDiagram
+    actor B as Browser (TLP:GREEN user)
+    participant API as DashboardApi
+    participant DS as DashboardService
+    participant R as EngineReadScopeResolver
+    participant PS as PermissionService
+    participant MS as HttpMarkingScopeSupplier
+    participant DB as PostgreSQL
+    participant ENG as ElasticService (es8)
+    participant ES as Elasticsearch
+
+    B->>API: POST /dashboards/adhoc/entities (TxCtx from the URL tenant)
+    API->>DS: adHocEntities(ctx, configuration, …)
+    DS->>R: resolve(ctx)
+    R->>DB: getUserWithAuth(userId) → RawUserAuth (grants, typed)
+    loop each type of EngineSecurityRegistry
+        R->>PS: hasCapabilityPermission(user, type's ResourceType, READ)
+        Note right of R: readable? grant-managed without its bypass<br/>capability → GrantKeys from the user's grants
+    end
+    R->>MS: clearanceFor(ctx) → marking ids held (same as the SQL rewrite)
+    R->>DB: SELECT asset_id FROM assets WHERE marking not covered → hiddenAssetIds
+    R-->>DS: EngineReadScope
+    DS->>ENG: entities(ctx, scope, runtime)
+    ENG->>ENG: buildQuery = data query<br/>+ filter tenantFilter(ctx)<br/>+ filter readerFilter(scope)
+    ENG->>ES: search (aggregations on asset fields: exclude hiddenAssetIds)
+    ES-->>ENG: hits
+    ENG->>ENG: stripHiddenAssets on each document
+    ENG-->>B: only what this reader may see
+```
+
+`readerFilter(scope)` builds one clause per readable type, OR-ed together. A document of a type the
+reader cannot read matches no clause, so it is excluded:
+
+```text
+bool.filter:
+  tenantFilter(ctx)                                    # unchanged since #8162
+  bool.should (minimum_should_match = 1):              # readerFilter(scope)
+    - base_entity = asset    AND NOT base_id            ∈ {A-RED}
+    - base_entity = finding  AND (base_scenario_side ∈ {S1} OR … OR no grant-key field)
+                             AND NOT base_endpoint_side ∈ {A-RED}
+    - base_entity = scenario AND (base_id ∈ {S1} OR no grant-key field)
+    - base_entity = tag                                  # open type: no condition
+    - …                                                  # one clause per readable type
+bool.must:
+  the widget's own filters (unchanged)
+```
+
+## 3.4 The grant dimension in detail: generic, not scenario-only
 
 The only grant filter that runs today, the snapshot export (`SnapshotObservationService.grantFilter`,
 [`78d284bf1`](https://github.com/OpenAEV-Platform/openaev/commit/78d284bf1bce03e4010d50ddb827b032773f5bb2)),
@@ -275,3 +457,32 @@ Reads run on the `openaev_*` wildcard, so the per-index conditions combine as
 `(base_entity = X AND filter_X) OR (base_entity = Y AND filter_Y) …`, next to `tenantFilter` and the
 marking filter. A new grantable resource is then one registry entry, and `base_restrictions` can be
 retired instead of fixed handler by handler.
+
+## 3.5 The sync lag: what can be stale
+
+PostgreSQL is the source of truth; the index follows it with a lag (1.1: about 15 s, minutes under
+load). The ids match by construction: each document's `base_id` (and its Elasticsearch `_id`) is the
+row's id, and the `*_side` fields hold PostgreSQL ids. Two types have a composite `base_id`
+(`vulnerable-endpoint`: `assetId_simulationId`; snapshot observations: an md5 of the grain), which is
+why the registry filters them on another field (`vulnerable_endpoint_id`, `base_asset_side`).
+
+The approach splits what can lag:
+
+- **Security state is read from PostgreSQL on every request** (capabilities, grants, clearance, the
+  hidden asset ids): a change applies on the next read, for documents already indexed too.
+- **Relationships come from the index** (which asset a finding is about, which scenario an inject
+  belongs to): they can be one sync behind.
+
+| Case | Effect during the lag | Severity |
+|---|---|---|
+| An asset becomes `TLP:RED` | Hidden immediately: its id is in the hidden list on the next read, history of past simulations included | none |
+| A new `TLP:RED` asset, not indexed yet | Nothing to show yet; once indexed, it is already in the hidden list | none |
+| A grant or a role is removed | Immediate | none |
+| An inject's targets change (RED added) | The index still shows the old targets: RED's id appears in the inject only after the next sync, and is then stripped | none (missing, never leaked) |
+| A finding gets linked to a RED asset after its creation | The finding stays visible until its document is re-indexed with RED among its assets | **small window** |
+| An entity is deleted in PostgreSQL | The delete is pushed after commit (replayed within 60 s if it fails); a deleted RED asset is no longer in the hidden list, so documents still referencing it are visible until the delete reaches them | **small window** |
+
+The residual risk is limited to **relationships edited after creation**, for at most one sync. Most
+links never change once written (an expectation's asset, a document's scenario or simulation).
+Storing the security state itself in the index would instead make **every** marking, grant or role
+change wait for a re-index.

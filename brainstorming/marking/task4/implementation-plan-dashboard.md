@@ -6,7 +6,8 @@ and Part 3 (security decided in SQL, the index filtered by ids at query time).
 **Depends on**: Task 2 (`MarkingClearanceCacheManager`), Task 3 / Task 4 (asset markings,
 `is_marking_set_allowed`), the tenant filter of the engine (`tenantFilter(TxCtx)`, #8162).
 
-**Status**: not started.
+**Status** (2026-10-09): steps 1–6 done on es8, step 7 partly done, steps 8–9 not started. es9 and
+OpenSearch accept the scope but ignore it until step 9 (today's behaviour, unfiltered).
 
 ---
 
@@ -74,7 +75,7 @@ Step 6 (plumbing) and step 7 (tests) cover every row of this table.
 
 ## 3) Delivery steps
 
-#### Step 1 — Failing tests first
+#### Step 1 — Failing tests first ✅ done
 
 Engine integration tests, in the style of `EngineServiceIntegrationTest` "Tenant scope (#6462)":
 index a small dataset (two scenarios S1/S2 with a simulation each, an unmarked asset, an asset marked
@@ -88,7 +89,7 @@ index a small dataset (two scenarios S1/S2 with a simulation each, an unmarked a
 
 **DoD**: the tests compile and fail for the expected reason (today every user sees everything).
 
-#### Step 2 — Registry: index → resource type, asset fields, grant keys
+#### Step 2 — Registry: index → resource type, asset fields, grant keys ✅ done
 
 A static registry (`EngineSecurityRegistry`, next to `MarkingDerivedTables` in spirit) describing, for
 each indexed type:
@@ -111,7 +112,7 @@ Exact field names to confirm per `Es*` class while writing it.
 **DoD**: a unit test fails if a `Handler` bean's index is missing from the registry, or if a field
 named in it does not exist on the `Es*` class.
 
-#### Step 3 — The scope object and its resolver
+#### Step 3 — The scope object and its resolver ✅ done
 
 - `EngineReadScope` (`openaev-model`): `unrestricted` flag (admin / BYPASS), readable `base_entity`
   values, grant filter per index (field → allowed ids), hidden asset ids.
@@ -128,7 +129,7 @@ named in it does not exist on the `Es*` class.
 **DoD**: unit tests per dimension (admin, BYPASS, `ACCESS_ASSESSMENT`, grant-only, no capability,
 `TLP:GREEN` vs `TLP:RED`); an asset re-marked RED appears in the hidden list on the next call.
 
-#### Step 4 — Filters in `buildQuery` (es8)
+#### Step 4 — Filters in `buildQuery` (es8) ✅ done
 
 Next to `tenantFilter(ctx)`:
 
@@ -141,7 +142,7 @@ call and its "issue/3768" TODO.
 
 **DoD**: step 1's document-level tests pass (M1, M2, G1, G2, C1, M7, G4).
 
-#### Step 5 — Buckets, labels and returned documents
+#### Step 5 — Buckets, labels and returned documents ✅ done
 
 What `buildQuery` does not cover:
 
@@ -154,7 +155,7 @@ What `buildQuery` does not cover:
 **DoD**: step 1's M3 test passes: a scenario targeting `ASSET_GREEN` and `ASSET_RED` shows only
 `ASSET_GREEN` in its "by asset" breakdown and in its returned `base_assets_side`.
 
-#### Step 6 — Plumbing the scope to every caller
+#### Step 6 — Plumbing the scope to every caller ✅ done
 
 `EngineService` methods take the scope (or replace `RawUserAuth` by it). Callers to update:
 `DashboardService` (stored widgets, ad-hoc), `CustomDashboardService` / `CustomDashboardTenantService`
@@ -165,7 +166,7 @@ endpoint table in §1.
 **DoD**: no `EngineService` read is callable without a scope (compile-time); existing dashboard,
 coverage and snapshot tests still pass.
 
-#### Step 7 — Dashboard API tests and the two-browser check
+#### Step 7 — Dashboard API tests and the two-browser check 🟡 partly done
 
 - API-level tests, same users as step 1, on at least one endpoint per row of the §1 table
   (stored widget, ad-hoc, home, scenario and simulation dashboards, attack paths, search, coverage,
@@ -176,14 +177,14 @@ coverage and snapshot tests still pass.
 
 **DoD**: tests green; manual check recorded here with its date.
 
-#### Step 8 — Performance check
+#### Step 8 — Performance check 🔴 not started
 
 On a restored main-environment dump: dashboard response times with and without the scope (home
 dashboard, a large simulation dashboard, an expectation list), and the size of the hidden-asset list.
 
 **DoD**: numbers recorded here; deny-list threshold decided (above it, fail closed for asset types).
 
-#### Step 9 — Port to es9 and OpenSearch
+#### Step 9 — Port to es9 and OpenSearch 🔴 not started
 
 Same filters, buckets and stripping in `es9/ElasticService` and `os3/OpenSearchService`; run step 1's
 tests against each engine.
@@ -199,3 +200,28 @@ tests against each engine.
 - **C2**: the capability required by each index (step 2's table is the proposal).
 - **C4**: which capability opens the home dashboard and the `/adhoc` screens (separate GitHub issue).
 - **X1 / X2**: field minimization and tenant id in responses, now or later.
+
+---
+
+## 5) What was built (2026-10-09)
+
+- `openaev-model`: `engine/security/EngineReadScope` (the scope, plus `stripHiddenAssets`),
+  `engine/security/EngineSecurityRegistry` (15 indexed types: capability, grant keys, asset fields).
+  `EngineService` read methods take an `EngineReadScope` instead of `RawUserAuth`. es8 applies it in
+  `buildQuery` (`readerFilter`), excludes hidden assets from "by asset" aggregations, strips them
+  from returned documents, and applies the same filter to the snapshot export; a read without a scope
+  is refused. The dead `buildQueryRestrictions` is gone from es8.
+- `openaev-api`: `service/engine/EngineReadScopeResolver` (capabilities through `PermissionService`,
+  grants from `RawUserAuth`, hidden assets from the same clearance as the SQL rewrite, per request,
+  no cache). Callers: `DashboardService` (stored widgets, ad-hoc, search, attack paths),
+  `AttackPatternService` (coverage), `SnapshotObservationService` (its `grantFilter` removed).
+- Rule decided while building: a document linked to **no** grant-managed resource (none of its
+  grant-key fields set) is not grant-filtered, as before (`must_not exists base_restrictions`).
+- Tests: `EngineSecurityRegistryTest` (2), `EngineReadScopeResolverTest` (8),
+  `EngineReadScopeIntegrationTest` (9, real Elasticsearch). Existing dashboard / engine / snapshot /
+  coverage tests: 281 run, all green after one fix — `DashboardSearchApiTest` searched endpoints
+  with a role holding only `ACCESS_DASHBOARDS`; its role now also has `ACCESS_ASSETS` (the leak C1
+  closes).
+- Not done: the two-browser manual check (step 7), performance on a dump (step 8), es9 / OpenSearch
+  (step 9), the full test suite.
+
