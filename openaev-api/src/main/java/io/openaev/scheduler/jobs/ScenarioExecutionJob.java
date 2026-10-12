@@ -110,9 +110,6 @@ public class ScenarioExecutionJob implements Job {
 
   private void createScheduledExercise(Scenario scenario, Instant now) {
     Instant start = scenarioRecurrenceService.getNextExecutionTime(scenario, now).orElse(now);
-    // No live user in this cron context: the recurrence owner's clearance gates dispatch
-    // instead. May be null if the scenario's recurrence was never (re)configured through
-    // ScenarioApi.updateScenarioRecurrence - resolves to zero clearance at dispatch time.
     Exercise exercise =
         this.scenarioToExerciseService.toExercise(
             scenario, start, false, scenario.getScheduledBy());
