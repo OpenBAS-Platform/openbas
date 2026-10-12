@@ -44,6 +44,8 @@ public class XtmHubClient {
   private static final String XTMHUB_PLATFORM_TOKEN_HEADER = "XTM-Hub-Platform-Token";
   private static final String XTMHUB_PLATFORM_ID_HEADER = "XTM-Hub-Platform-Id";
   private static final String PLATFORM_CONTRACT_FIELD = "platformContract";
+  private static final String PLATFORM_CONTRACT_UNKNOWN_FIELD_ERROR =
+      "Field \"" + PLATFORM_CONTRACT_FIELD + "\" is not defined by type";
   private final AtomicBoolean isPlatformContractFallbackLogged = new AtomicBoolean(false);
 
   private record HubResponse(int code, String body) {}
@@ -143,9 +145,9 @@ public class XtmHubClient {
                     : EntityUtils.toString(response.getEntity(), "UTF-8")));
   }
 
-  // A hub older than the edition refresh rejects the unknown input field. GraphQL quotes the field
-  // name it rejects, while the input value it echoes back holds an unquoted platformContract key on
-  // any other input error.
+  // A hub older than the edition refresh rejects the field as unknown, in graphql-js's wording.
+  // Any other error naming the field, an invalid value for instance, comes from a hub that knows
+  // it, so the refresh is not sent again without it.
   private static boolean isPlatformContractRejected(HubResponse response) {
     try {
       JsonElement errors = JsonParser.parseString(response.body()).getAsJsonObject().get("errors");
@@ -156,7 +158,7 @@ public class XtmHubClient {
         JsonElement message = error.isJsonObject() ? error.getAsJsonObject().get("message") : null;
         if (message != null
             && message.isJsonPrimitive()
-            && message.getAsString().contains("\"" + PLATFORM_CONTRACT_FIELD + "\"")) {
+            && message.getAsString().contains(PLATFORM_CONTRACT_UNKNOWN_FIELD_ERROR)) {
           return true;
         }
       }

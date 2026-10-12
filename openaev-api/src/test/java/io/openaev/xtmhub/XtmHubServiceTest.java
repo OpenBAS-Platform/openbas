@@ -1185,6 +1185,35 @@ class XtmHubServiceTest {
       assertThat(fallbackLogCount()).isZero();
     }
 
+    @ParameterizedTest(name = "{0}")
+    @ValueSource(
+        strings = {
+          "Variable \"$input\" got invalid value \"EE\" at \"input.platformContract\"; Value \"EE\" does not exist in \"PlatformContract\" enum.",
+          "Invalid \"platformContract\": the contract of a trial platform cannot change."
+        })
+    @DisplayName(
+        "Should not refresh again when XTM Hub knows the edition field but rejects its value")
+    void whenHubRejectsThePlatformContractValue_ShouldNotRetry(String errorMessage) {
+      // Given
+      givenDefaultTenantRegistration(buildLicense(true, true));
+      mockServer
+          .when(request().withMethod("POST").withPath(GRAPHQL_PATH))
+          .respond(
+              response()
+                  .withStatusCode(400)
+                  .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                  .withBody(hubErrors(errorMessage)));
+
+      // When
+      TenantXtmHubRegistration result = xtmHubService.refreshConnectivity(defaultTenantScope());
+
+      // Then
+      assertThat(recordedRefreshInputs()).hasSize(1);
+      assertThat(result.getRegistrationStatus())
+          .isEqualTo(XtmHubRegistrationStatus.LOST_CONNECTIVITY);
+      assertThat(fallbackLogCount()).isZero();
+    }
+
     @ParameterizedTest(name = "body: {0}")
     @ValueSource(
         strings = {
