@@ -1,21 +1,16 @@
 package io.openaev.architecture;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.openaev.config.ProductionActiveTables;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -47,8 +42,6 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 final class JsonTypeDirtyOnLoadCatalog {
 
   /** Where the production activation list lives, relative to the module root. */
-  private static final String APPLICATION_PROPERTIES = "src/main/resources/application.properties";
-
   private JsonTypeDirtyOnLoadCatalog() {}
 
   /** A {@link JsonType}-mapped field, identified by the class that declares it. */
@@ -167,23 +160,9 @@ final class JsonTypeDirtyOnLoadCatalog {
     return entities;
   }
 
-  /**
-   * The tenant tables activated in production, read from {@code application.properties} rather than
-   * from the environment: the test classpath declares no activation list, so a running context
-   * would report none active and every assertion built on it would be vacuous.
-   */
+  /** The tenant tables activated in production. One reader for the whole suite. */
   static Set<String> activeTables() {
-    Properties properties = new Properties();
-    try (InputStream in = new FileInputStream(APPLICATION_PROPERTIES)) {
-      properties.load(in);
-    } catch (IOException e) {
-      throw new UncheckedIOException("cannot read " + APPLICATION_PROPERTIES, e);
-    }
-    return Arrays.stream(properties.getProperty("openaev.tenant.active-tables", "").split(","))
-        .map(String::trim)
-        .filter(name -> !name.isEmpty())
-        .map(name -> name.toLowerCase(Locale.ROOT))
-        .collect(Collectors.toCollection(TreeSet::new));
+    return ProductionActiveTables.names();
   }
 
   /** The candidate fields stored in at least one tenant-active table. */
