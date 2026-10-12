@@ -309,9 +309,6 @@ public class AtomicTestingService {
     // normalized recurrence expression; clearing the schedule stays allowed.
     if (recurrence != null) {
       injectService.throwIfInjectNotLaunchable(inject);
-      // The actor a scheduled relaunch's launchedBy is resolved from when
-      // AtomicTestingExecutionJob fires it later with no live user present. Re-stamped
-      // on every recurrence configuration call, not just the first.
       inject.setScheduledBy(
           userRepository
               .findById(currentUser().getId())
