@@ -2146,7 +2146,7 @@
   "Injects successfully generated.": "Injects erfolgreich erzeugt.",
   "Injects that run after this one, on the condition you define.": "Injects, die nach diesem ausgeführt werden, gemäß der von Ihnen definierten Bedingung.",
   "Injects will appear here once they have been played.": "Injects erscheinen hier, sobald sie ausgeführt wurden.",
-  "Injects will be paused, do you want to continue?": "Die Injects werden pausiert. Möchten Sie fortfahren?",
+  "Injects would be paused do you confirm?": "Die Injektionen würden unterbrochen werden. Möchten Sie dies bestätigen?",
   "injectType cannot be null or empty": "injectType darf nicht null oder leer sein",
   "Input": "Eingabe",
   "Input (describe what you want)": "Eingabe (beschreiben Sie, was Sie wollen)",

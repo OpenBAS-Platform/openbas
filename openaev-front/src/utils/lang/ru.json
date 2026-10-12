@@ -2146,7 +2146,7 @@
   "Injects successfully generated.": "Инъекции успешно сгенерированы.",
   "Injects that run after this one, on the condition you define.": "Инъекции, выполняемые после этой, по заданному вами условию.",
   "Injects will appear here once they have been played.": "Инъекции появятся здесь после их выполнения.",
-  "Injects will be paused, do you want to continue?": "Инъекции будут приостановлены, хотите ли вы продолжить?",
+  "Injects would be paused do you confirm?": "Введение препарата будет приостановлено. Подтверждаете?",
   "injectType cannot be null or empty": "injectType не может быть равен null или пустым",
   "Input": "Ввод",
   "Input (describe what you want)": "Ввод (опишите, что вы хотите)",
