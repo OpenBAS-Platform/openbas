@@ -111,8 +111,8 @@ public class DomainService implements DependenciesManager {
 
   /**
    * Saves a collection of contract DTOs in the database. If an entity already exists (searched by
-   * name) in the database, it is retrieved instead of saved (no modification). If the entity is not
-   * found, it is created.
+   * name, then by {@link PresetDomain#toMatchingKey matching key}) in the database, it is retrieved
+   * instead of saved (no modification). If the entity is not found, it is created.
    *
    * @param domains set of domain DTOs to save or retrieve.
    * @return set of saved or retrieved domains
@@ -123,12 +123,14 @@ public class DomainService implements DependenciesManager {
       return new HashSet<>();
     }
 
+    Set<String> names = domains.stream().map(InjectorContractDomainDTO::getName).collect(toSet());
     Map<String, Domain> existing =
-        domainRepository
-            .findByNameInAndTenantId(
-                domains.stream().map(InjectorContractDomainDTO::getName).collect(toSet()), tenantId)
-            .stream()
+        domainRepository.findByNameInAndTenantId(names, tenantId).stream()
             .collect(toMap(Domain::getName, Function.identity()));
+    List<Domain> candidates =
+        existing.keySet().containsAll(names)
+            ? new ArrayList<>()
+            : new ArrayList<>(domainRepository.findByTenantId(tenantId));
 
     return domains.stream()
         .map(
@@ -136,15 +138,58 @@ public class DomainService implements DependenciesManager {
                 existing.computeIfAbsent(
                     d.getName(),
                     name ->
-                        domainRepository.save(
-                            buildSanityDomain(name, d.getColor(), new Tenant(tenantId)))))
+                        findByMatchingKey(name, candidates)
+                            .orElseGet(
+                                () -> {
+                                  Domain created =
+                                      domainRepository.save(
+                                          buildSanityDomain(
+                                              name, d.getColor(), new Tenant(tenantId)));
+                                  candidates.add(created);
+                                  return created;
+                                })))
         .collect(toSet());
   }
 
+  /**
+   * Returns the tenant's domain with this name, or with the same {@link PresetDomain#toMatchingKey
+   * matching key} when no name matches exactly, and creates it only when neither exists. A starter
+   * pack or an injector carrying a legacy spelling such as "Table-Top" thereby reuses the
+   * "Tabletop" preset instead of creating a duplicate.
+   *
+   * @param name the domain name
+   * @param color the color of the domain when it has to be created (random when null)
+   * @param tenant the tenant owning the domain
+   * @return the existing or newly created domain
+   */
   public Domain upsert(final String name, final String color, final Tenant tenant) {
-    Optional<Domain> existingDomain = domainRepository.findByNameAndTenantId(name, tenant.getId());
-    return existingDomain.orElseGet(
-        () -> domainRepository.save(buildSanityDomain(name, color, tenant)));
+    return domainRepository
+        .findByNameAndTenantId(name, tenant.getId())
+        .or(() -> findByMatchingKey(name, domainRepository.findByTenantId(tenant.getId())))
+        .orElseGet(() -> domainRepository.save(buildSanityDomain(name, color, tenant)));
+  }
+
+  /**
+   * Picks among candidate domains the one whose name has the same {@link PresetDomain#toMatchingKey
+   * matching key} as the given name. A preset wins over a custom domain sharing its key, then names
+   * are compared alphabetically, so the choice is deterministic.
+   *
+   * @param name the domain name to resolve
+   * @param candidates the domains of the tenant
+   * @return the matching domain, empty when none matches or the name has an empty key
+   */
+  static Optional<Domain> findByMatchingKey(
+      final String name, final Collection<Domain> candidates) {
+    String key = PresetDomain.toMatchingKey(name);
+    if (key.isEmpty()) {
+      return Optional.empty();
+    }
+    return candidates.stream()
+        .filter(candidate -> key.equals(PresetDomain.toMatchingKey(candidate.getName())))
+        .min(
+            Comparator.comparing(
+                    (Domain candidate) -> !PresetDomain.isPresetName(candidate.getName()))
+                .thenComparing(Domain::getName));
   }
 
   @Transactional

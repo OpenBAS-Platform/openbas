@@ -34,6 +34,10 @@ public interface DomainRepository
   @Transactional(readOnly = true)
   List<Domain> findByNameInAndTenantId(Collection<String> names, String tenantId);
 
+  @Nonnull
+  @Transactional(readOnly = true)
+  List<Domain> findByTenantId(String tenantId);
+
   @Query(
       value =
           "SELECT d.domain_id, d.domain_name, d.domain_color, "
