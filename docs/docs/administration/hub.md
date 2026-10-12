@@ -48,5 +48,8 @@ Your OpenAEV platform will regularly check if the connection with the XTM Hub is
 - **Continuous monitoring:**
     - Connectivity is automatically monitored to ensure it is functioning properly.
 
+- **Edition:**
+    - Each check also sends the platform's current edition (Community or Enterprise), so XTM Hub shows the right edition after you activate or remove an Enterprise Edition license, without registering the platform again.
+
 - **Notification:**
     - The OpenAEV administrators will be informed if a connectivity check fails.

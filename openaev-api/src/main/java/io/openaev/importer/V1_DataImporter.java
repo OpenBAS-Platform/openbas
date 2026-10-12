@@ -53,6 +53,7 @@ import jakarta.activation.MimetypesFileTypeMap;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
@@ -295,6 +296,7 @@ public class V1_DataImporter implements Importer {
             entityManager
                 .createNativeQuery(
                     "SELECT coalesce(current_setting('app.current_tenants', true), '')")
+                .setFlushMode(FlushModeType.COMMIT)
                 .getSingleResult();
     if (guc.isBlank()) {
       return fallback;
@@ -483,12 +485,15 @@ public class V1_DataImporter implements Importer {
   }
 
   /**
-   * Upserts a {@link Domain} from an object-shaped JSON node (find-by-name or create). Shared by
-   * {@link #importDomains} (object-format entries) and {@link
-   * #resolveInjectContractDomainsFromInjectFormat} so the upsert logic is defined once.
+   * Upserts a {@link Domain} from an object-shaped JSON node (find by name or matching key, or
+   * create, see {@link DomainService#upsert(String, String, Tenant)}). Shared by {@link
+   * #importDomains} (object-format entries) and {@link
+   * #resolveInjectContractDomainsFromInjectFormat} so the upsert logic is defined once. A legacy
+   * spelling of a preset ("Table-Top") resolves to the preset ("Tabletop").
    *
    * @param nodeDomain an object node carrying {@code domain_name} and {@code domain_color}
-   * @return the existing (matched by name) or newly created domain for the current tenant
+   * @return the existing (matched by name or matching key) or newly created domain for the current
+   *     tenant
    */
   private Domain upsertDomainFromNode(JsonNode nodeDomain) {
     return this.domainService.upsert(
@@ -1129,11 +1134,11 @@ public class V1_DataImporter implements Importer {
               if (savedExercise != null) {
                 Set<Exercise> exercises = new HashSet<>(team.getExercises());
                 exercises.add(savedExercise);
-                team.setExercises(exercises.stream().toList());
+                team.setExercises(exercises);
               } else if (savedScenario != null) {
                 Set<Scenario> scenarios = new HashSet<>(team.getScenarios());
                 scenarios.add(savedScenario);
-                team.setScenarios(scenarios.stream().toList());
+                team.setScenarios(scenarios);
               }
             });
     baseIds.putAll(baseTeams);
