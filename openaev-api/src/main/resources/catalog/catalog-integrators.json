@@ -3829,6 +3829,16 @@
                         "type": "string",
                         "default": ".alerts-security.alerts-*"
                     },
+                    "ELASTIC_QUERY_TEMPLATE": {
+                        "description": "Lucene query_string template used to correlate alerts with an expectation. Placeholders: {alerts_index} (configured index), {source_ips} (source IP values), {target_ips} (target IP values), {implant_urls} (implant callback URL paths), {implant_names} (implant process names), {start_date} (inject start date), {end_date} (inject end date), {time_window} (time window). Each list placeholder is rendered as an OR-joined set of quoted values, so write e.g. 'host.ip:({source_ips})'. The time range is always applied separately as an @timestamp filter. Leave empty to use the default query.",
+                        "type": "string",
+                        "default": "(source.ip:({source_ips}) OR host.ip:({source_ips}) OR client.ip:({source_ips})) OR (destination.ip:({target_ips}) OR server.ip:({target_ips}) OR host.ip:({target_ips})) OR (url.path:({implant_urls}) OR url.original:({implant_urls})) OR (process.name:({implant_names}) OR process.parent.name:({implant_names}) OR process.command_line:({implant_names}))"
+                    },
+                    "ELASTIC_EVENTS_INDEX": {
+                        "description": "Index pattern of raw endpoint/process events used to drill down from a detection alert to its source process and recover the OpenAEV implant marker. This enables deterministic per-inject correlation. Leave empty to disable the drilldown and fall back to host/IP + time correlation only.",
+                        "type": "string",
+                        "default": "logs-windows.sysmon_operational-*,logs-endpoint.events.process-*"
+                    },
                     "ELASTIC_KIBANA_URL": {
                         "description": "Kibana base URL used to build trace links. When unset, it is derived from the base URL.",
                         "type": "string"
@@ -3852,8 +3862,12 @@
                     },
                     "ELASTIC_VERIFY_SSL": {
                         "default": true,
-                        "description": "Whether to verify the Elasticsearch TLS certificate.",
+                        "description": "Whether to verify the Elasticsearch TLS certificate. Keep enabled in production; prefer trusting the cluster CA via ELASTIC_CA_CERT over disabling it.",
                         "type": "boolean"
+                    },
+                    "ELASTIC_CA_CERT": {
+                        "description": "Path (inside the collector container) to a CA bundle (PEM) used to verify the Elasticsearch TLS certificate, for self-signed or private CAs. When set, it takes precedence over ELASTIC_VERIFY_SSL.",
+                        "type": "string"
                     }
                 },
                 "required": [
