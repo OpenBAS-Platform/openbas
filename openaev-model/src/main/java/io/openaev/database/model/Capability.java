@@ -35,7 +35,9 @@ public enum Capability {
       pair(ResourceType.STEP, Action.READ),
       pair(ResourceType.STEP, Action.SEARCH),
       pair(ResourceType.CONDITION, Action.READ),
-      pair(ResourceType.CONDITION, Action.SEARCH)),
+      pair(ResourceType.CONDITION, Action.SEARCH),
+      pair(ResourceType.IOC_VALIDATION, Action.READ),
+      pair(ResourceType.IOC_VALIDATION, Action.SEARCH)),
   MANAGE_ASSESSMENT(
       ACCESS_ASSESSMENT,
       pair(ResourceType.SCENARIO, Action.WRITE),
@@ -72,7 +74,8 @@ public enum Capability {
       pair(ResourceType.SCENARIO, Action.LAUNCH),
       pair(ResourceType.SIMULATION, Action.LAUNCH),
       pair(ResourceType.AUTONOMOUS_RUN, Action.LAUNCH),
-      pair(ResourceType.ATOMIC_TESTING, Action.LAUNCH)),
+      pair(ResourceType.ATOMIC_TESTING, Action.LAUNCH),
+      pair(ResourceType.IOC_VALIDATION, Action.LAUNCH)),
 
   // Teams & Players
   ACCESS_TEAMS_AND_PLAYERS(
