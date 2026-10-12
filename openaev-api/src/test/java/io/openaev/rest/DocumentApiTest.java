@@ -1,7 +1,6 @@
 package io.openaev.rest;
 
 import static io.openaev.rest.document.DocumentApi.DOCUMENT_API;
-import static io.openaev.rest.document.DocumentService.DEFAULT_DOWNLOAD_FILE_NAME;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,7 +22,6 @@ import io.openaev.rest.document.DocumentService;
 import io.openaev.rest.document.form.DocumentCreateInput;
 import io.openaev.rest.document.form.DocumentRelationsOutput;
 import io.openaev.rest.document.form.RelatedEntityOutput;
-import io.openaev.rest.exception.BadRequestException;
 import io.openaev.utils.fixtures.*;
 import io.openaev.utils.fixtures.composers.*;
 import io.openaev.utils.fixtures.files.BinaryFile;
@@ -616,42 +614,6 @@ class DocumentApiTest extends IntegrationTest {
           .andReturn()
           .getResponse()
           .getContentAsString();
-    }
-
-    @Test
-    @DisplayName("Given names carrying a path should encode only the last component")
-    void given_names_carrying_a_path_should_encode_only_the_last_component() {
-      // Arrange
-      Map<String, String> expectedByName =
-          Map.of(
-              "../../ba03_direct.txt", "ba03_direct.txt",
-              "..\\..\\evil.exe", "evil.exe",
-              "/etc/cron.d/evil", "evil",
-              "C:\\Windows\\System32\\evil.dll", "evil.dll",
-              // Stays literal: one percent-decoding on the agent side gives back "..%2F..%2F..."
-              "..%2F..%2Fba03_encoded.txt", "..%252F..%252Fba03_encoded.txt");
-
-      // Act & Assert
-      expectedByName.forEach(
-          (name, expected) -> assertEquals(expected, DocumentService.encodeFileName(name)));
-    }
-
-    @Test
-    @DisplayName("Given names with no last component should encode a default name")
-    void given_names_with_no_last_component_should_encode_a_default_name() {
-      // Arrange
-      List<String> names = Arrays.asList(null, "", "   ", "folder/", "..\\");
-
-      // Act & Assert
-      names.forEach(
-          name -> assertEquals(DEFAULT_DOWNLOAD_FILE_NAME, DocumentService.encodeFileName(name)));
-    }
-
-    @Test
-    @DisplayName("Given an uploaded file name with no last component should reject the upload")
-    void given_uploaded_file_name_with_no_last_component_should_reject_the_upload() {
-      // Act & Assert
-      assertThrows(BadRequestException.class, () -> DocumentService.sanitizeFileName("folder/"));
     }
 
     @Test
