@@ -30,6 +30,8 @@ import org.springframework.stereotype.Component;
  * <ol>
  *   <li>Touch the injector contracts linked to the duplicate, so the engine re-indexes their
  *       expectations with the preset id.
+ *   <li>Row-lock the duplicate, so a link a concurrent writer adds to it is either repointed or
+ *       rejected by the foreign key, never removed by the cascade of the final delete.
  *   <li>Repoint every foreign key referencing {@code domains(domain_id)} to the preset. The
  *       referencing columns are read from {@code pg_constraint} ({@code
  *       injectors_contracts_domains} on the current schema). A row whose twin already references
@@ -62,6 +64,9 @@ public class V6_20261012120000000__Merge_preset_domain_duplicates extends BaseJa
       String duplicateId = merge.getKey();
       String presetId = merge.getValue();
       touchLinkedContracts(connection, duplicateId);
+      if (!lockDomain(connection, duplicateId)) {
+        continue;
+      }
       for (ReferencingColumn referencingColumn : referencingColumns) {
         repoint(connection, referencingColumn, duplicateId, presetId);
       }
@@ -196,6 +201,26 @@ public class V6_20261012120000000__Merge_preset_domain_duplicates extends BaseJa
             """)) {
       statement.setString(1, duplicateId);
       statement.executeUpdate();
+    }
+  }
+
+  /**
+   * Row-locks the duplicate until the migration commits. A concurrent writer (a node still running
+   * the previous version during a rolling deployment) linking a contract to it then either commits
+   * first, and its link is repointed, or waits and fails on the foreign key once the duplicate is
+   * deleted, instead of losing its link to the {@code ON DELETE CASCADE}. Must be taken after the
+   * contracts are touched: a writer updates its contract row before inserting the contract's domain
+   * links, so locking the domain first could deadlock with it.
+   *
+   * @return false when the duplicate no longer exists, so there is nothing left to merge
+   */
+  private boolean lockDomain(Connection connection, String domainId) throws SQLException {
+    try (PreparedStatement statement =
+        connection.prepareStatement("SELECT 1 FROM domains WHERE domain_id = ? FOR UPDATE")) {
+      statement.setString(1, domainId);
+      try (ResultSet resultSet = statement.executeQuery()) {
+        return resultSet.next();
+      }
     }
   }
 

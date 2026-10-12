@@ -38,6 +38,16 @@ public interface DomainRepository
   @Transactional(readOnly = true)
   List<Domain> findByTenantId(String tenantId);
 
+  /**
+   * Takes a PostgreSQL transaction-scoped advisory lock keyed on {@code key} and returns once it is
+   * held. {@code DomainService} calls this before creating a domain, so two transactions creating
+   * spellings of the same name in a tenant serialise and the second one finds the first one's
+   * domain. The lock auto-releases at commit or rollback and holds across API nodes. Must run
+   * inside a transaction.
+   */
+  @Query(value = "SELECT 1 FROM (SELECT pg_advisory_xact_lock(:key)) AS locked", nativeQuery = true)
+  Integer lockDomainCreation(@Param("key") long key);
+
   @Query(
       value =
           "SELECT d.domain_id, d.domain_name, d.domain_color, "

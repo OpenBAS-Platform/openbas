@@ -3,7 +3,9 @@ package io.openaev.rest.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -22,6 +24,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -74,6 +77,7 @@ class DomainServiceUpsertTest {
 
       // Assert
       assertThat(resolved).isSameAs(tabletop);
+      verify(domainRepository, never()).lockDomainCreation(anyLong());
       verify(domainRepository, never()).save(any());
     }
 
@@ -110,7 +114,33 @@ class DomainServiceUpsertTest {
       assertThat(created.getName()).isEqualTo("Satellite");
       assertThat(created.getColor()).isEqualTo("#123456");
       assertThat(created.getTenant().getId()).isEqualTo(TENANT_ID);
-      verify(domainRepository).save(created);
+      InOrder order = inOrder(domainRepository);
+      order
+          .verify(domainRepository)
+          .lockDomainCreation(DomainService.creationLockKey(TENANT_ID, "Satellite"));
+      order.verify(domainRepository).save(created);
+    }
+
+    @Test
+    @DisplayName("given_spellingCreatedConcurrently_should_reuseItOnceTheCreationLockIsHeld")
+    void given_spellingCreatedConcurrently_should_reuseItOnceTheCreationLockIsHeld() {
+      // Arrange
+      Domain concurrent = domain("space ops", "#654321");
+      when(domainRepository.findByNameAndTenantId("Space-Ops", TENANT_ID))
+          .thenReturn(Optional.empty());
+      when(domainRepository.findByTenantId(TENANT_ID)).thenReturn(List.of(), List.of(concurrent));
+
+      // Act
+      Domain resolved = domainService.upsert("Space-Ops", "#123456", new Tenant(TENANT_ID));
+
+      // Assert
+      assertThat(resolved).isSameAs(concurrent);
+      InOrder order = inOrder(domainRepository);
+      order
+          .verify(domainRepository)
+          .lockDomainCreation(DomainService.creationLockKey(TENANT_ID, "Space-Ops"));
+      order.verify(domainRepository).findByTenantId(TENANT_ID);
+      verify(domainRepository, never()).save(any());
     }
 
     @Test
@@ -180,6 +210,29 @@ class DomainServiceUpsertTest {
       // Assert
       assertThat(resolved).containsExactly(cloud);
       verify(domainRepository, never()).findByTenantId(any());
+      verify(domainRepository, never()).lockDomainCreation(anyLong());
+      verify(domainRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("given_nameCreatedConcurrently_should_reuseItOnceTheCreationLockIsHeld")
+    void given_nameCreatedConcurrently_should_reuseItOnceTheCreationLockIsHeld() {
+      // Arrange
+      Domain concurrent = domain("space ops", "#654321");
+      when(domainRepository.findByNameInAndTenantId(anyCollection(), eq(TENANT_ID)))
+          .thenReturn(List.of());
+      when(domainRepository.findByTenantId(TENANT_ID)).thenReturn(List.of(), List.of(concurrent));
+
+      // Act
+      Set<Domain> resolved = domainService.upserts(Set.of(dto("Space-Ops", "#123456")), TENANT_ID);
+
+      // Assert
+      assertThat(resolved).containsExactly(concurrent);
+      InOrder order = inOrder(domainRepository);
+      order
+          .verify(domainRepository)
+          .lockDomainCreation(DomainService.creationLockKey(TENANT_ID, "Space-Ops"));
+      order.verify(domainRepository).findByTenantId(TENANT_ID);
       verify(domainRepository, never()).save(any());
     }
 
@@ -199,7 +252,40 @@ class DomainServiceUpsertTest {
 
       // Assert
       assertThat(resolved).hasSize(1);
+      verify(domainRepository).lockDomainCreation(anyLong());
       verify(domainRepository).save(any(Domain.class));
+    }
+  }
+
+  @Nested
+  @DisplayName("Creation lock key")
+  class CreationLockKey {
+
+    @Test
+    @DisplayName("given_twoSpellingsOfANameInATenant_should_shareTheKey")
+    void given_twoSpellingsOfANameInATenant_should_shareTheKey() {
+      // Act & Assert
+      assertThat(DomainService.creationLockKey(TENANT_ID, "Space-Ops"))
+          .isEqualTo(DomainService.creationLockKey(TENANT_ID, "space ops"));
+    }
+
+    @Test
+    @DisplayName("given_anotherTenantOrName_should_useAnotherKey")
+    void given_anotherTenantOrName_should_useAnotherKey() {
+      // Arrange
+      long key = DomainService.creationLockKey(TENANT_ID, "Space-Ops");
+
+      // Act & Assert
+      assertThat(DomainService.creationLockKey("another-tenant", "Space-Ops")).isNotEqualTo(key);
+      assertThat(DomainService.creationLockKey(TENANT_ID, "Ground Ops")).isNotEqualTo(key);
+    }
+
+    @Test
+    @DisplayName("given_anyName_should_carryTheDomainNamespaceInTheHighBits")
+    void given_anyName_should_carryTheDomainNamespaceInTheHighBits() {
+      // Act & Assert
+      assertThat(DomainService.creationLockKey(TENANT_ID, "Space-Ops") >>> 32)
+          .isEqualTo(0x444F_0001L);
     }
   }
 
