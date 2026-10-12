@@ -42,7 +42,7 @@ When an import, an Injector or a Collector declares a Domain whose name differs 
 
 ## Security coverage visualization
 
-The Security Coverage Dashboard widget uses Domains to display a high-level view of your security posture. Each Domain appears as an icon with sub-domains (Prevention, Detection, Vulnerability, Table-Top) colored by the success rate of their associated Expectations.
+The Security Coverage Dashboard widget uses Domains to display a high-level view of your security posture. Each Domain appears as an icon with sub-domains (Prevention, Detection, Vulnerability, Tabletop) colored by the success rate of their associated Expectations.
 
 The main Domain icon reflects the aggregated state using a worst-case rule: if any sub-domain shows weak coverage, the overall Domain status reflects this.
 
