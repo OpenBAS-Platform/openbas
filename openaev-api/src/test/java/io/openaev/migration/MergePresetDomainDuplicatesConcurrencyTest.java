@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -35,6 +37,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @DisplayName("Merge preset domain duplicates migration - concurrent writer")
 class MergePresetDomainDuplicatesConcurrencyTest extends IntegrationTest {
 
+  private static final Instant LONG_AGO = Instant.parse("2020-01-01T00:00:00Z");
+
   @Autowired private V6_20261012120000000__Merge_preset_domain_duplicates migration;
   @Autowired private DataSource dataSource;
 
@@ -58,10 +62,11 @@ class MergePresetDomainDuplicatesConcurrencyTest extends IntegrationTest {
     contractId = UUID.randomUUID().toString();
     jdbc.update(
         "INSERT INTO injectors_contracts (injector_contract_id, tenant_id,"
-            + " injector_contract_content, injector_contract_import_available)"
-            + " VALUES (?, ?, '{}', false)",
+            + " injector_contract_content, injector_contract_import_available,"
+            + " injector_contract_updated_at) VALUES (?, ?, '{}', false, ?)",
         contractId,
-        tenantId);
+        tenantId,
+        Timestamp.from(LONG_AGO));
   }
 
   @AfterEach
@@ -104,6 +109,14 @@ class MergePresetDomainDuplicatesConcurrencyTest extends IntegrationTest {
     // Assert
     assertThat(linkedDomainIds()).containsExactly(presetId);
     assertThat(domainExists(duplicateId)).isFalse();
+    assertThat(
+            jdbc.queryForObject(
+                "SELECT injector_contract_updated_at FROM injectors_contracts"
+                    + " WHERE injector_contract_id = ?",
+                Timestamp.class,
+                contractId))
+        .as("the contract linked once the lock was held is touched for re-indexing")
+        .isAfter(Timestamp.from(LONG_AGO));
   }
 
   @Test

@@ -31,7 +31,8 @@ import org.springframework.stereotype.Component;
  *   <li>Touch the injector contracts linked to the duplicate, so the engine re-indexes their
  *       expectations with the preset id.
  *   <li>Row-lock the duplicate, so a link a concurrent writer adds to it is either repointed or
- *       rejected by the foreign key, never removed by the cascade of the final delete.
+ *       rejected by the foreign key, never removed by the cascade of the final delete, then touch
+ *       the contracts again with the current time, since the lock may have waited.
  *   <li>Repoint every foreign key referencing {@code domains(domain_id)} to the preset. The
  *       referencing columns are read from {@code pg_constraint} ({@code
  *       injectors_contracts_domains} on the current schema). A row whose twin already references
@@ -67,6 +68,9 @@ public class V6_20261012120000000__Merge_preset_domain_duplicates extends BaseJa
       if (!lockDomain(connection, duplicateId)) {
         continue;
       }
+      // Touched again once the lock is held: the lock may have waited, and a timestamp older than
+      // the indexing grace window at commit time is never re-read by the incremental indexer.
+      touchLinkedContracts(connection, duplicateId);
       for (ReferencingColumn referencingColumn : referencingColumns) {
         repoint(connection, referencingColumn, duplicateId, presetId);
       }
@@ -191,7 +195,7 @@ public class V6_20261012120000000__Merge_preset_domain_duplicates extends BaseJa
         connection.prepareStatement(
             """
             UPDATE injectors_contracts ic
-            SET injector_contract_updated_at = now()
+            SET injector_contract_updated_at = clock_timestamp()
             WHERE EXISTS (
               SELECT 1 FROM injectors_contracts_domains icd
               WHERE icd.injector_contract_id = ic.injector_contract_id
