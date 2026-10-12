@@ -83,17 +83,18 @@ public class DomainService implements DependenciesManager {
 
   @Transactional
   public Domain upsert(final DomainBaseInput input, final String tenantId) {
-    return this.upsert(input.getName(), input.getColor(), new Tenant(tenantId));
+    return doUpsert(input.getName(), input.getColor(), new Tenant(tenantId));
   }
 
   @Transactional
   public Domain upsert(final DomainBaseInput input) {
-    return this.upsert(input, TenantContext.getCurrentTenant());
+    return doUpsert(
+        input.getName(), input.getColor(), new Tenant(TenantContext.getCurrentTenant()));
   }
 
   @Transactional
   public Domain upsert(final Domain domainToUpsert) {
-    return this.upsert(
+    return doUpsert(
         domainToUpsert.getName(), domainToUpsert.getColor(), domainToUpsert.getTenant());
   }
 
@@ -180,6 +181,15 @@ public class DomainService implements DependenciesManager {
    */
   @Transactional
   public Domain upsert(final String name, final String color, final Tenant tenant) {
+    return doUpsert(name, color, tenant);
+  }
+
+  /**
+   * Body of the {@code upsert} overloads, kept un-annotated so they share it without an intra-class
+   * call to a {@code @Transactional} method, which would bypass the Spring proxy. Must run inside a
+   * transaction: the creation lock is transaction-scoped.
+   */
+  private Domain doUpsert(final String name, final String color, final Tenant tenant) {
     return findExisting(name, tenant.getId())
         .orElseGet(
             () -> {
