@@ -164,8 +164,7 @@ class TenantPurgeScopeTest extends IntegrationTest {
     bystanderTenantMarkingId = UUID.randomUUID().toString();
 
     // Past the grace period, so the purge picks them up. Two of them, so the loop iterates twice
-    // and
-    // the scope has to be redefined between the iterations.
+    // and the scope has to be redefined between iterations.
     seedExpiredTenant(firstExpiredTenantId, "purge-scope-expired-first");
     seedExpiredTenant(secondExpiredTenantId, "purge-scope-expired-second");
     jdbc.update(

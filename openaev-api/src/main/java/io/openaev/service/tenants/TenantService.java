@@ -213,12 +213,9 @@ public class TenantService {
     List<String> purgedIds = new java.util.ArrayList<>();
     for (Tenant tenant : expired) {
       try {
-        // Each tenant's cleanup reads and deletes that tenant's own rows, several of them on
-        // tenant-scoped tables: deleting a default injector contract hydrates its documents,
-        // domains, payloads, tags and vulnerabilities to cascade them. Unscoped, every one of those
-        // reads is fail-closed, so a manager that has to look at what it is removing sees nothing.
-        // The scope is narrowed per iteration and reset below for the statement that spans the
-        // whole purged set, so no tenant ever inherits the previous one's scope.
+        // The cascade reads this tenant's own rows on scoped tables, so it is fail-closed without
+        // a scope. Narrowed per iteration, and reset below for the statement spanning the whole
+        // purged set.
         tenantScopedTransaction.setScopeOnCurrentTransaction(TxCtx.forTenant(tenant.getId()));
         for (DependenciesManager dependency : dependencies) {
           dependency.deleteDependencyForTenant(tenant.getId());

@@ -62,20 +62,8 @@ public class InitAdminCommandLineRunner implements CommandLineRunner {
   @Override
   @Transactional
   public void run(String... args) {
-    // This transaction reads a tenant-scoped table: the well-known groups ensured below carry an
-    // eager Group.markings association, and marking_definitions is filtered on the transaction's
-    // scope. Without one the read is fail-closed, so the groups come back granting no marking at
-    // all - benign today only because clearance is read through JdbcTemplate rather than that
-    // association. The scope is the default tenant rather than every tenant: a marking belongs to
-    // exactly one tenant (marking_definitions.tenant_id is NOT NULL, there is no platform marking),
-    // the default tenant is the only one this runner provisions, and a group may only grant
-    // markings
-    // of its own tenant. A wider scope could therefore only surface another tenant's clearance
-    // grant
-    // on a group that must not carry it.
-    //
-    // The scope is set on the transaction this method already owns, not in a new one: the whole
-    // bootstrap must stay a single unit of work.
+    // The eager Group.markings read below is fail-closed without a scope, and this runner
+    // provisions the default tenant only.
     this.tenantScopedTransaction.setScopeOnCurrentTransaction(TxCtx.forTenant(DEFAULT_TENANT_UUID));
 
     // Handle admin user
@@ -87,13 +75,9 @@ public class InitAdminCommandLineRunner implements CommandLineRunner {
         this.tokenRepository.findFirstByUserIdOrderByCreatedAsc(adminUser.getId());
     adminToken.ifPresentOrElse(this::updateToken, () -> this.createToken(adminUser));
 
-    // Ensure the admin user holds full administrative privileges through well-known groups: a
-    // platform-scoped "Administrators" group (granting platform BYPASS) and the default-tenant
-    // "Administrators" group (granting tenant BYPASS). The default tenant is created by a Flyway
-    // migration and never runs the tenant-provisioning chain that seeds default groups for
-    // API-created tenants, so both must be bootstrapped explicitly here, once the admin user is
-    // guaranteed to exist. The platform group is ensured first because the tenant path clears the
-    // persistence context last (see AdminPrivilegeService#ensureAdminGroup).
+    // The default tenant comes from a Flyway migration and never runs the provisioning chain that
+    // seeds these groups, so both are bootstrapped here. Platform first: the tenant path clears
+    // the persistence context last.
     this.adminPrivilegeService.ensurePlatformAdminGroup(adminUser);
     this.adminPrivilegeService.ensureAdminGroup(DEFAULT_TENANT_UUID, adminUser);
   }
