@@ -8,7 +8,9 @@
 (asset marking = read filter, enforced via the statement-inspector rewrite).
 
 **Status**: 
-
+Chunk 1 done, PR needs to be merged. 
+Thanks to chunk 1, almost all other chunks can be done at the same time, a meeting is scheduled with the team 
+to size and set ETA for each chunk.
 ---
 
 # Chunk 1: POC — Launch scoping for Scenario/Simulation/Atomic Testing with marking clearance
@@ -252,16 +254,6 @@ is absent from the built DTO when a filtered `assetsToExecute` excludes it; exis
 from `executableInject.getAssetsToExecute()`, falling back to `injectService.resolveAllAssetsToExecute(inject)`
 when null. New `ExecutableInjectDTOMapperTest` (3 tests): cached-filtered-list path, fallback-to-resolve
 path, non-marking case unaffected.
-
-**`.assetGroups(...)` decision — left unfiltered, deliberately, not resolved the way the DoD assumed a
-clean answer existed:** the mapper's own existing comment confirms non-endpoint assets reached via a
-group (e.g. AI targets) are resolved by the downstream injector *from the group itself*, independent of
-the filtered flat asset list. Asset groups carry no marking of their own today — that's Task 4's own
-explicitly-deferred US1 — so there is no clearance rule to apply to this set yet; emptying it would
-silently break the AI-target-via-group path for external injectors, not just de-duplicate. **Known,
-scoped gap, not an oversight**: a marked AI-target asset reachable only through an asset group,
-dispatched to a non-agent external connector, is not covered by this fix. Revisit once US1 (POC 2)
-gives asset groups their own marking semantics.
 
 ## Chunk 2 — BYPASS capability must not widen marking clearance
 
@@ -532,18 +524,38 @@ that a run covered only part of the targets, and why. Otherwise scores and findi
   recurring runs) on Simulations and Atomic Testing, e.g. "Launched by *jdoe*", "Scheduled by *jdoe*".
 - **Show marking chips on every asset list.** Target lists, result tables, findings and asset-group members
   should all carry them, so a viewer sees which targets are marked and at which level.
-- **Give each skipped target an explicit status for viewers who can see it.** For example "Not executed:
-  outside the launcher's clearance", instead of the target looking absent or pending.
-  - **How to record it**: write a trace or status row per skipped asset at dispatch time.
-  - **Why it does not leak**: that row is linked to the restricted asset, so it is itself a derived row
-    filtered by the same C-2 mechanism. A `TLP:GREEN` viewer never sees it, a `TLP:RED` viewer does.
-- **Show a run-level indicator, computed per viewer.** For example "Partial run: 2 of 5 targets were not
-  executed". Show it **only** to viewers who can see at least one skipped target. A viewer with the same
-  clearance as the launcher sees no indicator, which preserves "a restricted asset does not exist".
-- **Label scores clearly.** State that a score covers the targets that actually ran. Read-time scores already
-  reflect what the viewer can see once `injects_expectations` is filtered (§3.2).
 
-## Chunk 10 — End-to-end proof, as a Playwright e2e test (CI-covered) 🔴 not started
+## Chunk 10 — UX enhancement: execution details count only what the user can see
+
+**Status**: not started. **The PO needs to design it**; this is
+a later enhancement: consolidate the displayed value from what the viewing user can see.
+
+When an admin launches an inject and a user looks at it, the execution details read "Distributing inject to
+2 agent(s) across 2 endpoint(s)", counting assets the user cannot see.
+
+## Chunk 11 — UX enhancement: global inject status from what the user can see
+
+**Status**: not started. **The PO needs to design it**; this is
+a later enhancement: consolidate the displayed value from what the viewing user can see.
+
+The global inject status can look odd when the user does not see all the assets, because it is computed over
+every asset.
+
+## Chunk 12 — UX enhancement: platforms in the scenario list for a user
+
+**Status**: not started. **The PO needs to design it**; this is
+a later enhancement: consolidate the displayed value from what the viewing user can see.
+
+The platforms of a scenario are wrong for a user. The platforms queries never read assets, they read injector
+contracts, so the marking filter does not apply.
+
+## Chunk 13 — Dashboards: last spike to POC
+
+**Status**: POC done. Tracked as a separate issue and PR, outside this plan's scope.
+
+Last spike of the POC, on dashboards (how marking clearance applies to dashboard data).
+
+## Chunk 14 — End-to-end proof, as a Playwright e2e test (CI-covered) 🔴 not started
 
 Replaces the earlier `curl`-based demo-script idea: Task 2/3's UI is now actually implemented
 (`GroupManageMarkings.tsx`, `MarkingDefinitions.tsx`, `ItemMarkings.tsx`), Playwright is already wired
@@ -583,22 +595,3 @@ UI-driven assertions, not clicking through every setup step):
   `ScenarioApiHelpers`, `TeamApiHelpers`, `DocumentApiHelpers`, `TenantApiHelpers` exist today.
 
 **DoD**: spec green in CI under the existing `test:e2e` job, no new pipeline required.
-
-## New issue 1 — Dashboards: last spike to POC
-
-**Status**: POC done. Tracked as a separate issue, outside this plan's scope.
-
-Last spike of the POC, on dashboards (how marking clearance applies to dashboard data).
-
-## New issue 2 — UX enhancements: consolidate what the user can see
-
-Three UX enhancements remain when a user sees only part of the assets of an inject. They are acceptable for
-the task 4 feature and are tracked as a later enhancement: the displayed value should be consolidated from what the
-viewing user can see.
-
-- **Execution details**: when an admin launches an inject and a user looks at it, the details read
-  "Distributing inject to 2 agent(s) across 2 endpoint(s)", counting assets the user cannot see.
-- **Global inject status**: it can look odd when the user does not see all the assets, because it is
-  computed over every asset.
-- **Platforms in the scenario list**: wrong for a user. The platforms queries never read assets, they
-  read injector contracts, so the marking filter does not apply.
