@@ -479,6 +479,34 @@ class XtmHubServiceTest {
       verifyNoInteractions(xtmHubEmailService);
       verify(platformSettingsService, never()).updateXTMHubEmailNotification(anyBoolean());
     }
+
+    @Test
+    @DisplayName("Should send a tenant name that needs JSON escaping intact")
+    void whenTenantNameNeedsEscaping_ShouldSendItIntact() {
+      // Given
+      String tenantName = "Société \"Générale\" \\ 東京";
+      TenantXtmHubRegistration registration =
+          buildRegistration(Tenant.DEFAULT_TENANT_UUID, "valid-token", now.minusHours(1));
+      registration.getTenant().setName(tenantName);
+      when(tenantXtmHubRegistrationRepository.findByTenantId(any()))
+          .thenReturn(Optional.of(registration));
+      when(tenantXtmHubRegistrationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+      mockSettings.setPlatformId("platform-123");
+      mockSettings.setPlatformVersion("1.0.0");
+      when(platformSettingsService.findSettings()).thenReturn(mockSettings);
+      whenHubReturnsConnectivityStatus("active");
+
+      // When
+      TenantXtmHubRegistration result = xtmHubService.refreshConnectivity(defaultTenantScope());
+
+      // Then
+      JsonObject input =
+          verifySingleGraphqlPostRequestAndGetBody(graphqlPostRequestMatcher())
+              .getAsJsonObject("variables")
+              .getAsJsonObject("input");
+      assertThat(input.get("tenantName").getAsString()).isEqualTo(tenantName);
+      assertThat(result.getRegistrationStatus()).isEqualTo(XtmHubRegistrationStatus.REGISTERED);
+    }
   }
 
   /** Returns the parsed GraphQL body for the all-tenants request. */
@@ -1146,6 +1174,34 @@ class XtmHubServiceTest {
                       hubErrors(
                           ECHOED_INPUT
                               + "Field \"platformVersion\" of required type \"String!\" was not provided.")));
+
+      // When
+      TenantXtmHubRegistration result = xtmHubService.refreshConnectivity(defaultTenantScope());
+
+      // Then
+      assertThat(recordedRefreshInputs()).hasSize(1);
+      assertThat(result.getRegistrationStatus())
+          .isEqualTo(XtmHubRegistrationStatus.LOST_CONNECTIVITY);
+      assertThat(fallbackLogCount()).isZero();
+    }
+
+    @ParameterizedTest(name = "body: {0}")
+    @ValueSource(
+        strings = {
+          "<html><body>502 Bad Gateway</body></html>",
+          "",
+          "[]",
+          "{\"errors\":\"unavailable\"}",
+          "{\"errors\":[\"unavailable\"]}",
+          "{\"errors\":[{\"extensions\":{\"code\":\"BAD_GATEWAY\"}}]}"
+        })
+    @DisplayName("Should not refresh again when the error body is not a GraphQL field rejection")
+    void whenHubErrorIsNotAFieldRejection_ShouldNotRetry(String errorBody) {
+      // Given
+      givenDefaultTenantRegistration(buildLicense(true, true));
+      mockServer
+          .when(request().withMethod("POST").withPath(GRAPHQL_PATH))
+          .respond(response().withStatusCode(502).withBody(errorBody));
 
       // When
       TenantXtmHubRegistration result = xtmHubService.refreshConnectivity(defaultTenantScope());

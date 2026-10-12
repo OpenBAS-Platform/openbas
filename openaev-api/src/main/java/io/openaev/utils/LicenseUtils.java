@@ -15,7 +15,7 @@ public class LicenseUtils {
     return "CE";
   }
 
-  /** CE or EE only: the trial contract belongs to the platforms XTM Hub deployed itself. */
+  /** CE or EE only: the trial contract is reserved for platforms deployed by XTM Hub. */
   public static String computeXtmHubEdition(License license) {
     if (license != null && license.isLicenseEnterprise() && license.isLicenseValidated()) {
       return "EE";
