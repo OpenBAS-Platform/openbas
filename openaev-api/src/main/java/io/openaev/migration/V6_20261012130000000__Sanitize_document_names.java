@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * Re-running is a no-op, since no rewritten name carries a separator or is blank.
  */
 @Component
-public class V6_20261012120000000__Sanitize_document_names extends BaseJavaMigration {
+public class V6_20261012130000000__Sanitize_document_names extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
