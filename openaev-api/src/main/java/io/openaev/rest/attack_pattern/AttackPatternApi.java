@@ -169,19 +169,8 @@ public class AttackPatternApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   public Iterable<AttackPattern> upsertAttackPatterns(
       TxCtx ctx, @Valid @RequestBody AttackPatternUpsertInput input) {
-    List<AttackPattern> upserted = new ArrayList<>();
-    List<AttackPatternCreateInput> attackPatterns = input.getAttackPatterns();
-    List<AttackPatternCreateInput> patternsWithoutParent =
-        attackPatterns.stream().filter(a -> a.getParentId() == null).toList();
-    List<AttackPatternCreateInput> patternsWithParent =
-        attackPatterns.stream().filter(a -> a.getParentId() != null).toList();
-    upserted.addAll(
-        attackPatternService.internalUpsertAttackPatterns(
-            ctx, patternsWithoutParent, input.getIgnoreDependencies()));
-    upserted.addAll(
-        attackPatternService.internalUpsertAttackPatterns(
-            ctx, patternsWithParent, input.getIgnoreDependencies()));
-    return upserted;
+    return attackPatternService.upsertAttackPatterns(
+        ctx, input.getAttackPatterns(), input.getIgnoreDependencies());
   }
 
   @DeleteMapping("/{attackPatternId}")

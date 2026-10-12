@@ -611,37 +611,95 @@ public class AttackPatternService {
                 createAttackPatternFromAttackPatternCreateInput(input, tenantId)));
   }
 
+  /**
+   * Upserts attack patterns, parents first so children can resolve them. Fails with 409 while
+   * another upsert runs for the same tenant: concurrent imports lock the same rows and would queue
+   * up until the connection pool is exhausted.
+   */
+  public List<AttackPattern> upsertAttackPatterns(
+      TxCtx ctx, List<AttackPatternCreateInput> attackPatterns, Boolean ignoreDependencies) {
+    String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
+    if (!attackPatternRepository.tryLockUpsert(tenantId)) {
+      throw new ResponseStatusException(
+          HttpStatus.CONFLICT, "An attack pattern upsert is already running");
+    }
+    List<AttackPattern> upserted = new ArrayList<>();
+    upserted.addAll(
+        internalUpsertAttackPatterns(
+            ctx,
+            attackPatterns.stream().filter(a -> a.getParentId() == null).toList(),
+            ignoreDependencies));
+    upserted.addAll(
+        internalUpsertAttackPatterns(
+            ctx,
+            attackPatterns.stream().filter(a -> a.getParentId() != null).toList(),
+            ignoreDependencies));
+    return upserted;
+  }
+
   public List<AttackPattern> internalUpsertAttackPatterns(
       TxCtx ctx, List<AttackPatternCreateInput> attackPatterns, Boolean ignoreDependencies) {
     // Same reasoning as findOrCreate: the external id and the STIX id are unique per tenant, so
     // every lookup this upsert makes is pinned to the tenant the new rows are attributed to.
     String tenantId = writeScopeResolver.tenantForWrite(ctx, null);
+    if (attackPatterns.isEmpty()) {
+      return new ArrayList<>();
+    }
+    Map<String, AttackPattern> existingByExternalId =
+        attackPatternRepository
+            .findAllByExternalIdInAndTenantIdWithKillChainPhases(
+                attackPatterns.stream().map(AttackPatternCreateInput::getExternalId).toList(),
+                tenantId)
+            .stream()
+            .collect(
+                Collectors.toMap(AttackPattern::getExternalId, Function.identity(), (a, b) -> a));
+    Set<String> phaseIds =
+        attackPatterns.stream()
+            .map(AttackPatternCreateInput::getKillChainPhasesIds)
+            .filter(Objects::nonNull)
+            .flatMap(List::stream)
+            .collect(Collectors.toSet());
+    Map<String, KillChainPhase> phasesById =
+        phaseIds.isEmpty()
+            ? Map.of()
+            : fromIterable(killChainPhaseRepository.findAllById(phaseIds)).stream()
+                .collect(Collectors.toMap(KillChainPhase::getId, Function.identity()));
+    Set<String> parentStixIds =
+        attackPatterns.stream()
+            .map(AttackPatternCreateInput::getParentId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+    Map<String, AttackPattern> parentsByStixId =
+        parentStixIds.isEmpty()
+            ? Map.of()
+            : attackPatternRepository.findAllByStixIdInAndTenantId(parentStixIds, tenantId).stream()
+                .collect(
+                    Collectors.toMap(AttackPattern::getStixId, Function.identity(), (a, b) -> a));
     List<AttackPattern> upserted = new ArrayList<>();
     attackPatterns.forEach(
         attackPatternInput -> {
           String attackPatternExternalId = attackPatternInput.getExternalId();
           Optional<AttackPattern> optionalAttackPattern =
-              attackPatternRepository.findByExternalIdAndTenantId(
-                  attackPatternExternalId, tenantId);
+              Optional.ofNullable(existingByExternalId.get(attackPatternExternalId));
           List<KillChainPhase> killChainPhases =
               attackPatternInput.getKillChainPhasesIds() != null
-                      && !attackPatternInput.getKillChainPhasesIds().isEmpty()
-                  ? fromIterable(
-                      killChainPhaseRepository.findAllById(
-                          attackPatternInput.getKillChainPhasesIds()))
+                  ? attackPatternInput.getKillChainPhasesIds().stream()
+                      .distinct()
+                      .map(phasesById::get)
+                      .filter(Objects::nonNull)
+                      .collect(Collectors.toCollection(ArrayList::new))
                   : new ArrayList<>();
-          AttackPattern attackPatternParent =
-              attackPatternInput.getParentId() != null
-                  ? attackPatternRepository
-                      .findByStixIdAndTenantId(attackPatternInput.getParentId(), tenantId)
-                      .orElseThrow(ElementNotFoundException::new)
-                  : null;
+          AttackPattern attackPatternParent = null;
+          if (attackPatternInput.getParentId() != null) {
+            attackPatternParent = parentsByStixId.get(attackPatternInput.getParentId());
+            if (attackPatternParent == null) {
+              throw new ElementNotFoundException();
+            }
+          }
           if (optionalAttackPattern.isEmpty()) {
-            attackPatternInput.setExternalId(attackPatternExternalId);
             AttackPattern newAttackPattern =
                 createAttackPatternFromAttackPatternCreateInput(attackPatternInput, tenantId);
             newAttackPattern.setKillChainPhases(killChainPhases);
-            newAttackPattern.setExternalId(attackPatternExternalId);
             upserted.add(newAttackPattern);
           } else {
             AttackPattern attackPattern = optionalAttackPattern.get();
