@@ -84,6 +84,12 @@ grep MASKED openaev-debug-sql.log | less -S
 grep -E "trace=[0-9a-f]" openaev-debug-sql.log | less -S
 ```
 
+## Before you enable it
+
+- **Overhead:** the default JFR profile (`profile`) has a non-trivial cost; set `openaev.debug.jfr.settings=default` for lighter profiling.
+- **Multi-tenancy:** on a shared instance, the SQL log mixes queries from all tenants and tenant ids are not masked. Restrict access to the output directory.
+- **Pyroscope:** when `pyroscope.agent.enabled=true`, the JFR recording does not start.
+
 ## Enabling and disabling
 
 The mode is driven by a single flag, off by default. Enable it (preferably via the environment
