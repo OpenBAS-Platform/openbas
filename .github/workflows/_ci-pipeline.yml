@@ -162,13 +162,19 @@ jobs:
 
   # Reported through the Pipeline Gate as advisory, never blocking, until it has run clean for a while
   # on real PRs. Making it blocking means taking the job out of the advisory list in the gate below.
+  # The job itself stays green so an advisory failure neither fails the workflow nor triggers
+  # ci-retry; the gate reads the check's result from the `outcome` output.
   docs-links-check:
     name: "🔎 Docs Links Check"
     runs-on: ubuntu-latest
     timeout-minutes: 3
+    outputs:
+      outcome: ${{ steps.check.outcome }}
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/actions/docs-links-check
+      - id: check
+        uses: ./.github/actions/docs-links-check
+        continue-on-error: true
 
   # Pull requests only: the gate reads what a PR adds against its target branch, and a push or a
   # scheduled run has no target branch. Skipped counts as passed in the Pipeline Gate.
@@ -748,6 +754,13 @@ jobs:
           for job in $(echo "$NEEDS_JSON" | jq -r 'keys[]'); do
             result=$(echo "$NEEDS_JSON" | jq -r --arg j "$job" '.[$j].result')
             TOTAL=$((TOTAL + 1))
+
+            # A job that keeps itself green with continue-on-error reports its check through an
+            # `outcome` output instead.
+            outcome=$(echo "$NEEDS_JSON" | jq -r --arg j "$job" '.[$j].outputs.outcome // empty')
+            if [ "$result" = "success" ] && [ "$outcome" = "failure" ]; then
+              result="failure"
+            fi
 
             # Apply the caller's scan policy here because `continue-on-error` does not define
             # the value of `needs.<job>.result`.

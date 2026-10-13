@@ -173,7 +173,7 @@ job-level `continue-on-error`, whose mapping onto `needs.<job>.result` is undocu
 | | Core CI | Nightly CI |
 |-|---------|------------|
 | Triggers | `push` to `main` / `testing-xtm-one`, `push` of a `N.N.N` tag, `pull_request` → `main` | `schedule: cron "0 3 * * *"` (daily 03:00 UTC), `workflow_dispatch` |
-| Total expanded jobs | ≈ 39 | ≈ 62 |
+| Total expanded jobs | 41 on pull requests, 45 on push and tags | 110 |
 
 ### API Tests matrix
 
@@ -183,21 +183,21 @@ package is never silently untested.
 
 |                 | Core CI | Nightly CI             |
 |-----------------|---------|------------------------|
-| Elasticsearch 8 | 7 shards + `remaining` | 7 shards + `remaining` |
-| Elasticsearch 9 | ✗ | 7 shards + `remaining` |
-| OpenSearch      | ✗ | 7 shards + `remaining` |
-| **Total cells** | **8** | **24**                 |
+| Elasticsearch 8 | 9 shards + `remaining` | 9 shards + `remaining`, ×3: standard, `shadow-prod`, `shadow-all` |
+| Elasticsearch 9 | ✗ | 9 shards + `remaining`, ×2: standard, `shadow-prod` |
+| OpenSearch      | ✗ | 9 shards + `remaining` |
+| **Total cells** | **10** | **60**                 |
 
 ### E2E Tests matrix
 
 | | Core CI                                          | Nightly CI                                             |
 |-|--------------------------------------------------|--------------------------------------------------------|
-| Images | standard only (amd64 + arm64)                    | standard + ubi9, amd64 + arm64                         |
-| Browsers | chrome (amd64), chromium (arm64)                 | chrome, chromium, webkit, firefox, edge                |
+| Images | standard only: amd64 on pull requests, amd64 + arm64 on push | standard + ubi9, amd64 + arm64                         |
+| Browsers | chromium on pull requests; chrome (amd64), chromium (arm64) on push | chrome, chromium, webkit, firefox, edge                |
 | Search engines | Elasticsearch 8 only                             | Elasticsearch 8 & 9 + OpenSearch                       |
-| Sharding | `arsenals`, `multitenant`, `remaining` catch-all | unsharded full suites                                  |
-| Infra tests | 4 cells, `infra-chromium`                        | 7 cells across chrome, chromium, firefox, webkit, edge |
-| **Total cells** | **10**                                           | **25**                                                 |
+| Sharding | `arsenals`, `external-integrations`, `remaining` catch-all | unsharded full suites                                  |
+| Infra tests | 3 cells on pull requests, 5 on push, `infra-chromium` | 7 cells across chrome, chromium, firefox, webkit, edge |
+| **Total cells** | **6 on pull requests, 10 on push**               | **25**                                                 |
 
 `ubi9` and `webkit` are nightly-only: they exercise the same JAR and were doubling the
 critical path. `artifact_suffix` must stay unique per cell — the report artifact is named
