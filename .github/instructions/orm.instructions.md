@@ -72,10 +72,11 @@ An entity's `equals`/`hashCode` is based on its id only, never on its fields.
   per hash for the same reason (the proxy initializes).
 - A mapped `List` (`PersistentBag`) hashes by identity and never loads, but then two instances of
   the same row hash differently.
-- Write the methods explicitly (they also stop `@Data` from generating its own): `equals` = same
-  type and `id != null && id.equals(other.id)`, `hashCode` = `Objects.hash(id)` (see `Inject`,
-  `Endpoint`). Avoid `@EqualsAndHashCode.Exclude` on a collection: the next field added is
-  included again.
+- Use hand-written methods (preferred; they also stop `@Data` from generating its own): `equals` =
+  same type and `id != null && id.equals(other.id)`, `hashCode` = `Objects.hash(id)` (see `Inject`,
+  `Endpoint`). Lombok `@EqualsAndHashCode(onlyExplicitlyIncluded = true)` with
+  `@EqualsAndHashCode.Include` on the id only is also compliant (see `Step`, `Workflow`). Avoid
+  `@EqualsAndHashCode.Exclude` on a collection: the next field added is included again.
 - Before switching a `List` to a `Set` (for example to clear `TenantFilteredBagCollectionsTest`),
   check the owner's identity. `add()` on a lazy `Set` also initializes it, where a bag only queued
   the element.
