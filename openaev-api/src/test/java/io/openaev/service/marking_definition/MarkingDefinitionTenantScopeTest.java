@@ -9,6 +9,7 @@ import io.openaev.context.TxCtx;
 import io.openaev.database.repository.MarkingDefinitionRepository;
 import io.openaev.utils.TenantIsolationTestHelper;
 import io.openaev.utils.mockUser.WithMockUser;
+import io.openaev.utilstest.WithoutTenantScope;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +96,7 @@ class MarkingDefinitionTenantScopeTest extends IntegrationTest {
   class WithoutScope {
 
     @Test
+    @WithoutTenantScope
     @DisplayName("given_noScope_should_failClosedEvenForOwnRow")
     void given_noScope_should_failClosedEvenForOwnRow() {
       // Act & Assert
