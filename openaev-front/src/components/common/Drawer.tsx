@@ -109,6 +109,7 @@ const Drawer: FunctionComponent<DrawerProps> = ({
     if (typeof children === 'function') {
       component = children();
     } else {
+      // eslint-disable-next-line @eslint-react/no-clone-element
       component = cloneElement(children as ReactElement);
     }
   }

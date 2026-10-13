@@ -233,6 +233,7 @@ class QuickInjectComponent extends Component {
   }
 
   toggleAll() {
+    // eslint-disable-next-line @eslint-react/no-access-state-in-setstate
     this.setState({ allTeams: !this.state.allTeams });
   }
 
@@ -249,6 +250,7 @@ class QuickInjectComponent extends Component {
   }
 
   handleRemoveTeam(teamId) {
+    // eslint-disable-next-line @eslint-react/no-access-state-in-setstate
     this.setState({ teamsIds: this.state.teamsIds.filter(a => a !== teamId) });
   }
 
@@ -258,6 +260,7 @@ class QuickInjectComponent extends Component {
 
   handleRemoveDocument(documentId) {
     this.setState({
+      // eslint-disable-next-line @eslint-react/no-access-state-in-setstate
       documents: this.state.documents.filter(
         d => d.document_id !== documentId,
       ),
@@ -270,6 +273,7 @@ class QuickInjectComponent extends Component {
 
   toggleAttachment(documentId) {
     this.setState({
+      // eslint-disable-next-line @eslint-react/no-access-state-in-setstate
       documents: this.state.documents.map(d => (d.document_id === documentId
         ? {
             document_id: d.document_id,
@@ -279,13 +283,10 @@ class QuickInjectComponent extends Component {
     });
   }
 
-  selectTupleFieldType(name, type) {
-    this.setState({ tupleFieldTypes: R.assoc(name, type, this.state.tupleFieldTypes) });
-  }
-
   teamsReverseBy(field) {
     this.setState({
       teamsSortBy: field,
+      // eslint-disable-next-line @eslint-react/no-access-state-in-setstate
       teamsOrderAsc: !this.state.teamsOrderAsc,
     });
   }
@@ -321,6 +322,7 @@ class QuickInjectComponent extends Component {
   documentsReverseBy(field) {
     this.setState({
       documentsSortBy: field,
+      // eslint-disable-next-line @eslint-react/no-access-state-in-setstate
       documentsOrderAsc: !this.state.documentsOrderAsc,
     });
   }

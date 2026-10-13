@@ -2,7 +2,7 @@ import { Chip, IconButton, Paper, Tooltip, TooltipContent, TooltipTrigger } from
 import { Add, DataObjectOutlined, DeleteOutlined } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 
 import { useFormatter } from '../../../components/i18n';
 import {
@@ -116,7 +116,7 @@ const ScopeVariables = ({ workflowConfiguration, onUpdate }: ScopeVariablesProps
 
             {/* Rows */}
             {variables.map(variable => (
-              <>
+              <Fragment key={variable.scope_variable_id}>
                 <Typography
                   key={`key-${variable.scope_variable_id}`}
                   variant="body2"
@@ -166,7 +166,7 @@ const ScopeVariables = ({ workflowConfiguration, onUpdate }: ScopeVariablesProps
                   </TooltipTrigger>
                   <TooltipContent>{t('Delete variable')}</TooltipContent>
                 </Tooltip>
-              </>
+              </Fragment>
             ))}
           </div>
         ) : (

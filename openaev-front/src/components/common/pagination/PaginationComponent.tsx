@@ -128,6 +128,7 @@ const PaginationComponent = <T extends object>({
       size: rowsPerPage,
     };
 
+    // eslint-disable-next-line @eslint-react/web-api-no-leaked-fetch
     fetch(finalSearchPaginationInput).then((result: { data: Page<T> }) => {
       const { data } = result;
       setContent(data.content);
@@ -157,6 +158,7 @@ const PaginationComponent = <T extends object>({
   // Children
   let component;
   if (children) {
+    // eslint-disable-next-line @eslint-react/no-clone-element
     component = cloneElement(children as ReactElement);
   }
 

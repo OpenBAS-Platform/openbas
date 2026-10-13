@@ -174,6 +174,7 @@ const InjectorContracts = () => {
 
     stopPolling();
     let attempts = 0;
+    // eslint-disable-next-line @eslint-react/web-api-no-leaked-interval
     pollIntervalRef.current = setInterval(() => {
       attempts += 1;
       if (attempts >= POLL_MAX_ATTEMPTS) {

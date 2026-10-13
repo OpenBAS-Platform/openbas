@@ -13,6 +13,7 @@ const useNetworkCheck = (url?: string | null): UseNetworkCheckResult => {
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
+    // eslint-disable-next-line @eslint-react/web-api-no-leaked-fetch
     fetch(url, {
       method: 'HEAD',
       mode: 'no-cors',

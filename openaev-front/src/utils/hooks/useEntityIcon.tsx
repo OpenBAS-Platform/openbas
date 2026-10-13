@@ -3,6 +3,7 @@ import { SecurityNetwork, SelectGroup } from 'mdi-material-ui';
 
 // Keep in sync with the left menu (LeftBar.tsx): search results must display
 // the same icon as the section the entity lives in.
+// eslint-disable-next-line @eslint-react/no-unnecessary-use-prefix
 const useEntityIcon = (entity: string) => {
   switch (entity) {
     case 'Asset':

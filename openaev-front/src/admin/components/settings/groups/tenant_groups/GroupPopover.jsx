@@ -63,12 +63,6 @@ class GroupPopoverComponent extends Component {
     });
   }
 
-  handleAddTag(value) {
-    if (value) {
-      this.setState({ tags: [value] });
-    }
-  }
-
   handleCloseUsers() {
     this.setState({
       openUsers: false,

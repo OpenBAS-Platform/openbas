@@ -155,6 +155,7 @@ const PaginationComponentV2 = <T extends object>({
     // API error) never leaves callers stuck in a perpetual loading state.
     let stale = false;
     setLoading?.(true);
+    // eslint-disable-next-line @eslint-react/web-api-no-leaked-fetch
     fetch(searchPaginationInput)
       .then((result: { data: Page<T> }) => {
         if (stale) {
@@ -221,6 +222,7 @@ const PaginationComponentV2 = <T extends object>({
   // TopBarChildren
   let topBarButtonComponent;
   if (topBarButtons) {
+    // eslint-disable-next-line @eslint-react/no-clone-element
     topBarButtonComponent = cloneElement(topBarButtons as ReactElement);
   }
 

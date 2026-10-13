@@ -34,10 +34,6 @@ class CreateInjectorContractComponent extends Component {
     });
   }
 
-  goToStep(step) {
-    this.setState({ activeStep: step });
-  }
-
   handleSelectInjectorContract(injectorContractId) {
     this.setState({
       selectedInjectorContract: injectorContractId,

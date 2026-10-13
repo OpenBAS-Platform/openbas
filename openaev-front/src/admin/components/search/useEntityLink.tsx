@@ -13,6 +13,7 @@ import {
 // entity now has a dedicated overview, so results must never land on a list
 // page with an edit drawer. Returns null for unsupported classes so callers
 // can render a non-navigable row instead of a dead link.
+// eslint-disable-next-line @eslint-react/no-unnecessary-use-prefix
 const useEntityLink = (entity: string, id: string): string | null => {
   switch (entity) {
     case 'Asset':

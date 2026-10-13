@@ -235,6 +235,7 @@ describe('DateField day pick — parity with the MUI X picker it replaced', () =
         now: NOW,
       });
       let submitted: Record<string, unknown> | undefined;
+      // eslint-disable-next-line @eslint-react/no-nested-component-definitions
       const Form = () => {
         const methods = useForm<{ when: string }>({ defaultValues: { when: UTC_MIDNIGHT_OCT_2 } });
         return (

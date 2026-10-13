@@ -60,6 +60,7 @@ const ResponsePie: FunctionComponent<Props> = ({
     return <Icon color={hasDistribution ? 'inherit' : 'disabled'} sx={iconOverlay} />;
   };
 
+  // eslint-disable-next-line @eslint-react/no-nested-component-definitions
   const Pie = useCallback(({ title, expectationResultsByType, type }: {
     title: string;
     expectationResultsByType?: ExpectationResultsByType;

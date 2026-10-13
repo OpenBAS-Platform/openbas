@@ -1,13 +1,13 @@
 /* eslint import/no-extraneous-dependencies: 0 */
 
 import js from '@eslint/js';
+import eslintReact from '@eslint-react/eslint-plugin';
 import stylistic from '@stylistic/eslint-plugin';
 import vitest from '@vitest/eslint-plugin';
 import customRules from 'eslint-plugin-custom-rules';
 import i18next from 'eslint-plugin-i18next';
 import importPlugin from 'eslint-plugin-import';
 import playwright from 'eslint-plugin-playwright';
-import react from 'eslint-plugin-react';
 import { reactRefresh } from 'eslint-plugin-react-refresh';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
@@ -20,10 +20,45 @@ export default [
   // rules recommended by typescript-eslint
   ...ts.configs.recommended,
 
-  // rules recommended by eslint-plugin-react
-  react.configs.flat.recommended,
-  react.configs.flat['jsx-runtime'],
-  { settings: { react: { version: 'detect' } } },
+  // rules recommended by @eslint-react/eslint-plugin
+  {
+    files: ['**/*.{ts,tsx,js,jsx}'],
+    ...eslintReact.configs['recommended-typescript'],
+  },
+  {
+    files: ['**/*.{ts,tsx,js,jsx}'],
+    languageOptions: {
+      // parse JSX in .js files; also lets @stylistic/comma-dangle accept the `<T,>` generic syntax in .tsx files
+      parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+    rules: {
+      // outside the preset, they cover jsx-no-target-blank, no-unknown-property and display-name
+      '@eslint-react/dom-no-unknown-property': 'error',
+      '@eslint-react/dom-no-unsafe-target-blank': 'error',
+      '@eslint-react/no-missing-component-display-name': 'error',
+
+      // Rules of Hooks and React Compiler checks (the eslint-plugin-react-hooks set), not enforced yet
+      '@eslint-react/error-boundaries': 'off',
+      '@eslint-react/exhaustive-deps': 'off',
+      '@eslint-react/purity': 'off',
+      '@eslint-react/rules-of-hooks': 'off',
+      '@eslint-react/set-state-in-effect': 'off',
+      '@eslint-react/set-state-in-render': 'off',
+      '@eslint-react/static-components': 'off',
+      '@eslint-react/unsupported-syntax': 'off',
+      '@eslint-react/use-memo': 'off',
+
+      // React 19 API migrations (use(Context), <Context> as provider, ref as a prop), not applied yet
+      '@eslint-react/no-context-provider': 'off',
+      '@eslint-react/no-forward-ref': 'off',
+      '@eslint-react/no-use-context': 'off',
+
+      // conventions not enforced in this codebase
+      '@eslint-react/naming-convention-ref-name': 'off',
+      '@eslint-react/no-array-index-key': 'off',
+      '@eslint-react/use-state': 'off',
+    },
+  },
 
   // rules recommended by eslint-plugin-import
   importPlugin.flatConfigs.recommended,
@@ -88,9 +123,6 @@ export default [
       ],
       '@typescript-eslint/no-use-before-define': 'error',
       '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
-
-      // eslint-plugin-react rules
-      'react/prop-types': 0,
 
       // @stylistic rules
       '@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: true }],

@@ -30,6 +30,7 @@ export const toFieldValue = (value: string): string =>
 
 /** Whether these children carry an empty-valued option at all. */
 export const hasEmptyOption = (children: ReactNode): boolean =>
+  // eslint-disable-next-line @eslint-react/no-children-to-array
   Children.toArray(children).some(
     child => isValidElement<ItemLikeProps>(child) && child.props.value === '',
   );
@@ -59,6 +60,7 @@ const unwrapLabel = (node: ReactNode): ReactNode => {
 };
 
 export const toSelectItems = (children: ReactNode): ReactNode =>
+  // eslint-disable-next-line @eslint-react/no-children-map
   Children.map(children, (child) => {
     if (!isValidElement(child)) {
       return child;
@@ -72,6 +74,7 @@ export const toSelectItems = (children: ReactNode): ReactNode =>
     }
     return (
       <SelectItem value={toItemValue(value)} disabled={disabled}>
+        {/* eslint-disable-next-line @eslint-react/no-children-map */}
         {Children.map(inner, unwrapLabel)}
       </SelectItem>
     );
@@ -106,6 +109,7 @@ export const toOptions = (children: ReactNode): {
     value: string;
     label: string;
   }[] = [];
+  // eslint-disable-next-line @eslint-react/no-children-for-each
   Children.forEach(children, (child) => {
     if (!isValidElement(child)) {
       return;

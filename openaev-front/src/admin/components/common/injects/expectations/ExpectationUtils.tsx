@@ -71,6 +71,7 @@ export const isPlayerExpectation = (injectExpectation: InjectExpectationOutput) 
   return injectExpectation.inject_expectation_user != null;
 };
 
+// eslint-disable-next-line @eslint-react/no-unnecessary-use-prefix
 export const useIsManuallyUpdatable = (injectExpectation: InjectExpectationOutput) => {
   const expectationType = injectExpectation.inject_expectation_type;
 

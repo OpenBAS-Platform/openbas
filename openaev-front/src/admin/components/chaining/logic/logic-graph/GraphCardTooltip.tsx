@@ -80,6 +80,7 @@ const GraphCardTooltip = ({ title, dismissKey, slotProps, children }: GraphCardT
       onClose={close}
       slotProps={slotProps ?? graphTooltipSlotProps}
     >
+      {/* eslint-disable-next-line @eslint-react/no-clone-element */}
       {cloneElement(children, { onPointerDownCapture: handlePointerDownCapture })}
     </Tooltip>
   );

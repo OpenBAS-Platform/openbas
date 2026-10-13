@@ -43,6 +43,7 @@ const PaperMetric: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const { classes } = useStyles();
+  // eslint-disable-next-line @eslint-react/no-clone-element
   const component = cloneElement(icon as ReactElement<SvgIconProps>, {
     color: 'primary',
     style: {

@@ -26,6 +26,7 @@ const useFetchInjectExecutionResult = (injectId: string, target: InjectTarget | 
     }
   };
   useEffect(() => {
+    // eslint-disable-next-line @eslint-react/web-api-no-leaked-fetch
     fetch();
   }, [injectId, target?.target_id, target?.target_type]);
   return ({

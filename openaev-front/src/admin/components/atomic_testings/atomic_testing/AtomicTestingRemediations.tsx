@@ -263,6 +263,7 @@ const AtomicTestingRemediations = () => {
               'wordBreak': 'break-word',
               '& p': { margin: 0 },
             }}
+            // eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml
             dangerouslySetInnerHTML={{ __html: resolveRuleHtml(rem) }}
           />
         </Paper>

@@ -144,8 +144,8 @@ const MarkingField: FunctionComponent<Props> = ({
         onChange={handleChange}
         isOptionEqualToValue={(option, val) => option.marking_definition_id === val.marking_definition_id}
         getOptionLabel={option => markingLabel(option)}
-        renderOption={(props, option) => (
-          <Box component="li" {...props} key={option.marking_definition_id}>
+        renderOption={({ key: _key, ...optionProps }, option) => (
+          <Box component="li" key={option.marking_definition_id} {...optionProps}>
             <Lens sx={{
               color: option.marking_definition_color,
               marginRight: 1,
