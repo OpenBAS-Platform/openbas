@@ -17,7 +17,6 @@ import io.openaev.database.audit.BaseEvent;
 import io.openaev.database.model.*;
 import io.openaev.helper.ObjectMapperHelper;
 import io.openaev.rest.exception.ElementNotFoundException;
-import io.openaev.rest.helper.RestBehavior;
 import io.openaev.service.PermissionService;
 import io.openaev.service.StreamService;
 import io.openaev.service.UserService;
