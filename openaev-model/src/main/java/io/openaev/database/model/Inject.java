@@ -53,6 +53,8 @@ public class Inject implements GrantableBase, Injection, TenantBase {
         if (o1.getDate().isPresent() && o2.getDate().isPresent()) {
           return o1.getDate().get().compareTo(o2.getDate().get());
         }
+        if (o1.getDate().isPresent() && o2.getDate().isEmpty()) return 1;
+        if (o1.getDate().isEmpty() && o2.getDate().isPresent()) return -1;
         if (o1.getId() != null && o2.getId() != null) {
           return o1.getId().compareTo(o2.getId());
         }

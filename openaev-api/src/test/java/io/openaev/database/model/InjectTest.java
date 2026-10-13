@@ -1,16 +1,25 @@
 package io.openaev.database.model;
 
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openaev.IntegrationTest;
+import io.openaev.database.repository.ExerciseRepository;
+import io.openaev.utils.RandomUtils;
 import io.openaev.utils.fixtures.ExerciseFixture;
 import io.openaev.utils.fixtures.InjectFixture;
 import io.openaev.utils.fixtures.PauseFixture;
+import io.openaev.utils.fixtures.ScenarioFixture;
 import io.openaev.utils.fixtures.composers.ExerciseComposer;
 import io.openaev.utils.fixtures.composers.InjectComposer;
 import io.openaev.utils.fixtures.composers.PauseComposer;
+import io.openaev.utils.fixtures.composers.ScenarioComposer;
 import io.openaev.utilstest.RabbitMQTestListener;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,9 +34,93 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class InjectTest extends IntegrationTest {
 
+  @Autowired private ScenarioComposer scenarioComposer;
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private InjectComposer injectComposer;
   @Autowired private PauseComposer pauseComposer;
+  @Autowired private ObjectMapper objectMapper;
+  @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private RandomUtils randomUtils;
+
+  @Nested
+  @DisplayName("Sorting tests")
+  public class SortingTests {
+    @Test
+    @DisplayName("Inject sorting is stable")
+    public void stableSort() {
+
+      InjectComposer.Composer injectA =
+          injectComposer.forInject(
+              () -> {
+                Inject inject = InjectFixture.getDefaultInject();
+                inject.setId("A");
+                inject.setDependsDuration(10L);
+                return inject;
+              });
+
+      InjectComposer.Composer injectB =
+          injectComposer.forInject(
+              () -> {
+                Inject inject = InjectFixture.getDefaultInject();
+                inject.setId("B");
+                return inject;
+              });
+
+      InjectComposer.Composer injectC =
+          injectComposer.forInject(
+              () -> {
+                Inject inject = InjectFixture.getDefaultInject();
+                inject.setId("C");
+                return inject;
+              });
+
+      InjectComposer.Composer injectD =
+          injectComposer.forInject(
+              () -> {
+                Inject inject = InjectFixture.getDefaultInject();
+                inject.setId("D");
+                return inject;
+              });
+
+      List<InjectComposer.Composer> injectsCollectionA =
+          Arrays.stream(new String[500])
+              .map(
+                  it ->
+                      injectComposer.forInject(
+                          () -> {
+                            Inject i = InjectFixture.getDefaultInject();
+                            i.setDependsDuration(randomUtils.getRandomLong(0, 100));
+                            return i;
+                          }))
+              .toList();
+      List<InjectComposer.Composer> injectsCollectionB =
+          Arrays.stream(new String[1000])
+              .map(it -> injectComposer.forInject(InjectFixture.getDefaultInject()))
+              .toList();
+      ExerciseComposer.Composer exerciseWrapper =
+          exerciseComposer
+              .forExercise(
+                  () -> {
+                    Exercise exercise = ExerciseFixture.createDefaultExercise();
+                    exercise.setStart(Instant.parse("2022-10-04T05:03:57Z"));
+                    return exercise;
+                  })
+              .withInjects(injectsCollectionA)
+              .withInjects(injectsCollectionB);
+      scenarioComposer
+          .forScenario(ScenarioFixture.getScenario())
+          .withInjects(injectsCollectionA)
+          .withSimulation(exerciseWrapper)
+          .persist();
+
+      entityManager.flush();
+      entityManager.clear();
+
+      Optional<Exercise> refetched = exerciseRepository.findById(exerciseWrapper.get().getId());
+
+      assertThatNoException().isThrownBy(() -> refetched.get().getInjects());
+    }
+  }
 
   @Nested
   @DisplayName("Given valid exercise")
