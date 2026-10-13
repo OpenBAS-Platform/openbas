@@ -74,6 +74,7 @@ public class AttackPatternUpsertService {
       if (existing == null) {
         AttackPattern created = input.toAttackPattern(tenantId);
         created.setKillChainPhases(phases);
+        created.setParent(parent);
         upserted.add(created);
       } else {
         update(existing, input, phases, parent, ignoreDependencies);
