@@ -257,9 +257,17 @@ path, non-marking case unaffected.
 
 ## Chunk 2 — BYPASS capability must not widen marking clearance
 
+Size: M 
+
 A user who belongs to a group holding a `BYPASS` role plus the marking `TLP:GREEN` could see `TLP:RED`.
 Principle: markings sit above capabilities, so `BYPASS` is secondary to markings, except for the
-`ACCESS`-type capabilities that grant clearance on their own (see "Open point").
+`ACCESS`-type capabilities that grant clearance on their own. 
+
+AC:
+- The first OpenAEV admin user root from the start is kept as the root and can still do/see what he wants, 
+he is out of this scope.
+- Users with BYPASS role shouldn't BYPASS the markings.
+- Order: Admin user root > markings > capa.
 
 Today two code paths disagree on who is a bypass user:
 
@@ -299,6 +307,8 @@ its members at execution time nor its aggregated result follow the launcher's cl
 
 ### 3a) Asset groups are not resolved per launcher clearance at execution time
 
+Size: S
+
 - `.assets(...)` of the external-push payload is filtered by the launcher's clearance
   (`getAssetsToExecute()`, with `resolveAllAssetsToExecute()` as the fallback, step 4.9).
 - `.assetGroups(...)` is left unfiltered on purpose (see the "`.assetGroups(...)` decision" note at the end
@@ -309,6 +319,8 @@ its members at execution time nor its aggregated result follow the launcher's cl
   members, it reads under its own account's clearance, not the launcher's.
 
 ### 3b) The asset-group expectation row still includes RED in its verdict
+
+Size: M
 
 - An inject that targets an asset group stores one group expectation row (`asset_group_id` set, `asset_id`
   NULL). Its verdict rolls up every member's result, using the group's validation mode.
@@ -339,6 +351,8 @@ Options for 3b, to settle before coding and check with Vertical 2:
 - **3.4** Check the admin still sees the full group, its members and its true verdict.
 
 ## Chunk 4 — Agentless traces of a RED asset
+
+Size: M, check with Laurent for a refacto in a table or if it's just a list of ids.
 
 External injectors that do not run through an agent (for example network scanners targeting agentless
 endpoints) report their results in an execution callback. The callback carries `contextIdentifiers`, the ids
@@ -381,6 +395,8 @@ filters ANDed together. Small-to-medium change in `MarkedTable` and `MarkingDime
   the admin sees every trace.
 
 ## Chunk 5 — SSE - Stream API revisited
+
+Size: L, check with Guillaume and Damien for the POC to revisit Stream.
 
 **Status**: leak reproduced (2026-10-08), fix not started.
 
