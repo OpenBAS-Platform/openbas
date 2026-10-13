@@ -14,7 +14,7 @@ Open the profile menu in the top right corner of any OpenAEV screen, then select
 
 To change your password or email address, you must enter your current password.
 
-These sections are not available if your account comes from an external identity provider (SSO).
+These sections are not available for the default admin account, whose credentials are set in the platform configuration.
 
 ### Changing the password
 
