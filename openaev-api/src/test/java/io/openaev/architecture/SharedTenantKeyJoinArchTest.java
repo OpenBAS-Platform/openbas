@@ -7,6 +7,7 @@ import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
+import io.openaev.config.ProductionActiveTables;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -21,6 +22,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -131,6 +133,9 @@ class SharedTenantKeyJoinArchTest {
           Pattern.CASE_INSENSITIVE);
 
   /** {@code <entry> # <reason>}: the hash that opens the reason is the one with space before it. */
+  /** The table an "until-active:<table>" deferral names, token-bounded like the guard baselines. */
+  private static final Pattern UNTIL_ACTIVE = Pattern.compile("until-active:([A-Za-z0-9_]+)");
+
   private static final Pattern WAIVER_LINE = Pattern.compile("(.*?)\\s+#\\s*(.*)");
 
   /** Spring resolves a SpEL selector into a bind parameter long before the SQL is parsed. */
@@ -567,49 +572,86 @@ class SharedTenantKeyJoinArchTest {
     assertEquals("attack_patterns", keys.get("attack_pattern_external_id"));
   }
 
+  /**
+   * The rules a single waiver must satisfy, as a pure function so each one can be shown to fire.
+   * {@code activeTables} is the production activation list: the two reasons that depend on it
+   * expire mechanically rather than when someone remembers them.
+   */
+  static List<String> waiverViolations(String key, String reason, Set<String> activeTables) {
+    List<String> malformed = new ArrayList<>();
+    if (reason.isBlank()) {
+      malformed.add(key + " :: no reason at all");
+      return malformed;
+    }
+    if (CLASSIFICATIONS.stream().noneMatch(reason::startsWith)) {
+      malformed.add(key + " :: reason does not begin with a classification: " + reason);
+      return malformed;
+    }
+    // A classification is a label, not an argument: each one must be followed by prose that says
+    // what makes the join safe, so a reason cannot be a bare tag.
+    String rest = reason;
+    for (String classification : CLASSIFICATIONS) {
+      if (reason.startsWith(classification)) {
+        rest = reason.substring(classification.length());
+      }
+    }
+    if (rest.replaceAll("[^A-Za-z]", "").length() < 25) {
+      malformed.add(key + " :: classification with no reason behind it: " + reason);
+    }
+    if (reason.startsWith("not-established") && !reason.contains("until-active:")) {
+      malformed.add(
+          key
+              + " :: an unestablished waiver must name the table whose activation retires it,"
+              + " as until-active:<table>");
+    }
+    if (reason.startsWith("reaches-active-table:")
+        && reason.substring("reaches-active-table:".length()).split("[ ,:]")[0].isBlank()) {
+      malformed.add(key + " :: reaches-active-table must name the table");
+    }
+    if (reason.startsWith("fixed-pending:")
+        && !reason.substring("fixed-pending:".length()).matches("#\\d+\\b.*")) {
+      malformed.add(
+          key
+              + " :: fixed-pending must name the pull request that repairs it, as"
+              + " fixed-pending:#<number>");
+    }
+    // The two reasons that depend on the activation list expire with it, so the list decides,
+    // not whoever does the activation. Without this the format check passes forever: a waiver
+    // could claim attenuation by a table nobody activated, and a deferral could outlive the
+    // activation that was supposed to retire it, both on a green build.
+    if (reason.startsWith("reaches-active-table:")) {
+      String named = reason.substring("reaches-active-table:".length()).split("[ ,:]")[0].trim();
+      if (!named.isBlank() && !activeTables.contains(named.toLowerCase(Locale.ROOT))) {
+        malformed.add(
+            key
+                + " :: reaches-active-table names "
+                + named
+                + ", which is not in openaev.tenant.active-tables. The attenuation this waiver"
+                + " claims does not hold, so the join is unprotected");
+      }
+    }
+    Matcher untilActive = UNTIL_ACTIVE.matcher(reason);
+    if (untilActive.find()) {
+      String named = untilActive.group(1).toLowerCase(Locale.ROOT);
+      if (activeTables.contains(named)) {
+        malformed.add(
+            key
+                + " :: until-active names "
+                + named
+                + ", which is now active. The deferral has expired: settle this join or"
+                + " reclassify it");
+      }
+    }
+    return malformed;
+  }
+
   @Test
   @DisplayName("every waiver carries a classification and a reason")
   void everyWaiverCarriesAClassificationAndAReason() throws IOException {
     List<String> malformed = new ArrayList<>();
+    Set<String> activeTables = ProductionActiveTables.names();
     for (Map.Entry<String, String> waiver : waivers().entrySet()) {
-      String reason = waiver.getValue();
-      if (reason.isBlank()) {
-        malformed.add(waiver.getKey() + " :: no reason at all");
-        continue;
-      }
-      if (CLASSIFICATIONS.stream().noneMatch(reason::startsWith)) {
-        malformed.add(
-            waiver.getKey() + " :: reason does not begin with a classification: " + reason);
-        continue;
-      }
-      // A classification is a label, not an argument: each one must be followed by prose that says
-      // what makes the join safe, so a reason cannot be a bare tag.
-      String rest = reason;
-      for (String classification : CLASSIFICATIONS) {
-        if (reason.startsWith(classification)) {
-          rest = reason.substring(classification.length());
-        }
-      }
-      if (rest.replaceAll("[^A-Za-z]", "").length() < 25) {
-        malformed.add(waiver.getKey() + " :: classification with no reason behind it: " + reason);
-      }
-      if (reason.startsWith("not-established") && !reason.contains("until-active:")) {
-        malformed.add(
-            waiver.getKey()
-                + " :: an unestablished waiver must name the table whose activation retires it,"
-                + " as until-active:<table>");
-      }
-      if (reason.startsWith("reaches-active-table:")
-          && reason.substring("reaches-active-table:".length()).split("[ ,:]")[0].isBlank()) {
-        malformed.add(waiver.getKey() + " :: reaches-active-table must name the table");
-      }
-      if (reason.startsWith("fixed-pending:")
-          && !reason.substring("fixed-pending:".length()).matches("#\\d+\\b.*")) {
-        malformed.add(
-            waiver.getKey()
-                + " :: fixed-pending must name the pull request that repairs it, as"
-                + " fixed-pending:#<number>");
-      }
+      malformed.addAll(waiverViolations(waiver.getKey(), waiver.getValue(), activeTables));
     }
     assertTrue(
         malformed.isEmpty(),
@@ -1135,6 +1177,66 @@ class SharedTenantKeyJoinArchTest {
           .map(String::trim)
           .filter(line -> !line.isEmpty() && !line.startsWith("#"))
           .toList();
+    }
+  }
+
+  @Nested
+  @DisplayName("A waiver that depends on the activation list expires with it")
+  class WaiverExpiry {
+
+    private static final Set<String> ACTIVE = Set.of("attack_patterns", "documents");
+
+    @Test
+    @DisplayName("given reaches-active-table on a table that is not active, then it is flagged")
+    void givenAttenuationByAnInactiveTable_shouldBeFlagged() {
+      List<String> found =
+          waiverViolations(
+              "SomeRepository#someQuery shared_key a=b",
+              "reaches-active-table:injectors_contracts : the chain goes on to that table so a"
+                  + " foreign row is removed there before it can matter here",
+              ACTIVE);
+      assertTrue(
+          found.stream().anyMatch(v -> v.contains("not in openaev.tenant.active-tables")),
+          "a waiver claiming attenuation by a table nobody activated must fail. Got: " + found);
+    }
+
+    @Test
+    @DisplayName("given reaches-active-table on a table that is active, then it is not flagged")
+    void givenAttenuationByAnActiveTable_shouldNotBeFlagged() {
+      List<String> found =
+          waiverViolations(
+              "SomeRepository#someQuery shared_key a=b",
+              "reaches-active-table:attack_patterns : the chain goes on to that table so a foreign"
+                  + " row is removed there before it can matter here",
+              ACTIVE);
+      assertTrue(found.isEmpty(), "an attenuation by an active table is legitimate. Got: " + found);
+    }
+
+    @Test
+    @DisplayName("given until-active on a table that is now active, then it is flagged")
+    void givenDeferralOnAnActivatedTable_shouldBeFlagged() {
+      List<String> found =
+          waiverViolations(
+              "SomeRepository#someQuery shared_key a=b",
+              "not-established until-active:documents : nobody has measured whether this one can"
+                  + " actually see another tenant row, so it waits for that activation",
+              ACTIVE);
+      assertTrue(
+          found.stream().anyMatch(v -> v.contains("is now active")),
+          "a deferral whose table was activated must fail. Got: " + found);
+    }
+
+    @Test
+    @DisplayName("given until-active on a table that is still inactive, then it is not flagged")
+    void givenDeferralOnAnInactiveTable_shouldNotBeFlagged() {
+      List<String> found =
+          waiverViolations(
+              "SomeRepository#someQuery shared_key a=b",
+              "not-established until-active:injectors_contracts : nobody has measured whether this"
+                  + " one can actually see another tenant row, so it waits for that activation",
+              ACTIVE);
+      assertTrue(
+          found.isEmpty(), "a deferral on a table still inactive is legitimate. Got: " + found);
     }
   }
 }

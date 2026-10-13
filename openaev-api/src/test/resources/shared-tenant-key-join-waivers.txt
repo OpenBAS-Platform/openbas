@@ -43,8 +43,6 @@ InjectorContractRepository#findInjectorContractsByVulnerabilityIdIn injector_con
 # ---------------------------------------------------------------------------------------------
 # Dead code. Two sites disappear with the method.
 # ---------------------------------------------------------------------------------------------
-InjectRepository#findRawByIds injector_contract_id i=icap  # dead-code : findRawByIds has no caller in either production module; a search for the name returns only its own declaration. Deleting the method removes this site and the next one for free.
-InjectRepository#findRawByIds injector_contract_id i=injcon  # dead-code : the second unscoped join of the same uncalled method, reached only if somebody starts calling it.
 
 # ---------------------------------------------------------------------------------------------
 # Not established, and nothing downstream attenuates them.
