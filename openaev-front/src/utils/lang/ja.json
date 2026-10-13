@@ -2146,7 +2146,7 @@
   "Injects successfully generated.": "インジェクトは正常に生成された。",
   "Injects that run after this one, on the condition you define.": "このインジェクトの後に、指定した条件で実行されるインジェクト。",
   "Injects will appear here once they have been played.": "実行されたインジェクトがここに表示されます。",
-  "Injects would be paused do you confirm?": "インジェクションを一時停止します。よろしいですか？",
+  "Injects would be paused do you confirm?": "インジェクトを一時停止します。よろしいですか？",
   "injectType cannot be null or empty": "injectTypeはnullまたは空であってはなりません",
   "Input": "入力",
   "Input (describe what you want)": "入力（必要な内容を説明してください）",
