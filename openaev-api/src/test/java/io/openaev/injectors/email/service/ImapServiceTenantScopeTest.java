@@ -12,6 +12,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.openaev.context.TenantScopedTransaction;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.Communication;
 import io.openaev.database.model.Inject;
 import io.openaev.database.model.Tenant;
@@ -29,6 +31,8 @@ import jakarta.mail.internet.MimeMessage;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -50,6 +54,7 @@ class ImapServiceTenantScopeTest {
   @Mock private FileService fileService;
   @Mock private Environment env;
   @Mock private SettingRepository settingRepository;
+  @Mock private TenantScopedTransaction tenantScopedTransaction;
 
   private ImapService imapService;
 
@@ -62,8 +67,21 @@ class ImapServiceTenantScopeTest {
             communicationRepository,
             fileService,
             env,
-            settingRepository);
+            settingRepository,
+            tenantScopedTransaction);
     ReflectionTestUtils.setField(imapService, "username", "mailbox@openaev.test");
+    // Pass-through: the scope itself is pinned on the real stack by ImapServiceInjectsScopeTest.
+    lenient()
+        .when(tenantScopedTransaction.execute(any(TxCtx.class), any(Supplier.class)))
+        .thenAnswer(invocation -> invocation.<Supplier<?>>getArgument(1).get());
+    lenient()
+        .doAnswer(
+            invocation -> {
+              invocation.<Runnable>getArgument(1).run();
+              return null;
+            })
+        .when(tenantScopedTransaction)
+        .execute(any(TxCtx.class), any(Runnable.class));
   }
 
   @Nested
@@ -223,8 +241,21 @@ class ImapServiceTenantScopeTest {
                 }
                 return java.util.List.of();
               });
+      java.util.Map<String, Communication> savedById = new java.util.HashMap<>();
       when(communicationRepository.save(any(Communication.class)))
-          .thenAnswer(invocation -> invocation.getArgument(0));
+          .thenAnswer(
+              invocation -> {
+                Communication saved = invocation.getArgument(0);
+                if (saved.getId() == null) {
+                  saved.setId(UUID.randomUUID().toString());
+                }
+                savedById.put(saved.getId(), saved);
+                return saved;
+              });
+      when(communicationRepository.findById(anyString()))
+          .thenAnswer(
+              invocation ->
+                  java.util.Optional.ofNullable(savedById.get(invocation.<String>getArgument(0))));
 
       Message[] messages =
           new Message[] {
