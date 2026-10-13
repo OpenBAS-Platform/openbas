@@ -272,8 +272,12 @@ can disagree. `isAdminOrBypass()` is also used in about 25 call sites, so its me
 changing it. No test exercises it with a `BYPASS` role today (the only mention is a comment in
 `InjectServiceTest`).
 
-**Open point**: "except for ACCESS" is read as the capabilities that already bypass on their own
-(`AGENT_RUNTIME_ACCESS`, `MANAGE_STIX_BUNDLE`). Confirm the exact list before step 2.3.
+Example: The "Access Assets" capability only protects access to the Assets and Asset Groups views. If you revoke it, 
+assets and asset groups are still visible under launchable objects (atomic testings, simulations and scenarios). 
+So it only protects against accessing the views not clearance to access assets as we do in markings.
+This is why markings are independent from the capabilities. Markings should be the first layer of access control 
+(which data , resources..Etc a user can access or see  trough the platform), and capabilities come second (which 
+features a user can access on the platform).
 
 ### Steps
 
@@ -314,11 +318,12 @@ its members at execution time nor its aggregated result follow the launcher's cl
   - "at least one" mode: the group shows Success thanks to RED alone.
 - The global score reads this row too (`InjectExpectationRepository.java:390-397`), so it is skewed as well.
   RED's identity stays hidden, but its outcome does not.
+- Check for atomic testings but simulations and scenarios too because it's the result of several injects.
 
 Options for 3b, to settle before coding and check with Vertical 2:
 
 - Recompute the group verdict at read time from the members the viewer can see. Correct, but it changes the
-  scoring code and costs more.
+  scoring code and costs more. See `computeChildrenScore` to give only the inject expectations the user sees.
 - Hide the group row from a viewer who cannot see every member. Simple, but it hides the group for that case.
 - Accept and document it, since it is an aggregate (the "stored aggregates" con of the chosen option).
 
@@ -501,7 +506,8 @@ Special bypass with OpenCTI user (shadow user not visible with all markings adde
 
 ## Chunk 7 — Tests chained simulation and autonomous run
 
-Check that autonomous run and chained scenario work (check with Vertical 1 if necessary). If not, add the user for the scenarios.
+Check that autonomous run and chained scenario work: check with Vertical 1 for the behavior with findings, assets,... 
+If not, add the user for the scenarios and fix/adapt the different missing things.
 
 ## Chunk 8 — Asset not targeted
 
@@ -551,7 +557,9 @@ contracts, so the marking filter does not apply.
 
 ## Chunk 13 — Dashboards: last spike to POC
 
-**Status**: POC done. Tracked as a separate issue and PR, outside this plan's scope.
+**Status**: POC done. Tracked as a separate issue and PR, outside this plan's scope because it needs product definition.
+The RBAC and grands have not been implemented yet, a first adjustment must be done before implementing markings 
+for dashboards.
 
 Last spike of the POC, on dashboards (how marking clearance applies to dashboard data).
 
