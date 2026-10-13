@@ -11,6 +11,7 @@ import io.openaev.database.model.CollectorType;
 import io.openaev.database.repository.CollectorTypeRepository;
 import io.openaev.utils.TenantIsolationTestHelper;
 import io.openaev.utils.mockUser.WithMockUser;
+import io.openaev.utilstest.WithoutTenantScope;
 import java.sql.PreparedStatement;
 import java.util.Optional;
 import java.util.UUID;
@@ -122,6 +123,7 @@ class CollectorTypeTenantScopeTest extends IntegrationTest {
     }
 
     @Test
+    @WithoutTenantScope
     @DisplayName("with no scope at all: even the caller's own type fails closed")
     void given_noScopeSet_should_failClosedEvenForItsOwnTenant() {
       // Act & Assert - the control for the test above, on a different line than the active-tables

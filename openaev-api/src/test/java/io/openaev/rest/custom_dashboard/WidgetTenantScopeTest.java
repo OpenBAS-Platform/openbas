@@ -17,6 +17,7 @@ import io.openaev.utils.TenantIsolationTestHelper;
 import io.openaev.utils.fixtures.composers.CustomDashboardComposer;
 import io.openaev.utils.fixtures.composers.WidgetComposer;
 import io.openaev.utils.mockUser.WithMockUser;
+import io.openaev.utilstest.WithoutTenantScope;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -110,6 +111,7 @@ class WidgetTenantScopeTest extends IntegrationTest {
     }
 
     @Test
+    @WithoutTenantScope
     @DisplayName("with no scope at all: even the caller's own widget fails closed")
     void given_noScopeSet_should_failClosedEvenForItsOwnWidget() {
       // Act & Assert - the control for the test above, on a different line than the active-tables
