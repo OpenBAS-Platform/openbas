@@ -36,6 +36,7 @@ const usePaginationState = (
     handleChangeRowsPerPage: useCallback((rowsPerPage: number) => onChangeRef.current?.(0, rowsPerPage), []),
     handleChangePagination: useCallback((pagination: Pagination) => onChangeRef.current?.(pagination.page, pagination.size), []),
     handleChangeTotalElements: useCallback((value: number) => setTotalElements(value), []),
+    incrementTotalElements: useCallback((delta: number) => setTotalElements(total => Math.max(0, total + delta)), []),
     getTotalElements: () => totalElements,
     page,
     elementsPerPage: size,
@@ -89,6 +90,7 @@ export const useLocalPaginationState = (
       setSize(newSize);
     }, []),
     handleChangeTotalElements: useCallback((value: number) => setTotalElements(value), []),
+    incrementTotalElements: useCallback((delta: number) => setTotalElements(total => Math.max(0, total + delta)), []),
     getTotalElements: () => totalElements,
     page,
     elementsPerPage: size,

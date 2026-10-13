@@ -204,7 +204,10 @@ const PhishingEmailTemplates = () => {
                     emailTemplate={emailTemplate}
                     inList
                     openEditOnInit={emailTemplate.phishing_email_template_id === searchId}
-                    onDelete={result => setEmailTemplates(emailTemplates.filter(v => v.phishing_email_template_id !== result))}
+                    onDelete={(result) => {
+                      setEmailTemplates(emailTemplates.filter(v => v.phishing_email_template_id !== result));
+                      queryableHelpers.paginationHelpers.incrementTotalElements(-1);
+                    }}
                   />
                 )}
               >

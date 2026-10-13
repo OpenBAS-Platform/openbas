@@ -67,7 +67,12 @@ const Tenants = () => {
           queryableHelpers={queryableHelpers}
           topBarButtons={(
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.TENANTS}>
-              <TenantCreate onCreate={addTenant} />
+              <TenantCreate
+                onCreate={(tenant) => {
+                  addTenant(tenant);
+                  queryableHelpers.paginationHelpers.incrementTotalElements(1);
+                }}
+              />
             </Can>
           )}
         />
