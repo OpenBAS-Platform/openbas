@@ -1,6 +1,6 @@
 import { Checkbox, Tooltip, TooltipContent, TooltipTrigger } from '@filigran/design-system';
 import { LocalPoliceOutlined, LockOutlined } from '@mui/icons-material';
-import { Box, Divider, Tooltip } from '@mui/material';
+import { Box, Divider } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Controller, type FieldValues, type Path, useFormContext, useWatch } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
