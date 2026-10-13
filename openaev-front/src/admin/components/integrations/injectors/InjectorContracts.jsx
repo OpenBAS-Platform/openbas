@@ -174,8 +174,7 @@ const InjectorContracts = () => {
 
     stopPolling();
     let attempts = 0;
-    // eslint-disable-next-line @eslint-react/web-api-no-leaked-interval
-    pollIntervalRef.current = setInterval(() => {
+    const intervalId = setInterval(() => {
       attempts += 1;
       if (attempts >= POLL_MAX_ATTEMPTS) {
         stopPolling();
@@ -183,8 +182,12 @@ const InjectorContracts = () => {
       }
       triggerRefetch();
     }, POLL_INTERVAL_MS);
+    pollIntervalRef.current = intervalId;
 
-    return stopPolling;
+    return () => {
+      clearInterval(intervalId);
+      pollIntervalRef.current = null;
+    };
   }, [hasFetched]);
 
   // Stop polling as soon as contracts appear

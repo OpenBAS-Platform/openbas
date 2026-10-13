@@ -24,7 +24,7 @@ import { isAutonomousRunActive } from '../../autonomous/autonomousStatus';
 import useAutonomousPanelWidth from '../../autonomous/useAutonomousPanelWidth';
 import useAutonomousRunForSimulation from '../../autonomous/useAutonomousRunForSimulation';
 import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../common/Context';
-import injectContextForExercise from './ExerciseContext';
+import useInjectContextForExercise from './ExerciseContext';
 import SimulationShell from './SimulationShell';
 
 const Simulation = lazy(() => import('./overview/SimulationComponent'));
@@ -233,7 +233,7 @@ const Index = () => {
     }
   }, [exercise, dispatch]);
 
-  const exerciseInjectContext = injectContextForExercise(exercise);
+  const exerciseInjectContext = useInjectContextForExercise(exercise);
 
   // avoid to show loader if something trigger useDataLoader
   if ((pristine && loading) || !autonomousResolved) {

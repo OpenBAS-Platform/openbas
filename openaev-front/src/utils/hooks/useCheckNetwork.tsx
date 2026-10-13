@@ -8,20 +8,36 @@ const useNetworkCheck = (url?: string | null): UseNetworkCheckResult => {
   useEffect(() => {
     if (!url) {
       setIsReachable(false);
-      return;
+      return undefined;
     }
 
+    // Set on cleanup so a request aborted because the url changed (or the
+    // component unmounted) does not report the old url as unreachable.
+    let cancelled = false;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
-    // eslint-disable-next-line @eslint-react/web-api-no-leaked-fetch
     fetch(url, {
       method: 'HEAD',
       mode: 'no-cors',
       signal: controller.signal,
     })
-      .then(() => setIsReachable(true))
-      .catch(() => setIsReachable(false))
+      .then(() => {
+        if (!cancelled) {
+          setIsReachable(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setIsReachable(false);
+        }
+      })
       .finally(() => clearTimeout(timeoutId));
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, [url]);
 
   return { isReachable };

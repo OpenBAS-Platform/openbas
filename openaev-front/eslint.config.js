@@ -37,16 +37,11 @@ export default [
       '@eslint-react/dom-no-unsafe-target-blank': 'error',
       '@eslint-react/no-missing-component-display-name': 'error',
 
-      // Rules of Hooks and React Compiler checks (the eslint-plugin-react-hooks set), not enforced yet
-      '@eslint-react/error-boundaries': 'off',
+      // eslint-plugin-react-hooks checks still to fix (dependency arrays and React Compiler rules), not enforced yet
       '@eslint-react/exhaustive-deps': 'off',
       '@eslint-react/purity': 'off',
-      '@eslint-react/rules-of-hooks': 'off',
       '@eslint-react/set-state-in-effect': 'off',
-      '@eslint-react/set-state-in-render': 'off',
       '@eslint-react/static-components': 'off',
-      '@eslint-react/unsupported-syntax': 'off',
-      '@eslint-react/use-memo': 'off',
 
       // React 19 API migrations (use(Context), <Context> as provider, ref as a prop), not applied yet
       '@eslint-react/no-context-provider': 'off',
@@ -235,6 +230,8 @@ export default [
     ...playwright.configs['flat/recommended'],
     rules: {
       ...playwright.configs['flat/recommended'].rules,
+      // Playwright fixtures receive a `use` callback, which the React rule mistakes for React's use()
+      '@eslint-react/rules-of-hooks': 'off',
       'import/no-extraneous-dependencies': [
         'error',
         {

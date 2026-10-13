@@ -9,7 +9,7 @@ const { mockIsFeatureEnabled, mockCan } = vi.hoisted(() => ({
 
 vi.mock('../../../../../components/i18n', () => ({ useFormatter: () => ({ t: (value: string) => value }) }));
 
-vi.mock('../../../../../utils/utils', () => ({ isFeatureEnabled: mockIsFeatureEnabled }));
+vi.mock('../../../../../utils/utils', () => ({ useIsFeatureEnabled: mockIsFeatureEnabled }));
 
 vi.mock('../../../../../utils/hooks/useAuth', () => ({ default: () => ({ settings: { default_tenant_id: '2cffad3a-0001-4078-b0e2-ef74274022c3' } }) }));
 

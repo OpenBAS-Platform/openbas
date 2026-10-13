@@ -27,7 +27,7 @@ import useAutonomousPanelWidth from '../../autonomous/useAutonomousPanelWidth';
 import { useAutonomousRunForScenario } from '../../autonomous/useAutonomousRunForSimulation';
 import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../common/Context';
 import useHasInjectTests from '../../injects/useHasInjectTests';
-import injectContextForScenario from './ScenarioContext';
+import useInjectContextForScenario from './ScenarioContext';
 import ScenarioHeader from './ScenarioHeader';
 import buildScenarioTabs from './scenarioTabs';
 
@@ -301,7 +301,7 @@ const Index = () => {
     });
   }, [scenarioId]);
 
-  const scenarioInjectContext = injectContextForScenario(scenario);
+  const scenarioInjectContext = useInjectContextForScenario(scenario);
 
   // Loader until the CURRENT scenario's fetch has completed
   if (loadedScenarioId !== scenarioId || !autonomousResolved) {

@@ -11,7 +11,7 @@ import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { INHERITED_CONTEXT } from '../../../../../utils/permissions/types';
 import useSimulationPermissions from '../../../../../utils/permissions/useSimulationPermissions';
 import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../../common/Context';
-import injectContextForExercise from '../ExerciseContext';
+import useInjectContextForExercise from '../ExerciseContext';
 import SimulationShell from '../SimulationShell';
 import SimulationInjectCreation from './SimulationInjectCreation';
 
@@ -32,7 +32,7 @@ const SimulationInjectCreationRoute: FunctionComponent = () => {
     dispatch(fetchExercise(exerciseId));
   });
 
-  const injectContext = injectContextForExercise(exercise);
+  const injectContext = useInjectContextForExercise(exercise);
   const permissions = useSimulationPermissions(exerciseId, exercise);
   const permissionsContext: PermissionsContextType = useMemo(() => ({
     permissions,
