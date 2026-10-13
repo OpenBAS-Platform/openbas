@@ -2030,8 +2030,7 @@
                         "type": "string"
                     },
                     "SPLUNKES_QUERY_TEMPLATE": {
-                        "description": "SPL query template for fetching alerts. Placeholders: {alerts_index} (configured index), {source_ips} (source IP values, quoted for IN operator; * if none), {target_ips} (target IP values, quoted for IN operator; * if none), {hostnames} (hostname values, quoted for IN operator; * if none), {start_date} (inject start date or relative time like -3600s), {end_date} (inject end date or 'now'). Implant names, URLs and other signatures are not query placeholders: they are matched afterwards in each alert's _raw text. The query MUST include '| table _time' for proper alert parsing. Leave empty to use the default query.",
-                        "default": "index={alerts_index} (src_ip IN ({source_ips}) OR src IN ({source_ips}) OR source_ip IN ({source_ips}) OR client_ip IN ({source_ips})) (dst_ip IN ({target_ips}) OR dest IN ({target_ips}) OR dest_ip IN ({target_ips}) OR destination_ip IN ({target_ips}) OR server_ip IN ({target_ips})) (host IN ({hostnames}) OR hostname IN ({hostnames}) OR host_name IN ({hostnames})) earliest={start_date} latest={end_date} | table _time, src_ip, src, source_ip, client_ip, dst_ip, dest, dest_ip, destination_ip, server_ip, host, hostname, signature, rule_name, event_type, severity, url_path, _raw | sort -_time",
+                        "description": "SPL query template for fetching alerts. Placeholders: {alerts_index} (configured index), {source_ips} (source IP values, quoted for IN operator; * if none), {target_ips} (target IP values, quoted for IN operator; * if none), {hostnames} (hostname values, quoted for IN operator; * if none), {start_date} (inject start date or relative time like -3600s), {end_date} (inject end date or 'now'). Implant names, URLs and other signatures are not query placeholders: they are matched afterwards in each alert's _raw text. The query MUST include '| table _time' for proper alert parsing. Leave empty to use the collector's built-in query.",
                         "type": "string"
                     }
                 },
@@ -3830,9 +3829,8 @@
                         "default": ".alerts-security.alerts-*"
                     },
                     "ELASTIC_QUERY_TEMPLATE": {
-                        "description": "Lucene query_string template used to correlate alerts with an expectation. Placeholders: {alerts_index} (configured index), {source_ips} (source IP values), {target_ips} (target IP values), {implant_urls} (implant callback URL paths), {implant_names} (implant process names), {start_date} (inject start date), {end_date} (inject end date), {time_window} (time window). Each list placeholder is rendered as an OR-joined set of quoted values, so write e.g. 'host.ip:({source_ips})'. The time range is always applied separately as an @timestamp filter. Leave empty to use the default query.",
-                        "type": "string",
-                        "default": "(source.ip:({source_ips}) OR host.ip:({source_ips}) OR client.ip:({source_ips})) OR (destination.ip:({target_ips}) OR server.ip:({target_ips}) OR host.ip:({target_ips})) OR (url.path:({implant_urls}) OR url.original:({implant_urls})) OR (process.name:({implant_names}) OR process.parent.name:({implant_names}) OR process.command_line:({implant_names}))"
+                        "description": "Lucene query_string template used to correlate alerts with an expectation. Placeholders: {alerts_index} (configured index), {source_ips} (source IP values), {target_ips} (target IP values), {implant_urls} (implant callback URL paths), {implant_names} (implant process names), {start_date} (inject start date), {end_date} (inject end date), {time_window} (time window). Each list placeholder is rendered as an OR-joined set of quoted values, so write e.g. 'host.ip:({source_ips})'. The time range is always applied separately as an @timestamp filter. Leave empty to use the collector's built-in query.",
+                        "type": "string"
                     },
                     "ELASTIC_EVENTS_INDEX": {
                         "description": "Index pattern of raw endpoint/process events used to drill down from a detection alert to its source process and recover the OpenAEV implant marker. This enables deterministic per-inject correlation. Leave empty to disable the drilldown and fall back to host/IP + time correlation only.",
@@ -3862,12 +3860,8 @@
                     },
                     "ELASTIC_VERIFY_SSL": {
                         "default": true,
-                        "description": "Whether to verify the Elasticsearch TLS certificate. Keep enabled in production; prefer trusting the cluster CA via ELASTIC_CA_CERT over disabling it.",
+                        "description": "Whether to verify the Elasticsearch TLS certificate. Keep enabled in production: disabling it exposes credentials to interception.",
                         "type": "boolean"
-                    },
-                    "ELASTIC_CA_CERT": {
-                        "description": "Path (inside the collector container) to a CA bundle (PEM) used to verify the Elasticsearch TLS certificate, for self-signed or private CAs. When set, it takes precedence over ELASTIC_VERIFY_SSL.",
-                        "type": "string"
                     }
                 },
                 "required": [

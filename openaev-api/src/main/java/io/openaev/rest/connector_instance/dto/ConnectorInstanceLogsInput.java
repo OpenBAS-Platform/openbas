@@ -11,5 +11,6 @@ import lombok.Setter;
 public class ConnectorInstanceLogsInput {
   @Schema(description = "The connector instance logs, oldest first")
   @JsonProperty("connector_instance_logs")
+  // List, not Set: the composer sends lines in order, and the same line can repeat.
   private List<String> logs;
 }

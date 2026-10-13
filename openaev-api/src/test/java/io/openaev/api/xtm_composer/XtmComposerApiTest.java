@@ -508,11 +508,11 @@ public class XtmComposerApiTest extends IntegrationTest {
         registerComposer();
         pushLogs(instance, List.of("line 1", "line 2", "line 3"));
 
-        // Act: the composer resends its tail, which now overlaps the previous push
-        pushLogs(instance, List.of("line 2", "line 3", "line 4"));
+        // Act: the composer resends its tail, which overlaps the previous push and repeats a line
+        pushLogs(instance, List.of("line 2", "line 3", "line 2"));
 
         // Assert
-        assertEquals(List.of("line 2", "line 3", "line 4"), storedLogs(instance));
+        assertEquals(List.of("line 2", "line 3", "line 2"), storedLogs(instance));
       }
 
       @Test

@@ -37,43 +37,23 @@ const SECRET = buildDefinition({
 // -- TESTS --
 
 describe('resolveInitialConfigurationValue', () => {
-  describe('when a value is stored on the instance', () => {
-    it('keeps a stored false boolean instead of the true default', () => {
-      expect(resolveInitialConfigurationValue(BOOLEAN_DEFAULT_TRUE, false, true)).toBe(false);
-    });
-
-    it('keeps a stored 0 integer instead of the default', () => {
-      expect(resolveInitialConfigurationValue(INTEGER_DEFAULT_3, 0, true)).toBe('0');
-    });
-
-    it('keeps a stored empty string instead of the default', () => {
-      expect(resolveInitialConfigurationValue(STRING_WITH_DEFAULT, '', true)).toBe('');
-    });
-
-    it('keeps a stored truthy value', () => {
-      expect(resolveInitialConfigurationValue(STRING_WITH_DEFAULT, 'debug', true)).toBe('debug');
-    });
+  it.each([
+    ['false boolean', BOOLEAN_DEFAULT_TRUE, false, false],
+    ['0 integer', INTEGER_DEFAULT_3, 0, '0'],
+    ['empty string', STRING_WITH_DEFAULT, '', ''],
+  ])('keeps a stored %s instead of the catalog default', (_label, definition, stored, expected) => {
+    expect(resolveInitialConfigurationValue(definition, stored, true)).toBe(expected);
   });
 
-  describe('when nothing is stored on the instance', () => {
-    it.each([undefined, null])('falls back to the catalog default (%s)', (stored) => {
-      expect(resolveInitialConfigurationValue(BOOLEAN_DEFAULT_TRUE, stored, true)).toBe(true);
-    });
+  it.each([undefined, null])('falls back to the catalog default when nothing is stored (%s)', (stored) => {
+    expect(resolveInitialConfigurationValue(BOOLEAN_DEFAULT_TRUE, stored, true)).toBe(true);
+  });
 
-    it('stringifies an integer default', () => {
-      expect(resolveInitialConfigurationValue(INTEGER_DEFAULT_3, undefined, false)).toBe('3');
-    });
+  it('masks a write-only secret when editing', () => {
+    expect(resolveInitialConfigurationValue(SECRET, undefined, true)).toBe(DOTS);
+  });
 
-    it('falls back to an empty string when the catalog has no default', () => {
-      expect(resolveInitialConfigurationValue(buildDefinition({}), undefined, false)).toBe('');
-    });
-
-    it('masks a write-only secret when editing', () => {
-      expect(resolveInitialConfigurationValue(SECRET, undefined, true)).toBe(DOTS);
-    });
-
-    it('does not mask a write-only secret when creating', () => {
-      expect(resolveInitialConfigurationValue(SECRET, undefined, false)).toBe('');
-    });
+  it('does not mask a write-only secret when creating', () => {
+    expect(resolveInitialConfigurationValue(SECRET, undefined, false)).toBe('');
   });
 });

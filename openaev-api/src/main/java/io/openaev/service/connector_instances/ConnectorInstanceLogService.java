@@ -59,12 +59,16 @@ public class ConnectorInstanceLogService {
     if (logLines.isEmpty()) {
       return;
     }
-    List<ConnectorInstanceLog> storedLogs =
-        connectorInstanceLogRepository.findOrderedByConnectorInstanceId(connectorInstance.getId());
-    if (storedLogs.stream().map(ConnectorInstanceLog::getLog).toList().equals(logLines)) {
+    List<String> storedLines =
+        connectorInstanceLogRepository
+            .findOrderedByConnectorInstanceId(connectorInstance.getId())
+            .stream()
+            .map(ConnectorInstanceLog::getLog)
+            .toList();
+    if (storedLines.equals(logLines)) {
       return;
     }
-    connectorInstanceLogRepository.deleteAll(storedLogs);
+    connectorInstanceLogRepository.deleteByConnectorInstanceId(connectorInstance.getId());
 
     Instant firstLineAt = Instant.now();
     List<ConnectorInstanceLog> snapshot = new ArrayList<>(logLines.size());
