@@ -596,9 +596,6 @@ public class ScenarioApi extends RestBehavior {
             || (input.getRecurrence() != null && !input.getRecurrence().isBlank());
     if (schedules) {
       this.scenarioService.throwIfScenarioNotLaunchable(scenario);
-      // The actor a scheduled Exercise's launchedBy is resolved from when ScenarioExecutionJob
-      // materializes it later with no live user present. Re-stamped on every recurrence
-      // configuration call, not just the first — always the live caller at that moment.
       scenario.setScheduledBy(
           this.userRepository
               .findById(currentUser().getId())
@@ -681,7 +678,6 @@ public class ScenarioApi extends RestBehavior {
       TxCtx ctx, @PathVariable @NotBlank final String scenarioId) throws ChainingException {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     Exercise simulation;
-    // The live caller's clearance gates this Exercise's inject dispatch.
     User launchedBy =
         this.userRepository
             .findById(currentUser().getId())

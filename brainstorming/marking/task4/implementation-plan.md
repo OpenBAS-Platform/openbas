@@ -8,7 +8,9 @@
 (asset marking = read filter, enforced via the statement-inspector rewrite).
 
 **Status**: 
-
+Chunk 1 done, PR needs to be merged. 
+Thanks to chunk 1, almost all other chunks can be done at the same time, a meeting is scheduled with the team 
+to size and set ETA for each chunk.
 ---
 
 # Chunk 1: POC — Launch scoping for Scenario/Simulation/Atomic Testing with marking clearance
@@ -253,17 +255,132 @@ from `executableInject.getAssetsToExecute()`, falling back to `injectService.res
 when null. New `ExecutableInjectDTOMapperTest` (3 tests): cached-filtered-list path, fallback-to-resolve
 path, non-marking case unaffected.
 
-**`.assetGroups(...)` decision — left unfiltered, deliberately, not resolved the way the DoD assumed a
-clean answer existed:** the mapper's own existing comment confirms non-endpoint assets reached via a
-group (e.g. AI targets) are resolved by the downstream injector *from the group itself*, independent of
-the filtered flat asset list. Asset groups carry no marking of their own today — that's Task 4's own
-explicitly-deferred US1 — so there is no clearance rule to apply to this set yet; emptying it would
-silently break the AI-target-via-group path for external injectors, not just de-duplicate. **Known,
-scoped gap, not an oversight**: a marked AI-target asset reachable only through an asset group,
-dispatched to a non-agent external connector, is not covered by this fix. Revisit once US1 (POC 2)
-gives asset groups their own marking semantics.
+## Chunk 2 — BYPASS capability must not widen marking clearance
 
-## Chunk 2 — SSE - Stream API revisited
+A user who belongs to a group holding a `BYPASS` role plus the marking `TLP:GREEN` could see `TLP:RED`.
+Principle: markings sit above capabilities, so `BYPASS` is secondary to markings, except for the
+`ACCESS`-type capabilities that grant clearance on their own (see "Open point").
+
+Today two code paths disagree on who is a bypass user:
+
+- `InjectService.resolveLaunchedByClearance` (dispatch) uses `launchedBy.isAdminOrBypass()` only.
+- `HttpMarkingScopeSupplier` (read) uses `isAdminOrBypass()`, `AGENT_RUNTIME_ACCESS` or `MANAGE_STIX_BUNDLE`.
+
+For a user whose bypass comes from a group `BYPASS` role, the read path can treat them as full bypass while
+the dispatch path resolves through their group marking grants (narrower, fail-closed), so reads and dispatch
+can disagree. `isAdminOrBypass()` is also used in about 25 call sites, so its meaning must be checked before
+changing it. No test exercises it with a `BYPASS` role today (the only mention is a comment in
+`InjectServiceTest`).
+
+Example: The "Access Assets" capability only protects access to the Assets and Asset Groups views. If you revoke it, 
+assets and asset groups are still visible under launchable objects (atomic testings, simulations and scenarios). 
+So it only protects against accessing the views not clearance to access assets as we do in markings.
+This is why markings are independent from the capabilities. Markings should be the first layer of access control 
+(which data , resources..Etc a user can access or see  trough the platform), and capabilities come second (which 
+features a user can access on the platform).
+
+### Steps
+
+- **2.1** Failing test first: a user in a group with a `BYPASS` role and only `TLP:GREEN` cleared must not
+  see a `TLP:RED` asset (read path), and must not dispatch to it (`resolveLaunchedByClearance`).
+- **2.2** Settle what `isAdminOrBypass()` returns for a group `BYPASS` role, and list the call sites that
+  feed a marking decision (`AssetMarkingsService`, `MarkingDefinitionApi`, `HttpMarkingScopeSupplier`,
+  `InjectService`).
+- **2.3** Fix: one shared rule for "full marking clearance" used by both the read and the dispatch path, where
+  group `BYPASS` no longer grants full clearance. A platform admin and the `ACCESS`-type capabilities of the
+  open point keep it.
+- **2.4** Check the three users still behave: admin (everything), `BYPASS`-group user (their markings only),
+  OpenCTI and agent service accounts (everything).
+
+## Chunk 3 — Asset groups: clearance at execution and in the group verdict
+
+An asset group carries no marking of its own (Task 4's deferred US1), so neither 
+its members at execution time nor its aggregated result follow the launcher's clearance.
+
+### 3a) Asset groups are not resolved per launcher clearance at execution time
+
+- `.assets(...)` of the external-push payload is filtered by the launcher's clearance
+  (`getAssetsToExecute()`, with `resolveAllAssetsToExecute()` as the fallback, step 4.9).
+- `.assetGroups(...)` is left unfiltered on purpose (see the "`.assetGroups(...)` decision" note at the end
+  of Chunk 1) until asset groups get their own marking semantics.
+- The payload only carries each group's id and name (`AssetGroupSimple`), not its members. The external
+  injector resolves the members itself, later, so the launcher's clearance never applies to them.
+- `asset_groups_assets` is filtered by the clearance of whoever reads it. When the injector resolves the
+  members, it reads under its own account's clearance, not the launcher's.
+
+### 3b) The asset-group expectation row still includes RED in its verdict
+
+- An inject that targets an asset group stores one group expectation row (`asset_group_id` set, `asset_id`
+  NULL). Its verdict rolls up every member's result, using the group's validation mode.
+- The read filter only hides rows that have an `asset_id`. The RED member's own row is hidden, but the group
+  row is not, and its verdict was computed with RED included:
+  - "all assets" mode: the group shows Failed because of RED alone, while every visible member succeeded.
+  - "at least one" mode: the group shows Success thanks to RED alone.
+- The global score reads this row too (`InjectExpectationRepository.java:390-397`), so it is skewed as well.
+  RED's identity stays hidden, but its outcome does not.
+- Check for atomic testings but simulations and scenarios too because it's the result of several injects.
+
+Options for 3b, to settle before coding and check with Vertical 2:
+
+- Recompute the group verdict at read time from the members the viewer can see. Correct, but it changes the
+  scoring code and costs more. See `computeChildrenScore` to give only the inject expectations the user sees.
+- Hide the group row from a viewer who cannot see every member. Simple, but it hides the group for that case.
+- Accept and document it, since it is an aggregate (the "stored aggregates" con of the chosen option).
+
+### Steps
+
+- **3.1** Failing tests first: (a) a group with a RED and a GREEN member launched by a GREEN user must reach
+  the external injector with only the GREEN member resolvable; (b) the same group in both validation modes
+  must not show a verdict or score driven by RED.
+- **3.2** Choose how the external injector resolves group members under the launcher's clearance: send the
+  filtered member list in the payload, or give the injector the launcher's clearance when it reads
+  `asset_groups_assets`.
+- **3.3** Backend fix for 3a, then brainstorm/implement the 3b choice.
+- **3.4** Check the admin still sees the full group, its members and its true verdict.
+
+## Chunk 4 — Agentless traces of a RED asset
+
+External injectors that do not run through an agent (for example network scanners targeting agentless
+endpoints) report their results in an execution callback. The callback carries `contextIdentifiers`, the ids
+of the targets the result is about (assets, teams or players). The trace is saved with no agent and those ids
+in `execution_context_identifiers` (`InjectStatusService.java:237`).
+
+**Why it leaks**: the read filter on `execution_traces` follows trace → agent → asset
+(`MarkingDerivedTables`: `linkedTo("execution_traces", "execution_agent_id", "agents", "agent_id")`).
+Agentless traces have no agent, so they count as global and stay visible.
+
+- UI: no leak. The trace only shows when the user clicks the RED target, which a GREEN user cannot see.
+- API: `GET /api/injects/execution-traces?targetId=<RED id>` returns them (`findByInjectIdAndAssetId`
+  matches on the array).
+- API: the endpoints that return the raw Inject embed `status_traces`, which carry the RED asset id and the
+  injector's output to anyone who can read the inject.
+
+**Fix**: a second condition on the trace, hidden if any asset named in the array is restricted:
+
+```sql
+NOT EXISTS (SELECT 1 FROM assets a
+            WHERE a.asset_id = ANY(t.execution_context_identifiers)
+              AND NOT is_marking_set_allowed(a.marking_ids))
+```
+
+Team and player ids in the array match no asset, so they do not affect the result.
+
+**Engine work**: today a table can be filtered one way only, and `execution_traces` already follows the agent.
+So `MarkedTable` needs a fourth filter type ("an array of asset ids"), and a table must accept several
+filters ANDed together. Small-to-medium change in `MarkedTable` and `MarkingDimension`, plus tests
+(`MarkingLinkedTablesTest`, `MarkingLinkedTablesRowsTest`).
+
+### Steps
+
+- **4.1** Failing test first: an agentless trace whose `execution_context_identifiers` contains a `TLP:RED`
+  asset id is not returned to a `TLP:GREEN` user by `execution-traces?targetId=` nor in the raw Inject's
+  `status_traces`.
+- **4.2** Engine: add the "array of asset ids" filter type, and let a table carry several filters ANDed.
+- **4.3** Declare the second filter on `execution_traces` in `MarkingDerivedTables`.
+- **4.4** Check: traces with only team or player ids stay visible, agent traces still follow the agent, and
+  the admin sees every trace.
+
+## Chunk 5 — SSE - Stream API revisited
 
 **Status**: leak reproduced (2026-10-08), fix not started.
 
@@ -368,35 +485,85 @@ never leak state.
 
 ### 3) Steps
 
-- **2.1** Failing test first: a `TLP:GREEN` consumer of `StreamApi` must not receive the `instance` of a
+- **5.1** Failing test first: a `TLP:GREEN` consumer of `StreamApi` must not receive the `instance` of a
   `TLP:RED` asset update (today it does).
-- **2.2** Backend: signal-only events + marking gate on `Asset`; tests for an unmarked asset (signal to
+- **5.2** Backend: signal-only events + marking gate on `Asset`; tests for an unmarked asset (signal to
   everyone with READ), a RED asset (nothing to a GREEN consumer), a RED-cleared consumer (signal).
-- **2.3** Frontend: signal handling in `useDataLoader.js` (per-schema subscribers), then `Endpoints.tsx`
+- **5.3** Frontend: signal handling in `useDataLoader.js` (per-schema subscribers), then `Endpoints.tsx`
   refetch via `reloadContentCount`.
-- **2.4** Review the remaining `useDataLoader` / store-driven views and migrate those that relied on
+- **5.4** Review the remaining `useDataLoader` / store-driven views and migrate those that relied on
   the pushed payload.
-- **2.5** (optional) Stream each endpoint change once (duplicate `ModelBaseListener` on `Asset` /
+- **5.5** (optional) Stream each endpoint change once (duplicate `ModelBaseListener` on `Asset` /
   `Endpoint`).
 
-## Chunk 3 — Asset not targeted
+## Chunk 6 — OCTI: scenario create
+
+We need to add all the markings to the OpenCTI service account, in addition to adding the OpenCTI user to the scheduled scenario.
+See `resolveLaunchedByClearance`.
+
+**Question**: which user to add to `launchedBy` / `scheduledBy`?
+Special bypass with OpenCTI user (shadow user not visible with all markings added).
+
+## Chunk 7 — Tests chained simulation and autonomous run
+
+Check that autonomous run and chained scenario work: check with Vertical 1 for the behavior with findings, assets,... 
+If not, add the user for the scenarios and fix/adapt the different missing things.
+
+## Chunk 8 — Asset not targeted
 
 "Asset not targeted" vs "No asset executed", line 100 in `ExecutionExecutorService.java`: compare the list of assets the user's clearance holds to the list of assets.
 For the admin user looking at each asset overview, display "asset not targeted" when the user has no clearance on that asset.
 Same test with an agentless test with Nuclei: a scenario was created with an agentless asset.
 A user can only see one agentless asset => make sure the admin sees "asset not targeted" on the RED asset.
 
-## Chunk 4 — OCTI: scenario create
+## Chunk 9 — UX/UI: show who launched and what was skipped
 
-We need to add all the markings to the OpenCTI service account, in addition to adding the OpenCTI user to the scheduled scenario.
-See `resolveLaunchedByClearance`.
+**Status**: not started. **The PO needs to design it** before any code: the points below are the needs, not
+a design.
 
-**Question**: which user to add to `launchedBy` / `scheduledBy`?
-If we add OCTI user account we have to add all the markings to the OCTI user account as well.
+With more marked entities, partial runs become the norm rather than the exception. A viewer with higher
+clearance, for example an admin opening a Scenario, a Simulation or an Atomic Testing, must be able to tell
+that a run covered only part of the targets, and why. Otherwise scores and findings get misread as
+"everything was tested".
 
-## Chunk 5 — Tests chained simulation
+- **Show who launched the run, and on whose clearance.** Display `launched_by` (and `scheduled_by` for
+  recurring runs) on Simulations and Atomic Testing, e.g. "Launched by *jdoe*", "Scheduled by *jdoe*".
+- **Show marking chips on every asset list.** Target lists, result tables, findings and asset-group members
+  should all carry them, so a viewer sees which targets are marked and at which level.
 
-## Chunk 100 — End-to-end proof, as a Playwright e2e test (CI-covered) 🔴 not started
+## Chunk 10 — UX enhancement: execution details count only what the user can see
+
+**Status**: not started. **The PO needs to design it**; this is
+a later enhancement: consolidate the displayed value from what the viewing user can see.
+
+When an admin launches an inject and a user looks at it, the execution details read "Distributing inject to
+2 agent(s) across 2 endpoint(s)", counting assets the user cannot see.
+
+## Chunk 11 — UX enhancement: global inject status from what the user can see
+
+**Status**: not started. **The PO needs to design it**; this is
+a later enhancement: consolidate the displayed value from what the viewing user can see.
+
+The global inject status can look odd when the user does not see all the assets, because it is computed over
+every asset.
+
+## Chunk 12 — UX enhancement: platforms in the scenario list for a user
+
+**Status**: not started. **The PO needs to design it**; this is
+a later enhancement: consolidate the displayed value from what the viewing user can see.
+
+The platforms of a scenario are wrong for a user. The platforms queries never read assets, they read injector
+contracts, so the marking filter does not apply.
+
+## Chunk 13 — Dashboards: last spike to POC
+
+**Status**: POC done. Tracked as a separate issue and PR, outside this plan's scope because it needs product definition.
+The RBAC and grands have not been implemented yet, a first adjustment must be done before implementing markings 
+for dashboards.
+
+Last spike of the POC, on dashboards (how marking clearance applies to dashboard data).
+
+## Chunk 14 — End-to-end proof, as a Playwright e2e test (CI-covered) 🔴 not started
 
 Replaces the earlier `curl`-based demo-script idea: Task 2/3's UI is now actually implemented
 (`GroupManageMarkings.tsx`, `MarkingDefinitions.tsx`, `ItemMarkings.tsx`), Playwright is already wired

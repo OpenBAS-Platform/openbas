@@ -565,9 +565,6 @@ public class InjectService {
     this.throwIfInjectNotLaunchable(inject);
     inject.clean();
     inject.setUpdatedAt(Instant.now());
-    // The actor whose marking clearance this launch's dispatch is filtered against.
-    // Only ever reached from AtomicTestingService.launch(), a live-user, HTTP-triggered call -
-    // atomic testing has no "launch with no live user" path (only relaunch does).
     inject.setLaunchedBy(userService.currentUser());
     Inject savedInject = saveInjectAndStatusAsQueuing(inject);
     return injectMapper.toInjectResultOverviewOutput(savedInject);
@@ -596,10 +593,6 @@ public class InjectService {
     if (checkLaunchable) {
       this.throwIfInjectNotLaunchable(duplicatedInject);
     }
-    // The actor whose marking clearance this relaunch's dispatch is filtered against.
-    // checkLaunchable distinguishes a manual relaunch (live user, checkLaunchable=true) from a
-    // scheduled one fired by AtomicTestingExecutionJob (no live user, checkLaunchable=false) -
-    // deliberately NOT copied forward from the inject being replaced; see duplicateInject().
     duplicatedInject.setLaunchedBy(
         checkLaunchable ? userService.currentUser() : duplicatedInject.getScheduledBy());
     Inject savedInject = saveInjectAndStatusAsQueuing(duplicatedInject);
