@@ -2146,7 +2146,7 @@
   "Injects successfully generated.": " 注入已成功生成。",
   "Injects that run after this one, on the condition you define.": "在此注入之后按您定义的条件运行的注入。",
   "Injects will appear here once they have been played.": "注入执行后将显示在此处。",
-  "Injects will be paused, do you want to continue?": "注入将会暂停. 你想要继续么?",
+  "Injects would be paused do you confirm?": "注入将被暂停。请确认。",
   "injectType cannot be null or empty": "injectType 不能为空或留空",
   "Input": "输入",
   "Input (describe what you want)": "输入（描述您想要什么）",

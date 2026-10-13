@@ -2146,7 +2146,7 @@
   "Injects successfully generated.": "Injects successfully generated.",
   "Injects that run after this one, on the condition you define.": "Injects that run after this one, on the condition you define.",
   "Injects will appear here once they have been played.": "Injects will appear here once they have been played.",
-  "Injects will be paused, do you want to continue?": "Injects will be paused, do you want to continue?",
+  "Injects would be paused do you confirm?": "Injects would be paused do you confirm?",
   "injectType cannot be null or empty": "injectType cannot be null or empty",
   "Input": "Input",
   "Input (describe what you want)": "Input (describe what you want)",

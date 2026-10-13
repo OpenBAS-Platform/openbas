@@ -2146,7 +2146,7 @@
   "Injects successfully generated.": "성공적으로 생성된 인젝트입니다.",
   "Injects that run after this one, on the condition you define.": "정의한 조건에 따라 이 인젝트 이후에 실행되는 인젝트.",
   "Injects will appear here once they have been played.": "실행된 인젝트가 여기에 표시됩니다.",
-  "Injects will be paused, do you want to continue?": "인젝트가 일시 중지됩니다. 계속하시겠습니까?",
+  "Injects would be paused do you confirm?": "주입이 일시 중지됩니다. 확인하시겠습니까?",
   "injectType cannot be null or empty": "injectType은 null이거나 비어 있을 수 없습니다",
   "Input": "입력",
   "Input (describe what you want)": "입력(원하는 내용 설명)",
