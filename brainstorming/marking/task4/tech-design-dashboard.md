@@ -30,8 +30,8 @@ Fields shared by every document (`EsBase`, `EsTenantBase`):
     <tr><td><code>base_id</code>, <code>base_entity</code></td><td>id, document type (= index name)</td></tr>
     <tr><td><code>base_representative</code></td><td>display label (asset name, scenario name…)</td></tr>
     <tr><td><code>base_created_at</code>, <code>base_updated_at</code></td><td>timestamps (<code>base_updated_at</code> = effective updated_at)</td></tr>
-    <tr style="background-color: #d4edda; color: #155724;"><td><code>base_tenant_side</code></td><td><b>tenant id</b>, on every document</td></tr>
-    <tr style="background-color: #f8d7da; color: #721c24;"><td><code>base_restrictions</code></td><td>grant ACL ids (scenario / simulation / own id); written but not used, see 1.3</td></tr>
+    <tr style="background-color: rgba(40, 167, 69, 0.15);"><td><code>base_tenant_side</code></td><td><b>tenant id</b>, on every document</td></tr>
+    <tr style="background-color: rgba(220, 53, 69, 0.15);"><td><code>base_restrictions</code></td><td>grant ACL ids (scenario / simulation / own id); written but not used, see 1.3</td></tr>
     <tr><td><code>base_dependencies</code></td><td>ids whose deletion deletes this document</td></tr>
   </tbody>
 </table>
@@ -57,11 +57,12 @@ the reader. It was solved in two moves:
 `base_restrictions`) is commented out in `buildQuery`,  ([`6f5609722`](https://github.com/OpenAEV-Platform/openaev/commit/6f5609722728ad2dc992da228bd4d3cd1c496a92), Hedi Tarchouni, 2025-09-24).
 (`searchCursorPaged`) still applies it. 
 
-<div style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 6px; padding: 12px 16px;">
-🔥 So anyone allowed on a dashboard endpoint sees <b>all data of the tenant</b>. <br/><br/>
-🔥 <b>If I am a user with no <code>ACCESS_ASSETS capability</code> but with <code>ACCESS_DASHBOARD</code>, I can see the asset entity thro the dashboard API.</b>
-<br/><br/><b>Question to Soumaya:</b> is it something we also want to address?
-</div>
+> [!CAUTION]
+> 🔥 So anyone allowed on a dashboard endpoint sees **all data of the tenant**.
+>
+> 🔥 **If I am a user with no `ACCESS_ASSETS capability` but with `ACCESS_DASHBOARD`, I can see the asset entity thro the dashboard API.**
+>
+> **Question to Soumaya:** is it something we also want to address?
 
 > A bit of History of `buildQueryRestrictions` (why per-user filtering disappeared)
 > 
@@ -85,11 +86,10 @@ supports this reading.
 
 # Part 2 — Requirements to validate with Soumaya
 
-<div style="background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; border-radius: 6px; padding: 12px 16px;">
-<b>Question to Soumaya: what do we want to cover?</b> Today dashboards filter by tenant only (Part 1),
-so none of the requirements below holds. Tick the ones we keep: markings only, or markings, grants
-and capabilities.
-</div>
+> [!NOTE]
+> **Question to Soumaya: what do we want to cover?** Today dashboards filter by tenant only (Part 1),
+> so none of the requirements below holds. Tick the ones we keep: markings only, or markings, grants
+> and capabilities.
 
 **Scope.** Every read of the search engine: custom dashboards, the home dashboard, scenario and
 simulation dashboards, the screens built on `/dashboards/adhoc/*` (expectation lists, security

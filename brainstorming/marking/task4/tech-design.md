@@ -106,10 +106,11 @@ on, and the fact that the effect is hidden from them afterward doesn't undo that
 - ❌ Not built, and costly either way: a marking set to keep up to date along the whole chain
   (Variant-1), or SQL functions blind to dynamic groups (Variant-2). Elasticsearch needs its own set.
 
-<div style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 6px; padding: 12px 16px;">
-💡💡 <b>Recommendation: Option 1 Fine Granularity</b> <br/><br/>Fine granularity (option1) offers more functional potential for future evolution: <br/>As we mark more
-objects we still want end users with clearance to be able to see and act on the platform.<br/><br/>
-</div>
+> [!TIP]
+> 💡💡 **Recommendation: Option 1 Fine Granularity**
+>
+> Fine granularity (option1) offers more functional potential for future evolution: <br/>As we mark more
+> objects we still want end users with clearance to be able to see and act on the platform.
 
 # Option 1: The problems to solve
 
@@ -187,7 +188,7 @@ sequenceDiagram
     participant EX as Exercise (DB)
 
     U->>API: PUT /scenarios/{id}/recurrence
-    rect rgb(255, 205, 205)
+    rect rgba(255, 0, 0, 0.15)
         API->>SCN: scenario.setScheduledBy(currentUser())<br/>*** NEW ***
     end
     Note over SCN: Recurrence configured now — the Exercise it<br/>produces may not exist for days or weeks.
@@ -196,7 +197,7 @@ sequenceDiagram
         SCHED->>SCN: recurringScenarios(now) — is this scenario due?
     end
     SCHED->>SVC: toExercise(scenario, start, isRunning=false)
-    rect rgb(255, 205, 205)
+    rect rgba(255, 0, 0, 0.15)
         SVC->>EX: exercise.setLaunchedBy(scenario.getScheduledBy())<br/>*** NEW — no live user exists at this point ***
     end
     Note over EX: From here, dispatch reads Exercise.launchedBy exactly<br/>as shown in the Atomic Testing diagram below.
@@ -219,7 +220,7 @@ sequenceDiagram
     alt Manual launch
         U->>API: POST /atomic-testings/{id}/launch
         API->>SVC: launch(id)
-        rect rgb(255, 205, 205)
+        rect rgba(255, 0, 0, 0.15)
             SVC->>INJ: inject.setLaunchedBy(currentUser())<br/>*** NEW ***
         end
     else Manual relaunch
@@ -227,14 +228,14 @@ sequenceDiagram
         API->>SVC: relaunch(id, checkLaunchable=true)
         SVC->>DUP: duplicateInject(original)
         DUP-->>SVC: new Inject<br/>(content + inject_user copied forward, as today)
-        rect rgb(255, 205, 205)
+        rect rgba(255, 0, 0, 0.15)
             SVC->>INJ: newInject.setLaunchedBy(currentUser())<br/>*** NEW — do not copy old launched_by forward ***
         end
     else Scheduled relaunch
         SCHED->>SVC: relaunch(id, checkLaunchable=false)
         SVC->>DUP: duplicateInject(original)
         DUP-->>SVC: new Inject
-        rect rgb(255, 205, 205)
+        rect rgba(255, 0, 0, 0.15)
             SVC->>INJ: newInject.setLaunchedBy(original.getScheduledBy())<br/>*** NEW ***
         end
     end
@@ -271,7 +272,7 @@ sequenceDiagram
 
     EXEC->>CTX: launchExecutorContext(inject)
     CTX->>ISVC: getAgentsAndAgentlessAssetsByInject(inject)
-    rect rgb(205, 255, 205)
+    rect rgba(0, 200, 0, 0.15)
         ISVC->>ISVC: resolveLaunchedByClearance(inject)
         ISVC->>INJ: inject.getAssets() + expand inject.getAssetGroups(),<br/>each checked against that clearance before extraction
         ISVC-->>CTX: resolved agents + agentless assets<br/>(restricted assets excluded from both)
@@ -303,7 +304,7 @@ sequenceDiagram
     participant EXP as InjectExpectationService
 
     EXECJOB->>ISVC: resolveAllAssetsToExecute(inject)
-    rect rgb(205, 255, 205)
+    rect rgba(0, 200, 0, 0.15)
         ISVC->>CACHE: findClearance(launchedBy.id, tenantId, bypass)
         CACHE-->>ISVC: MarkingCtx
         ISVC->>ISVC: drop assets whose marking is not in MarkingCtx
@@ -341,10 +342,10 @@ sequenceDiagram
     participant MQ as RabbitMQ
 
     EXEC->>MAP: toExecutableInjectDTO(executableInject, ...)
-    rect rgb(205, 255, 205)
+    rect rgba(0, 200, 0, 0.15)
         MAP->>EI: executableInject.getAssetsToExecute()<br/>(falls back to resolveAllAssetsToExecute() if not pre-cached)
     end
-    rect rgb(255, 230, 200)
+    rect rgba(255, 140, 0, 0.18)
         MAP->>EI: executableInject.getAssetGroups()<br/>*** unfiltered by design — groups carry no marking yet (US1) ***
     end
     MAP-->>EXEC: ExecutableInjectDTO
@@ -421,12 +422,12 @@ the asset row it comes from is visible:
 write path remembering to copy a marking. The stream is the one consumer where A would have been
 simpler.
 
-<div style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 6px; padding: 12px 16px;">
-💡💡 <b>Recommendation: Variant B - Derived tables, filtered through the asset</b> <br/><br/>
-MarkingDimension is enriched with several layers of filtering.<br/>
-Each child table is filtered through the parent table (i.e. the asset). The parent table is the source of truth.<br/>
-The developer must explicitly declare the linked tables, and how they are linked. <br/><br/>
-</div>
+> [!TIP]
+> 💡💡 **Recommendation: Variant B - Derived tables, filtered through the asset**
+>
+> MarkingDimension is enriched with several layers of filtering.<br/>
+> Each child table is filtered through the parent table (i.e. the asset). The parent table is the source of truth.<br/>
+> The developer must explicitly declare the linked tables, and how they are linked.
 
 
 # Option 1: How to implement: the technical design
