@@ -1,4 +1,4 @@
-import { HelpOutlineOutlined } from '@mui/icons-material';
+import { ForwardToInbox, HelpOutlineOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, useTheme } from '@mui/material';
 import { type CSSProperties, type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -103,7 +103,8 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
   ];
 
   // Filter and sort hook
-  const [tests, setTests] = useState<InjectTestStatusOutput[] | null>([]);
+  // null until the first page is loaded, so the empty state does not flash before it
+  const [tests, setTests] = useState<InjectTestStatusOutput[] | null>(null);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({}));
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -130,7 +131,7 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
       >
         <InjectTestReplayAll
           searchPaginationInput={searchPaginationInput}
-          injectIds={tests?.map((test: InjectTestStatusOutput) => test.inject_id!)}
+          injectIds={tests?.map((test: InjectTestStatusOutput) => test.inject_id!) ?? []}
           onTest={result => setTests(result)}
         />
       </PaginationComponent>
@@ -204,7 +205,13 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
                 </ListItem>
               );
             })}
-        {!tests ? (<Empty message={t('No data available')} />) : null}
+        {tests?.length === 0 && (
+          <Empty
+            message={t('No test yet')}
+            hint={t('Test an email or SMS inject from the Injects tab to see its result here.')}
+            icon={ForwardToInbox}
+          />
+        )}
       </List>
       {
         selectedInjectTestStatus !== null
