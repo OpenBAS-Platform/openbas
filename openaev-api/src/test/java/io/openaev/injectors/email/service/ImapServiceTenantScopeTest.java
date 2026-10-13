@@ -41,6 +41,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.env.Environment;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -70,7 +71,9 @@ class ImapServiceTenantScopeTest {
             settingRepository,
             tenantScopedTransaction);
     ReflectionTestUtils.setField(imapService, "username", "mailbox@openaev.test");
-    // Pass-through: the scope itself is pinned on the real stack by ImapServiceInjectsScopeTest.
+    // Pass-through, so the body runs. What scope each call receives is asserted by the
+    // ScopeArguments tests below: the real-stack test cannot tell forTenant from allTenants,
+    // because every read after the resolve is keyed by a globally unique id.
     lenient()
         .when(tenantScopedTransaction.execute(any(TxCtx.class), any(Supplier.class)))
         .thenAnswer(invocation -> invocation.<Supplier<?>>getArgument(1).get());
@@ -313,5 +316,51 @@ class ImapServiceTenantScopeTest {
     lenient().doReturn(new Date()).when(spy).getSentDate();
     lenient().doReturn(new Date()).when(spy).getReceivedDate();
     return spy;
+  }
+
+  @Nested
+  @DisplayName("Scope arguments: which TxCtx each unit of work receives")
+  class ScopeArguments {
+
+    /**
+     * The resolve has to look across tenants, because an inbound mail carries no tenant. Everything
+     * after it must run in the inject's own tenant. Nothing else pins that narrowing: every read
+     * and write after the resolve is keyed by a globally unique id or filters on the tenant itself,
+     * so widening the scope to allTenants leaves the recorded data identical and every other test
+     * here and on the real stack stays green.
+     */
+    @Test
+    @DisplayName("given_aReply_should_resolveAcrossTenantsThenWorkInTheInjectTenantOnly")
+    void given_aReply_should_resolveAcrossTenantsThenWorkInTheInjectTenantOnly() throws Exception {
+      // Arrange
+      String injectId = "0b1c2d3e-4f50-4617-8829-aabbccddeeff";
+      String tenantId = "tenant-scope-args";
+      String messageId = "message-scope-args";
+      Inject inject = new Inject();
+      inject.setId(injectId);
+      inject.setTenant(new Tenant(tenantId));
+      when(injectRepository.findById(injectId)).thenReturn(java.util.Optional.of(inject));
+      when(communicationRepository.existsByIdentifierAndInjectTenantId(messageId, tenantId))
+          .thenReturn(true);
+      Message[] messages = new Message[] {buildMessage(messageId, "[inject_id=" + injectId + "]")};
+
+      // Act
+      ReflectionTestUtils.invokeMethod(imapService, "parseMessages", messages, false);
+
+      // Assert
+      ArgumentCaptor<TxCtx> scopes = ArgumentCaptor.forClass(TxCtx.class);
+      verify(tenantScopedTransaction, Mockito.atLeastOnce())
+          .execute(scopes.capture(), any(Supplier.class));
+      List<TxCtx> used = scopes.getAllValues();
+      Assertions.assertEquals(
+          TxCtx.allTenants(),
+          used.get(0),
+          "the resolve must look across tenants: an inbound mail names no tenant");
+      Assertions.assertTrue(
+          used.subList(1, used.size()).stream().allMatch(c -> c.equals(TxCtx.forTenant(tenantId))),
+          "every unit of work after the resolve must be narrowed to the inject's own tenant, not"
+              + " left at allTenants. Got: "
+              + used);
+    }
   }
 }
