@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -227,8 +228,12 @@ public class LazyAfterCommitProbeListener implements QueryExecutionListener {
 
   /**
    * Replays a read made inside a test transaction on that same connection, the only one that sees
-   * the test's uncommitted rows. The scope is transaction-local, so it is set, used and restored
-   * without touching anything the test or the request will read afterwards.
+   * the test's uncommitted rows.
+   *
+   * <p>Inside a savepoint, released on every path. A failing replay statement would otherwise leave
+   * the surrounding transaction aborted and the scope on whichever value the probe set last, so the
+   * instrument would change what the test measures next. Rolling back to the savepoint undoes both,
+   * since the scope is transaction-local and savepoint-aware.
    */
   private static int[] replayInOpenTransaction(
       Connection connection, String sql, QueryInfo query, String requestScope, String scopeAtRead) {
@@ -236,12 +241,18 @@ public class LazyAfterCommitProbeListener implements QueryExecutionListener {
       return new int[] {-1, -1};
     }
     try {
-      setScope(connection, requestScope.isEmpty() ? scopeAtRead : requestScope);
-      int underRequestScope = countRows(connection, sql, query);
-      setScope(connection, "");
-      int underEmptyScope = countRows(connection, sql, query);
-      setScope(connection, scopeAtRead);
-      return new int[] {underRequestScope, underEmptyScope};
+      Savepoint savepoint = connection.setSavepoint("lazy_after_commit_probe");
+      try {
+        setScope(connection, requestScope.isEmpty() ? scopeAtRead : requestScope);
+        int underRequestScope = countRows(connection, sql, query);
+        setScope(connection, "");
+        int underEmptyScope = countRows(connection, sql, query);
+        return new int[] {underRequestScope, underEmptyScope};
+      } finally {
+        connection.rollback(savepoint);
+        connection.releaseSavepoint(savepoint);
+        setScope(connection, scopeAtRead);
+      }
     } catch (SQLException e) {
       return new int[] {-1, -1};
     }

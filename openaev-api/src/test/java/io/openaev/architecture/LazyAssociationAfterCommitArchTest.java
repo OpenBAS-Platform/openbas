@@ -44,6 +44,12 @@ class LazyAssociationAfterCommitArchTest {
 
   private static final String BASELINE_RESOURCE = "/lazy-after-commit-baseline.txt";
 
+  /**
+   * The only verdicts an entry may carry. An unknown one, such as a typo or a verdict invented to
+   * get a line past the guard, fails rather than passing as "has a delimiter".
+   */
+  private static final String[] VERDICTS = {"CONFIRMED", "ATTENUATED", "NOT ESTABLISHED"};
+
   /** The baseline's exact size. Lower it with every entry removed, never raise it. */
   static final int BASELINE_SIZE = 1300;
 
@@ -181,13 +187,20 @@ lower BASELINE_SIZE by as many:%n%s""",
     }
 
     @Test
-    @DisplayName("given the baseline, when read, then every entry carries a verdict and a reason")
+    @DisplayName(
+        "given the baseline, when read, then every entry carries a known verdict and a reason")
     void given_baseline_should_carryVerdictAndReason() {
       // -- Act & Assert --
       baseline()
           .forEach(
-              (site, reason) ->
-                  assertThat(reason).as("verdict and reason for %s", site).contains("|"));
+              (site, entry) -> {
+                String[] parts = entry.split("\\|", -1);
+                assertThat(parts)
+                    .as("\"<VERDICT> | <reason>\" for %s, got \"%s\"", site, entry)
+                    .hasSize(2);
+                assertThat(parts[0].trim()).as("verdict for %s", site).isIn((Object[]) VERDICTS);
+                assertThat(parts[1].trim()).as("reason for %s", site).isNotEmpty();
+              });
     }
   }
 
