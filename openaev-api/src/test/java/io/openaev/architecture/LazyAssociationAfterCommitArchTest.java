@@ -161,7 +161,9 @@ class LazyAssociationAfterCommitArchTest {
       // -- Assert --
       assertThat(stale)
           .as(
-              "Baseline entries that no longer exist. Remove them and lower BASELINE_CEILING:%n%s",
+              """
+              Baseline entries naming a response that no longer exists. Deleting these lines is \
+              the whole fix; the ceiling is an upper bound, so lowering it is optional hygiene:%n%s""",
               String.join(System.lineSeparator(), stale))
           .isEmpty();
     }
