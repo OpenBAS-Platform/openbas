@@ -126,7 +126,7 @@ CollectorApi.updateCollector -> SecurityPlatform.collectors | NOT ESTABLISHED | 
 CollectorApi.updateCollector -> SecurityPlatform.injectors | NOT ESTABLISHED | not written by any measured test response
 CustomDashboardApi.createCustomDashboard -> CustomDashboard.widgets | ATTENUATED | measured: initialised inside the transaction whenever written
 CustomDashboardApi.customDashboard -> CustomDashboard.widgets | ATTENUATED | measured: initialised inside the transaction whenever written
-CustomDashboardApi.customDashboards -> CustomDashboard.widgets | CONFIRMED | measured: written without rows that exist
+CustomDashboardApi.customDashboards -> CustomDashboard.widgets | ATTENUATED | fixed in #8484: fetch join in CustomDashboardRepository#findAllByIdInFetchingWidgets
 CustomDashboardApi.updateCustomDashboard -> CustomDashboard.widgets | ATTENUATED | measured: initialised inside the transaction whenever written
 DocumentApi.document -> Document.exercises | ATTENUATED | measured: initialised inside the transaction whenever written
 DocumentApi.document -> Document.scenarios | ATTENUATED | measured: initialised inside the transaction whenever written
@@ -596,10 +596,10 @@ ReportingApi.createReporting -> Reporting.generations | ATTENUATED | measured: i
 ReportingApi.createReporting -> Reporting.schedules | ATTENUATED | measured: initialised inside the transaction whenever written
 ReportingApi.createReporting -> ReportingSchedule.recipientUsers | NOT ESTABLISHED | not written by any measured test response
 ReportingApi.createReportingSchedule -> ReportingSchedule.recipientUsers | ATTENUATED | measured: initialised inside the transaction whenever written
-ReportingApi.reporting -> Reporting.generations | CONFIRMED | measured: written without rows that exist
+ReportingApi.reporting -> Reporting.generations | ATTENUATED | fixed in #8484: history loaded inside the scoped transaction
 ReportingApi.reporting -> Reporting.schedules | NOT ESTABLISHED | read after the commit, but no test row to lose
 ReportingApi.reporting -> ReportingSchedule.recipientUsers | NOT ESTABLISHED | not written by any measured test response
-ReportingApi.reportings -> Reporting.generations | CONFIRMED | measured: written without rows that exist
+ReportingApi.reportings -> Reporting.generations | ATTENUATED | fixed in #8484: history loaded inside the scoped transaction
 ReportingApi.reportings -> Reporting.schedules | NOT ESTABLISHED | read after the commit, but no test row to lose
 ReportingApi.reportings -> ReportingSchedule.recipientUsers | NOT ESTABLISHED | not written by any measured test response
 ReportingApi.reportingsByContext -> Reporting.generations | NOT ESTABLISHED | read after the commit, but no test row to lose
@@ -1050,7 +1050,7 @@ SecurityPlatformApi.updateSecurityPlatform -> SecurityPlatform.collectors | ATTE
 SecurityPlatformApi.updateSecurityPlatform -> SecurityPlatform.injectors | ATTENUATED | measured: initialised inside the transaction whenever written
 SecurityPlatformApi.upsertSecurityPlatform -> Asset.tags | ATTENUATED | measured: initialised inside the transaction whenever written
 SecurityPlatformApi.upsertSecurityPlatform -> SecurityPlatform.collectors | NOT ESTABLISHED | read after the commit, but no test row to lose
-SecurityPlatformApi.upsertSecurityPlatform -> SecurityPlatform.injectors | CONFIRMED | measured: written without rows that exist
+SecurityPlatformApi.upsertSecurityPlatform -> SecurityPlatform.injectors | ATTENUATED | fixed in #8484: upsert goes through withManagerLinksInitialized before the link is written
 SimulationChallengeApi.playerDocuments -> Document.exercises | ATTENUATED | measured: initialised inside the transaction whenever written
 SimulationChallengeApi.playerDocuments -> Document.scenarios | ATTENUATED | measured: initialised inside the transaction whenever written
 SimulationChallengeApi.playerDocuments -> Document.tags | ATTENUATED | measured: initialised inside the transaction whenever written
