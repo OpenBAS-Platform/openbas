@@ -5,15 +5,13 @@ security rule behind multi-tenancy is simple to state: a tenant must never see o
 tenant's data.
 
 This page explains how the platform enforces that rule at the SQL layer, how a request or a
-background job obtains its tenant scope, and what you need to know when you write code that touches
-a tenant-isolated table.
+background job gets its tenant scope, and the rules to follow when your code touches an isolated
+table.
 
-!!! info "Who should read this"
-    Anyone contributing to the OpenAEV backend. The isolation mechanism changes how you write
-    controllers, services and background jobs, and the most common mistakes fail silently by
-    design. Reading this page first will save you a debugging session.
+!!! note "Who should read this"
+    Anyone contributing to the OpenAEV backend. The most common mistakes fail silently by design.
 
-## The idea in one paragraph
+## How isolation works
 
 Think of the tenant scope as a badge. Every database transaction carries a badge that lists the
 tenants it is allowed to see. The database checks the badge on every row of the activated tables.
@@ -24,8 +22,8 @@ Three components cooperate to make this work:
 
 - **`TxCtx`** is the badge as a Java object. It says "this transaction may see tenants A and B".
   It is passed explicitly as a method parameter.
-- **The transaction aspect** fires when a `@Transactional` method runs. It reads the `TxCtx`
-  parameter and writes the badge into the database with
+- **The transaction aspect** (`TenantScopeTransactionAspect`) fires when a `@Transactional`
+  method runs. It reads the `TxCtx` parameter and writes the badge into the database with
   `set_config('app.current_tenants', ..., true)`. This setting is transaction-local: it disappears
   at commit.
 - **The statement inspector** (`TenantStatementInspector`) rewrites every SQL statement that
@@ -51,20 +49,31 @@ A request can name the tenants it wants to work with in two ways:
 - the `X-Tenant-Ids` header on the regular path
 
 If the request names no tenant, the scope defaults to every tenant the caller is a member of.
-Naming a tenant outside the caller's memberships is rejected.
+Naming a tenant outside the caller's memberships is refused with HTTP 403 (`TENANT_ACCESS_DENIED`).
 
-The resolved scope becomes a `TxCtx` parameter on the controller handler. A dedicated argument
-resolver (`TxCtxArgumentResolver`) builds it from the request; you never construct it yourself in
-a controller:
+The resolved scope becomes a `TxCtx` parameter on the controller handler. The argument resolver
+(`TxCtxArgumentResolver`) builds it from the request; you never construct it yourself in a
+controller:
 
 ```java
 @Transactional
-@GetMapping({VULNERABILITY_API + "/{id}", TENANT_VULNERABILITY_API + "/{id}"})
-public VulnerabilityOutput getVulnerability(TxCtx ctx, @PathVariable String id) {
-    // the handler body does not use ctx: the transaction aspect does
-    return mapper.toOutput(service.findById(id));
+@GetMapping({
+  VULNERABILITY_API + "/{vulnerabilityId}",
+  TENANT_VULNERABILITY_API + "/{vulnerabilityId}"
+})
+@AccessControl(
+    resourceId = "#vulnerabilityId",
+    actionPerformed = Action.READ,
+    resourceType = ResourceType.VULNERABILITY)
+public VulnerabilityOutput getVulnerability(TxCtx ctx, @PathVariable String vulnerabilityId) {
+  // ctx is not used here: the transaction aspect reads it
+  return vulnerabilityMapper.toVulnerabilityOutput(
+      vulnerabilityService.findById(vulnerabilityId));
 }
 ```
+
+The aspect runs before the RBAC check (`@AccessControl`), so the permission check already reads
+under the tenant scope.
 
 ```mermaid
 sequenceDiagram
@@ -85,15 +94,15 @@ sequenceDiagram
     The handler body never touches `ctx`. The aspect reads it from the method arguments when the
     transaction opens. If a refactoring removes the parameter, the endpoint silently loses its
     scope and every query on an isolated table returns nothing. An architecture test
-    (`TenantScopedEntrypointsTxCtxArchTest`) fails the build when a registered endpoint loses its
-    `TxCtx`.
+    (`TenantScopedEntrypointsTxCtxArchTest`) fails the build when a listed endpoint loses its
+    `TxCtx`. The list is hardcoded: a new endpoint without `TxCtx` is not caught.
 
 Two details matter here:
 
 - The aspect only fires on `@Transactional` methods. A `TxCtx` parameter on a method without the
   annotation is ignored, and the endpoint stays fail-closed.
 - Once a transaction carries a scope, a nested `@Transactional` call must not redefine it. The
-  aspect refuses a different `TxCtx` inside the same transaction.
+  aspect refuses a different set of tenants inside the same transaction; the same set is accepted.
 
 ## How the SQL is rewritten
 
@@ -124,9 +133,8 @@ unfiltered. This has one practical consequence for contributors:
     activated. Cover every native query on an isolated table with an integration test so this
     surfaces in CI, not in production.
 
-Raw JDBC (`JdbcTemplate`, direct `Connection` usage) bypasses Hibernate entirely, so the inspector
-never sees it. An architecture test (`TenantNonOrmAccessArchTest`) forbids raw JDBC in production
-code outside a small audited allowlist. Tenant data must be accessed through Hibernate.
+Raw JDBC (`JdbcTemplate`, direct `Connection` usage) bypasses Hibernate, so the inspector never
+sees it. Tenant data must be accessed through Hibernate (see `TenantNonOrmAccessArchTest` below).
 
 ## Writing data: one row, one tenant
 
@@ -145,6 +153,12 @@ The resolver applies three rules:
 - a multi-tenant scope with no explicit selector is refused (HTTP 400): the platform never guesses
   which tenant should own a new row.
 
+!!! tip "Endpoints that must run in one tenant"
+    Annotate the parameter as `@RequireTenantSelector TxCtx ctx`. Without a selector, a
+    single-tenant caller resolves to its own tenant and a multi-tenant caller falls back to the
+    default tenant. Only a multi-tenant caller without access to the default tenant gets HTTP 400
+    (`TENANT_SELECTOR_REQUIRED`).
+
 ### The find-or-create trap
 
 Isolated tables use per-tenant unique keys: two tenants may both own a row with the same business
@@ -161,16 +175,14 @@ The correct order is always:
 
 ## Background work: the transaction primitive
 
-Background code (scheduled jobs, queue consumers, startup tasks) does not receive HTTP requests,
-so nothing resolves a scope for it. It also cannot safely rely on `@Transactional`, because of a
-known Spring pitfall: the self-invocation trap.
+Background code (scheduled jobs, queue consumers, startup tasks) receives no HTTP request, so
+nothing resolves a scope for it. It must not rely on `@Transactional` either, because of the Spring
+self-invocation trap.
 
 ### Why `@Transactional` is banned in background code
 
-Spring implements `@Transactional` with a proxy that wraps the class. Only calls coming from
-outside the class go through the proxy. When a method calls another `@Transactional` method of the
-same class, the call stays internal: no proxy, no transaction, and for us no scope. Nothing fails.
-The code simply runs without the badge.
+Spring implements `@Transactional` with a proxy. When a method calls another `@Transactional`
+method of the same class, the call skips the proxy: no transaction, no scope, and no error.
 
 ```mermaid
 flowchart TD
@@ -184,9 +196,8 @@ flowchart TD
     end
 ```
 
-A silent failure is unacceptable for a security mechanism. Background code therefore opens its
-transactions through an explicit object that cannot be bypassed by accident:
-`TenantScopedTransaction`.
+Background code therefore opens its transactions through an explicit object that cannot be
+bypassed by accident: `TenantScopedTransaction`.
 
 ### The primitive
 
@@ -197,39 +208,29 @@ tenantTx.execute(TxCtx.forTenant(tenantId), () -> {
 });
 ```
 
-```mermaid
-sequenceDiagram
-    participant J as Job
-    participant P as TenantScopedTransaction
-    participant R as Intention resolver
-    participant DB as PostgreSQL
-    J->>P: execute(ctx, work)
-    P->>P: refuse if a transaction is already active
-    P->>P: refuse if ctx is null or Missing
-    P->>DB: open the transaction
-    P->>R: resolve(ctx)
-    R-->>P: explicit tenant list
-    P->>DB: set_config('app.current_tenants', list, true)
-    P->>J: run the work (queries are filtered)
-    P->>DB: commit (the setting disappears with the transaction)
-```
+The primitive has three entry points:
 
-The primitive has two entry points. `execute()` opens a top-level transaction: this is the normal
-door. `executeNew()` opens a nested `REQUIRES_NEW` transaction from inside an existing one, for
-the rare cases where a failure must be isolated or a narrower scope is needed deliberately.
+- `execute()` opens a top-level transaction. This is the normal door.
+- `executeNew()` opens a nested `REQUIRES_NEW` transaction inside an existing one, to isolate a
+  failure or narrow the scope on purpose.
+- `setScopeOnCurrentTransaction()` sets the scope on a transaction the caller already opened,
+  without opening one, so the work still sees that transaction's uncommitted rows. It has no
+  nesting guard: it overwrites the current scope, to narrow it, widen it or switch tenants.
 
-The primitive is strict on purpose. Each guard exists because the silent alternative was worse:
+The primitive is strict on purpose:
 
 | Guard | Behavior | Why |
 |---|---|---|
-| `execute()` refuses an already active transaction | immediate exception | opening the primitive is a scope boundary; joining silently would make it unclear which badge applies |
-| `executeNew()` refuses to run outside a transaction | exception pointing to `execute()` | otherwise it becomes a universal escape hatch around the first guard; nesting must be a deliberate choice |
-| `null` and `Missing` scopes are refused | exception naming the reason | a scope-less background transaction would read zero rows silently; failing loudly at open is better than working for nothing |
-| the scope is set before any work runs | always | no query of the work can execute without the badge |
+| `execute()` and `forEachTenant()` refuse an already active transaction | exception | the primitive is a scope boundary, never a silent join |
+| `executeNew()` and `setScopeOnCurrentTransaction()` refuse to run outside a transaction | exception | nesting must be a deliberate choice |
+| `null` and `Missing` scopes are refused | exception | a scope-less transaction would read zero rows silently |
+| the scope is set before any work runs | always | no query can run without the badge |
 
 A `@Transactional` service called from inside the primitive joins its transaction (standard Spring
-`REQUIRED` propagation) and keeps the scope. The aspect finds no `TxCtx` argument and stays inert.
-Existing services can be reused from background code without modification.
+`REQUIRED` propagation) and keeps the scope. Existing services can be reused from background code
+without changes when they take no `TxCtx` argument: the aspect then stays inert. A joined method
+whose `TxCtx` holds a different set of tenants is refused, for example under
+`execute(TxCtx.allTenants(), work)`.
 
 Choosing the right method:
 
@@ -240,28 +241,20 @@ Choosing the right method:
 | per-tenant work in parallel, on the job's own executor | one `execute(TxCtx.forTenant(id), work)` per task; concurrent scoped transactions are isolated from each other, and the job must await every task before returning |
 | one global bulk job (read / delete / update by predicate) spanning all tenants in one shared transaction | `execute(TxCtx.allTenants(), work)` |
 | isolate a failure, or narrow the scope, inside a running transaction | `executeNew(ctx, work)` |
+| re-scope a transaction you joined but do not own, keeping its uncommitted rows visible | `setScopeOnCurrentTransaction(ctx)` |
 
 Where does the tenant id come from in a job? Usually from the data the job processes (an entity
 carries its tenant), from the message that triggered it, or from the per-tenant loop below, which
-hands each iteration a ready-made single-tenant scope.
+hands each iteration its tenant id.
 
 ### `allTenants()`: an intention, never a wildcard
 
-Some jobs are genuinely global: a purge that scans every tenant, an indexing pass. They run as one
-shared transaction with `tenantTx.execute(TxCtx.allTenants(), work)`. The important design
-property: `allTenants()` is an intention, not a usable badge, and no wildcard value ever reaches
-the database.
-
-```mermaid
-flowchart TD
-    A["TxCtx.allTenants(): an intention"] -->|"asked for its badge value (toGuc)?"| E["EXCEPTION: unresolved intention"]
-    A -->|"through the primitive only"| R["Resolver: SELECT the active tenants"]
-    R --> L["Explicit list: t1, t2, t3, ..."]
-    L --> S["set_config: the database only ever sees a list"]
-```
+Some jobs are global, such as a purge or an indexing pass. They run as one shared transaction with
+`tenantTx.execute(TxCtx.allTenants(), work)`. `allTenants()` is an intention, not a badge: no
+wildcard value ever reaches the database.
 
 - Asking the intention for its badge value (`toGuc()`, the string written into the PostgreSQL
-  setting) throws. Misusing it, for example passing it to an HTTP handler, fails loudly.
+  setting) throws, so misuse on the HTTP path fails loudly.
 - Only the primitive resolves it, at the moment the transaction opens, into the explicit list of
   active tenants. A long job that chains short transactions re-resolves at each one, so tenants
   created in between become visible.
@@ -269,19 +262,9 @@ flowchart TD
 
 ### The poisoning rule
 
-One behavior surprises everyone the first time. Inside a background transaction, any runtime
-exception thrown by a joined `@Transactional` service marks the whole transaction rollback-only.
-Catching the exception and carrying on does not help: the work continues, then the final commit
-fails with `UnexpectedRollbackException` and everything is rolled back.
-
-```mermaid
-flowchart TD
-    T["Background transaction"] --> S["Call into a joined @Transactional service"]
-    S --> X["The service throws (guard, refusal, business bug)"]
-    X --> M["Spring marks the transaction rollback-only"]
-    M --> C["The job catches the exception and continues... for nothing"]
-    C --> F["COMMIT: UnexpectedRollbackException, everything is rolled back"]
-```
+Inside a background transaction, any runtime exception thrown by a joined `@Transactional`
+service marks the whole transaction rollback-only. Catching the exception and carrying on does not
+help: the final commit fails with `UnexpectedRollbackException` and everything is rolled back.
 
 The practical rule: never catch-and-continue inside a single transaction. Recover around a
 transaction boundary instead, either an `executeNew()` block (its `REQUIRES_NEW` transaction
@@ -289,15 +272,16 @@ isolates the failure) or one iteration of the per-tenant loop below.
 
 ### `forEachTenant`: the per-tenant loop
 
-Most per-tenant jobs want the same thing: run a unit of work once for every active tenant, and do
-not let one bad tenant take the others down. The primitive provides this as a flat loop:
+Most per-tenant jobs run a unit of work once for every active tenant, without letting one bad
+tenant take the others down. The work receives the tenant id; rebuild the scope with
+`TxCtx.forTenant()` when a called method needs it:
 
 ```java
-tenantTx.forEachTenant(ctx -> {
-    // runs once per active tenant, in its OWN top-level transaction,
-    // scoped to that tenant; ctx is ready for write attribution
-    service.refreshSomething(ctx);
-});
+tenantTx.forEachTenant(
+    tenantId -> {
+      // runs in its own top-level transaction, scoped to this tenant
+      service.refreshSomething(TxCtx.forTenant(tenantId));
+    });
 ```
 
 ```mermaid
@@ -308,9 +292,8 @@ flowchart LR
     T2 -.-> AGG["one aggregate exception at the end, carrying the causes"]
 ```
 
-Because every tenant runs in its own top-level transaction, a failing tenant is rolled back alone
-and cannot poison the others. Failures are collected and rethrown as one aggregate exception at
-the end, never swallowed. Two semantics to keep in mind:
+A failing tenant is rolled back alone and cannot poison the others. Failures are collected and
+rethrown as one aggregate exception at the end, never swallowed. Keep in mind:
 
 - the tenant list is a snapshot taken when the loop starts; a tenant created mid-loop is picked up
   by the next run of the job;
@@ -331,9 +314,8 @@ this page. Activating a table means, in one reviewed change:
 4. the table name is appended to `openaev.tenant.active-tables`;
 5. the build-time guards are extended for the new table.
 
-A step-by-step runbook for this procedure is maintained in the repository
-(`.claude/skills/activate-tenant-table/SKILL.md`), including the eligibility gates, the required
-tests and the go-live checklist.
+The step-by-step runbook, with the eligibility gates, required tests and go-live checklist, is
+`.claude/skills/activate-tenant-table/SKILL.md` in the repository.
 
 The list of currently isolated tables is the value of `openaev.tenant.active-tables` in
 `openaev-api/src/main/resources/application.properties`.
@@ -342,54 +324,52 @@ Several architecture tests detect regressions over time:
 
 | Guard | What it protects |
 |---|---|
-| `TenantScopedEntrypointsTxCtxArchTest` | a registered endpoint cannot silently lose its `TxCtx` parameter |
+| `TenantScopedEntrypointsTxCtxArchTest` | a listed endpoint cannot silently lose its `TxCtx` parameter |
 | `TenantActiveTableAccessArchTest` | only reviewed classes may access an isolated table's repository or lazy-load it through an association; activating a table without extending the guard fails the build |
-| `TenantNonOrmAccessArchTest` | no raw JDBC outside the audited allowlist: tenant data goes through Hibernate so the inspector sees it |
-| `TenantBackgroundTransactionArchTest` | background classes cannot use `@Transactional` or raw transaction plumbing; existing violations are frozen in a committed baseline, only new ones fail the build |
-| `ScopeChannelSourceTripwireTest` | exactly two classes, the aspect and the primitive, may write the scope channel (`set_config('app.current_tenants', ...)`) |
+| `TenantNonOrmAccessArchTest` | no raw JDBC in production code outside `io.openaev.migration` unless the class opts out with `@AllowRawJdbc` and a reason: tenant data goes through Hibernate so the inspector sees it |
+| `TenantBackgroundTransactionArchTest` | no self-invocation of `@Transactional` methods, no `@Transactional` or raw transaction plumbing in `io.openaev.scheduler.jobs`, and no `TenantScopedTransaction` on the HTTP path; existing violations are frozen in a committed baseline |
+| `ScopeChannelSourceTripwireTest` | only the aspect and the primitive may write the scope channel (`set_config('app.current_tenants', ...)`) |
 
-## The frozen baseline: reading the tech debt, and avoiding new debt
+## The frozen baseline
 
-`TenantBackgroundTransactionArchTest` locks its two rules (self-invocation, raw transaction
-plumbing) against a baseline file per rule, committed under
-`openaev-api/src/test/resources/archunit_store/`. The baseline is allowed to shrink, never to grow.
-Every line already in it is real, unfixed architectural debt that predates a given activation;
-the build refuses any line that is not already there.
+`TenantBackgroundTransactionArchTest` freezes each of its four rules against a baseline file
+committed under `openaev-api/src/test/resources/archunit_store/` (`stored.rules` maps each rule to
+its file). Every line is a known, unfixed violation. The baseline may shrink, never grow. The store
+is locked, so a test run cannot rewrite it.
 
-### Reading an entry: three shapes, three different risks
+Each entry is one of these risks:
 
-| Shape | Example | Actual risk today |
-|---|---|---|
-| **A1 - dead inner annotation** | `UserService.changePassword` (already `@Transactional`) calls `this.user(...)`, itself `@Transactional(readOnly = true)` | none at runtime: the outer transaction is already open when the inner call happens, so the inner annotation never gets a chance to do anything on this path. The debt is that the code *looks* like `user()` carries its own transactional guarantee, which stops being true the moment someone calls it from a non-transactional context and copies the assumption |
-| **A2/A3 - self-invocation from a non-transactional caller** | an HTTP handler or a job calls `this.someTransactionalMethod()` directly, with no other transaction open | a live bug: no transaction, no tenant scope, silently. Reads return zero rows, writes run unguarded |
-| **B/C - `@Transactional` or raw plumbing in a job** | a scheduler job opens a raw `TransactionTemplate`, or is itself annotated `@Transactional` | no tenant scope is ever set for that transaction: any isolated-table query inside it reads nothing, silently, and the annotation gives no hint that the primitive was bypassed |
+- **Self-invocation from a non-transactional caller**: a live bug. No transaction and no scope:
+  reads return zero rows, writes run unguarded.
+- **Self-invocation inside an open transaction**: harmless today, but the inner annotation looks
+  like a guarantee it does not give.
+- **`@Transactional` or raw `TransactionTemplate` in a job**: the transaction never gets a tenant
+  scope, so isolated-table queries inside it read nothing.
 
-`UserService.changePassword` calling `this.user(...)` is an A1: safe today, still counted as debt
-because nothing prevents a future caller of `user()` from relying on the annotation that does not
-actually apply here.
+Rules to follow:
 
-### Best practices to follow from now on
+1. **Never call your own `@Transactional` method through `this.method()`.** Either drop the inner
+   annotation, or move the method to another Spring bean and call it through injection.
+2. **Background code never uses `@Transactional`, `TransactionTemplate` or
+   `PlatformTransactionManager`.** It opens through `TenantScopedTransaction`, the only mechanism
+   that also sets the tenant scope.
+3. **A new violation fails the build.** Fix the code; never re-freeze the store to hide it. A merge
+   from `main` can bring someone else's violation: check `git log` on the flagged method and report
+   or fix it.
+4. **A `StoreUpdateFailedException` means a recorded violation was fixed, renamed or moved.**
+   ArchUnit counts a rename or move as solved plus new. Removing the line is a store write, so
+   re-freeze in the same PR as the change.
+5. **Shrink the baseline when you can.** No CI step forces it. When you touch a class that already
+   has an entry, use `.claude/skills/reduce-tx-baseline/SKILL.md`: one class per PR, fix, test and
+   re-freeze together.
 
-1. **Never call your own `@Transactional` method through `this.method()` (or an unqualified
-   call).** The Spring proxy that opens the transaction is bypassed for calls from inside the same
-   class. If the method needs a real transactional boundary and is also called internally, either
-   drop the inner annotation (if it never has to run standalone) or extract it into a separate
-   Spring bean and call it through injection, so the proxy is back in the call path.
-2. **Background code never uses `@Transactional` or a hand-built `TransactionTemplate` /
-   `PlatformTransactionManager`.** Every job opens through `TenantScopedTransaction` (`execute`,
-   `executeNew`, `forEachTenant`) — the only mechanism that also sets the tenant scope. See
-   "Activating a background writer" above.
-3. **A new violation fails the build immediately; the frozen store does not absorb it.** If
-   `TenantBackgroundTransactionArchTest` throws `StoreUpdateFailedException` after your change, you
-   introduced a new self-invocation or new raw plumbing. Fix the code — do not re-freeze the store
-   to make the failure disappear.
-4. **A merge from `main` can silently import someone else's new violation into your branch.** If a
-   rebase or merge grows the baseline, check `git log` on the newly flagged method before folding
-   it into your PR. Even if it is unrelated to your change, it is still a regression that landed in
-   your history — report it or fix it, do not just re-freeze past it.
-5. **Shrinking the baseline is opportunistic, not gated.** No CI step forces the list down. Use the
-   `reduce-tx-baseline` skill (`.claude/skills/reduce-tx-baseline/SKILL.md`) whenever you happen to
-   touch a class that already has an entry: one class per PR, fix + test + re-freeze together.
+## Testing
+
+- The test configuration activates no table. An isolation test must activate its table itself,
+  for example `@TestPropertySource(properties = "openaev.tenant.active-tables=import_mappers")`
+  (see `ImportMapperHttpIsolationTest`).
+- Tests around `TenantScopedTransaction` must not be `@Transactional`: `execute()` refuses an
+  active transaction. `TenantScopedTransactionIntegrationTest` is the reference.
 
 ## Troubleshooting
 
@@ -407,7 +387,10 @@ never work around the inspector with raw JDBC.
 row under an ambiguous multi-tenant scope. Use the tenant path (`/api/tenants/{tenantId}/...`) or
 a single-tenant selector so the platform knows which tenant owns the new row.
 
-**A `UnexpectedRollbackException` at commit in a background job.** Something inside the
+**An HTTP 403 with `TENANT_ACCESS_DENIED`.** The tenant path or the `X-Tenant-Ids` header names
+a tenant the caller is not a member of.
+
+**An `UnexpectedRollbackException` at commit in a background job.** Something inside the
 transaction threw and was caught. See the poisoning rule above: recover around an `executeNew()`
 or a `forEachTenant` iteration, not inside the transaction.
 
@@ -416,7 +399,15 @@ or a `forEachTenant` iteration, not inside the transaction.
 | Class | Role |
 |---|---|
 | `io.openaev.context.TxCtx` | the scope (badge): `Missing`, `Restricted(list)` or the `AllTenants` intention |
-| `io.openaev.context.TenantScopedTransaction` | the background primitive: `execute`, `executeNew`, `forEachTenant` |
+| `io.openaev.context.TenantScopedTransaction` | the background primitive: `execute`, `executeNew`, `setScopeOnCurrentTransaction`, `forEachTenant` |
+| `io.openaev.aop.TenantScopeTransactionAspect` | writes the `TxCtx` of a `@Transactional` method into `app.current_tenants` |
+| `io.openaev.config.TxCtxArgumentResolver` | builds the controller `TxCtx` from the tenant path or the `X-Tenant-Ids` header |
 | `io.openaev.config.TenantStatementInspector` | rewrites SQL, adds `can_access_tenant`, fail-closed on unknown shapes |
 | `io.openaev.config.TenantWriteScopeResolver` | resolves the single tenant a new row belongs to |
 | `openaev.tenant.active-tables` (property) | the list of isolated tables |
+
+## What's next?
+
+- [Multi-tenancy](../administration/multi-tenancy.md) -- How administrators create and manage Tenants
+- [Database migrations](database-migrations.md) -- Write Flyway migrations
+- [Platform development](platform.md) -- Set up and run the platform locally
