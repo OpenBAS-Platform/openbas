@@ -98,7 +98,12 @@ const Organizations = () => {
 
   return (
     <div style={{ display: 'flex' }}>
-      <div style={{ flexGrow: 1 }}>
+      {/* minWidth 0: lets the list shrink so long cell values truncate instead of widening the page */}
+      <div style={{
+        flexGrow: 1,
+        minWidth: 0,
+      }}
+      >
         <Breadcrumbs
           variant="list"
           elements={[{ label: t(SETTINGS_LABEL) }, { label: t('Security') }, {
