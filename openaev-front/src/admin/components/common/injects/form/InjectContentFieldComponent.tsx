@@ -22,11 +22,13 @@ import InjectEndpointsList from './endpoints/InjectEndpointsList';
 interface Props {
   field: EnhancedContractElement;
   readOnly?: boolean;
+  placeholder?: string;
 }
 
 const InjectContentFieldComponent = ({
   field,
   readOnly = false,
+  placeholder,
 }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
@@ -166,6 +168,7 @@ const InjectContentFieldComponent = ({
           <TextFieldController
             name={field.key}
             label={t(label)}
+            placeholder={placeholder}
             disabled={isSubmitting || readOnly}
             multiline={field.type === 'textarea'}
             rows={field.type === 'textarea' ? (field.settings?.rows ?? 10) : 1}
