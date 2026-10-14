@@ -2,17 +2,9 @@
 
 OpenAEV provides a REST API that lets you perform any platform action programmatically. Any action available in the graphical interface can also be run through the API.
 
-## Why use the REST API?
-
-The REST API is useful when you need to:
-
-- **Automate repetitive tasks** such as creating Scenarios, launching Simulations, or importing Assets in bulk.
-- **Integrate OpenAEV with external tools** like SIEMs (Security Information and Event Management systems), ticketing systems, or CI/CD (Continuous Integration/Continuous Deployment) pipelines.
-- **Build custom Dashboards or reports** by querying platform data programmatically.
-
 ## Authentication
 
-Every `/api/` endpoint requires authentication, except a few public ones such as `/api/login`. Two methods are supported.
+Every `/api/` endpoint requires authentication, except a few public ones such as `/api/login`.
 
 ### API key
 
@@ -37,23 +29,7 @@ API key requests are stateless: the server creates no session for them.
 
 ### Session cookie
 
-Session-based authentication is useful for scripts that simulate browser interactions.
-
-1. Send a `POST` request to `/api/login` with a JSON body containing `login` (your email) and `password`.
-2. Keep the `openaev_session` cookie from the response and send it with later requests.
-
-```http
-POST /api/login
-Content-Type: application/json
-
-{ "login": "user@example.com", "password": "<PASSWORD>" }
-```
-
-The session expires after 24 hours of inactivity by default.
-
-!!! note
-
-    Cookie sessions are protected against CSRF. `POST`, `PUT` and `DELETE` requests must send the value of the `XSRF-TOKEN` cookie in the `X-XSRF-TOKEN` header. Login does not set this cookie: the first such request returns `403` with the cookie, then retry with the header. For scripts, prefer an API key.
+The API also accepts the browser session cookie, with CSRF protection on `POST`, `PUT` and `DELETE`. For scripts, use an API key.
 
 ## API documentation (Swagger UI)
 
@@ -115,66 +91,7 @@ The response wraps results in a page object:
 
 ### Filtering
 
-A `filterGroup` combines filters with `and` or `or`. Example: Scenarios with one of two tags and a `critical` severity:
-
-```json
-{
-  "filterGroup": {
-    "mode": "and",
-    "filters": [
-      {
-        "id": "tags",
-        "key": "scenario_tags",
-        "mode": "or",
-        "operator": "contains",
-        "values": ["<TAG_ID_1>", "<TAG_ID_2>"]
-      },
-      {
-        "id": "severity",
-        "key": "scenario_severity",
-        "operator": "eq",
-        "values": ["critical"]
-      }
-    ]
-  }
-}
-```
-
-For the full format and the list of operators, see [Filters](filters.md).
-
-### Bulk operations on Injects
-
-Bulk update and bulk delete of Injects are scoped to their parent Scenario or Simulation. Authorization is checked on that parent, so users with the right access to it can work on its Injects without platform-wide privileges.
-
-| Operation | Endpoint |
-|---|---|
-| Bulk update Injects of a Scenario | `PUT /api/scenarios/{scenarioId}/injects` |
-| Bulk delete Injects of a Scenario | `DELETE /api/scenarios/{scenarioId}/injects` |
-| Bulk update Injects of a Simulation | `PUT /api/exercises/{exerciseId}/injects` |
-| Bulk delete Injects of a Simulation | `DELETE /api/exercises/{exerciseId}/injects` |
-
-The body selects Injects either by ID (`inject_ids_to_process`) or by a search (`search_pagination_input`), not both. With a search, exclude Injects with `inject_ids_to_ignore`.
-
-Example: delete two Injects of a Scenario.
-
-```http
-DELETE /api/scenarios/{scenarioId}/injects
-```
-
-```json
-{
-  "inject_ids_to_process": [
-    "5f8317eb-e19f-4234-9d34-7b65a52ea82f",
-    "9a4f9138-9163-40c2-bd21-b579d4a26428"
-  ]
-}
-```
-
-Calling these endpoints on a parent you cannot modify returns `403`.
-
-!!! note
-
-    Earlier versions exposed generic `PUT /api/injects` and `DELETE /api/injects` endpoints taking a `simulation_or_scenario_id` in the body. They are replaced by the scoped endpoints above.
+The `filterGroup` field combines filters with `and` or `or`. For the format and the list of operators, see [Filters](filters.md).
 
 ### Error responses
 
@@ -189,24 +106,6 @@ Calling these endpoints on a parent you cannot modify returns `403`.
 | `500` | Internal server error |
 
 Validation errors (`400`) return per-field error messages. Other errors return a JSON body with a `message` field.
-
-## Grant-scoped endpoints
-
-Global inventory endpoints such as `/api/endpoints`, `/api/asset_groups` or `/api/injector_contracts` require the matching platform capability (Assets, Threat Arsenal). A user who only holds a grant on a Simulation or Scenario can use the Workflow API instead, which only exposes the elements its workflow references:
-
-| Endpoint | Description |
-|---|---|
-| `GET /api/tenants/{tenantId}/workflows/{workflowId}/scope/endpoints` | Endpoints referenced by the workflow scope rules (allowlist and denylist) |
-| `POST /api/tenants/{tenantId}/workflows/{workflowId}/scope/endpoints/find` | Same as above, restricted to the requested IDs |
-| `GET /api/tenants/{tenantId}/workflows/{workflowId}/scope/asset-groups` | Asset groups referenced by the workflow scope rules |
-| `POST /api/tenants/{tenantId}/workflows/{workflowId}/scope/asset-groups/find` | Same as above, restricted to the requested IDs |
-| `GET /api/tenants/{tenantId}/workflows/{workflowId}/injector_contracts/{injectorContractId}` | An injector contract, returned only if a workflow step references it |
-
-These endpoints check the caller's grant on the workflow's parent Simulation or Scenario, not the global capabilities. IDs that the workflow does not reference are ignored, so these endpoints cannot read arbitrary platform data.
-
-!!! tip "Enterprise Edition"
-
-    The Workflow API requires an Enterprise Edition license.
 
 ## Multi-tenant context
 
