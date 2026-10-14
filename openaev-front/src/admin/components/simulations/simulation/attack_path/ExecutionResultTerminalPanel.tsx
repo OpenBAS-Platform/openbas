@@ -861,7 +861,6 @@ const ExecutionResultTerminalPanel = ({ loading, detail, onClose, onBack, onOpen
                     </div>
                     {/* Detection rule text is sanitized before rendering — never injected raw. */}
                     <div
-                      // eslint-disable-next-line react/no-danger
                       dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize((rem.detection_remediation_values ?? '').replace(/\n/g, '<br/>')) }}
                     />
                   </div>

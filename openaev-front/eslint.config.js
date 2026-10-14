@@ -146,8 +146,7 @@ export default [
         process: true,
       },
     },
-    // to fix when eslint handle disable directive on missing rules on purpose
-    linterOptions: { reportUnusedDisableDirectives: 'off' },
+    linterOptions: { reportUnusedDisableDirectives: 'error' },
   },
 
   // unit tests config
