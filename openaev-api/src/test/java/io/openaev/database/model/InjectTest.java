@@ -48,40 +48,6 @@ public class InjectTest extends IntegrationTest {
     @Test
     @DisplayName("Inject sorting is stable")
     public void stableSort() {
-
-      InjectComposer.Composer injectA =
-          injectComposer.forInject(
-              () -> {
-                Inject inject = InjectFixture.getDefaultInject();
-                inject.setId("A");
-                inject.setDependsDuration(10L);
-                return inject;
-              });
-
-      InjectComposer.Composer injectB =
-          injectComposer.forInject(
-              () -> {
-                Inject inject = InjectFixture.getDefaultInject();
-                inject.setId("B");
-                return inject;
-              });
-
-      InjectComposer.Composer injectC =
-          injectComposer.forInject(
-              () -> {
-                Inject inject = InjectFixture.getDefaultInject();
-                inject.setId("C");
-                return inject;
-              });
-
-      InjectComposer.Composer injectD =
-          injectComposer.forInject(
-              () -> {
-                Inject inject = InjectFixture.getDefaultInject();
-                inject.setId("D");
-                return inject;
-              });
-
       List<InjectComposer.Composer> injectsCollectionA =
           Arrays.stream(new String[500])
               .map(
@@ -147,6 +113,7 @@ public class InjectTest extends IntegrationTest {
       @DisplayName(
           "When the inject was affected by both pauses its starting date should account for both pauses")
       public void WhenInjectEffectivelyWasPausedTwice_InjectDateAccountsForBothPauses() {
+        Instant now = Instant.now();
         Exercise exercise =
             getExerciseComposer()
                 .withPause(
@@ -162,14 +129,15 @@ public class InjectTest extends IntegrationTest {
 
         Inject inject = exercise.getInjects().getFirst();
 
-        Assertions.assertTrue(inject.getDate().isPresent(), "Inject has no date.");
-        Assertions.assertEquals(expected_instant, inject.getDate().get());
+        Assertions.assertTrue(inject.getDate(now).isPresent(), "Inject has no date.");
+        Assertions.assertEquals(expected_instant, inject.getDate(now).get());
       }
 
       @Test
       @DisplayName(
           "When the inject was affected by first pause only its starting date should account for first pause only")
       public void WhenInjectEffectivelyWasPausedOnce_InjectDateAccountsForSinglePause() {
+        Instant now = Instant.now();
         Exercise exercise =
             getExerciseComposer()
                 .withPause(
@@ -186,8 +154,8 @@ public class InjectTest extends IntegrationTest {
 
         Inject inject = exercise.getInjects().getFirst();
 
-        Assertions.assertTrue(inject.getDate().isPresent(), "Inject has no date.");
-        Assertions.assertEquals(expected_instant, inject.getDate().get());
+        Assertions.assertTrue(inject.getDate(now).isPresent(), "Inject has no date.");
+        Assertions.assertEquals(expected_instant, inject.getDate(now).get());
       }
     }
   }
