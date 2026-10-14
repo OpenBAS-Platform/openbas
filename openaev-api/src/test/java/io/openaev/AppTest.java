@@ -5,11 +5,15 @@ import static io.openaev.database.model.SettingKeys.PLATFORM_INSTANCE_CREATION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_CLASS;
 
 import io.openaev.config.OpenAEVConfig;
 import io.openaev.config.cache.LicenseCacheManager;
 import io.openaev.database.model.Setting;
 import io.openaev.database.repository.SettingRepository;
+import io.openaev.ee.EnterpriseEditionService;
+import io.openaev.utils.fixtures.LicenceFixture;
+import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -18,17 +22,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(MockitoExtension.class)
 class AppTest extends IntegrationTest {
 
   @Mock private SettingRepository settingRepository;
+  @MockitoSpyBean private EnterpriseEditionService enterpriseEditionService;
   @Autowired private OpenAEVConfig openAEVConfig;
   @Autowired private LicenseCacheManager licenseCacheManager;
 
@@ -121,14 +131,40 @@ class AppTest extends IntegrationTest {
     verifyNoMoreInteractions(settingRepository);
   }
 
-  private void givenStoredInstance(String instanceId, String creationDate) {
-    when(settingRepository.findByKeyAndTenantIsNull(PLATFORM_INSTANCE.key()))
+  private void givenStoredInstance(SettingRepository mock, String instanceId, String creationDate) {
+    when(mock.findByKeyAndTenantIsNull(PLATFORM_INSTANCE.key()))
         .thenReturn(Optional.of(new Setting(PLATFORM_INSTANCE.key(), instanceId)));
-    when(settingRepository.findByKeyAndTenantIsNull(PLATFORM_INSTANCE_CREATION.key()))
+    when(mock.findByKeyAndTenantIsNull(PLATFORM_INSTANCE_CREATION.key()))
         .thenReturn(
             creationDate == null
                 ? Optional.empty()
                 : Optional.of(new Setting(PLATFORM_INSTANCE_CREATION.key(), creationDate)));
+  }
+
+  @Nested
+  @SpringBootTest
+  @DirtiesContext(classMode = BEFORE_CLASS)
+  @DisplayName("Licence cache test")
+  @Transactional
+  public class LicenceCacheTest {
+    @Autowired private SettingRepository settingRepository;
+
+    @DisplayName("Should validate licence for configured instance id")
+    @Test
+    void shouldValidateLicenceForConfiguredInstanceId() throws Exception {
+      String correctInstanceId = UUID.randomUUID().toString();
+
+      openAEVConfig.setInstanceId(correctInstanceId);
+      openAEVConfig.setApplicationLicense(
+          LicenceFixture.getLicenceStringForInstanceId(correctInstanceId));
+      when(enterpriseEditionService.verifyCertificate(
+              any(X509Certificate.class), any(X509Certificate.class)))
+          .thenReturn(true);
+
+      new App(settingRepository, openAEVConfig, licenseCacheManager).init();
+
+      assertThat(licenseCacheManager.isEnterpriseEditionActive()).isTrue();
+    }
   }
 
   @DisplayName("Should write the creation date of a new instance as an ISO-8601 instant")
@@ -154,7 +190,7 @@ class AppTest extends IntegrationTest {
   @Test
   void shouldKeepCreationDateWhenInstanceIdChanges() {
     String createdAt = "2026-09-01T08:00:00Z";
-    givenStoredInstance(UUID.randomUUID().toString(), createdAt);
+    givenStoredInstance(settingRepository, UUID.randomUUID().toString(), createdAt);
     // The same Setting instance is saved at each restart: record what each save wrote
     List<String> saved = new ArrayList<>();
     when(settingRepository.save(any(Setting.class)))
@@ -181,7 +217,7 @@ class AppTest extends IntegrationTest {
   @Test
   void shouldNotSetMissingCreationDateOnExistingInstance() {
     openAEVConfig.setInstanceId(UUID.randomUUID().toString());
-    givenStoredInstance(UUID.randomUUID().toString(), null);
+    givenStoredInstance(settingRepository, UUID.randomUUID().toString(), null);
 
     new App(settingRepository, openAEVConfig, licenseCacheManager).init();
 
@@ -194,7 +230,7 @@ class AppTest extends IntegrationTest {
   void shouldLeaveFutureCreationDateUnchanged() {
     openAEVConfig.setInstanceId(null);
     String future = Instant.now().plus(365, ChronoUnit.DAYS).toString();
-    givenStoredInstance(UUID.randomUUID().toString(), future);
+    givenStoredInstance(settingRepository, UUID.randomUUID().toString(), future);
 
     new App(settingRepository, openAEVConfig, licenseCacheManager).init();
 
@@ -208,7 +244,7 @@ class AppTest extends IntegrationTest {
   void shouldRewriteLegacyCreationDateAsInstant() {
     openAEVConfig.setInstanceId(null);
     String legacy = "2026-09-01 10:00:00.123";
-    givenStoredInstance(UUID.randomUUID().toString(), legacy);
+    givenStoredInstance(settingRepository, UUID.randomUUID().toString(), legacy);
 
     new App(settingRepository, openAEVConfig, licenseCacheManager).init();
 
@@ -225,7 +261,8 @@ class AppTest extends IntegrationTest {
   @Test
   void shouldRewriteOffsetCreationDateAsUtcInstant() {
     openAEVConfig.setInstanceId(null);
-    givenStoredInstance(UUID.randomUUID().toString(), "2026-09-01T10:00:00.123+02:00");
+    givenStoredInstance(
+        settingRepository, UUID.randomUUID().toString(), "2026-09-01T10:00:00.123+02:00");
 
     new App(settingRepository, openAEVConfig, licenseCacheManager).init();
 
