@@ -92,7 +92,7 @@ public class PermissionService {
    * TxCtx} for, such as the stream listeners: resolving a parent permission loads the child row (an
    * inject, an autonomous run), which a v2-active table hides from an unscoped transaction.
    */
-  @Transactional
+  @Transactional(readOnly = true)
   public boolean hasPermissionInTenant(
       TxCtx ctx,
       @NotNull final User user,

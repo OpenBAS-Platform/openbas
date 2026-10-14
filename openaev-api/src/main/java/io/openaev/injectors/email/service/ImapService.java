@@ -220,8 +220,8 @@ public class ImapService extends ExternalServiceBase {
         TxCtx.allTenants(),
         () ->
             injectRepository
-                .findById(injectId)
-                .map(inject -> new ResolvedInject(inject.getId(), inject.getTenant().getId())));
+                .findTenantRefById(injectId)
+                .map(ref -> new ResolvedInject(ref.getId(), ref.getTenantId())));
   }
 
   private RecordedCommunication recordCommunication(String injectId, Communication communication) {

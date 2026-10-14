@@ -104,7 +104,8 @@ class ImapServiceTenantScopeTest {
       inject.setId(injectId);
       inject.setTenant(new Tenant(tenantId));
 
-      when(injectRepository.findById(injectId)).thenReturn(java.util.Optional.of(inject));
+      when(injectRepository.findTenantRefById(injectId))
+          .thenReturn(java.util.Optional.of(tenantRef(injectId, tenantId)));
       when(communicationRepository.existsByIdentifierAndInjectTenantId(messageId, tenantId))
           .thenReturn(true);
 
@@ -131,7 +132,8 @@ class ImapServiceTenantScopeTest {
       inject.setId(injectId);
       inject.setTenant(new Tenant(tenantId));
 
-      when(injectRepository.findById(anyString())).thenReturn(java.util.Optional.of(inject));
+      when(injectRepository.findTenantRefById(anyString()))
+          .thenReturn(java.util.Optional.of(tenantRef(inject.getId(), tenantId)));
       when(communicationRepository.existsByIdentifierAndInjectTenantId(messageId, tenantId))
           .thenReturn(false);
       when(userRepository.findAllByEmailInIgnoreCaseAndTenantId(anyList(), eq(tenantId)))
@@ -173,7 +175,8 @@ class ImapServiceTenantScopeTest {
       emailContent.setBody("Hello team");
       String bodyWithFooter = emailContent.buildMessage(executableInject, "http://localhost:8080");
 
-      when(injectRepository.findById(injectId)).thenReturn(java.util.Optional.of(inject));
+      when(injectRepository.findTenantRefById(injectId))
+          .thenReturn(java.util.Optional.of(tenantRef(injectId, tenantId)));
       when(communicationRepository.existsByIdentifierAndInjectTenantId(messageId, tenantId))
           .thenReturn(false);
       when(userRepository.findAllByEmailInIgnoreCaseAndTenantId(anyList(), eq(tenantId)))
@@ -186,7 +189,7 @@ class ImapServiceTenantScopeTest {
 
       // Assert - the id extracted from the real footer must be exactly the inject id, not
       // polluted by the trailing "[base_url=...]" token that follows it in the same footer block
-      verify(injectRepository).findById(injectId);
+      verify(injectRepository).findTenantRefById(injectId);
       verify(communicationRepository).existsByIdentifierAndInjectTenantId(messageId, tenantId);
     }
 
@@ -227,6 +230,18 @@ class ImapServiceTenantScopeTest {
                 }
                 if (injectId != null && injectId.contains(injectIdB)) {
                   return java.util.Optional.of(injectB);
+                }
+                return java.util.Optional.empty();
+              });
+      when(injectRepository.findTenantRefById(anyString()))
+          .thenAnswer(
+              invocation -> {
+                String injectId = invocation.getArgument(0);
+                if (injectId != null && injectId.contains(injectIdA)) {
+                  return java.util.Optional.of(tenantRef(injectIdA, tenantA));
+                }
+                if (injectId != null && injectId.contains(injectIdB)) {
+                  return java.util.Optional.of(tenantRef(injectIdB, tenantB));
                 }
                 return java.util.Optional.empty();
               });
@@ -339,7 +354,8 @@ class ImapServiceTenantScopeTest {
       Inject inject = new Inject();
       inject.setId(injectId);
       inject.setTenant(new Tenant(tenantId));
-      when(injectRepository.findById(injectId)).thenReturn(java.util.Optional.of(inject));
+      when(injectRepository.findTenantRefById(injectId))
+          .thenReturn(java.util.Optional.of(tenantRef(injectId, tenantId)));
       when(communicationRepository.existsByIdentifierAndInjectTenantId(messageId, tenantId))
           .thenReturn(true);
       Message[] messages = new Message[] {buildMessage(messageId, "[inject_id=" + injectId + "]")};
@@ -362,5 +378,20 @@ class ImapServiceTenantScopeTest {
               + " left at allTenants. Got: "
               + used);
     }
+  }
+
+  /** The projection the cross-tenant resolve reads, which carries two columns and no entity. */
+  private static InjectRepository.InjectTenantRef tenantRef(String id, String tenantId) {
+    return new InjectRepository.InjectTenantRef() {
+      @Override
+      public String getId() {
+        return id;
+      }
+
+      @Override
+      public String getTenantId() {
+        return tenantId;
+      }
+    };
   }
 }
