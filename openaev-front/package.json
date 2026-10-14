@@ -25,6 +25,7 @@
     "check-licenses": "license-checker-rseidelsohn --production --summary --onlyAllow '0BSD;Apache-2.0;BlueOak-1.0.0;BSD-2-Clause;BSD-3-Clause;CC-BY-3.0;CC-BY-4.0;CC0-1.0;ISC;MIT;OFL-1.1;Python-2.0;Unlicense;UNLICENSED'",
     "generate-types-from-api": "swagger-typescript-api generate --no-client --path=${API_URL:-http://localhost:8080}/api-docs --output=src/utils --name=api-types.d.ts --sort-types",
     "test": "vitest run --coverage",
+    "test:eslint-rules": "node --test \"packages/eslint-plugin-custom-rules/tests/**/*.test.js\"",
     "test:e2e": "yarn playwright test --project=setup --project=chromium",
     "test:e2e:infra": "yarn playwright test --project=setup --project=infra-chromium",
     "test:e2e:ui": "yarn test:e2e --ui --workers=1",

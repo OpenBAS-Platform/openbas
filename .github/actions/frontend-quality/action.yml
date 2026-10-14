@@ -28,6 +28,10 @@ runs:
       run: yarn lint
       shell: bash
       working-directory: openaev-front
+    - name: Test custom ESLint rules
+      run: yarn test:eslint-rules
+      shell: bash
+      working-directory: openaev-front
     - name: Check module dependencies
       run: yarn depcruise
       shell: bash
