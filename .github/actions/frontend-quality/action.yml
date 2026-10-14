@@ -1,6 +1,6 @@
 name: Frontend Quality & Unit Tests
 description: >
-  Run TypeScript checks, ESLint, i18n validation, and Vitest unit tests.
+  Run TypeScript checks, ESLint, dependency-cruiser, i18n validation, and Vitest unit tests.
   Uploads coverage report as an artifact.
 
 inputs:
@@ -26,6 +26,10 @@ runs:
       working-directory: openaev-front
     - name: Run ESLint
       run: yarn lint
+      shell: bash
+      working-directory: openaev-front
+    - name: Check module dependencies
+      run: yarn depcruise
       shell: bash
       working-directory: openaev-front
     - name: Check i18n translations

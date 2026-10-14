@@ -100,6 +100,7 @@ mvn jacoco:check                                  # Verify coverage thresholds
 cd openaev-front
 yarn lint                  # ESLint (must pass with 0 warnings)
 yarn check-ts              # TypeScript type checking
+yarn depcruise             # Import cycles and dependency rules (dependency-cruiser)
 yarn test                  # Unit tests (Vitest)
 yarn test:e2e              # E2E tests (Playwright, requires running application)
 ```

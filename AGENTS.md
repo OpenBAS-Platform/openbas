@@ -24,6 +24,7 @@ mvn spotless:apply                     # Format Java
 mvn test                               # Tests (needs Docker services)
 cd openaev-front && yarn build         # Build frontend
 yarn lint && yarn check-ts             # Lint + type-check
+yarn depcruise                         # Import cycles + dependency rules
 yarn generate-types-from-api           # Sync API types
 ```
 

@@ -223,6 +223,15 @@ export default [
     },
   },
 
+  // CommonJS tooling config (.dependency-cruiser.cjs)
+  {
+    files: ['**/*.cjs'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: globals.node,
+    },
+  },
+
   // ignores patterns
   {
     ignores: [
