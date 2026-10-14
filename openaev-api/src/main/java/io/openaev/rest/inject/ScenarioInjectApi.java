@@ -112,6 +112,7 @@ public class ScenarioInjectApi extends RestBehavior {
             .sorted(new InjectExecutionComparator(Instant.now()))
             .toList();
     KillChainPhaseInitializer.initializeFromInjects(injects);
+    InjectLinksInitializer.initialize(injects);
     return injects;
   }
 
