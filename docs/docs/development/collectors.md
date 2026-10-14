@@ -1,72 +1,55 @@
 # Collector development
 
-## Detection & Prevention (SIEM, XDR, EDR, NDR)
+This page explains how to build an OpenAEV Collector for a detection or prevention product, such as an **EDR (Endpoint Detection and Response)**, **XDR (Extended Detection and Response)**, **SIEM (Security Information and Event Management)** or **NDR (Network Detection and Response)**. The Collector fetches the product's security events and matches them against the expectations of the Injects that OpenAEV executed.
 
-### Introduction
+For a functional overview, see [Collectors](../integrations/collectors/collectors.md).
 
-This guide explains how to implement an **OpenAEV collector for an EDR/XDR**, to retrieve security events and compare
-them against injected expectations in OpenAEV.
+## Prerequisites
 
-### Prerequisites
+- Basic knowledge of Python and a working Python install.
+- [PyOAEV](https://pypi.org/project/pyoaev/), the official Python client for the OpenAEV API.
 
 !!! tip "Not just Python"
 
-    Note that while this guide puts an emphasis on the Python language, a collector may be implemented in any language
-    because it communicates with the OpenAEV server via its REST API. However, Filigran provides an official implementation
-    of a REST client for the OpenAEV API, in python: PyOAEV.
+    A Collector talks to OpenAEV through the REST API, so you can write it in any language. This page uses PyOAEV.
 
-In this guide, we will use [PyOAEV](https://pypi.org/project/pyoaev/), the official OpenAEV API client for Python. The guide requires a basic understanding
-of the Python language, and a working Python install on the development machine.
-
-### High level overview
-
-Let's consider this diagram for understanding the basic, generic process involved to retrieve alerts and match them with
-expectations from within the OpenAEV system.
+## How a Collector works
 
 ![High level process overview](assets/high-level-collector-overview.png)
 
-This would translate to this partially-pseudo code, using PyOAEV (some functions omitted for brevity):
+The pseudo-code below shows this loop with PyOAEV (some functions are omitted):
+
 ```python
 from pyoaev.daemons import CollectorDaemon
 from pyoaev.configuration import Configuration
 
-# this is where the whole of the collector logic needs
-# to be implemented.
+# The whole Collector logic lives here.
 def main_loop(collector: CollectorDaemon):
-    # get some expectations from OpenAEV
-    # if there are any waiting for results
+    # Get the expectations still waiting for a result
     expectations = collector.api.inject_expectation.expectations_models_for_source(collector.get_id())
     if any(expectations):
-        # fetch some alerts from the security platform
-        security_platform_alerts = security_platform_api.fetch_alerts();
+        # Fetch alerts from the security platform
+        security_platform_alerts = security_platform_api.fetch_alerts()
 
-        if any(alerts):
-            # usually we want to preprocess raw alerts so that they match
-            # an expected format for comparison with the expectations
-            # in order to determine whether an alert is relevant to an
-            # expectation
+        if any(security_platform_alerts):
+            # Convert raw alerts to a format you can compare with the expectations
             processed_alerts = process_alerts(security_platform_alerts)
             for expectation in expectations:
                 for processed_alert in processed_alerts:
-                    # if we find that an alert's data is relevant
-                    # to an expectation, update the latter with the result
-                    # whether it was successful or not
                     if match(processed_alert, expectation):
-                        # first update the object's data
+                        # Update the object's data, then send it to the API
                         expectation.update(
-                            success=alert.get_outcome(),
+                            success=processed_alert.get_outcome(),
                             sender_id=collector.get_id(),
                             metadata={}
                         )
-                        # update the object through the API
                         collector.api.inject_expectation.update(
                             inject_expectation_id=expectation.inject_expectation_id,
                             inject_expectation=expectation
                         )
 
 if __name__ == "__main__":
-    # this might look a bit verbose
-    # it defines where and how to specify various config keys
+    # Where and how to read each configuration key
     config = Configuration(config_hints={
             # OpenAEV API
             "openaev_url": {"env": "OPENAEV_URL"},
@@ -76,7 +59,7 @@ if __name__ == "__main__":
             "collector_name": {"env": "COLLECTOR_NAME"},
             "collector_type": {
                 "env": "COLLECTOR_TYPE",
-                # a discrete, unique string; like a secondary id
+                # A unique string, like a secondary ID
                 "default": "my_collector_type",
             },
             "collector_platform": {
@@ -93,56 +76,48 @@ if __name__ == "__main__":
         },
     )
 
-    # instantiate the long-running daemon object
+    # Long-running daemon
     collector = CollectorDaemon(configuration=config)
-    # set the method that needs to run every period (default 60s)
+    # Method run at every period (default 60s)
     collector.set_callback(main_loop)
-    # starts the daemon process
     collector.start()
 ```
 
-### In-depth step-by-step decomposition
-#### 1. Retrieving Expectations
+## How to implement the matching logic
 
-The first step involves fetching all expectations that have not yet been fulfilled by your collector. These expectations
-should be validated within a short timeframe to assess the responsiveness of your EDR/XDR (for example 45 minutes). If this
-period is exceeded, the expectations should be updated to be marked as failed by the collector.
+1. **Retrieve the expectations.** Fetch the expectations that your Collector has not answered yet. Answer them quickly to measure how fast your product responds. You do not need to fail late ones yourself: the expectation expiration job of OpenAEV marks unanswered expectations as expired after a timeout (see [Platform managers](../deployment/platform/managers.md#scheduled-jobs)).
+2. **Retrieve the alerts.** Collect the alerts from your product and decide:
+    - how to extract the data that matches the OpenAEV signatures;
+    - whether the alert shows that the attack was prevented or detected.
+3. **Match expectations and alerts.** Compare each expectation's signatures with the alert data, then update the expectation with the result.
 
-#### 2. Retrieving Alerts
+A signature is a way to find an attack in an alert. The main ones are:
 
-This step focuses on collecting alerts from your service tiers. There are two key aspects to define:
-
-- How to extract relevant information from an alert to match OpenAEV signatures.
-- How to determine whether the alert successfully prevented or detected the attack based on the expectations.
-
-Definition: a signature is a way to find an attack in an alert, for example the presence of a specific process name
-in the process tree of the subject of the alert:
-
-| Signature           | Description                                                                                                                 |
-|---------------------|-----------------------------------------------------------------------------------------------------------------------------|
-| PARENT_PROCESS_NAME | The parent process name of the attack, which corresponds to the implant<br/>name created with openaev-implant-INJECT_ID.exe |
-
-#### 3. Matching Expectations
-
-The final step involves aligning retrieved expectations with logs and signatures from your service tiers to ensure
-proper validation.
+| Signature | Description |
+|---|---|
+| `parent_process_name` | Name of the parent process of the attack. For the OpenAEV implant, it is `oaev-implant-<inject_id>-agent-<agent_id>` (the file itself has `.exe` on Windows). |
+| `source_ipv4_address`, `source_ipv6_address` | IP address of the Asset that ran the attack. |
+| `target_ipv4_address`, `target_ipv6_address`, `target_hostname_address` | IP address or hostname targeted by the attack. |
 
 ![Collector diagram](assets/collector-diagram.png)
 
-### Use it
+## Run the Collector
 
-Now, you can launch your collector by connecting it with OpenAEV.
-Your collector will register to OpenAEV and you can view in Integrations > Collectors.
+Start your Collector. It registers with OpenAEV through `POST /api/collectors` and appears under **Integrations > Deployed**.
 
 ![Collectors view in OpenAEV](assets/collectors-view.png)
 
-## Learn more
+## Examples
 
-You may find reference implementations in the OpenAEV Collectors repository:
+Use these reference implementations from the OpenAEV Collectors repository as a starting point for your own matching logic:
 
-* [Crowdstrike Falcon EDR](https://github.com/OpenAEV-Platform/collectors/tree/main/crowdstrike)
-* [Microsoft Defender](https://github.com/OpenAEV-Platform/collectors/tree/main/microsoft-defender)
-* [Microsoft Sentinel](https://github.com/OpenAEV-Platform/collectors/tree/main/microsoft-sentinel)
+- [CrowdStrike Falcon EDR](https://github.com/OpenAEV-Platform/collectors/tree/main/crowdstrike)
+- [Microsoft Defender](https://github.com/OpenAEV-Platform/collectors/tree/main/microsoft-defender)
+- [Microsoft Sentinel](https://github.com/OpenAEV-Platform/collectors/tree/main/microsoft-sentinel)
 
-You might find them useful to find inspiration on how to implement a matching logic against your EDR or SIEM
-of choice, using PyOAEV.
+## What's next?
+
+- [Deploy Collectors](../integrations/collectors/deploy-collectors.md) -- Deploy and configure a Collector
+- [Expectations](../usage/run-and-evaluate/expectations/expectations.md) -- Understand the expectations a Collector answers
+- [Injector development](injectors.md) -- Build a custom Injector
+- [API usage](api-usage.md) -- Call the OpenAEV REST API

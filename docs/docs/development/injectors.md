@@ -1,46 +1,36 @@
 # Injector development
 
-!!! question "What are injectors?"
-
-    For a functional overview of the role of Injectors within the OpenAEV ecosystem, please refer to [the User Guide section on Injectors](../integrations/injectors/injectors.md).
-
-### Introduction
-
-This guide explains how to implement an **OpenAEV injector**, to extend the platform's capabilities by adding new type
-of injects.
+This page explains how to build an OpenAEV Injector to add new types of Injects to the platform. For a functional overview, see [Injectors](../integrations/injectors/injectors.md).
 
 !!! note
 
-    The following is based on the Filigran-maintained [HTTP Injector](https://github.com/OpenAEV-Platform/injectors/tree/main/http-query)
-    and only highlights the larger picture of the steps to create an injector from scratch. Please refer to the HTTP injector's
-    codebase for an example of the implementation of a functional injector.
+    This page gives the big picture only. For a working example, read the code of the Filigran-maintained [HTTP Injector](https://github.com/OpenAEV-Platform/injectors/tree/main/http-query).
 
-### Implementing the Injector
+## How an Injector works with OpenAEV
 
-#### 1. Define one or more contracts
+An Injector is an independent process. It talks to OpenAEV through the REST API and a RabbitMQ queue, so you can write it in any language.
 
-The contract is the list of parameters and corresponding fields that will constitute the data that the injector will
-handle as part of its core logic. It describes how OpenAEV will parse and display the input form in the GUI for defining
-new injects to be executed by the injector. It is also the data structure that the injector handles
-internally to access the parameter values.
+1. **Register.** The Injector sends `POST /api/injectors` as a multipart request: an `input` part with its `injector_id`, `injector_name`, `injector_type` and `injector_contracts`, and an optional PNG `icon` part. The response gives the RabbitMQ `connection` details and the queue to `listen` to: `<prefix>_injector_<injector_id>`, where the prefix is `openaev.rabbitmq.prefix` (`openaev` by default).
+2. **Consume.** OpenAEV pushes each Inject to execute to this queue.
+3. **Report.** The Injector sends the result with `POST /api/injects/execution/callback/{injectId}`, with at least `execution_message` and `execution_status`.
 
-!!! note "🐍 Python-based injectors"
+## How to implement an Injector
 
-    For injectors created with the Python language, Filigran maintains the [`pyoaev` library](https://pypi.org/project/pyoaev/)
-    which provides a wealth of utility classes to compose a functional contract.
+1. **Define one or more contracts.** A contract lists the fields of the Inject. OpenAEV uses it to build the Inject form in the UI, and the Injector uses it to read the values the user entered.
+2. **Write the internal logic.** When the Injector receives an Inject, it reads the contract values and performs the action.
 
-    Note however that injectors are typically independent processes communicating with OpenAEV via a network transport, 
-    and may be implemented in any language.
+!!! note "Python-based Injectors"
 
-#### 2. Define the internal logic
+    For Python, Filigran maintains the [`pyoaev` library](https://pypi.org/project/pyoaev/), with helper classes to build contracts.
 
-The next step is to implement the internal logic based on the parameters defined in the contract.
-When the injector executes an inject based on its contract, it will retrieve the parameters provided by the end user and
-use them within its internal logic to perform the necessary actions.
+## Run the Injector
 
-### Use it
-
-Now, the new injector may be launched as a new process, and it should register with OpenAEV. It will then be listed
-in ***Integrations > Injectors*** and its inject contracts should be available for creating new injects.
+Start the Injector process. It registers with OpenAEV and appears under **Integrations > Deployed**. Its contracts are then available when you create an Inject.
 
 ![Injectors view in OpenAEV](assets/injectors-view.png)
+
+## What's next?
+
+- [Deploy Injectors](../integrations/injectors/deploy-injectors.md) -- Deploy and configure an Injector
+- [Collector development](collectors.md) -- Build a custom Collector
+- [API usage](api-usage.md) -- Call the OpenAEV REST API

@@ -1,27 +1,27 @@
 # API usage
 
-This page explains how to interact with the OpenAEV REST API programmatically when building integrations, scripts, or custom tools.
+This page shows how to call the OpenAEV REST API from integrations, scripts or custom tools. For the full reference, see [REST API](../reference/apis/rest-api.md).
 
 ## Authentication
 
-All API requests require authentication. Include your API key in the `Authorization` header:
+Every request needs an API key in the `Authorization` header:
 
 ```http
 Content-Type: application/json
 Authorization: Bearer <API_KEY>
 ```
 
-Generate an API key from your user profile in the OpenAEV interface. The key inherits the permissions of the user who created it.
+Generate the key from your user profile. It has the permissions of the user who created it.
 
 ## Base URL
 
-All endpoints are prefixed with `/api/`. In a multi-tenant setup, Tenant-scoped endpoints use `/api/tenants/{tenantId}/`.
+All endpoints start with `/api/`. In a multi-tenant setup, Tenant-scoped endpoints use `/api/tenants/{tenantId}/` (see [Multi-tenant context](../reference/apis/rest-api.md#multi-tenant-context)).
 
 ## Common operations
 
 ### List resources
 
-Most resources support a search endpoint that accepts pagination, sorting, and filtering:
+Most resources have a search endpoint with pagination, sorting and filtering. `size` is at most 1000:
 
 ```http
 POST /api/scenarios/search
@@ -44,7 +44,7 @@ POST /api/scenarios/search
 
 ### Create a resource
 
-Send a `POST` request with the resource data in the request body:
+Send a `POST` request with the resource data:
 
 ```http
 POST /api/scenarios
@@ -76,18 +76,18 @@ DELETE /api/scenarios/{scenarioId}
 
 ## Discovering endpoints
 
-Use the OpenAPI schema to discover all available endpoints and their request/response models:
+The OpenAPI schema lists every endpoint with its request and response models:
 
 - **Swagger UI**: `https://<your-openaev-url>/swagger-ui/index.html`
 - **OpenAPI schema (JSON)**: `https://<your-openaev-url>/api-docs`
 
 ## Filtering
 
-Search endpoints accept a `filterGroup` object for fine-grained queries. See the [Filters reference](../reference/apis/filters.md) for the complete filter format.
+Search endpoints accept a `filterGroup` object. See [Filters](../reference/apis/filters.md) for the format.
 
 ## Error handling
 
-The API returns standard HTTP status codes. Handle errors based on the status code:
+The API returns standard HTTP status codes:
 
 | Code | Meaning | Action |
 |---|---|---|
@@ -95,10 +95,11 @@ The API returns standard HTTP status codes. Handle errors based on the status co
 | `401` | Authentication failed | Verify your API key |
 | `403` | Insufficient permissions | Check the user's roles and capabilities |
 | `404` | Resource not found | Verify the resource ID |
+| `409` | Conflict (database constraint or lock) | Check for a duplicate, or retry |
 | `500` | Server error | Retry or report the issue |
 
 ## What's next?
 
-- [REST API](../reference/apis/rest-api.md) -- Full API documentation with pagination and filtering details
-- [Filters reference](../reference/apis/filters.md) -- Filter format documentation
+- [REST API](../reference/apis/rest-api.md) -- Full API reference, including session login and rate limits
+- [Filters](../reference/apis/filters.md) -- Filter format
 - [Platform development](platform.md) -- Set up a local development environment
