@@ -3527,6 +3527,7 @@ public class V1_DataImporter implements Importer {
         Condition condition =
             Condition.builder()
                 .workflowId(workflow.getId())
+                .tenant(workflow.getTenant())
                 .key(
                     condNode.has("condition_key") && !condNode.get("condition_key").isNull()
                         ? condNode.get("condition_key").asText()

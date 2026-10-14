@@ -72,6 +72,7 @@ public class ConditionService {
     Condition root =
         Condition.builder()
             .workflowId(input.getWorkflowId())
+            .tenant(workflowTenant(input.getWorkflowId()))
             .name(input.getName())
             .description(input.getDescription())
             .type(rootInput.getType())
@@ -94,6 +95,17 @@ public class ConditionService {
           }
         },
         null);
+  }
+
+  /**
+   * The tenant of an event's workflow. An event linked to no step has no other parent to take its
+   * tenant from.
+   */
+  private Tenant workflowTenant(String workflowId) {
+    if (workflowId == null || workflowId.isBlank()) {
+      return null;
+    }
+    return workflowRepository.findById(workflowId).map(Workflow::getTenant).orElse(null);
   }
 
   /**
