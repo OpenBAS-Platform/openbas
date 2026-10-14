@@ -3,6 +3,7 @@ package io.openaev.service;
 import io.openaev.database.model.Agent;
 import io.openaev.database.model.Asset;
 import io.openaev.database.repository.AgentRepository;
+import io.openaev.database.repository.AssetRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.validation.constraints.NotBlank;
@@ -21,6 +22,7 @@ public class AgentService {
   @PersistenceContext private EntityManager entityManager;
 
   private final AgentRepository agentRepository;
+  private final AssetRepository assetRepository;
 
   public Optional<Agent> getAgentForAnAssetByExecutorId(
       String assetId,
@@ -55,7 +57,7 @@ public class AgentService {
    *     no asset
    */
   public Optional<Asset> findPrimaryAgentAsset(@NotBlank final String agentId) {
-    return agentRepository.findPrimaryAgentAsset(agentId);
+    return agentRepository.findPrimaryAgentAssetId(agentId).flatMap(assetRepository::findById);
   }
 
   public List<Agent> getAgentsByExecutorId(String executorId) {

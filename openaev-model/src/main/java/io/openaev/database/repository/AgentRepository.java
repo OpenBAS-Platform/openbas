@@ -2,7 +2,6 @@ package io.openaev.database.repository;
 
 import io.openaev.database.model.Agent;
 import io.openaev.database.model.AgentStatus;
-import io.openaev.database.model.Asset;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -42,25 +41,53 @@ public interface AgentRepository
    * asset is targeted by the inject, either directly or as a static member of one of the inject's
    * asset groups. Dynamic group membership is not covered here. Only ids are read: neither the
    * agent nor the inject is loaded.
+   *
+   * <p>Native on purpose: a JPQL root on {@code Agent} or {@code Inject} would carry the v1 {@code
+   * tenantFilter}, which reads the {@code TenantContext} thread-local. That thread-local is only
+   * set on the tenant-prefixed routes, so on the non-prefixed implant routes it falls back to the
+   * default tenant and rejects a valid agent of any other tenant. The tenant scope here is the
+   * transaction's own ({@code TxCtx}): the v2-active {@code assets} and {@code asset_groups} are
+   * rewritten by the statement inspector, and the agent is bound to its asset's tenant explicitly
+   * since {@code agents} is still v1. {@code injects_assets} and {@code injects_asset_groups} are
+   * reached through the scoped assets and groups only.
    */
   @Query(
-      """
-      SELECT COUNT(a) > 0 FROM Agent a
-        WHERE a.id = :agentId
-          AND a.parent IS NULL
-          AND a.inject IS NULL
-          AND (EXISTS (SELECT 1 FROM Inject i JOIN i.assets ia
-                        WHERE i.id = :injectId AND ia.id = a.asset.id)
-            OR EXISTS (SELECT 1 FROM Inject i JOIN i.assetGroups g JOIN g.assets ga
-                        WHERE i.id = :injectId AND ga.id = a.asset.id))
-      """)
+      value =
+          """
+          SELECT COUNT(*) > 0 FROM agents ag
+            JOIN assets a ON a.asset_id = ag.agent_asset AND a.tenant_id = ag.tenant_id
+            WHERE ag.agent_id = :agentId
+              AND ag.agent_parent IS NULL
+              AND ag.agent_inject IS NULL
+              AND (EXISTS (SELECT 1 FROM injects_assets ia
+                            WHERE ia.inject_id = :injectId AND ia.asset_id = a.asset_id)
+                OR EXISTS (SELECT 1 FROM injects_asset_groups iag
+                            JOIN asset_groups g ON g.asset_group_id = iag.asset_group_id
+                            JOIN asset_groups_assets aga ON aga.asset_group_id = g.asset_group_id
+                            WHERE iag.inject_id = :injectId AND aga.asset_id = a.asset_id))
+          """,
+      nativeQuery = true)
   boolean isPrimaryAgentAssetStaticallyTargetedByInject(
       @Param("agentId") String agentId, @Param("injectId") String injectId);
 
-  /** The asset of the agent, only when it is a primary agent, without loading the agent. */
+  /**
+   * The id of the asset of the agent, only when it is a primary agent, without loading the agent.
+   * Native for the same reason as {@link #isPrimaryAgentAssetStaticallyTargetedByInject}: scoped by
+   * the transaction's {@code TxCtx} through {@code assets}, not by the v1 filter on {@code Agent}.
+   * Returns the id rather than the entity: a native query cannot hydrate the computed columns of
+   * {@code Asset}, so the caller loads it through the asset repository.
+   */
   @Query(
-      "SELECT a.asset FROM Agent a WHERE a.id = :agentId AND a.parent IS NULL AND a.inject IS NULL")
-  Optional<Asset> findPrimaryAgentAsset(@Param("agentId") String agentId);
+      value =
+          """
+          SELECT a.asset_id FROM assets a
+            JOIN agents ag ON ag.agent_asset = a.asset_id AND ag.tenant_id = a.tenant_id
+            WHERE ag.agent_id = :agentId
+              AND ag.agent_parent IS NULL
+              AND ag.agent_inject IS NULL
+          """,
+      nativeQuery = true)
+  Optional<String> findPrimaryAgentAssetId(@Param("agentId") String agentId);
 
   List<Agent> findByExecutorId(String executorId);
 
