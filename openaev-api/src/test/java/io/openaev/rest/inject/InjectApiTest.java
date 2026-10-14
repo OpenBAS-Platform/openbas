@@ -217,14 +217,14 @@ class InjectApiTest extends IntegrationTest {
     @BeforeEach
     void setUpSyncPath() {
       // Force the synchronous callback path so the assertions run after the processing
-      savedQueueService = injectApi.getInjectTraceQueueService();
-      injectApi.setInjectTraceQueueService(null);
+      savedQueueService = injectExecutionCallbackService.getInjectTraceQueueService();
+      injectExecutionCallbackService.setInjectTraceQueueService(null);
     }
 
     @AfterEach
     void restoreSyncPath() {
-      // injectApi is a shared singleton: restore it so later tests keep the async path
-      injectApi.setInjectTraceQueueService(savedQueueService);
+      // the callback service is a shared singleton: restore it so later tests keep the async path
+      injectExecutionCallbackService.setInjectTraceQueueService(savedQueueService);
     }
 
     @Test
