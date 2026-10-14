@@ -2008,8 +2008,8 @@
                         "writeOnly": true
                     },
                     "SPLUNKES_ALERTS_INDEX": {
-                        "default": "_notable",
-                        "description": "Index to search for alerts (default: _notable).",
+                        "default": "notable",
+                        "description": "Index to search for alerts (default: notable, the Splunk ES notable index).",
                         "type": "string"
                     },
                     "SPLUNKES_TIME_WINDOW": {
@@ -2019,13 +2019,13 @@
                         "type": "string"
                     },
                     "SPLUNKES_MAX_RETRY": {
-                        "default": 3,
-                        "description": "Maximum number of retry attempts for API calls.",
+                        "default": 5,
+                        "description": "Maximum number of retry attempts for API calls. Combined with offset, this defines how long the collector keeps looking for a notable after an inject (default 5 x 120s covers ~10 min of detection latency: SIEM ingestion + correlation-search schedule).",
                         "type": "integer"
                     },
                     "SPLUNKES_OFFSET": {
-                        "default": "PT30S",
-                        "description": "Time offset between retry attempts.",
+                        "default": "PT2M",
+                        "description": "Time waited between retry attempts, also used to extend the search window forward on each retry.",
                         "format": "duration",
                         "type": "string"
                     },
