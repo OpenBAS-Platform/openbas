@@ -149,6 +149,7 @@ const MarkingDefinitions = () => {
         const createdMarkingDefinition = extractMarkingDefinitionFromStoreResult(result);
         if (createdMarkingDefinition) {
           upsert(createdMarkingDefinition);
+          queryableHelpers.paginationHelpers.incrementTotalElements(1);
           setOpenCreate(false);
         }
         return result;
@@ -209,9 +210,11 @@ const MarkingDefinitions = () => {
               secondaryAction={(
                 <MarkingDefinitionPopover
                   markingDefinition={item}
-                  onDelete={result =>
+                  onDelete={(result) => {
                     setMarkingDefinitions(prev =>
-                      prev.filter(d => d.marking_definition_id !== result))}
+                      prev.filter(d => d.marking_definition_id !== result));
+                    queryableHelpers.paginationHelpers.incrementTotalElements(-1);
+                  }}
                   onUpdate={upsert}
                 />
               )}

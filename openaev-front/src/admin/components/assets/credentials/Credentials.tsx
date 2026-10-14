@@ -186,7 +186,10 @@ const Credentials = () => {
           <Box display="flex" gap={1} alignItems="center">
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.CREDENTIALS}>
               <CredentialCreation
-                onCreate={result => setCredentials(current => [result, ...current])}
+                onCreate={(result) => {
+                  setCredentials(current => [result, ...current]);
+                  queryableHelpers.paginationHelpers.incrementTotalElements(1);
+                }}
               />
             </Can>
           </Box>
@@ -266,6 +269,7 @@ const Credentials = () => {
                     }}
                     onDelete={(deletedId) => {
                       setCredentials(current => current.filter(item => item.credential_id !== deletedId));
+                      queryableHelpers.paginationHelpers.incrementTotalElements(-1);
                     }}
                   />
                 )}
