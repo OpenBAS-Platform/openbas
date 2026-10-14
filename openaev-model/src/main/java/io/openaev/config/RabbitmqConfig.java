@@ -71,11 +71,6 @@ public class RabbitmqConfig {
   @Value("${openbas.rabbitmq.queue-type:${openaev.rabbitmq.queue-type:#{null}}}")
   private String queueType;
 
-  /** Whether to allow insecure connections to the management API. */
-  @JsonProperty("rabbitmq_management_insecure")
-  @Value("${openbas.rabbitmq.management-insecure:${openaev.rabbitmq.management-insecure:false}}")
-  private boolean managementInsecure;
-
   /** The password for the SSL trust store. */
   @JsonIgnore
   @Value(

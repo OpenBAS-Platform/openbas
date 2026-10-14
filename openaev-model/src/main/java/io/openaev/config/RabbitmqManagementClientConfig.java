@@ -15,7 +15,7 @@ public class RabbitmqManagementClientConfig {
       throws Exception {
     HttpClient.Builder builder = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(30));
     if (rabbitmqConfig.isSsl()) {
-      builder.sslContext(rabbitMQSslConfiguration.managementSslContext(rabbitmqConfig));
+      builder.sslContext(rabbitMQSslConfiguration.sslContext(rabbitmqConfig));
     }
     return builder.build();
   }
