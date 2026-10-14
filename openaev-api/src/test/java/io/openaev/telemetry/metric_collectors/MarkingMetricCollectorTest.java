@@ -248,13 +248,19 @@ class MarkingMetricCollectorTest {
     private Supplier<Map<Attributes, Long>> registerAndCaptureAssignmentGauge(
         MarkingMetricCollector collector) {
       AtomicReference<Supplier<Map<Attributes, Long>>> registeredGauge = new AtomicReference<>();
+      // Matched generically on name: init() also registers the unrelated "markings_total" gauge,
+      // and under strict stubbing an eq(MARKING_ASSIGNMENT_COUNT) matcher would make that other
+      // call a PotentialStubbingProblem instead of a no-op.
       doAnswer(
               invocation -> {
-                registeredGauge.set(invocation.getArgument(2));
+                String name = invocation.getArgument(0);
+                if (MARKING_ASSIGNMENT_COUNT.equals(name)) {
+                  registeredGauge.set(invocation.getArgument(2));
+                }
                 return null;
               })
           .when(metricRegistry)
-          .registerMultiGauge(eq(MARKING_ASSIGNMENT_COUNT), anyString(), any());
+          .registerMultiGauge(anyString(), anyString(), any());
 
       collector.init();
 
