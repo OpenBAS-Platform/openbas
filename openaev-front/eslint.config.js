@@ -120,6 +120,7 @@ export default [
             'vite.config.ts',
             'vitest.config.ts',
             'playwright.config.ts',
+            'knip.ts',
           ],
         },
       ],

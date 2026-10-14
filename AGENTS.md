@@ -25,6 +25,7 @@ mvn test                               # Tests (needs Docker services)
 cd openaev-front && yarn build         # Build frontend
 yarn lint && yarn check-ts             # Lint + type-check
 yarn depcruise                         # Import cycles + dependency rules
+yarn knip --dependencies               # Unused or undeclared dependencies
 yarn generate-types-from-api           # Sync API types
 ```
 
