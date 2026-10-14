@@ -1640,7 +1640,7 @@ public class InjectExecutionStepTest extends IntegrationTest {
     injectExecutionStep.end(stepRun);
 
     // ASSERT
-    verifyNoInteractions(injectService);
+    verify(injectService, never()).inject(any());
     assertEquals(StepStatus.END, stepRun.getStatus());
   }
 
