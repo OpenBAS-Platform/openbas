@@ -32,7 +32,6 @@ export const ensureCsrf = async (): Promise<void> => {
   await csrfBootstrapPromise;
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const api = <T>(schema?: Schema<T> | null): AxiosInstance => {
   const instance = axios.create({
     headers: { responseType: 'json' },

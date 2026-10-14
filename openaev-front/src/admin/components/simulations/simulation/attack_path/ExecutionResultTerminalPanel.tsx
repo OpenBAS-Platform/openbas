@@ -2,7 +2,6 @@ import { Button, IconButton, Paper, Text } from '@filigran/design-system';
 import { ArrowBack, Close, OpenInNew, ShieldOutlined } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-// eslint-disable-next-line import/no-named-as-default
 import DOMPurify from 'dompurify';
 import { useEffect, useRef, useState } from 'react';
 

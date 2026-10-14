@@ -1,11 +1,8 @@
-/* eslint import/no-extraneous-dependencies: 0 */
-
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import vitest from '@vitest/eslint-plugin';
 import customRules from 'eslint-plugin-custom-rules';
 import i18next from 'eslint-plugin-i18next';
-import importPlugin from 'eslint-plugin-import';
 import playwright from 'eslint-plugin-playwright';
 import react from 'eslint-plugin-react';
 import { reactRefresh } from 'eslint-plugin-react-refresh';
@@ -30,18 +27,6 @@ export default [
         // ('detect' crashes on ESLint 10); must follow the installed React version
         version: '19.3',
       },
-    },
-  },
-
-  // rules recommended by eslint-plugin-import
-  importPlugin.flatConfigs.recommended,
-  importPlugin.flatConfigs.typescript,
-  {
-    settings: {
-      'import/resolver': 'next',
-      'import/ignore': [
-        'react-apexcharts', // ignore react-apexcharts as the default export is broken
-      ],
     },
   },
 
@@ -74,6 +59,7 @@ export default [
 
       // local package eslint-plugin-custom-rules rules
       'custom-rules/classes-rule': 1,
+      'custom-rules/no-mutable-exports': 'error',
 
       // @typescript-eslint rules
       '@typescript-eslint/naming-convention': ['error', {
@@ -106,27 +92,10 @@ export default [
       '@stylistic/object-curly-newline': ['error', { multiline: true }],
       '@stylistic/object-property-newline': ['error', { allowAllPropertiesOnSameLine: false }],
 
-      // eslint-plugin-import rules
-      'import/no-named-as-default-member': 'off',
-      'import/prefer-default-export': 'error',
-      'import/no-mutable-exports': 'error',
-      'import/namespace': 'off', // off to reduce computing time for one file, on when doing yarn lint
-      'import/no-extraneous-dependencies': [
-        'error',
-        {
-          devDependencies: [
-            '**/*.test.tsx',
-            '**/*.test.ts',
-            'vite.config.ts',
-            'vitest.config.ts',
-            'playwright.config.ts',
-            'knip.ts',
-          ],
-        },
-      ],
-
       // custom rules
       'sort-imports': 'off',
+      // `import type` declarations may stay apart from the value import of the same module
+      'no-duplicate-imports': ['error', { allowSeparateTypeImports: true }],
       'no-underscore-dangle': 'error',
       'no-await-in-loop': 'error',
       'no-param-reassign': 'error',
@@ -193,15 +162,6 @@ export default [
         'error',
         { assertFunctionNames: ['expect', 'expectLibrary*', 'expectNoMuiControls'] },
       ],
-      'import/no-extraneous-dependencies': [
-        'error',
-        {
-          devDependencies: [
-            '**/*.ts',
-            '**/*.tsx',
-          ],
-        },
-      ],
     },
   },
 
@@ -210,18 +170,6 @@ export default [
     files: ['tests_e2e/**/*'],
     // rules recommended by eslint-plugin-playwright
     ...playwright.configs['flat/recommended'],
-    rules: {
-      ...playwright.configs['flat/recommended'].rules,
-      'import/no-extraneous-dependencies': [
-        'error',
-        {
-          devDependencies: [
-            '**/*.ts',
-            '**/*.tsx',
-          ],
-        },
-      ],
-    },
   },
 
   // CommonJS tooling config (.dependency-cruiser.cjs)
