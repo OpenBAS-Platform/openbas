@@ -1,5 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
+import { TIMEOUT } from '../../utils/constants';
+
 class ThreatArsenalListPage {
   readonly page: Page;
   readonly addButton: Locator;
@@ -60,8 +62,21 @@ class ThreatArsenalListPage {
     return this.listContainer.nth(lineNumber);
   }
 
+  /**
+   * The URL changes before the page mounts. On a slow WebKit runner the header
+   * and the pagination row can take longer than the 15s action timeout to show,
+   * so wait for both here, once, instead of in the first action of each test.
+   */
   async waitForLoad() {
     await this.page.waitForURL('**/threat-arsenal**');
+    await this.gridViewButton.waitFor({
+      state: 'visible',
+      timeout: TIMEOUT,
+    });
+    await this.paginationRow.waitFor({
+      state: 'visible',
+      timeout: TIMEOUT,
+    });
   }
 
   async openCreateThreatArsenal() {
