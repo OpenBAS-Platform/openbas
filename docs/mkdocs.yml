@@ -63,6 +63,7 @@ plugins:
   - search
   - redirects:
       redirect_maps:
+        'development/api-usage.md': 'reference/apis/rest-api.md'
         'deployment/authentication.md': 'deployment/platform/authentication.md'
         'deployment/certificate-validation.md': 'deployment/platform/certificate-validation.md'
         'deployment/configuration.md': 'reference/deployment/configuration.md'
@@ -311,5 +312,4 @@ nav:
     - Collector development: development/collectors.md
     - Injector development: development/injectors.md
     - Attack path: development/attack-path.md
-    - REST API: development/api-usage.md
     - Translations: development/translations.md
