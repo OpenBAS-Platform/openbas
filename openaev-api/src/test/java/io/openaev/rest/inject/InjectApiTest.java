@@ -2067,6 +2067,17 @@ class InjectApiTest extends IntegrationTest {
           injectExecutionCallbackService.setInjectTraceQueueService(queue);
         }
 
+        // The statistics live on the SessionFactory shared by every test of the JVM: switch them
+        // back off so the following tests do not run with them on.
+        @AfterEach
+        void disableStatistics() {
+          entityManager
+              .getEntityManagerFactory()
+              .unwrap(SessionFactory.class)
+              .getStatistics()
+              .setStatisticsEnabled(false);
+        }
+
         private Statistics resetStatistics() {
           Statistics stats =
               entityManager.getEntityManagerFactory().unwrap(SessionFactory.class).getStatistics();
