@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * global constraints cannot hold such duplicates, so only a schema that lost them can fail here.
  */
 @Component
-public class V6_20261014090000000__Make_injector_contract_unique_indexes_tenant_aware
+public class V6_20261014160000000__Make_injector_contract_unique_indexes_tenant_aware
     extends BaseJavaMigration {
 
   public static final String EXTERNAL_ID_INDEX = "injector_contract_external_id_unique";

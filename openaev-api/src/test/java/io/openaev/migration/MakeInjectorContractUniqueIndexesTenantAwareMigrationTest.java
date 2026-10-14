@@ -1,10 +1,10 @@
 package io.openaev.migration;
 
 import static io.openaev.database.model.Tenant.DEFAULT_TENANT_UUID;
-import static io.openaev.migration.V6_20261014090000000__Make_injector_contract_unique_indexes_tenant_aware.EXTERNAL_ID_INDEX;
-import static io.openaev.migration.V6_20261014090000000__Make_injector_contract_unique_indexes_tenant_aware.GLOBAL_EXTERNAL_ID_CONSTRAINT;
-import static io.openaev.migration.V6_20261014090000000__Make_injector_contract_unique_indexes_tenant_aware.GLOBAL_PAYLOAD_CONSTRAINT;
-import static io.openaev.migration.V6_20261014090000000__Make_injector_contract_unique_indexes_tenant_aware.PAYLOAD_INDEX;
+import static io.openaev.migration.V6_20261014160000000__Make_injector_contract_unique_indexes_tenant_aware.EXTERNAL_ID_INDEX;
+import static io.openaev.migration.V6_20261014160000000__Make_injector_contract_unique_indexes_tenant_aware.GLOBAL_EXTERNAL_ID_CONSTRAINT;
+import static io.openaev.migration.V6_20261014160000000__Make_injector_contract_unique_indexes_tenant_aware.GLOBAL_PAYLOAD_CONSTRAINT;
+import static io.openaev.migration.V6_20261014160000000__Make_injector_contract_unique_indexes_tenant_aware.PAYLOAD_INDEX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -35,14 +35,14 @@ import org.springframework.transaction.annotation.Transactional;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
 @WithMockUser(isAdmin = true)
-@DisplayName("Migration V6_20261014090000000: tenant-aware injector contract unique indexes")
+@DisplayName("Migration V6_20261014160000000: tenant-aware injector contract unique indexes")
 class MakeInjectorContractUniqueIndexesTenantAwareMigrationTest extends IntegrationTest {
 
   private static final String COLLIDING_EXTERNAL_ID = "colliding-external-id";
   private static final String COLLIDING_PAYLOAD_ID = "colliding-payload-id";
 
   @Autowired
-  private V6_20261014090000000__Make_injector_contract_unique_indexes_tenant_aware migration;
+  private V6_20261014160000000__Make_injector_contract_unique_indexes_tenant_aware migration;
 
   @Nested
   @DisplayName("Schema")
