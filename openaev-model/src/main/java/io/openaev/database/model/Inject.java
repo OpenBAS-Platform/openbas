@@ -490,7 +490,17 @@ public class Inject implements GrantableBase, Injection, TenantBase {
         source, speed, getDependsDuration(), getExercise(), now());
   }
 
+  /**
+   * Deprecated; prefer using getDate(Instant) This is kept for serialisation purposes
+   *
+   * @return the execution date if applicable
+   */
   @JsonProperty("inject_date")
+  public Optional<Instant> getDate() {
+    return this.getDate(now());
+  }
+
+  @JsonIgnore
   public Optional<Instant> getDate(Instant stableNowReference) {
     // If a trigger now was executed for this inject linked to an exercise, we ignore pauses and we
     // set inject inside of a range of execution
