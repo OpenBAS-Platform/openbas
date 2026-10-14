@@ -33,8 +33,10 @@ import org.junit.jupiter.api.Test;
  * fetch join or an explicit initialisation attenuates a site is not visible here; the frozen
  * baseline records, per site, what the measurement found.
  *
- * <p>The baseline only shrinks: a site that no longer exists must leave it, and its size may not
- * exceed {@link #BASELINE_CEILING}. A new endpoint returns a DTO, or ignores the association,
+ * <p>The baseline only shrinks: a site that no longer exists must leave it, and its size must equal
+ * {@link #BASELINE_SIZE} exactly. The count is checked for equality rather than as a ceiling, so
+ * removing a line forces the number down in the same change and the baseline cannot quietly regrow
+ * into the slack a ceiling would leave. A new endpoint returns a DTO, or ignores the association,
  * rather than joining the baseline.
  */
 @DisplayName("No new response serialises a lazy association into a tenant-active table")
@@ -42,8 +44,8 @@ class LazyAssociationAfterCommitArchTest {
 
   private static final String BASELINE_RESOURCE = "/lazy-after-commit-baseline.txt";
 
-  /** The baseline's size when it was frozen. Lower it with every entry removed, never raise it. */
-  static final int BASELINE_CEILING = 1300;
+  /** The baseline's exact size. Lower it with every entry removed, never raise it. */
+  static final int BASELINE_SIZE = 1300;
 
   @Nested
   @DisplayName("The inventory it is built on")
@@ -162,17 +164,20 @@ class LazyAssociationAfterCommitArchTest {
       assertThat(stale)
           .as(
               """
-              Baseline entries naming a response that no longer exists. Deleting these lines is \
-              the whole fix; the ceiling is an upper bound, so lowering it is optional hygiene:%n%s""",
+              Baseline entries naming a response that no longer exists. Delete these lines and \
+lower BASELINE_SIZE by as many:%n%s""",
               String.join(System.lineSeparator(), stale))
           .isEmpty();
     }
 
     @Test
-    @DisplayName("given the baseline, when counted, then it does not exceed its ceiling")
-    void given_baseline_should_notGrowPastCeiling() {
+    @DisplayName("given the baseline, when counted, then its size matches the frozen count exactly")
+    void given_baseline_should_matchFrozenSizeExactly() {
       // -- Act & Assert --
-      assertThat(baseline()).hasSizeLessThanOrEqualTo(BASELINE_CEILING);
+      assertThat(baseline())
+          .as(
+              "Baseline size must equal BASELINE_SIZE. Removed a line? Lower the constant in the same change.")
+          .hasSize(BASELINE_SIZE);
     }
 
     @Test

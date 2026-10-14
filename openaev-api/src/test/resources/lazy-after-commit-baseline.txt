@@ -1,8 +1,16 @@
 # Responses that serialise a lazy association into a tenant-active table, as listed by
 # LazyAssociationCatalog. Read by LazyAssociationAfterCommitArchTest. This list only shrinks: fix a
-# site (return a DTO built inside the transaction, or fetch the association there) and remove its
-# line. Removing a line is the whole fix: BASELINE_CEILING is an upper bound, so lowering it is
-# optional hygiene. Never add a line.
+# site and settle its line in the same change. Never add a line.
+#
+# Two kinds of fix, and they settle differently, because only the first one is visible to the
+# static catalog:
+#   The response stops reaching the association (a DTO, @JsonIgnore, the endpoint removed). The
+#   site leaves the catalog, so delete its line and lower BASELINE_SIZE by as many. The stale
+#   check fails and names the lines if you forget.
+#   The association is loaded inside the transaction (fetch join, entity graph,
+#   Hibernate.initialize). The site stays in the catalog and NOTHING here fails, so change its
+#   verdict by hand to `ATTENUATED | fixed in #<pr>` and leave the line in place. A line left
+#   CONFIRMED after such a fix is the one rot this file cannot detect on its own.
 #
 # Format: <Controller.method> -> <Class.property> | <VERDICT> | <evidence>
 #
