@@ -42,59 +42,13 @@ restart only makes the exports fail. Air-gapped platforms never send telemetry.
 
 ## Telemetry metrics
 
-Here are the main metrics sent.
+Metrics are counts and flags, grouped by area:
 
-### Platform identity
-
-- The platform version
-- The platform unique identifier and creation date
-- The IP address of the server running the platform
-- The deployment tags, when configured (`telemetry.tags` / `TELEMETRY_TAGS`): comma-separated free
-  tags such as `saas,eu-west`, normalized to lowercase and sorted before export
-
-### Usage
-
-- Enterprise Edition status (activated or not)
-- The number of users, the number of successful logins over the last 24 hours, and the number of
-  active Tenants
-- The number of credentials
-- The number of Assets, by Asset category (host, cloud resource, web application...) and by agent
-  coverage (agent based when at least one agent is installed on the Asset, agentless otherwise)
-- The deployed Injectors, Collectors and Executors, by catalog identity (the catalog connector slug,
-  or the component type when not deployed from the catalog, with a managed/manual flag)
-- The number of Simulations, Scenarios and Atomic Tests created
-- The number of Simulations played, and of Injects played by Injector type, with and without agents
-- The number of times each Executor type is used
-- The number of "Average" Dashboard widgets created
-- The number of marking definitions created and updated, and the number of marking definitions per
-  Tenant (the Tenant is identified by a SHA-256 hash of its id)
-- Scope rule usage: entries created by mode, entries added by type and source, and the number of
-  workflows using each source
-- Workflow safety policy changes: timeout and rate-limit values, and whether they are the default
-
-### AI and ecosystem
-
-- AI usage counters, without any content: AI feature calls by feature (fix spelling, summarize,
-  generate message...), chatbot messages, AI agent calls by agent identifier, TTP extractions, AI
-  detection and remediation rule generations by Security Platform name, and inject assistant runs
-- Whether the built-in LLM is enabled (with the provider type), whether XTM One is configured,
-  whether the chatbot AI terms of use are accepted, and whether the platform is registered on XTM Hub
-- The enabled authentication strategies (local, OIDC, SAML2, Kerberos)
-
-### Content inventory
-
-- Counts, without any content: Payloads (by type, source and status), Teams, endpoints (by
-  platform), Asset groups, security platforms (by type), organizations, Injects, challenges,
-  documents, channels, articles, custom Dashboards, import mappers, notification rules, workflows,
-  Findings, vulnerabilities, vulnerable endpoints, attack patterns, reports, and recurring Scenarios
-
-### Results and automation
-
-- Expectation validation traces by Collector type
-- Security coverage bundles processed, Scenarios generated from them, and results sent back
-- Workflow runs, and runs force-completed by the timeout safety policy
-- Payloads created per Payload type, Payloads duplicated, and Payloads upserted by Collectors
-- Emails sent
+- **Platform identity**: version, unique identifier, creation date, server IP address and deployment tags (`telemetry.tags`).
+- **Usage**: Enterprise Edition status, users and logins, Tenants, Assets, deployed integrations, Scenarios, Simulations and Injects played.
+- **AI and ecosystem**: AI feature usage (no content), AI and XTM One configuration, XTM Hub registration, enabled authentication methods.
+- **Content inventory**: number of Payloads, Teams, Assets, Findings, vulnerabilities, Dashboards and other objects.
+- **Results and automation**: expectation traces, security coverage processing, workflow runs, Payload creation and emails sent.
 
 ## What's next?
 
