@@ -299,7 +299,7 @@ nav:
     - Filters: reference/apis/filters.md
     - Bulk snapshot export: reference/apis/bulk-snapshot.md
     - Telemetry: reference/deployment/telemetry.md
-  - Troubleshooting & FAQ: troubleshooting/index.md
+  - Troubleshooting: troubleshooting/index.md
   - Development:
     - Prerequisites:
       - Ubuntu: development/environment-ubuntu.md
