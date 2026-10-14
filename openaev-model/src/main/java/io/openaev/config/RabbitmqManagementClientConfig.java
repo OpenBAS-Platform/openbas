@@ -10,7 +10,13 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitmqManagementClientConfig {
 
   @Bean
-  public HttpClient rabbitmqManagementHttpClient() {
-    return HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(30)).build();
+  public HttpClient rabbitmqManagementHttpClient(
+      RabbitmqConfig rabbitmqConfig, RabbitMQSslConfiguration rabbitMQSslConfiguration)
+      throws Exception {
+    HttpClient.Builder builder = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(30));
+    if (rabbitmqConfig.isSsl()) {
+      builder.sslContext(rabbitMQSslConfiguration.managementSslContext(rabbitmqConfig));
+    }
+    return builder.build();
   }
 }
