@@ -9,6 +9,7 @@ import io.openaev.IntegrationTest;
 import io.openaev.database.model.Injector;
 import io.openaev.database.model.InjectorContract;
 import io.openaev.utils.mockUser.WithMockUser;
+import io.openaev.utilstest.WithoutTenantScope;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -72,10 +73,13 @@ class BuiltinConnectorRegistrationScopeTest extends IntegrationTest {
   class TheCallerTransaction {
 
     @Test
+    @WithoutTenantScope
     @DisplayName("given no scope on the caller's transaction, should leave none behind")
     void given_noScopeOnTheCallerTransaction_should_leaveNoneBehind() {
       // -- PREPARE --
-      // Nothing scopes this test's transaction: it carries no TxCtx, so the aspect stays inert.
+      // The premise is stated rather than inherited: DefaultTenantScopeTestListener arms the
+      // default tenant on a test transaction, so "no scope" has to be asked for explicitly or
+      // this test stops testing what it says.
       assertThat(currentScope()).isEmpty();
 
       // -- ACT --
