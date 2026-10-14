@@ -305,9 +305,35 @@ public class InjectService {
    */
   public void checkAgentTargetsInject(String injectId, String agentId) {
     if (injectId == null || agentId == null || !isInjectTarget(injectId, agentId)) {
-      log.warn("Agent access to inject denied: inject {}, agent {}", injectId, agentId);
-      throw new ForbiddenException(AGENT_ACCESS_DENIED);
+      denyAgentAccess(injectId, agentId);
     }
+  }
+
+  /**
+   * Object-level authorization gate of the implant execution callback. Same contract as {@link
+   * #checkAgentTargetsInject}, except that an agent granted the inject at launch keeps the right to
+   * report on it: its outputs and its final COMPLETE must not be lost, nor the inject left pending,
+   * because the inject's targets were edited (or a dynamic group stopped matching) mid-execution.
+   * The agent is accepted when it holds an expectation or an execution trace on the inject, or when
+   * it is currently a target. The payload retrieval keeps the strict {@link
+   * #checkAgentTargetsInject}: nothing was granted yet at that point.
+   *
+   * @param injectId the inject the agent is reporting on
+   * @param agentId the agent reported by the implant
+   * @throws ForbiddenException if the agent was neither granted nor targeted by the inject
+   */
+  public void checkAgentMayReportOnInject(String injectId, String agentId) {
+    if (injectId == null
+        || agentId == null
+        || !(agentService.isPrimaryAgentGrantedInject(agentId, injectId)
+            || isInjectTarget(injectId, agentId))) {
+      denyAgentAccess(injectId, agentId);
+    }
+  }
+
+  private void denyAgentAccess(String injectId, String agentId) {
+    log.warn("Agent access to inject denied: inject {}, agent {}", injectId, agentId);
+    throw new ForbiddenException(AGENT_ACCESS_DENIED);
   }
 
   private boolean isInjectTarget(String injectId, String agentId) {

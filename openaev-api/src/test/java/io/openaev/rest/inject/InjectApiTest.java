@@ -2042,6 +2042,123 @@ class InjectApiTest extends IntegrationTest {
             .andExpect(status().isForbidden());
       }
 
+      /**
+       * A pending inject targeting its own endpoint, with an execution trace of the given agent:
+       * the agent is not a target of the inject but was served it (start trace on payload
+       * retrieval).
+       */
+      private Inject injectWithTraceOfNonTargetedAgent(AgentComposer.Composer agentWrapper) {
+        return injectComposer
+            .forInject(InjectFixture.getDefaultInject())
+            .withInjectorContract(
+                injectorContractComposer
+                    .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
+                    .withInjector(InjectorFixture.createDefaultPayloadInjector()))
+            .withEndpoint(
+                endpointComposer
+                    .forEndpoint(EndpointFixture.createEndpoint())
+                    .withAgent(agentComposer.forAgent(AgentFixture.createDefaultAgentService())))
+            .withInjectStatus(
+                injectStatusComposer
+                    .forInjectStatus(InjectStatusFixture.createPendingInjectStatus())
+                    .withExecutionTrace(
+                        executionTraceComposer
+                            .forExecutionTrace(
+                                ExecutionTraceFixture.createDefaultExecutionTraceStart())
+                            .withAgent(agentWrapper)))
+            .persist()
+            .get();
+      }
+
+      @DisplayName(
+          "Should accept the callback of an agent with a trace on the inject, even if no longer targeted")
+      @Test
+      void given_agentWithTraceNoLongerTargeted_should_acceptCallback() throws Exception {
+        // -- PREPARE --
+        AgentComposer.Composer agentWrapper =
+            agentComposer.forAgent(AgentFixture.createDefaultAgentService());
+        persistEndpointWithAgent(agentWrapper);
+        Inject inject = injectWithTraceOfNonTargetedAgent(agentWrapper);
+        entityManager.flush();
+
+        // -- EXECUTE & ASSERT --
+        performRawCallbackRequest(agentWrapper.get().getId(), inject.getId())
+            .andExpect(status().is2xxSuccessful());
+      }
+
+      @DisplayName(
+          "Should accept the callback of an agent with an expectation on the inject, even if no longer targeted")
+      @Test
+      void given_agentWithExpectationNoLongerTargeted_should_acceptCallback() throws Exception {
+        // -- PREPARE --
+        AgentComposer.Composer agentWrapper =
+            agentComposer.forAgent(AgentFixture.createDefaultAgentService());
+        persistEndpointWithAgent(agentWrapper);
+        Inject inject =
+            pendingInjectWrapper()
+                .withEndpoint(
+                    endpointComposer
+                        .forEndpoint(EndpointFixture.createEndpoint())
+                        .withAgent(
+                            agentComposer.forAgent(AgentFixture.createDefaultAgentService())))
+                .withExpectation(
+                    injectExpectationComposer
+                        .forExpectation(
+                            InjectExpectationFixture.createDefaultDetectionInjectExpectation())
+                        .withAgent(agentWrapper))
+                .persist()
+                .get();
+        entityManager.flush();
+
+        // -- EXECUTE & ASSERT --
+        performRawCallbackRequest(agentWrapper.get().getId(), inject.getId())
+            .andExpect(status().is2xxSuccessful());
+      }
+
+      @DisplayName("Should reject the callback of a child agent, even with a trace on the inject")
+      @Test
+      void given_childAgentWithTrace_should_forbidCallback() throws Exception {
+        // -- PREPARE --
+        AgentComposer.Composer parentAgentWrapper =
+            agentComposer.forAgent(AgentFixture.createDefaultAgentService());
+        Endpoint endpoint = persistEndpointWithAgent(parentAgentWrapper);
+        Agent childAgent = AgentFixture.createDefaultAgentSession();
+        childAgent.setAsset(endpoint);
+        childAgent.setParent(parentAgentWrapper.get());
+        AgentComposer.Composer childAgentWrapper =
+            agentComposer.forAgent(agentRepository.save(childAgent));
+        Inject inject = injectWithTraceOfNonTargetedAgent(childAgentWrapper);
+        entityManager.flush();
+
+        // -- EXECUTE & ASSERT --
+        performRawCallbackRequest(childAgentWrapper.get().getId(), inject.getId())
+            .andExpect(status().isForbidden());
+      }
+
+      @DisplayName(
+          "Should still reject the payload retrieval of an agent with a trace but no longer targeted")
+      @Test
+      void given_agentWithTraceNoLongerTargeted_should_forbidPayloadRetrieval() throws Exception {
+        // -- PREPARE --
+        AgentComposer.Composer agentWrapper =
+            agentComposer.forAgent(AgentFixture.createDefaultAgentService());
+        persistEndpointWithAgent(agentWrapper);
+        Inject inject = injectWithTraceOfNonTargetedAgent(agentWrapper);
+        entityManager.flush();
+
+        // -- EXECUTE & ASSERT --
+        mvc.perform(
+                get(INJECT_URI
+                        + "/"
+                        + inject.getId()
+                        + "/"
+                        + agentWrapper.get().getId()
+                        + "/executable-payload")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(csrf()))
+            .andExpect(status().isForbidden());
+      }
+
       @DisplayName("Should reject the callback when the agent does not exist")
       @Test
       void given_unknownAgent_should_forbidCallback() throws Exception {

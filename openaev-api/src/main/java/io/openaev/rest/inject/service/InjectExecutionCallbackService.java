@@ -68,12 +68,15 @@ public class InjectExecutionCallbackService {
    * @param agentId the agent reported by the implant, or {@code null} for an injector
    * @param injectId the inject the callback is about
    * @param input the execution result
-   * @throws ForbiddenException if the agent is not a target of the inject
+   * @throws ForbiddenException if the agent was neither granted the inject at launch nor is a
+   *     target of it
    */
   public void injectExecutionCallback(
       @Nullable String agentId, String injectId, InjectExecutionInput input) throws IOException {
     if (agentId != null) {
-      injectService.checkAgentTargetsInject(injectId, agentId);
+      // Not the strict target check: an agent already running the inject must be able to deliver
+      // its remaining outputs and its COMPLETE even if the targets were edited meanwhile.
+      injectService.checkAgentMayReportOnInject(injectId, agentId);
     }
     if (!previewFeatureService.isFeatureEnabled(PreviewFeature.LEGACY_INGESTION_EXECUTION_TRACE)
         && injectTraceQueueService != null) {

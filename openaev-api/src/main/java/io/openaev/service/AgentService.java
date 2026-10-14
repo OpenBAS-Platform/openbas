@@ -49,6 +49,20 @@ public class AgentService {
   }
 
   /**
+   * True when the agent is a primary agent that was granted the inject at launch, i.e. it has an
+   * expectation or an execution trace on it. Unlike the target check, this does not change when the
+   * inject's targets are edited afterwards.
+   *
+   * @param agentId the agent id
+   * @param injectId the inject id
+   * @return whether the primary agent holds an expectation or a trace on the inject
+   */
+  public boolean isPrimaryAgentGrantedInject(
+      @NotBlank final String agentId, @NotBlank final String injectId) {
+    return agentRepository.isPrimaryAgentGrantedInject(agentId, injectId);
+  }
+
+  /**
    * Find the asset of an agent, only when it is a primary agent (no parent and not created for a
    * specific inject).
    *

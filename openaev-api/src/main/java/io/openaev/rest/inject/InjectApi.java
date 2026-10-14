@@ -402,7 +402,8 @@ public class InjectApi extends RestBehavior {
         @ApiResponse(responseCode = "200", description = "Execution callback was successful"),
         @ApiResponse(
             responseCode = "403",
-            description = "The agent is not a target of the inject."),
+            description =
+                "The agent is neither a target of the inject nor was granted it at launch."),
         @ApiResponse(
             responseCode = "409",
             description =

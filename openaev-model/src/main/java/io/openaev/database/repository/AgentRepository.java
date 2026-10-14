@@ -71,6 +71,34 @@ public interface AgentRepository
       @Param("agentId") String agentId, @Param("injectId") String injectId);
 
   /**
+   * True when the agent is a primary agent that was granted the inject at launch: it has an
+   * expectation or an execution trace on it. Both only exist once the platform targeted the agent
+   * (expectations at launch) or the agent was served the inject (start trace on payload retrieval),
+   * so they outlive any later edit of the inject's targets. Only ids are read.
+   *
+   * <p>Native for the same reason as {@link #isPrimaryAgentAssetStaticallyTargetedByInject}: scoped
+   * by the transaction's {@code TxCtx} through {@code assets}, not by the v1 filter on {@code
+   * Agent}.
+   */
+  @Query(
+      value =
+          """
+          SELECT COUNT(*) > 0 FROM agents ag
+            JOIN assets a ON a.asset_id = ag.agent_asset AND a.tenant_id = ag.tenant_id
+            WHERE ag.agent_id = :agentId
+              AND ag.agent_parent IS NULL
+              AND ag.agent_inject IS NULL
+              AND (EXISTS (SELECT 1 FROM injects_expectations ie
+                            WHERE ie.inject_id = :injectId AND ie.agent_id = ag.agent_id)
+                OR EXISTS (SELECT 1 FROM execution_traces et
+                            JOIN injects_statuses s ON s.status_id = et.execution_inject_status_id
+                            WHERE s.status_inject = :injectId AND et.execution_agent_id = ag.agent_id))
+          """,
+      nativeQuery = true)
+  boolean isPrimaryAgentGrantedInject(
+      @Param("agentId") String agentId, @Param("injectId") String injectId);
+
+  /**
    * The id of the asset of the agent, only when it is a primary agent, without loading the agent.
    * Native for the same reason as {@link #isPrimaryAgentAssetStaticallyTargetedByInject}: scoped by
    * the transaction's {@code TxCtx} through {@code assets}, not by the v1 filter on {@code Agent}.
