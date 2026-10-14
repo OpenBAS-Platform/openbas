@@ -5,7 +5,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { execFileSync } = require('node:child_process');
+const { spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -44,7 +44,10 @@ function runSummary({ reports, runOutcome = 'success', mode = 'all', shard = '3-
   const script = path.join(dir, 'step.sh');
   fs.writeFileSync(script, stepScript('Summarise the multi-tenancy shadow run'));
 
-  const stdout = execFileSync('bash', ['-eo', 'pipefail', script], {
+  // spawnSync, not execFileSync: the step ends on `exit $VERDICT`, which is non-zero whenever the
+  // fail-closed gate reported a new signature or wrote no report at all. That exit code is a
+  // result to assert on, not a harness error, and throwing on it would hide every case below.
+  const run = spawnSync('bash', ['-eo', 'pipefail', script], {
     cwd: dir,
     encoding: 'utf8',
     env: {
@@ -55,12 +58,13 @@ function runSummary({ reports, runOutcome = 'success', mode = 'all', shard = '3-
       RUN_OUTCOME: runOutcome,
     },
   });
+  const stdout = run.stdout;
 
   const verdictPath = path.join(dir, 'openaev-api/target/tenant-shadow-verdict.tsv');
   const verdict = fs.existsSync(verdictPath)
     ? fs.readFileSync(verdictPath, 'utf8').trimEnd().split('\t')
     : null;
-  return { stdout, verdict, summary: fs.readFileSync(summary, 'utf8') };
+  return { stdout, verdict, status: run.status, summary: fs.readFileSync(summary, 'utf8') };
 }
 
 const green = 'Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1 s\n';
@@ -112,4 +116,14 @@ test('the shadow run does not ignore test failures', () => {
     !argsLine.includes('maven.test.failure.ignore'),
     'the shadow run must not ignore test failures',
   );
+});
+
+test('a shard whose fail-closed gate wrote no report exits non-zero', () => {
+  // The gate's own verdict, added in #7914 and kept here: a shard with no signature set is not a
+  // clean one. The step still writes its summary and its verdict line first, so the exit code
+  // never costs the report.
+  const { status, verdict, summary } = runSummary({ reports: { 'A.txt': green } });
+  assert.notStrictEqual(status, 0, 'a missing fail-closed report must fail the step');
+  assert.ok(verdict, 'the verdict line is written before the step exits');
+  assert.match(summary, /No fail-closed shadow report/);
 });
