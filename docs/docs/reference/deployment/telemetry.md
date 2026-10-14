@@ -1,45 +1,102 @@
 # Usage telemetry
 
-The application collects statistical data related to its usage and performances.
+OpenAEV sends usage statistics to Filigran. This page lists what is sent, where and how often, and
+how to stop it.
 
-!!! note "Confidentiality"
+!!! note "What telemetry contains"
 
-    The OpenAEV platform does not collect any information related to vulnerability which remains strictly confidential. Also, the collection is strictly anonymous and personally identifiable information is NOT collected (including IP addresses).
+    Telemetry sends counts, configuration flags and a few labels. The labels are:
 
-We do not collect any personal data, only statistical data. All collected data is aggregated to ensure privacy and compliance with relevant privacy regulations (see breakdown below for details).
+    - the IP address of the server running the platform;
+    - the platform unique identifier;
+    - Security Platform names, as entered by users;
+    - AI agent identifiers (lowercased, at most 64 characters);
+    - the deployment tags;
+    - the workflow safety policy values.
+
+    No end-user or client IP address is sent, and no content of your Scenarios, Findings,
+    vulnerabilities or Payloads.
 
 ## Purpose of the telemetry
 
-The collected data is used for the following purposes:
+Filigran uses the data to:
 
-- Improving the functionality and performance of the application.
-- Analyzing user behavior to enhance user experience.
-- Generating aggregated and anonymized statistics for internal and external reporting.
+- improve the features and performance of the platform;
+- understand how the platform is used, to improve the user experience;
+- produce aggregated statistics for internal and external reporting.
 
-## Important thing to know
+## How data is sent
 
-The platform send the metrics to the hostname `telemetry.filigran.io` using the OTLP protocol (over HTTPS). The format of the data is OpenTelemetry JSON.
+- **Destination**: `https://telemetry.oaev.filigran.io/v1/metrics`, using OTLP (OpenTelemetry
+  Protocol) over HTTPS, encoded as protobuf.
+- **Frequency**: metrics are collected every 60 minutes. The first export happens about 5 hours
+  after the platform starts, then every 6 hours.
+- **Startup check**: when the platform starts, it tests the connection to the destination. If the
+  destination cannot be reached, telemetry stays off until the next restart.
 
-The metrics push is done every 6 hours if OpenAEV was able to connect to the hostname when the telemetry manager is started.
+## How to disable telemetry
+
+There is no setting to turn telemetry off. To stop it, block outbound access or DNS resolution to
+`telemetry.oaev.filigran.io` from the platform, then restart the platform. Blocking without a
+restart only makes the exports fail. Air-gapped platforms never send telemetry.
 
 ## Telemetry metrics
 
-The application collects statistical data related to its usage. Here is an exhaustive list of the collected metrics:
+Here are the main metrics sent.
 
-- The current platform version
-- The platform's unique identifier
-- The platform creation date
-- The deployment tags, when configured by the operator (`telemetry.tags` / `TELEMETRY_TAGS` - comma-separated freeform tags such as `saas,eu-west`, normalized to lowercase and sorted before export)
+### Platform identity
+
+- The platform version
+- The platform unique identifier and creation date
+- The IP address of the server running the platform
+- The deployment tags, when configured (`telemetry.tags` / `TELEMETRY_TAGS`): comma-separated free
+  tags such as `saas,eu-west`, normalized to lowercase and sorted before export
+
+### Usage
+
 - Enterprise Edition status (activated or not)
-- The total number of users
-- The number of assets, broken down by asset category (host, cloud resource, web application, ...) and by agent coverage (agent based when at least one agent is installed on the asset, agentless otherwise). Counts only, no asset content.
-- The deployed injectors, collectors, and executors broken down by catalog identity (the catalog connector slug for components deployed from the catalog, otherwise the component's own type identifier, with a managed/manual flag). No component configuration is ever collected.
-- The number of simulations, scenarios, and atomic tests created
-- The number of simulations or injects executed
-- The number of injects played, broken down by injector type
-- AI usage counters, without any content: AI feature calls by feature (fix spelling, summarize, generate message, etc. - identical whichever backend serves them), chatbot messages, generic AI agent calls by agent identifier, TTP extractions, AI detection/remediation rule generations by collector type, and inject assistant runs
-- AI and ecosystem configuration state: whether the built-in LLM is enabled (with the provider type), whether XTM One is configured, whether the chatbot AI terms of use have been accepted, and whether the platform is registered on XTM Hub
-- Authentication strategies enabled (local, OIDC, SAML2, Kerberos) - configuration booleans only
-- Content inventory counts, without any content: payloads (by type, source and status), teams, endpoints (by platform), asset groups, security platforms, organizations, injects, challenges, documents, channels, articles, custom dashboards, import mappers, notification rules, workflows, findings, vulnerabilities, CVEs, vulnerable endpoints, attack patterns, reports, and recurring scenarios
-- Results and automation counters: expectation validation traces by collector type, security coverage bundles processed / scenarios generated / results sent, workflow runs and timeout-forced completions, payloads created / duplicated / upserted, and emails sent
+- The number of users, the number of successful logins over the last 24 hours, and the number of
+  active Tenants
+- The number of credentials
+- The number of Assets, by Asset category (host, cloud resource, web application...) and by agent
+  coverage (agent based when at least one agent is installed on the Asset, agentless otherwise)
+- The deployed Injectors, Collectors and Executors, by catalog identity (the catalog connector slug,
+  or the component type when not deployed from the catalog, with a managed/manual flag)
+- The number of Simulations, Scenarios and Atomic Tests created
+- The number of Simulations played, and of Injects played by Injector type, with and without agents
+- The number of times each Executor type is used
+- The number of "Average" Dashboard widgets created
+- The number of marking definitions created and updated, and the number of marking definitions per
+  Tenant (the Tenant is identified by a SHA-256 hash of its id)
+- Scope rule usage: entries created by mode, entries added by type and source, and the number of
+  workflows using each source
+- Workflow safety policy changes: timeout and rate-limit values, and whether they are the default
 
+### AI and ecosystem
+
+- AI usage counters, without any content: AI feature calls by feature (fix spelling, summarize,
+  generate message...), chatbot messages, AI agent calls by agent identifier, TTP extractions, AI
+  detection and remediation rule generations by Security Platform name, and inject assistant runs
+- Whether the built-in LLM is enabled (with the provider type), whether XTM One is configured,
+  whether the chatbot AI terms of use are accepted, and whether the platform is registered on XTM Hub
+- The enabled authentication strategies (local, OIDC, SAML2, Kerberos)
+
+### Content inventory
+
+- Counts, without any content: Payloads (by type, source and status), Teams, endpoints (by
+  platform), Asset groups, security platforms (by type), organizations, Injects, challenges,
+  documents, channels, articles, custom Dashboards, import mappers, notification rules, workflows,
+  Findings, vulnerabilities, vulnerable endpoints, attack patterns, reports, and recurring Scenarios
+
+### Results and automation
+
+- Expectation validation traces by Collector type
+- Security coverage bundles processed, Scenarios generated from them, and results sent back
+- Workflow runs, and runs force-completed by the timeout safety policy
+- Payloads created per Payload type, Payloads duplicated, and Payloads upserted by Collectors
+- Emails sent
+
+## What's next?
+
+- [Platform managers](../../deployment/platform/managers.md) -- How the telemetry manager runs
+- [Configuration](configuration.md) -- All platform configuration parameters

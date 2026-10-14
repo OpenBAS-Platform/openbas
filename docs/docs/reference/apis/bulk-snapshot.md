@@ -1,72 +1,67 @@
 # Bulk snapshot export
 
-The bulk snapshot export is a pair of REST API endpoints that let an external system read the
-current, verified state of every Asset in a Tenant as a machine-readable feed. It is designed for
-the OpenGRC connector and other Governance, Risk and Compliance (GRC) integrations: instead of
-replaying every Simulation, a consumer polls these endpoints and reads a current-state inventory,
-differentially, one page at a time.
+The bulk snapshot export is a pair of REST API endpoints that return the current, verified state of
+every Asset in a Tenant, one page at a time. It is built for the OpenGRC connector and other GRC
+(Governance, Risk and Compliance) integrations: instead of replaying every Simulation, a consumer
+polls these endpoints and syncs only what changed.
 
 !!! note "Preview feature"
 
     The bulk snapshot export is a preview feature, off by default. See
-    [Enabling the feature](#enabling-the-feature) below.
+    [Enabling the feature](#enabling-the-feature).
 
 ## Before you start
 
 - **Enable the `BULK_SNAPSHOT_EXPORT` preview feature.** See
   [Enabling the feature](#enabling-the-feature).
-- **Create a dedicated, non-administrator user** for the connector, and grant it the
+- **Create a dedicated, non-administrator user** for the connector and grant it the
   `Access observation snapshots` capability. See
-  [Users and RBAC](../../administration/users-and-rbac.md) for how to create users, roles and
-  capabilities. The connector authenticates with that user's API token.
+  [Users and RBAC](../../administration/users-and-rbac.md). The connector authenticates with that
+  user's API token.
 
-!!! warning "Decide what the account sees: all assessments, or only granted ones"
+!!! warning "Decide what the account sees"
 
-    Observations are restricted to the Scenario and Simulation they come from, and filtered like
-    Scenarios and Simulations everywhere else in the platform:
+    Observations follow the same access rules as their Scenario and Simulation:
 
-    - an account that is an administrator, or holds `Bypass` or `Access assessment`, sees the
-      observations of **every** Scenario and Simulation of the Tenant;
-    - any other account only sees the observations of the Scenarios and Simulations it holds a grant
-      on. Without any grant, the attack stream is **empty** (every attack observation belongs to a
-      Scenario), with no error to explain why.
+    - an administrator, or an account with `Bypass` or `Access assessment`, sees the observations
+      of **every** Scenario and Simulation of the Tenant;
+    - any other account only sees the observations of the Scenarios and Simulations it has a grant
+      on. Without any grant, the attack stream is **empty**, with no error.
 
-    For a full inventory, give the account `Access assessment` rather than per-Scenario grants.
-    Grants added later only apply to documents updated afterwards: the documents of a newly granted
+    For a full inventory, give the account `Access assessment`. The documents of a newly granted
     Scenario that the connector's cursor has already passed only come back with the next full
     reconciliation.
 
-!!! note "Unrestricted documents are tenant-wide"
+!!! note "Unrestricted documents are visible Tenant-wide"
 
-    A document that belongs to no grantable resource — typically a Finding produced outside any
-    Scenario or Simulation — carries no restriction, and the platform returns unrestricted documents
-    to every holder of the `Access observation snapshots` capability in the Tenant, whatever their
-    individual grants. Grant this capability only to accounts meant to see the whole Tenant
-    inventory.
+    A document that belongs to no Scenario or Simulation, such as a Finding produced outside any
+    Scenario, is returned to every holder of `Access observation snapshots` in the Tenant, whatever
+    their grants. Grant this capability only to accounts meant to see the whole Tenant inventory.
 
 ### Enabling the feature
 
-The feature is controlled by the `openaev.enabled-dev-features` property, which is empty by
-default:
+Add `BULK_SNAPSHOT_EXPORT` to the `openaev.enabled-dev-features` property (empty by default), then
+restart the platform:
 
 ```properties
 openaev.enabled-dev-features=BULK_SNAPSHOT_EXPORT
 ```
 
-The value is a comma-separated list of preview feature names. If the property already has a value on
-your platform, extend it rather than replacing it, for example
+The value is a comma-separated list of preview feature names, and `*` enables all of them. If the
+property already has a value, extend it, for example
 `openaev.enabled-dev-features=SOME_OTHER_FEATURE,BULK_SNAPSHOT_EXPORT`.
+
+The `Access observation snapshots` capability only appears in roles once the feature is enabled.
 
 !!! note "Legacy property name"
 
-    The legacy `openbas.enabled-dev-features` key is also read, and takes precedence over
-    `openaev.enabled-dev-features` when set. Platforms still on the legacy key can enable the
-    feature there instead.
+    The legacy `openbas.enabled-dev-features` key is still read and takes precedence over
+    `openaev.enabled-dev-features` when set.
 
 ## Endpoints
 
-Both endpoints are `POST` requests, scoped to a Tenant, and take the same request body and the same
-response envelope:
+Both endpoints are `POST` requests scoped to a Tenant. They take the same request body and return
+the same response envelope:
 
 ```http
 POST /api/tenants/{tenantId}/snapshot/attack-observations/search
@@ -77,15 +72,14 @@ POST /api/tenants/{tenantId}/snapshot/vulnerability-observations/search
 
 All fields are optional.
 
-| JSON field | Type | Default | Bounds |
+| JSON field | Type | Default | Description |
 |---|---|---|---|
-| `cursor` | string | `null` | Opaque resume token from a previous page. Mutually exclusive with `since` — sending both returns a **400**. |
-| `since` | ISO-8601 instant | `null` | Full reconciliation lower bound. Mutually exclusive with `cursor`. |
-| `page_size` | integer | `500` | Silently clamped to `[1, 1000]`. |
-| `safety_lag_seconds` | integer | `120` | Silently clamped to `[max(60, grace), 3600]`, where `grace` is the `engine.indexing-grace-window-seconds` [configuration parameter](../deployment/configuration.md). |
+| `cursor` | string | `null` | Opaque resume token from a previous page. Cannot be sent with `since`. |
+| `since` | ISO-8601 instant | `null` | Only return documents updated at or after this instant. Cannot be sent with `cursor`. |
+| `page_size` | integer | `500` | Clamped to `[1, 1000]`. |
+| `safety_lag_seconds` | integer | `120` | Clamped to `[max(60, grace), 3600]`, where `grace` is the `engine.indexing-grace-window-seconds` [configuration parameter](../deployment/configuration.md#engine). |
 
-Clamping is silent: an out-of-range `page_size` or `safety_lag_seconds` is corrected rather than
-rejected. A client that sends `page_size: 5000` receives 1000 items, not an error.
+Out-of-range values are corrected, not rejected: `page_size: 5000` returns up to 1000 items.
 
 ### Response envelope
 
@@ -102,8 +96,8 @@ rejected. A client that sends `page_size: 5000` receives 1000 items, not an erro
 
 ## Attack observations
 
-An attack observation is one document per Tenant, Asset, attack pattern, expectation type and
-Scenario: the latest verified state of one technique on one Asset against one Scenario.
+One document per Tenant, Asset, attack pattern, expectation type and Scenario: the latest verified
+state of one technique on one Asset in one Scenario.
 
 | JSON field | Meaning |
 |---|---|
@@ -134,18 +128,14 @@ Scenario: the latest verified state of one technique on one Asset against one Sc
 | `platform_types_succeeded` | Types of the Security Platforms that succeeded. |
 | `last_verified_at` | Last verification timestamp. |
 
-`platforms_reporting` is every security platform that returned a result for this technique, while
-`platforms_succeeded` is the subset of those that detected or prevented it in at least one attempt.
-The difference between the two is what the interface calls "Missed by security platform". The
-`platform_types_*` fields carry the same two sets as types, read from each result, so a client that
-keys a verdict on the platform type needs no lookup.
-
-A grain can span several Injects of the Simulation: `last_inject_id` is one of them, to link to.
+Platforms in `platforms_reporting` but not in `platforms_succeeded` are the ones the interface shows
+as "Missed by security platform". The `platform_types_*` fields carry the same two sets as types.
+An observation can span several Injects of the Simulation: `last_inject_id` is one of them.
 
 ## Vulnerability observations
 
-A vulnerability observation is one document per Tenant, Asset and vulnerability: the latest known
-state of one vulnerability on one Asset.
+One document per Tenant, Asset and vulnerability: the latest known state of one vulnerability on one
+Asset.
 
 | JSON field | Meaning |
 |---|---|
@@ -166,27 +156,23 @@ state of one vulnerability on one Asset.
 | `last_simulation_name` | Name of the last Simulation that produced this observation. |
 | `last_verified_at` | Last verification timestamp. |
 
-`last_finding_id` is the Finding that defines the current state of the grain: one grain, one
-Finding, by construction.
+`last_finding_id` is the one Finding that defines the observation's state.
 
-Only `CVE` Findings are exported. A CVE named in a `Vulnerability` Finding is not: the value of such
-a Finding holds the vulnerability name and its status together (`name [status]`), so it cannot be
-keyed on the vulnerability alone.
+Only `CVE` Findings are exported. A CVE named in a `Vulnerability` Finding is not, because the value
+of such a Finding holds the name and status together (`name [status]`).
 
 ## Cursor semantics
 
-A request omits both `cursor` and `since` to start a **full reconciliation**: a walk of the entire
-current state, from the beginning, with no lower bound. A request sends `since` instead to start a
-walk of the entire current state, restricted to documents updated at or after that instant. A
-request sends `cursor` to resume a walk in progress, from the `next_cursor` of a previous page.
+- **No `cursor` and no `since`**: full reconciliation, a walk of the entire current state.
+- **`since`**: a walk of the current state, limited to documents updated at or after that instant.
+- **`cursor`**: resume a walk from the `next_cursor` of a previous page.
 
-The cursor is opaque: do not parse it, store it beyond your own resume logic, or share it across
-Tenants or streams — a cursor is bound to the Tenant and the stream it was issued for, and a
-foreign-tenant, foreign-stream or malformed cursor returns a **400**.
+The cursor is opaque and bound to the Tenant and the stream it was issued for. Do not parse it or
+reuse it across Tenants or streams.
 
 !!! example "Full reconciliation, then resume by cursor"
 
-    First request — full reconciliation, no `cursor` and no `since`:
+    First request, with no `cursor` and no `since`:
 
     ```http
     POST /api/tenants/2cffad3a-0001-4078-b0e2-ef74274022c3/snapshot/attack-observations/search
@@ -211,11 +197,7 @@ foreign-tenant, foreign-stream or malformed cursor returns a **400**.
     }
     ```
 
-    `has_more` is `true`, so the client resumes with the returned `next_cursor`:
-
-    ```http
-    POST /api/tenants/2cffad3a-0001-4078-b0e2-ef74274022c3/snapshot/attack-observations/search
-    ```
+    `has_more` is `true`, so the client sends the returned `next_cursor`:
 
     ```json
     {
@@ -223,111 +205,67 @@ foreign-tenant, foreign-stream or malformed cursor returns a **400**.
     }
     ```
 
-    ```json
-    {
-      "observations": [],
-      "next_cursor": "eyJ2IjoxLCJ0ZW5hbnQiOiIyY2ZmYWQzYS0wMDAxLTQwNzgtYjBlMi1lZjc0Mjc0MDIyYzMiLCJ0cyI6IjIwMjYtMDgtMjRUMDc6NTg6MDBaIiwiaWQiOiI3ZjNiMWM2Mi05ZDRhLTRmMTgtOGIyMS01YzBlOWE3ZDRlMzMifQ",
-      "has_more": false,
-      "snapshot_window_end": "2026-08-24T07:58:05Z",
-      "indexed_through": "2026-08-24T07:59:35Z",
-      "server_time": "2026-08-24T08:00:05Z",
-      "consistency_mode": "eventual",
-      "snapshot_ready": true
-    }
-    ```
-
-    An empty page with `has_more: false` means the client has caught up; poll again after a delay.
-    The cursor is echoed back unchanged, so `cursor = response.next_cursor` remains correct and the
-    client does not need to remember an earlier one.
+    An empty page with `has_more: false` means the client has caught up. The cursor comes back
+    unchanged, so the client stores `next_cursor` and polls again later.
 
 ## Consistency and the safety lag
 
-The served window never runs ahead of the platform's own indexing. `snapshot_window_end` is
-`min(now - safety_lag, indexed_through)`, so no cursor can ever request data past what has been
-indexed.
+The served window always stays behind the platform's own indexing:
+`snapshot_window_end = min(now - safety_lag, indexed_through)`. The safety lag makes sure rows
+committed by long write transactions are not missed.
 
-!!! note "`indexed_through` is an approximation"
+`indexed_through` is approximate. Once indexing has passed `now - safety_lag`, the platform reports
+`now - grace` instead of measuring the exact progress. This never changes what is served, which
+stays capped at `now - safety_lag`: treat `indexed_through` as a readiness signal only.
 
-    Once indexing is known to have passed `now - safety_lag`, the platform stops measuring the exact
-    cursor and reports `now - grace` instead. That value can sit up to `safety_lag - grace` seconds
-    ahead of the real cursor. It never affects what is served — `snapshot_window_end` is still
-    capped at `now - safety_lag` — so treat `indexed_through` as a readiness signal, not as a
-    precise measurement of indexing progress.
-
-!!! note "`indexed_through` follows a platform-wide cursor"
-
-    The indexing cursor is stored per stream, not per Tenant, and the indexer sweeps every Tenant
-    together. The check for pending rows is scoped to the Tenant, so a Tenant with nothing waiting
-    is not held back by another Tenant's backlog. But a row of this Tenant waits its turn behind
-    that backlog: on a busy shared platform, `indexed_through`, and therefore `snapshot_ready`, can
-    lag because of another Tenant's write volume, with nothing in the response to explain why. See
-    the warning in [Client obligations](#client-obligations) about not gating polling on
-    `snapshot_ready`.
+The check for pending rows is per Tenant, but indexing runs for all Tenants together. On a busy
+shared platform, another Tenant's write volume can delay `indexed_through` and `snapshot_ready`.
 
 ## Client obligations
 
-A client integrating against this export must honor the following:
+A client must honor the following:
 
-1. **The window is eventually consistent and deliberately behind wall-clock time.** The safety lag
-   exists so that rows committed by long write transactions are not missed.
-2. **Delivery is at-least-once.** Consumption must be idempotent on `id` and `updated_at` — the same
-   document can legitimately be delivered twice.
-3. **While `snapshot_ready` is `false`, the inventory is incomplete, so absence must not be read as a
-   verdict.** Pages remain correct for the window they announce, and the served window is clamped to
-   `indexed_through`, so no cursor can ever run ahead of the index.
-4. **The polling loop must not be gated on `snapshot_ready`.** It is a data-interpretation signal, not
-   a wait condition.
-
-    !!! warning "Do not gate polling on `snapshot_ready`"
-
-        A client that sleeps until `snapshot_ready` becomes `true` can starve permanently on a busy
-        platform, because `indexed_through` follows a platform-wide cursor (see above) that a Tenant
-        does not control.
-
-5. **Differential synchronization carries no deletions. A weekly full reconciliation is mandatory.**
-   A request with both `cursor` and `since` omitted performs that full reconciliation, which is
-   required to detect the observations removed from the export, such as those of a deleted Asset or
-   Scenario. It does not catch the observations that stay in the export after their source changed:
-   see obligations 10 and 11.
-6. **The attack stream is Scenario-borne; the vulnerability stream is not.** An attack observation
-   only exists for a technique verified within a Scenario, so an Asset exercised solely outside a
-   Scenario is absent from the attack stream and reads as "never verified". A vulnerability
-   observation is exported even when its Finding was produced outside any Scenario; in that case
-   `last_scenario_id` and `last_scenario_name` are `null`.
-7. **Absence has one overloaded meaning.** A grain missing from the stream may be out of scope, never
-   verified, or deleted, and the export cannot tell these apart. This is exactly why the full
-   reconciliation of obligation 5 is required.
-8. **Labels are as of `last_verified_at`.** Every name copied into an observation — Asset name,
-   Endpoint hostname, Scenario and Simulation names, attack pattern name, Tenant name — is the one
-   observed when the observation was last recomputed. Renaming one of them does not update the
-   existing observations: the new name only appears with the next verdict (attack stream) or the
-   next Finding (vulnerability stream) on that grain. A stale name is expected behaviour, not a
-   bug; the full reconciliation of obligation 5 does not refresh it either. Rely on the ids
-   (`asset_id`, `scenario_id`…) to join, never on the names.
-9. **Attack patterns are attributed per Injector Contract.** A contract carrying three techniques,
-   detected once, produces three separate `SUCCESS` documents — one per technique. A consumer that
-   counts detections per technique must account for this.
-10. **An attack observation can be superseded by a later Simulation.** When a later Simulation of a
-    Scenario no longer plays a technique on an Asset, the observation keeps the verdict of the
-    earlier Simulation, full reconciliation included. Compare the observations of one Asset and
-    Scenario: an observation whose `last_simulation_start_date` is earlier than that of another one
-    whose `last_simulation_status` is `FINISHED` is superseded.
-11. **Deleting a Finding does not update its vulnerability observation.** The observation keeps the
-    state it had, `last_finding_id` included, and stays in the export even when no Finding of its
-    grain remains, full reconciliation included.
+1. **Delivery is at-least-once.** Process documents idempotently on `id` and `updated_at`: the same
+   document can come twice.
+2. **While `snapshot_ready` is `false`, the inventory is incomplete.** Do not read a missing document
+   as a verdict.
+3. **Do not wait for `snapshot_ready` before polling.** It tells you how to read the data, not when to
+   poll. A client that sleeps until it becomes `true` can wait forever on a busy platform.
+4. **Run a full reconciliation at least weekly.** Differential sync carries no deletions; only a full
+   reconciliation reveals observations removed from the export, such as those of a deleted Asset or
+   Scenario. It does not fix superseded attack observations or deleted Findings (items 9 and 10).
+5. **A missing document has several meanings.** It may be out of scope, never verified, or deleted;
+   the export cannot tell them apart.
+6. **The attack stream only covers Scenarios.** An Asset tested only outside a Scenario has no attack
+   observation. Vulnerability observations are exported even without a Scenario, with
+   `last_scenario_id` and `last_scenario_name` set to `null`.
+7. **Names are as of the last update.** Asset, endpoint, Scenario, Simulation, attack pattern and
+   Tenant names are copied when the observation is recomputed. A rename only shows up with the next
+   verdict or Finding on that observation, even after a full reconciliation. Join on ids, never on
+   names.
+8. **Attack patterns are counted per Injector contract.** A contract with three techniques, detected
+   once, produces three `SUCCESS` documents, one per technique.
+9. **A later Simulation can supersede an attack observation.** When a later Simulation of a Scenario
+   no longer plays a technique on an Asset, the observation keeps the earlier verdict, full
+   reconciliation included. For the same Asset and Scenario, an observation whose
+   `last_simulation_start_date` is older than that of another one with `last_simulation_status` `FINISHED` is superseded.
+10. **Deleting a Finding does not update its vulnerability observation.** The observation keeps its
+    last state, `last_finding_id` included, and stays in the export even when no matching Finding
+    remains, full reconciliation included.
 
 ## Errors
 
 | Status | Cause |
 |---|---|
-| **400** | `since` and `cursor` sent together, or a malformed, unparseable, wrong-version, foreign-tenant, or foreign-stream `cursor`. |
+| **400** | `since` and `cursor` sent together, or a malformed, unsupported-version, foreign-Tenant or foreign-stream `cursor`. |
 | **401** | No authentication. |
-| **403** | Authenticated without the `Access observation snapshots` capability, or not a member of the Tenant in the path. |
-| **404** | The `BULK_SNAPSHOT_EXPORT` preview feature is off: the endpoints do not exist, whatever the caller's capabilities. |
+| **403** | Missing the `Access observation snapshots` capability, or not a member of the Tenant in the path. |
+| **404** | The `BULK_SNAPSHOT_EXPORT` preview feature is off: the endpoints do not exist. |
 
 ## What's next?
 
-- [Users and RBAC](../../administration/users-and-rbac.md) — create the connector's user account and
-  grant it the `Access observation snapshots` capability
-- [Configuration](../deployment/configuration.md) — the `engine.indexing-grace-window-seconds`
+- [Users and RBAC](../../administration/users-and-rbac.md) -- Create the connector's user and grant
+  it the `Access observation snapshots` capability
+- [Configuration](../deployment/configuration.md#engine) -- The `engine.indexing-grace-window-seconds`
   parameter that bounds `safety_lag_seconds`
+- [REST API](rest-api.md) -- Authenticate and call the OpenAEV REST API
