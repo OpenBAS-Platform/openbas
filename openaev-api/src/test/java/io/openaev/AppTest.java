@@ -7,6 +7,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 import io.openaev.config.OpenAEVConfig;
+import io.openaev.config.cache.LicenseCacheManager;
 import io.openaev.database.model.Setting;
 import io.openaev.database.repository.SettingRepository;
 import java.sql.Timestamp;
@@ -29,6 +30,7 @@ class AppTest extends IntegrationTest {
 
   @Mock private SettingRepository settingRepository;
   @Autowired private OpenAEVConfig openAEVConfig;
+  @Autowired private LicenseCacheManager licenseCacheManager;
 
   @DisplayName("Should throw an exception when having an incorrect instance id")
   @Test
@@ -37,7 +39,7 @@ class AppTest extends IntegrationTest {
     when(settingRepository.findByKeyAndTenantIsNull(PLATFORM_INSTANCE.key()))
         .thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> new App(settingRepository, openAEVConfig).init())
+    assertThatThrownBy(() -> new App(settingRepository, openAEVConfig, licenseCacheManager).init())
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("Invalid UUID string: pouet");
     verify(settingRepository).findByKeyAndTenantIsNull(PLATFORM_INSTANCE.key());
@@ -49,7 +51,7 @@ class AppTest extends IntegrationTest {
   void shouldUpdateInstanceIdWithProperty() {
     String uuid = UUID.randomUUID().toString();
     openAEVConfig.setInstanceId(uuid);
-    new App(settingRepository, openAEVConfig).init();
+    new App(settingRepository, openAEVConfig, licenseCacheManager).init();
     verify(settingRepository).findByKeyAndTenantIsNull(PLATFORM_INSTANCE.key());
     verify(settingRepository).findByKeyAndTenantIsNull(PLATFORM_INSTANCE_CREATION.key());
     verify(settingRepository)
@@ -68,7 +70,7 @@ class AppTest extends IntegrationTest {
     // Mock le repository pour retourner empty
     when(settingRepository.findByKeyAndTenantIsNull(PLATFORM_INSTANCE.key()))
         .thenReturn(Optional.empty());
-    new App(settingRepository, openAEVConfig).init();
+    new App(settingRepository, openAEVConfig, licenseCacheManager).init();
     verify(settingRepository).findByKeyAndTenantIsNull(PLATFORM_INSTANCE.key());
     verify(settingRepository).findByKeyAndTenantIsNull(PLATFORM_INSTANCE_CREATION.key());
     verify(settingRepository)
@@ -84,7 +86,7 @@ class AppTest extends IntegrationTest {
     openAEVConfig.setInstanceId("");
     when(settingRepository.findByKeyAndTenantIsNull(PLATFORM_INSTANCE.key()))
         .thenReturn(Optional.empty());
-    new App(settingRepository, openAEVConfig).init();
+    new App(settingRepository, openAEVConfig, licenseCacheManager).init();
     verify(settingRepository).findByKeyAndTenantIsNull(PLATFORM_INSTANCE.key());
     verify(settingRepository).findByKeyAndTenantIsNull(PLATFORM_INSTANCE_CREATION.key());
     verify(settingRepository)
@@ -100,7 +102,7 @@ class AppTest extends IntegrationTest {
     when(settingRepository.findByKeyAndTenantIsNull(PLATFORM_INSTANCE.key()))
         .thenReturn(
             Optional.of(new Setting(PLATFORM_INSTANCE.key(), UUID.randomUUID().toString())));
-    new App(settingRepository, openAEVConfig).init();
+    new App(settingRepository, openAEVConfig, licenseCacheManager).init();
     verify(settingRepository).findByKeyAndTenantIsNull(PLATFORM_INSTANCE.key());
     verify(settingRepository).findByKeyAndTenantIsNull(PLATFORM_INSTANCE_CREATION.key());
     verifyNoMoreInteractions(settingRepository);
@@ -113,7 +115,7 @@ class AppTest extends IntegrationTest {
     when(settingRepository.findByKeyAndTenantIsNull(PLATFORM_INSTANCE.key()))
         .thenReturn(
             Optional.of(new Setting(PLATFORM_INSTANCE.key(), UUID.randomUUID().toString())));
-    new App(settingRepository, openAEVConfig).init();
+    new App(settingRepository, openAEVConfig, licenseCacheManager).init();
     verify(settingRepository).findByKeyAndTenantIsNull(PLATFORM_INSTANCE.key());
     verify(settingRepository).findByKeyAndTenantIsNull(PLATFORM_INSTANCE_CREATION.key());
     verifyNoMoreInteractions(settingRepository);
@@ -135,7 +137,7 @@ class AppTest extends IntegrationTest {
     openAEVConfig.setInstanceId(null);
     Instant before = Instant.now();
 
-    new App(settingRepository, openAEVConfig).init();
+    new App(settingRepository, openAEVConfig, licenseCacheManager).init();
     Instant after = Instant.now();
 
     ArgumentCaptor<Setting> saved = ArgumentCaptor.forClass(Setting.class);
@@ -168,7 +170,7 @@ class AppTest extends IntegrationTest {
     for (int restart = 0; restart < 2; restart++) {
       String configuredId = UUID.randomUUID().toString();
       openAEVConfig.setInstanceId(configuredId);
-      new App(settingRepository, openAEVConfig).init();
+      new App(settingRepository, openAEVConfig, licenseCacheManager).init();
       expected.add(PLATFORM_INSTANCE.key() + "=" + configuredId);
     }
 
@@ -181,7 +183,7 @@ class AppTest extends IntegrationTest {
     openAEVConfig.setInstanceId(UUID.randomUUID().toString());
     givenStoredInstance(UUID.randomUUID().toString(), null);
 
-    new App(settingRepository, openAEVConfig).init();
+    new App(settingRepository, openAEVConfig, licenseCacheManager).init();
 
     verify(settingRepository, never())
         .save(argThat(setting -> PLATFORM_INSTANCE_CREATION.key().equals(setting.getKey())));
@@ -194,7 +196,7 @@ class AppTest extends IntegrationTest {
     String future = Instant.now().plus(365, ChronoUnit.DAYS).toString();
     givenStoredInstance(UUID.randomUUID().toString(), future);
 
-    new App(settingRepository, openAEVConfig).init();
+    new App(settingRepository, openAEVConfig, licenseCacheManager).init();
 
     verify(settingRepository).findByKeyAndTenantIsNull(PLATFORM_INSTANCE.key());
     verify(settingRepository).findByKeyAndTenantIsNull(PLATFORM_INSTANCE_CREATION.key());
@@ -208,7 +210,7 @@ class AppTest extends IntegrationTest {
     String legacy = "2026-09-01 10:00:00.123";
     givenStoredInstance(UUID.randomUUID().toString(), legacy);
 
-    new App(settingRepository, openAEVConfig).init();
+    new App(settingRepository, openAEVConfig, licenseCacheManager).init();
 
     Instant expected = Timestamp.valueOf(legacy).toInstant();
     verify(settingRepository)
@@ -225,7 +227,7 @@ class AppTest extends IntegrationTest {
     openAEVConfig.setInstanceId(null);
     givenStoredInstance(UUID.randomUUID().toString(), "2026-09-01T10:00:00.123+02:00");
 
-    new App(settingRepository, openAEVConfig).init();
+    new App(settingRepository, openAEVConfig, licenseCacheManager).init();
 
     verify(settingRepository)
         .save(
