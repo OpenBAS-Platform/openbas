@@ -58,6 +58,8 @@ public class Inject implements GrantableBase, Injection, TenantBase {
         if (o1.getId() != null && o2.getId() != null) {
           return o1.getId().compareTo(o2.getId());
         }
+        if(o1.getId() != null) return 1;
+        if(o2.getId() != null) return -1;
         return 0;
       };
 
