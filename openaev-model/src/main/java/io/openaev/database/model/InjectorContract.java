@@ -160,9 +160,11 @@ public class InjectorContract implements TenantBase, CompositeIdResolvableI {
     return ofNullable(getPayload()).map(Payload::isPendingVersion).orElse(false);
   }
 
+  // Filtered on the displayed status: an approved payload with a new version waiting matches
+  // PENDING, like the list shows it. The value returned is the stored status.
   @Queryable(
       filterable = true,
-      path = "payload.approvalStatus",
+      path = "payload.displayApprovalStatus",
       refEnumClazz = Payload.PAYLOAD_APPROVAL_STATUS.class)
   @JsonProperty("injector_contract_payload_approval_status")
   @Enumerated(EnumType.STRING)

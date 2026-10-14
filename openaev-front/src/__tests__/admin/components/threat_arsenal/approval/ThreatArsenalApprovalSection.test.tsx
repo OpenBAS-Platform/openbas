@@ -231,7 +231,10 @@ describe('ThreatArsenalApprovalSection', () => {
       // Assert
       expect((screen.getByRole('button', { name: /Approve/ }) as HTMLButtonElement).disabled).toBe(false);
       expect(screen.getByText('Pending version')).toBeTruthy();
-      expect(screen.getByText('v1')).toBeTruthy();
+      // The status is the latest version's (Pending), not "Approved"; the active version stays in use.
+      expect(screen.getByText('Pending approval')).toBeTruthy();
+      expect(screen.queryByText('Approved')).toBeNull();
+      expect(screen.getByText('v{number} (approved, still in use)')).toBeTruthy();
       const diff = screen.getByLabelText('Command');
       expect(diff.textContent).toContain('  whoami');
       expect(diff.textContent).toContain('+ id');

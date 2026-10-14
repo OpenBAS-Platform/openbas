@@ -13,7 +13,7 @@ import { TO_CLASSIFY } from '../../../utils/domains/domainUtils';
 import { tint } from '../../../utils/tint';
 import InjectIcon from '../common/injects/InjectIcon';
 import ApprovalStatusChip from './approval/ApprovalStatusChip';
-import PendingVersionChip from './approval/PendingVersionChip';
+import { displayedApprovalStatus } from './approval/approvalStatusUtils';
 import ThreatArsenalActionPopover from './ThreatArsenalActionPopover';
 import { getStatusColor, getStatusLabel } from './threatArsenalStatusUtils';
 
@@ -70,10 +70,9 @@ const ThreatArsenalCard: FunctionComponent<Props> = ({
   const statusLabel = getStatusLabel(status);
   // A payload that is not approved shows its approval status instead of Verified / Unverified /
   // Deprecated: the approval decides whether it can be used.
-  const approvalStatus = action.action_payload?.payload_approval_status;
+  // A new version waiting shows as Pending (the latest version's status).
+  const approvalStatus = displayedApprovalStatus(action.action_payload?.payload_approval_status, action.action_payload?.payload_pending_version);
   const approvalWins = approvalStatus === 'PENDING' || approvalStatus === 'REJECTED';
-  // An approved action with a new version waiting shows it the same way.
-  const pendingVersion = !approvalWins && !!action.action_payload?.payload_pending_version;
   const name = tPick(action.action_labels);
 
   const showCheckbox = anySelected || selected || checked;
@@ -153,17 +152,7 @@ const ThreatArsenalCard: FunctionComponent<Props> = ({
             <ApprovalStatusChip status={approvalStatus} />
           </Box>
         )}
-        {pendingVersion && (
-          <Box sx={{
-            position: 'absolute',
-            top: 12,
-            right: 48,
-          }}
-          >
-            <PendingVersionChip />
-          </Box>
-        )}
-        {!approvalWins && !pendingVersion && statusLabel && (
+        {!approvalWins && statusLabel && (
           <Tooltip>
             <TooltipTrigger asChild>
               <Box

@@ -296,6 +296,15 @@ public class Payload implements GrantableBase, TenantBase {
   @JsonProperty("payload_pending_version")
   private boolean pendingVersion;
 
+  // The status lists and filters display: PENDING while a new version waits for approval, the
+  // stored status otherwise. Read-only and computed by the database; the stored status (what
+  // runs) is not affected.
+  @Formula("CASE WHEN payload_pending_version THEN 'PENDING' ELSE payload_approval_status END")
+  @Enumerated(EnumType.STRING)
+  @JsonIgnore
+  @Setter(NONE)
+  private PAYLOAD_APPROVAL_STATUS displayApprovalStatus;
+
   @OneToMany(
       mappedBy = "payload",
       cascade = CascadeType.ALL,

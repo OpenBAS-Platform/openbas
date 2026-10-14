@@ -1328,7 +1328,8 @@ public class InjectorContractService implements DependenciesManager {
     CriteriaQuery<Tuple> q = cb.createTupleQuery();
     Root<InjectorContract> root = q.from(InjectorContract.class);
     Join<InjectorContract, Payload> payloadJoin = root.join("payload", JoinType.INNER);
-    Path<Payload.PAYLOAD_APPROVAL_STATUS> status = payloadJoin.get("approvalStatus");
+    // The displayed status: a new version waiting counts as PENDING (see Payload).
+    Path<Payload.PAYLOAD_APPROVAL_STATUS> status = payloadJoin.get("displayApprovalStatus");
 
     Predicate predicate = baseSpec.toPredicate(root, q, cb);
     if (predicate != null) {
