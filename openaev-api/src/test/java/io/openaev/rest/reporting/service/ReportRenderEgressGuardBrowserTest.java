@@ -1,10 +1,12 @@
 package io.openaev.rest.reporting.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.options.LoadState;
@@ -53,7 +55,14 @@ class ReportRenderEgressGuardBrowserTest {
   @BeforeAll
   static void launchBrowser() {
     playwright = Playwright.create();
-    browser = playwright.chromium().launch();
+    browser =
+        playwright
+            .chromium()
+            .launch(
+                // Only the trusted origin of the "public render url" scenario is resolvable by
+                // Chromium: every other name (public.test...) must stay unreachable for it.
+                new BrowserType.LaunchOptions()
+                    .setArgs(List.of("--host-resolver-rules=MAP trusted.test 127.0.0.1")));
   }
 
   @AfterAll
@@ -65,11 +74,14 @@ class ReportRenderEgressGuardBrowserTest {
   @BeforeEach
   void setUp() throws IOException {
     this.internal = new RecordingServer();
+    this.trusted = new RecordingServer();
     this.publicHost = new RecordingServer();
     this.publicHost.on(
         "/redirect-to-internal",
         redirectTo("http://127.0.0.1:" + this.internal.port() + "/internal.png"));
-    this.trusted = new RecordingServer();
+    this.publicHost.on(
+        "/redirect-to-trusted",
+        redirectTo("http://localhost:" + this.trusted.port() + "/api/from-redirect"));
     this.trusted.on(
         "/render",
         page(
@@ -80,6 +92,9 @@ class ReportRenderEgressGuardBrowserTest {
                 + "<img src='http://public.test:"
                 + this.publicHost.port()
                 + "/redirect-to-internal'>"
+                + "<img src='http://public.test:"
+                + this.publicHost.port()
+                + "/redirect-to-trusted'>"
                 + "<img src='http://127.0.0.1:"
                 + this.internal.port()
                 + "/internal.png'>"
@@ -151,11 +166,68 @@ class ReportRenderEgressGuardBrowserTest {
         "the internal hop must never be contacted, but it received: " + this.internal.paths());
   }
 
+  @Test
+  void a_redirect_from_a_public_host_to_the_loopback_trusted_origin_never_arrives() {
+    renderTrustedPage();
+
+    // The redirect target is the platform's own origin, but it is reached by the guard's external
+    // fetch, which refuses loopback: the hostile host cannot make the platform's API be called,
+    // with or without the render token.
+    assertTrue(this.publicHost.paths().contains("/redirect-to-trusted"));
+    assertFalse(
+        this.trusted.paths().contains("/api/from-redirect"),
+        "the trusted origin must not be reached through a redirect from an external host");
+  }
+
+  @Test
+  void a_redirect_from_a_public_host_to_a_publicly_resolvable_trusted_origin_carries_no_token()
+      throws IOException {
+    // render-base-url may point at a publicly resolvable name (a reverse proxy in front of the
+    // platform). A hostile host redirecting there must not be able to borrow the render token: the
+    // redirect is followed by the external fetch, which never carries credentials.
+    RecordingServer publicTrusted = new RecordingServer();
+    ExternalResourceFetcher publicFetcher =
+        new ExternalResourceFetcher(
+            new LoopbackAsPublicDnsResolver("public.test", "trusted.test"), 1024);
+    try {
+      this.publicHost.on(
+          "/redirect-to-public-trusted",
+          redirectTo("http://trusted.test:" + publicTrusted.port() + "/api/from-redirect"));
+      publicTrusted.on(
+          "/render",
+          page(
+              "<html><body><img src='http://public.test:"
+                  + this.publicHost.port()
+                  + "/redirect-to-public-trusted'></body></html>"));
+      ReportRenderEgressGuard publicTrustedGuard =
+          new ReportRenderEgressGuard(
+              "http://trusted.test:" + publicTrusted.port(), 8080, false, publicFetcher);
+
+      renderPage(publicTrustedGuard, "http://trusted.test:" + publicTrusted.port() + "/render");
+
+      assertEquals(
+          List.of(RENDER_TOKEN),
+          publicTrusted.authorizationHeadersFor("/render"),
+          "the page itself is requested by the browser with the render token");
+      assertEquals(
+          Collections.singletonList(null),
+          publicTrusted.authorizationHeadersFor("/api/from-redirect"),
+          "the redirected request reaches the platform, but as an anonymous external fetch");
+    } finally {
+      publicFetcher.close();
+      publicTrusted.stop();
+    }
+  }
+
   private void renderTrustedPage() {
+    renderPage(this.guard, "http://localhost:" + this.trusted.port() + "/render");
+  }
+
+  private void renderPage(final ReportRenderEgressGuard guardToInstall, final String url) {
     try (BrowserContext context = browser.newContext()) {
-      this.guard.install(context, RENDER_TOKEN);
+      guardToInstall.install(context, RENDER_TOKEN);
       Page page = context.newPage();
-      page.navigate("http://localhost:" + this.trusted.port() + "/render");
+      page.navigate(url);
       page.waitForLoadState(LoadState.NETWORKIDLE);
       // A same-origin call, like the SPA's own API calls, must be authenticated too.
       page.evaluate("() => fetch('/api/ping').then(r => r.status)");
@@ -180,10 +252,10 @@ class ReportRenderEgressGuardBrowserTest {
 
   /** Tiny HTTP server that records the path and Authorization header of every request. */
   private static final class RecordingServer {
+    private record Seen(String path, String authorization) {}
+
     private final HttpServer server;
-    private final List<String> paths = Collections.synchronizedList(new ArrayList<>());
-    private final List<String> authorizationHeaders =
-        Collections.synchronizedList(new ArrayList<>());
+    private final List<Seen> requests = Collections.synchronizedList(new ArrayList<>());
 
     RecordingServer() throws IOException {
       this.server = HttpServer.create(new InetSocketAddress(0), 0);
@@ -201,8 +273,10 @@ class ReportRenderEgressGuardBrowserTest {
       this.server.createContext(
           path,
           exchange -> {
-            this.paths.add(exchange.getRequestURI().getPath());
-            this.authorizationHeaders.add(exchange.getRequestHeaders().getFirst("Authorization"));
+            this.requests.add(
+                new Seen(
+                    exchange.getRequestURI().getPath(),
+                    exchange.getRequestHeaders().getFirst("Authorization")));
             handler.handle(exchange);
             exchange.close();
           });
@@ -212,16 +286,27 @@ class ReportRenderEgressGuardBrowserTest {
       return this.server.getAddress().getPort();
     }
 
-    List<String> paths() {
-      synchronized (this.paths) {
-        return new ArrayList<>(this.paths);
+    private List<Seen> snapshot() {
+      synchronized (this.requests) {
+        return new ArrayList<>(this.requests);
       }
     }
 
+    List<String> paths() {
+      return snapshot().stream().map(Seen::path).toList();
+    }
+
+    /** Authorization header of every request, null where a request carried none. */
     List<String> authorizationHeaders() {
-      synchronized (this.authorizationHeaders) {
-        return new ArrayList<>(this.authorizationHeaders);
-      }
+      return snapshot().stream().map(Seen::authorization).toList();
+    }
+
+    /** Authorization header of every request to the given path, null where it carried none. */
+    List<String> authorizationHeadersFor(final String path) {
+      return snapshot().stream()
+          .filter(seen -> seen.path().equals(path))
+          .map(Seen::authorization)
+          .toList();
     }
 
     void stop() {

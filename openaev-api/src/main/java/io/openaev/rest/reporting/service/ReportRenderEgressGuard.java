@@ -44,7 +44,16 @@ import org.springframework.stereotype.Component;
  * header on every request of the context, handing the token to whoever controls a tenant-supplied
  * logo url. Instead the guard attaches the {@code Authorization} header itself, and only on
  * requests to the trusted origin (an allow-list rather than a strip-list). External requests are
- * made by {@link ExternalResourceFetcher}, which never forwards credentials.
+ * made by {@link ExternalResourceFetcher}, which never forwards credentials. A tenant-controlled
+ * host therefore cannot borrow the token through a redirect either: the redirect is followed by
+ * that fetch, which reaches the trusted origin like any other host (loopback is refused, a publicly
+ * resolvable origin is fetched anonymously).
+ *
+ * <p>Known limit: a request the browser itself makes to the trusted origin carries the token
+ * whoever referenced it. A tenant url that points straight at that origin could thus have the
+ * platform's own API requested as an image with the render token. Saved theme urls must be public,
+ * so this needs a publicly resolvable {@code openaev.reporting.render-base-url}, and the response
+ * is only ever rendered as an image, never readable by the tenant.
  */
 @Slf4j
 @Component
