@@ -102,6 +102,28 @@ export interface PayloadVersionOutput {
   version_status: "PENDING" | "APPROVED" | "REJECTED" | "SUPERSEDED";
 }
 
+export interface NotificationPreferenceInput {
+  /** Also sent by email */
+  notification_preference_email?: boolean;
+  /** Shown in the notification center and the bell */
+  notification_preference_in_app?: boolean;
+  /** Notification type */
+  notification_preference_type:
+    | "PAYLOAD_APPROVAL_REQUESTS"
+    | "PAYLOAD_APPROVAL_OUTCOMES";
+}
+
+export interface NotificationPreferenceOutput {
+  /** Also sent by email */
+  notification_preference_email?: boolean;
+  /** Shown in the notification center and the bell */
+  notification_preference_in_app?: boolean;
+  /** Notification type */
+  notification_preference_type:
+    | "PAYLOAD_APPROVAL_REQUESTS"
+    | "PAYLOAD_APPROVAL_OUTCOMES";
+}
+
 export interface ThreatArsenalApproveInput {
   /**
    * Optional comment recorded in the approval history
@@ -8489,6 +8511,10 @@ export interface NotificationTriggerInput {
     | "UPDATE"
     | "DELETE"
     | "SCORE_DEGRADATION"
+    | "APPROVAL_PENDING"
+    | "APPROVED"
+    | "REJECTED"
+    | "SUPERSEDED"
   )[];
   /** Filter group applied to matching entities */
   notification_trigger_filters?: FilterGroup;
@@ -8600,6 +8626,10 @@ export interface NotificationTriggerOutput {
     | "UPDATE"
     | "DELETE"
     | "SCORE_DEGRADATION"
+    | "APPROVAL_PENDING"
+    | "APPROVED"
+    | "REJECTED"
+    | "SUPERSEDED"
   )[];
   /** Filter group applied to matching entities */
   notification_trigger_filters?: FilterGroup;

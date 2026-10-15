@@ -6,12 +6,14 @@ import {
 } from '@mui/icons-material';
 import { Box, List, ListItem, ListItemIcon, ListItemText, Skeleton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router';
 
 import type { DomainHelper } from '../../../actions/domains/domain-helper';
 import {
   bulkDeleteThreatArsenalActions,
   exportThreatArsenalCsvMapper,
+  fetchThreatArsenalAction,
   fetchThreatArsenalAuthorCounts,
   searchThreatArsenalActions,
 } from '../../../actions/threat_arsenals/threatArsenal-actions';
@@ -29,6 +31,7 @@ import { useHelper } from '../../../store';
 import {
   type SearchPaginationInput,
   type ThreatArsenalAction,
+  type ThreatArsenalActionFullOutput,
 } from '../../../utils/api-types';
 import { useBulkOperationsFinishedCount } from '../../../utils/bulkOperations';
 import useEntityToggle from '../../../utils/hooks/useEntityToggle';
@@ -39,6 +42,7 @@ import ThreatArsenalRunTestDrawer from './bulk/ThreatArsenalRunTestDrawer';
 import CreateThreatArsenalAction from './CreateThreatArsenalAction';
 import ImportUploaderThreatArsenal from './ImportUploaderThreatArsenal';
 import ThreatArsenalCard from './ThreatArsenalCard';
+import { ACTION_PARAM, toThreatArsenalAction } from './threatArsenalDeepLink';
 import ThreatArsenalEmptyState from './ThreatArsenalEmptyState';
 import ThreatArsenalHero from './ThreatArsenalHero';
 import ThreatArsenalInformationDrawer from './ThreatArsenalInformationDrawer';
@@ -66,6 +70,31 @@ const ThreatArsenal = () => {
   const canDeleteThreatArsenal = ability.can(ACTIONS.DELETE, SUBJECTS.THREAT_ARSENALS);
 
   const [selectedThreatArsenalAction, setSelectedThreatArsenalAction] = useState<ThreatArsenalAction | null>(null);
+
+  // Deep link (e.g. from a notification): ?action=<id> opens that action's drawer.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const linkedActionId = searchParams.get(ACTION_PARAM);
+  useEffect(() => {
+    if (!linkedActionId) {
+      return undefined;
+    }
+    let cancelled = false;
+    fetchThreatArsenalAction(linkedActionId)
+      .then((response) => {
+        if (!cancelled) setSelectedThreatArsenalAction(toThreatArsenalAction(response.data as ThreatArsenalActionFullOutput));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [linkedActionId]);
+  const closeSelectedAction = () => {
+    setSelectedThreatArsenalAction(null);
+    if (linkedActionId) {
+      searchParams.delete(ACTION_PARAM);
+      setSearchParams(searchParams, { replace: true });
+    }
+  };
   const [isRunTestDrawerOpened, setRunTestDrawerOpened] = useState<boolean>(false);
   const [isBulkDeleteDialogOpened, setBulkDeleteDialogOpened] = useState<boolean>(false);
   const [threatArsenalActions, setThreatArsenalActions] = useState<ThreatArsenalAction[]>([]);
@@ -613,7 +642,7 @@ const ThreatArsenal = () => {
       {(selectedThreatArsenalAction !== null) && (
         <ThreatArsenalInformationDrawer
           open={true}
-          onClose={() => setSelectedThreatArsenalAction(null)}
+          onClose={closeSelectedAction}
           threatArsenalAction={selectedThreatArsenalAction}
           onApprovalChanged={(actionId, status, pendingVersion) => setThreatArsenalActions(prev => prev.map(a => (
             a.injector_contract_id === actionId && a.action_payload

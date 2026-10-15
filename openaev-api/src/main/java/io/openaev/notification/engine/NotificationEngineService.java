@@ -149,6 +149,12 @@ public class NotificationEngineService {
           case UPDATE -> "updated";
           case DELETE -> "deleted";
           case SCORE_DEGRADATION -> "score degraded";
+          // Sent by PayloadApprovalNotificationService with its own messages, never matched here
+          // (triggers cannot subscribe to them).
+          case APPROVAL_PENDING -> "pending approval";
+          case APPROVED -> "approved";
+          case REJECTED -> "rejected";
+          case SUPERSEDED -> "superseded";
         };
     String resourceLabel = entry.getResourceType().name().toLowerCase().replace('_', ' ');
     return "[" + resourceLabel + "] " + label + " " + operation;

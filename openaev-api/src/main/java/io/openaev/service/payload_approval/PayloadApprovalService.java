@@ -5,6 +5,7 @@ import io.openaev.database.model.Payload;
 import io.openaev.database.model.Payload.PAYLOAD_APPROVAL_STATUS;
 import io.openaev.database.model.PayloadApproval;
 import io.openaev.database.model.PayloadApproval.ORIGIN;
+import io.openaev.database.model.PayloadApprovalNotification;
 import io.openaev.database.model.PayloadVersion;
 import io.openaev.database.model.ResourceType;
 import io.openaev.database.model.User;
@@ -48,6 +49,7 @@ public class PayloadApprovalService {
   static final String SYSTEM_COMMENT = "Built-in payload created by the platform";
 
   private final PayloadApprovalRepository payloadApprovalRepository;
+  private final PayloadApprovalNotificationService payloadApprovalNotificationService;
 
   /** Whether the user may approve payload content ("Approve content", admin or tenant bypass). */
   public static boolean canApprove(@Nullable final User user) {
@@ -73,10 +75,18 @@ public class PayloadApprovalService {
       // Cosmetic edit or identical re-sync: what runs did not change, neither does the status.
       return;
     }
+    // Approvers are notified when a payload becomes pending, not again while it stays pending.
+    boolean wasPending =
+        fingerprintBefore != null && payload.getApprovalStatus() == PAYLOAD_APPROVAL_STATUS.PENDING;
     switch (origin) {
       case SYSTEM ->
           apply(payload, PAYLOAD_APPROVAL_STATUS.APPROVED, origin, true, null, SYSTEM_COMMENT);
-      case COLLECTOR -> apply(payload, PAYLOAD_APPROVAL_STATUS.PENDING, origin, true, null, null);
+      case COLLECTOR -> {
+        apply(payload, PAYLOAD_APPROVAL_STATUS.PENDING, origin, true, null, null);
+        if (!wasPending) {
+          payloadApprovalNotificationService.recordPending(payload, null, null);
+        }
+      }
       case CREATE, DUPLICATE, IMPORT, UPDATE -> {
         if (canApprove(actor)) {
           apply(
@@ -92,6 +102,9 @@ public class PayloadApprovalService {
               payload, PAYLOAD_APPROVAL_STATUS.APPROVED, ORIGIN.SYSTEM, true, null, SYSTEM_COMMENT);
         } else {
           apply(payload, PAYLOAD_APPROVAL_STATUS.PENDING, origin, true, actor, null);
+          if (!wasPending) {
+            payloadApprovalNotificationService.recordPending(payload, actor, null);
+          }
         }
       }
       default -> throw new IllegalArgumentException("Not a write origin: " + origin);
@@ -115,13 +128,18 @@ public class PayloadApprovalService {
       throw new BadRequestException(
           "The content of this payload changed since it was shown. Review it again, then approve.");
     }
-    return apply(
-        payload,
-        PAYLOAD_APPROVAL_STATUS.APPROVED,
-        ORIGIN.APPROVE,
-        false,
-        decider,
-        bounded(blankToNull(comment)));
+    User author = pendingAuthor(payload);
+    PayloadApproval approval =
+        apply(
+            payload,
+            PAYLOAD_APPROVAL_STATUS.APPROVED,
+            ORIGIN.APPROVE,
+            false,
+            decider,
+            bounded(blankToNull(comment)));
+    payloadApprovalNotificationService.recordOutcome(
+        payload, PayloadApprovalNotification.EVENT.APPROVED, decider, author, null, null);
+    return approval;
   }
 
   /** Rejects a pending payload. The reason is mandatory and shown to the author. */
@@ -132,8 +150,28 @@ public class PayloadApprovalService {
     if (trimmed == null) {
       throw new BadRequestException("A reason is required to reject a payload.");
     }
-    return apply(
-        payload, PAYLOAD_APPROVAL_STATUS.REJECTED, ORIGIN.REJECT, false, decider, bounded(trimmed));
+    String boundedReason = bounded(trimmed);
+    User author = pendingAuthor(payload);
+    PayloadApproval rejection =
+        apply(
+            payload,
+            PAYLOAD_APPROVAL_STATUS.REJECTED,
+            ORIGIN.REJECT,
+            false,
+            decider,
+            boundedReason);
+    payloadApprovalNotificationService.recordOutcome(
+        payload, PayloadApprovalNotification.EVENT.REJECTED, decider, author, null, boundedReason);
+    return rejection;
+  }
+
+  // Who sent the payload to pending (told the outcome): null for a collector.
+  private User pendingAuthor(Payload payload) {
+    return payloadApprovalRepository
+        .findFirstByPayloadIdAndStatusOrderByCreatedAtDesc(
+            payload.getId(), PAYLOAD_APPROVAL_STATUS.PENDING)
+        .map(PayloadApproval::getActor)
+        .orElse(null);
   }
 
   /**

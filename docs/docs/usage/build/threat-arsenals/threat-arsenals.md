@@ -69,6 +69,15 @@ How the status is set:
 
 To approve or reject, open the Action, then use **Approve** or **Reject** in its *Approval* section. A rejection requires a reason. If the payload changed while you were reviewing it, the approval is refused and you review the new content first. The *Approval* section also shows the latest decision, the approval history and, as information, where the payload is used (*Used in*: Atomic Tests, Scenarios and Simulations still to run, with links for users who can open them). The list can be filtered by approval status.
 
+### Notifications
+
+Approvers and authors are notified in the [Notification Center](../../notifications/notification-center.md#payload-approval-notifications), without any Trigger to configure:
+
+* users whose role in the Tenant explicitly holds *Approve content* are told when a Payload, or a new version of an approved Payload, waits for approval (never about their own edits);
+* authors are told when their Payload or version is approved, rejected (with the reason), or replaced by someone else's newer version.
+
+Notifications are batched every minute and link to the Action. Each user chooses in-app and email delivery in the Notification Center's **Preferences** tab (in-app on, email off by default).
+
 ### Versions of an approved payload
 
 Editing an approved payload never stops what already uses it. The payload keeps its **active version**, the approved content, everywhere it runs: Atomic Tests, Scenarios, Simulations, chaining workflows, the implant and the executors.
