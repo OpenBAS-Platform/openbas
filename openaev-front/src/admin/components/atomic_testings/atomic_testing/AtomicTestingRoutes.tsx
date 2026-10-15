@@ -1,11 +1,12 @@
-import { lazy } from 'react';
-import { Route, Routes } from 'react-router';
+import { lazy, useContext } from 'react';
+import { Navigate, Route, Routes, useLocation } from 'react-router';
 
 import { errorWrapper } from '../../../../components/Error';
 import NotFound from '../../../../components/NotFound';
 import type { InjectResultOverviewOutput } from '../../../../utils/api-types';
 import { externalContractTypesWithFindings } from '../../../../utils/injector_contract/InjectorContractUtils';
 import SnapshotRemediationProvider from '../../threat_arsenal/utils/SnapshotRemediationProvider';
+import { InjectResultOverviewOutputContext } from '../InjectResultOverviewOutputContext';
 
 interface Props { injectResultOverview: InjectResultOverviewOutput }
 
@@ -16,10 +17,18 @@ const AtomicTestingPayloadInfo = lazy(() => import('./payload_info/AtomicTesting
 const AtomicTestingRemediations = lazy(() => import('./AtomicTestingRemediations'));
 
 const AtomicTestingRoutes = ({ injectResultOverview }: Props) => {
+  const location = useLocation();
+  const { injectHasTargets } = useContext(InjectResultOverviewOutputContext);
+
   return (
     <SnapshotRemediationProvider>
       <Routes>
-        <Route path="" element={errorWrapper(AtomicTesting)()} />
+        <Route
+          path=""
+          element={injectHasTargets !== false
+            ? errorWrapper(AtomicTesting)()
+            : <Navigate to={`execution_details${location.search}`} replace />}
+        />
         <Route path="execution_details" element={errorWrapper(AtomicTestingExecutionDetails)()} />
         {(injectResultOverview.inject_injector_contract?.injector_contract_payload
           || externalContractTypesWithFindings.includes(injectResultOverview.inject_type ?? '')) && (

@@ -10,6 +10,7 @@ import { useHelper } from '../../../../../store';
 import { type Exercise as ExerciseType, type InjectResultOverviewOutput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import useInjectHasTargets from '../../../../../utils/hooks/useInjectHasTargets';
 import { INHERITED_CONTEXT } from '../../../../../utils/permissions/types';
 import useSimulationPermissions from '../../../../../utils/permissions/useSimulationPermissions';
 import AtomicTestingRoutes from '../../../atomic_testings/atomic_testing/AtomicTestingRoutes';
@@ -30,6 +31,7 @@ const InjectIndexComponent: FunctionComponent<{
   };
 
   const [injectResultOverviewOutput, setInjectResultOverviewOutput] = useState<InjectResultOverviewOutput>(injectResult);
+  const injectHasTargets = useInjectHasTargets(injectResultOverviewOutput.inject_id, injectResultOverviewOutput.inject_updated_at);
 
   const updateInjectResultOverviewOutput = (newData: InjectResultOverviewOutput) => {
     setInjectResultOverviewOutput(newData);
@@ -39,6 +41,7 @@ const InjectIndexComponent: FunctionComponent<{
     <InjectResultOverviewOutputContext.Provider value={{
       injectResultOverviewOutput,
       updateInjectResultOverviewOutput,
+      injectHasTargets,
     }}
     >
       <PermissionsContext.Provider value={permissionsContext}>
