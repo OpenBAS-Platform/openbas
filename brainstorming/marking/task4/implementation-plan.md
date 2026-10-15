@@ -514,18 +514,36 @@ never leak state.
 
 ## Chunk 6 — OCTI: scenario create
 
+Size: M, try the best option (around 3-4 days) else "short term" solution.
+
 We need to add all the markings to the OpenCTI service account, in addition to adding the OpenCTI user to the scheduled scenario.
 See `resolveLaunchedByClearance`.
 
 **Question**: which user to add to `launchedBy` / `scheduledBy`?
-Special bypass with OpenCTI user (shadow user not visible with all markings added).
+
+3 identified ideas:
+- Add all markings to OpenCTI user service account or new user not visible
+- "Don't check" markings when a scenario is launched from OpenCTI
+- Best option: Unlock markings for user service account + add service account user to the OpenCTI scenario. 
+Think about default init and manually created markings. Be careful with other service account.
+- Other?
 
 ## Chunk 7 — Tests chained simulation and autonomous run
 
+Size: M, schedule a meeting between Verticals 1 and 3 for the tests.
+
 Check that autonomous run and chained scenario work: check with Vertical 1 for the behavior with findings, assets,... 
-If not, add the user for the scenarios and fix/adapt the different missing things.
+If not, add the user for the scenarios and fix/adapt the different missing things to match the time-based scenario.
+
+Remarks:
+- Check for chained scenario if a new asset can be created during a scan of an inject? -> flag markings or not?
+- Check the code for chained scenario to resolve the assets and refacto if necessary.
+
+Create new tasks if big issues are found.
 
 ## Chunk 8 — Asset not targeted
+
+Size: S.
 
 "Asset not targeted" vs "No asset executed", line 100 in `ExecutionExecutorService.java`: compare the list of assets the user's clearance holds to the list of assets.
 For the admin user looking at each asset overview, display "asset not targeted" when the user has no clearance on that asset.
@@ -533,6 +551,8 @@ Same test with an agentless test with Nuclei: a scenario was created with an age
 A user can only see one agentless asset => make sure the admin sees "asset not targeted" on the RED asset.
 
 ## Chunk 9 — UX/UI: show who launched and what was skipped
+
+Size: M, check for refactoring the assets lists. S for the dev.
 
 **Status**: not started. **The PO needs to design it** before any code: the points below are the needs, not
 a design.
@@ -572,6 +592,8 @@ The platforms of a scenario are wrong for a user. The platforms queries never re
 contracts, so the marking filter does not apply.
 
 ## Chunk 13 — Dashboards: last spike to POC
+
+Size: M.
 
 **Status**: POC done. Tracked as a separate issue and PR, outside this plan's scope because it needs product definition.
 The RBAC and grands have not been implemented yet, a first adjustment must be done before implementing markings 
