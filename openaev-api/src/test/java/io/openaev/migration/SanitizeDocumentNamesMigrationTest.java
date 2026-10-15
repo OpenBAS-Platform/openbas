@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @DisplayName("Sanitize document names migration")
 class SanitizeDocumentNamesMigrationTest extends IntegrationTest {
 
-  @Autowired private V6_20261012130000000__Sanitize_document_names migration;
+  @Autowired private V6_20261015100000000__Sanitize_document_names migration;
 
   private static Stream<Arguments> namesCarryingAPath() {
     return Stream.of(
