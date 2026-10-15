@@ -12,6 +12,7 @@ import io.openaev.database.model.Injector;
 import io.openaev.database.model.InjectorContract;
 import io.openaev.database.model.Payload;
 import io.openaev.database.model.SecurityPlatform;
+import io.openaev.database.model.User;
 import io.openaev.rest.exception.BadRequestException;
 import io.openaev.rest.exception.ElementNotFoundException;
 import io.openaev.rest.injector_contract.InjectorContractService;
@@ -350,8 +351,10 @@ public class ThreatArsenalService {
           payload, userService.currentUser(), input.fingerprint(), input.comment());
       payloadService.resynchroniseInjectorContract(payload);
     } else {
-      payloadApprovalService.approve(
-          payload, userService.currentUser(), input.fingerprint(), input.comment());
+      User decider = userService.currentUser();
+      payloadApprovalService.approve(payload, decider, input.fingerprint(), input.comment());
+      // A pending payload approved before (e.g. edited before versions existed) gets a new number.
+      payloadVersionService.onReapproved(payload, decider);
     }
     return findById(actionId);
   }

@@ -9,6 +9,7 @@ import io.openaev.database.model.Executable;
 import io.openaev.database.model.FileDrop;
 import io.openaev.database.model.Payload;
 import io.openaev.database.model.Payload.PAYLOAD_APPROVAL_STATUS;
+import io.openaev.database.model.PayloadApproval;
 import io.openaev.database.model.PayloadApprovalNotification.EVENT;
 import io.openaev.database.model.PayloadExecutableContent;
 import io.openaev.database.model.PayloadVersion;
@@ -186,9 +187,48 @@ public class PayloadVersionService {
     return payloadVersionRepository.findFirstByPayloadIdAndStatus(payloadId, STATUS.PENDING);
   }
 
-  /** The number of the active version of a payload (1 until a later version is approved). */
+  /**
+   * The number of the active version of a payload: the latest approved version, and at least the
+   * number of different contents approved (approvals made outside versions count too: a pending
+   * payload approved again, or history from before versions existed). 1 until a second content is
+   * approved.
+   */
   public int activeNumber(@NotNull final String payloadId) {
-    return payloadVersionRepository.activeNumber(payloadId);
+    return Math.max(
+        payloadVersionRepository.activeNumber(payloadId),
+        payloadApprovalService.approvedContentCount(payloadId));
+  }
+
+  /**
+   * Records an approval made outside versions as a new version: a pending payload that had already
+   * been approved, approved again (by a decision or an approver's edit). The first approval of a
+   * payload is its version 1 and records nothing.
+   *
+   * @param payload the payload just approved (the approval entry is already recorded)
+   * @param decider who approved it
+   */
+  public void onReapproved(@NotNull final Payload payload, @NotNull final User decider) {
+    int approvedContents = payloadApprovalService.approvedContentCount(payload.getId());
+    if (approvedContents < 2) {
+      return;
+    }
+    PayloadVersion version =
+        newVersion(
+            payload,
+            ORIGIN.UPDATE,
+            PayloadFingerprint.of(payload),
+            payloadApprovalService.pendingAuthor(payload));
+    // The approval just recorded is already counted: this version follows the previous ones.
+    version.setNumber(
+        Math.max(payloadVersionRepository.maxNumber(payload.getId()), approvedContents - 1) + 1);
+    // The approval just recorded carries the decision's comment, and now points to its version.
+    Optional<PayloadApproval> approval =
+        payloadApprovalService
+            .latest(payload.getId())
+            .filter(entry -> entry.getStatus() == PAYLOAD_APPROVAL_STATUS.APPROVED);
+    decide(
+        version, STATUS.APPROVED, decider, approval.map(PayloadApproval::getComment).orElse(null));
+    approval.ifPresent(entry -> entry.setVersion(version));
   }
 
   /**
@@ -227,7 +267,12 @@ public class PayloadVersionService {
     PayloadVersion version = new PayloadVersion();
     version.setTenant(payload.getTenant());
     version.setPayload(payload);
-    version.setNumber(payloadVersionRepository.maxNumber(payload.getId()) + 1);
+    // After every version and every approved content (approvals outside versions count too).
+    version.setNumber(
+        Math.max(
+                payloadVersionRepository.maxNumber(payload.getId()),
+                payloadApprovalService.approvedContentCount(payload.getId()))
+            + 1);
     version.setOrigin(origin);
     version.setSnapshot(PayloadExecutableContent.of(payload));
     version.setFingerprint(fingerprint);

@@ -166,7 +166,7 @@ public class PayloadApprovalService {
   }
 
   // Who sent the payload to pending (told the outcome): null for a collector.
-  private User pendingAuthor(Payload payload) {
+  User pendingAuthor(Payload payload) {
     return payloadApprovalRepository
         .findFirstByPayloadIdAndStatusOrderByCreatedAtDesc(
             payload.getId(), PAYLOAD_APPROVAL_STATUS.PENDING)
@@ -196,6 +196,14 @@ public class PayloadApprovalService {
   /** The approval history of a payload, newest first. */
   public List<PayloadApproval> history(@NotNull final String payloadId) {
     return payloadApprovalRepository.findByPayloadIdOrderByCreatedAtDesc(payloadId);
+  }
+
+  /**
+   * How many different executable contents of a payload were approved: a version count that also
+   * covers approvals made outside versions (a pending payload approved again, older history).
+   */
+  public int approvedContentCount(@NotNull final String payloadId) {
+    return (int) payloadApprovalRepository.countApprovedContents(payloadId);
   }
 
   /** The latest entry of the approval history of a payload. */

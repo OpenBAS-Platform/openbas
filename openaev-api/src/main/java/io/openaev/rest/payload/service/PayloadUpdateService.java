@@ -72,6 +72,7 @@ public class PayloadUpdateService {
 
     Payload payload = (Payload) Hibernate.unproxy(existingPayload);
     PayloadVersionService.Active active = PayloadVersionService.Active.of(payload);
+    boolean wasApproved = payload.getApprovalStatus() == Payload.PAYLOAD_APPROVAL_STATUS.APPROVED;
     // Null outside an authenticated request (system flows): an unknown modifier, never a stale one.
     User actor = userService.currentUserOrNull();
     payloadUtils.copyProperties(input, payload);
@@ -95,6 +96,12 @@ public class PayloadUpdateService {
     Payload saved = payloadRepository.save(payload);
     payloadApprovalService.onWrite(
         saved, saved.getLastModifiedBy(), PayloadApproval.ORIGIN.UPDATE, active.fingerprint());
+    if (!wasApproved
+        && actor != null
+        && saved.getApprovalStatus() == Payload.PAYLOAD_APPROVAL_STATUS.APPROVED) {
+      // An approver's edit approving a pending payload that had been approved before: new number.
+      payloadVersionService.onReapproved(saved, actor);
+    }
     InjectorContract injectorContract =
         payloadService.synchroniseInjectorContractBasedOnPayload(
             saved,
