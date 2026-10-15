@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
-import { TIMEOUT } from '../../utils/constants';
+import { TIMEOUT, WEBKIT_PAGE_LOAD_TIMEOUT } from '../../utils/constants';
 
 class ThreatArsenalListPage {
   readonly page: Page;
@@ -63,19 +63,22 @@ class ThreatArsenalListPage {
   }
 
   /**
-   * The URL changes before the page mounts. On a slow WebKit runner the header
-   * and the pagination row can take longer than the 15s action timeout to show,
-   * so wait for both here, once, instead of in the first action of each test.
+   * The URL changes before the page mounts, so wait for the header and the
+   * pagination row here, once, instead of in the first action of each test.
+   * WebKit gets a longer budget: see WEBKIT_PAGE_LOAD_TIMEOUT.
    */
   async waitForLoad() {
+    const timeout = this.page.context().browser()?.browserType().name() === 'webkit'
+      ? WEBKIT_PAGE_LOAD_TIMEOUT
+      : TIMEOUT;
     await this.page.waitForURL('**/threat-arsenal**');
     await this.gridViewButton.waitFor({
       state: 'visible',
-      timeout: TIMEOUT,
+      timeout,
     });
     await this.paginationRow.waitFor({
       state: 'visible',
-      timeout: TIMEOUT,
+      timeout,
     });
   }
 
