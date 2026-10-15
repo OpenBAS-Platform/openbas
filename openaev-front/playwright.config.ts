@@ -19,10 +19,14 @@ const isFirstCiAttempt = !!process.env.CI && Number(process.env.GITHUB_RUN_ATTEM
 
 // Desktop Safari defaults to deviceScaleFactor 2, which is slow to render on the CI runners.
 // Its video is recorded only when CI re-runs a failed job, not on the first attempt.
+// WebKit on Linux sometimes stalls a request for ~20s (#8507), so it gets 30s timeouts.
+const WEBKIT_TIMEOUT = 30_000;
 const webkitUse = {
   ...devices['Desktop Safari'],
   deviceScaleFactor: 1,
   video: isFirstCiAttempt ? 'off' : 'retain-on-failure',
+  actionTimeout: WEBKIT_TIMEOUT,
+  navigationTimeout: WEBKIT_TIMEOUT,
 } as const;
 
 /**
@@ -132,6 +136,7 @@ export default defineConfig({
     {
       name: 'webkit',
       testIgnore: nonInfraTestIgnore,
+      expect: { timeout: WEBKIT_TIMEOUT },
       use: {
         ...webkitUse,
         storageState: 'tests_e2e/.auth/user.json',
@@ -203,6 +208,7 @@ export default defineConfig({
       name: 'infra-webkit',
       testMatch: /infra\/.*\.spec\.ts/,
       timeout: INFRA_TEST_TIMEOUT,
+      expect: { timeout: WEBKIT_TIMEOUT },
       use: {
         ...webkitUse,
         storageState: 'tests_e2e/.auth/user.json',
