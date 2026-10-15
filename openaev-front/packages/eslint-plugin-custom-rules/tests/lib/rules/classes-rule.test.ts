@@ -63,6 +63,20 @@ const C = () => { const { classes } = useStyles(); return <Child classes={classe
     tss(`
 const useStyles = makeStyles()(() => ({ root: {} }));
 const C = () => { const styles = useStyles(); return styles.classes.root; };`),
+    // a `classes` third parameter that is not a plain identifier
+    tss(`
+const useStyles = makeStyles()((theme, _params, { b }) => ({ a: { [\`& .\${b}\`]: {} }, b: {} }));
+const C = () => { const { classes } = useStyles(); return classes.a; };`),
+    // a computed key in the destructuring
+    tss(`
+const useStyles = makeStyles()(() => ({ a: {}, b: {} }));
+const C = () => { const { ['classes']: c } = useStyles(); return c.a; };`),
+    // several hooks in one module keep their own names
+    tss(`
+const useHeaderStyles = makeStyles()(() => ({ a: {} }));
+const C = () => { const { classes } = useHeaderStyles(); return classes.a; };
+const useBodyStyles = makeStyles()(() => ({ b: {} }));
+const D = () => { const { classes } = useBodyStyles(); return classes.b; };`),
     // not the tss-react makeStyles
     `
 import { makeStyles } from '@mui/styles';
@@ -84,8 +98,13 @@ const C = () => {
   const { classes } = useStyles();
   return [classes.avatar, classes.container];
 };`),
-      errors: [{ messageId: 'unusedClass', data: { name: 'drawerPaper' } }],
-      output: tss(`
+      errors: [{
+        messageId: 'unusedClass',
+        data: { name: 'drawerPaper' },
+        suggestions: [{
+          messageId: 'removeClass',
+          data: { name: 'drawerPaper' },
+          output: tss(`
 const useStyles = makeStyles()(theme => ({
   container: { padding: 0 },
   avatar: { width: 24 },
@@ -94,18 +113,37 @@ const C = () => {
   const { classes } = useStyles();
   return [classes.avatar, classes.container];
 };`),
+        }],
+      }],
     },
     {
       code: tss(`
 const useStyles = makeStyles()({ a: {}, b: {}, c: {} });
 const C = () => { const { classes } = useStyles(); return classes.b; };`),
       errors: [
-        { messageId: 'unusedClass', data: { name: 'a' } },
-        { messageId: 'unusedClass', data: { name: 'c' } },
-      ],
-      output: tss(`
-const useStyles = makeStyles()({ b: {} });
+        {
+          messageId: 'unusedClass',
+          data: { name: 'a' },
+          suggestions: [{
+            messageId: 'removeClass',
+            data: { name: 'a' },
+            output: tss(`
+const useStyles = makeStyles()({ b: {}, c: {} });
 const C = () => { const { classes } = useStyles(); return classes.b; };`),
+          }],
+        },
+        {
+          messageId: 'unusedClass',
+          data: { name: 'c' },
+          suggestions: [{
+            messageId: 'removeClass',
+            data: { name: 'c' },
+            output: tss(`
+const useStyles = makeStyles()({ a: {}, b: {} });
+const C = () => { const { classes } = useStyles(); return classes.b; };`),
+          }],
+        },
+      ],
     },
     {
       // the hook is called but `classes` is never taken
@@ -114,11 +152,18 @@ const useStyles = makeStyles()(() => ({
   a: {},
 }));
 const C = () => { const { cx } = useStyles(); return cx('x'); };`),
-      errors: [{ messageId: 'unusedClass', data: { name: 'a' } }],
-      output: tss(`
+      errors: [{
+        messageId: 'unusedClass',
+        data: { name: 'a' },
+        suggestions: [{
+          messageId: 'removeClass',
+          data: { name: 'a' },
+          output: tss(`
 const useStyles = makeStyles()(() => ({
 }));
 const C = () => { const { cx } = useStyles(); return cx('x'); };`),
+        }],
+      }],
     },
     {
       code: tss(`
@@ -126,12 +171,19 @@ const C = () => {
   const { classes } = makeStyles()(() => ({ a: {}, b: {} }))();
   return classes.a;
 };`),
-      errors: [{ messageId: 'unusedClass', data: { name: 'b' } }],
-      output: tss(`
+      errors: [{
+        messageId: 'unusedClass',
+        data: { name: 'b' },
+        suggestions: [{
+          messageId: 'removeClass',
+          data: { name: 'b' },
+          output: tss(`
 const C = () => {
   const { classes } = makeStyles()(() => ({ a: {} }))();
   return classes.a;
 };`),
+        }],
+      }],
     },
     {
       code: tss(`
@@ -145,11 +197,11 @@ const A = () => { const { classes } = useStyles(); return classes.a; };
 const B = () => { const { classes } = useStyles(); return classes.a; };`),
     },
     {
-      // renaming would clash with the existing useStyles
+      // renaming would clash with an existing useStyles
       code: tss(`
-const useStyles = makeStyles()(() => ({ a: {} }));
-const useOther = makeStyles()(() => ({ b: {} }));
-const C = () => [useStyles().classes, useOther().classes];`),
+const useStyles = () => null;
+const useFooStyles = makeStyles()(() => ({ a: {} }));
+const C = () => [useStyles(), useFooStyles().classes];`),
       errors: [{ messageId: 'name' }],
     },
     {
@@ -164,11 +216,18 @@ const C = () => { const { classes } = useStyles(); return classes; };`),
 import { makeStyles as tssMakeStyles } from 'tss-react';
 const useStyles = tssMakeStyles()({ a: {}, b: {} });
 const C = () => { const { classes } = useStyles(); return classes.a; };`,
-      errors: [{ messageId: 'unusedClass', data: { name: 'b' } }],
-      output: `
+      errors: [{
+        messageId: 'unusedClass',
+        data: { name: 'b' },
+        suggestions: [{
+          messageId: 'removeClass',
+          data: { name: 'b' },
+          output: `
 import { makeStyles as tssMakeStyles } from 'tss-react';
 const useStyles = tssMakeStyles()({ a: {} });
 const C = () => { const { classes } = useStyles(); return classes.a; };`,
+        }],
+      }],
     },
   ],
 });

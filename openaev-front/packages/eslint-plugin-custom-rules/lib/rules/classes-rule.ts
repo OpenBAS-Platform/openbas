@@ -1,6 +1,8 @@
 // tss-react `makeStyles()(styles)` returns a hook whose `classes` object maps each key of
 // `styles` to a generated class name. A key that no `classes.<key>` reads is dead CSS, and
-// a hook kept inside its module is named `useStyles` so every component reads the same way.
+// the hook of a module that keeps a single one is named `useStyles` so every component reads
+// the same way. Removing an unused class is only a suggestion: as an autofix, a fix on save
+// would delete a class that is being written.
 
 import { AST_NODE_TYPES, ASTUtils, ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 
@@ -92,7 +94,7 @@ const collectHookCallReads = (sourceCode: SourceCode, call: TSESTree.CallExpress
   if (parent.type !== AST_NODE_TYPES.VariableDeclarator || parent.id.type !== AST_NODE_TYPES.ObjectPattern) {
     return null;
   }
-  if (parent.id.properties.some(property => property.type === AST_NODE_TYPES.RestElement)) {
+  if (parent.id.properties.some(property => property.type === AST_NODE_TYPES.RestElement || property.computed)) {
     return null;
   }
   const property = parent.id.properties.find(p => getKeyName(p) === 'classes');
@@ -155,6 +157,7 @@ export default ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: 'suggestion',
     fixable: 'code',
+    hasSuggestions: true,
     docs: {
       description: 'Require tss-react makeStyles hooks to be named useStyles and to define only the classes they use',
     },
@@ -162,6 +165,7 @@ export default ESLintUtils.RuleCreator.withoutDocs({
       name: 'A makeStyles hook used only in its module must be named \'{{expected}}\'.',
       empty: 'makeStyles defines no class.',
       unusedClass: 'Class \'{{name}}\' is never read from \'classes\'.',
+      removeClass: 'Remove class \'{{name}}\'.',
     },
     schema: [],
   },
@@ -218,7 +222,7 @@ export default ESLintUtils.RuleCreator.withoutDocs({
       // `(theme, params, classes) => ...` lets a class reference another one in a selector
       const [styles] = node.arguments;
       const classesParam = 'params' in styles ? styles.params[2] : undefined;
-      if (classesParam?.type === AST_NODE_TYPES.Identifier && !collectClassReads(getDeclaredVariable(sourceCode, styles, classesParam.name), used)) {
+      if (classesParam && (classesParam.type !== AST_NODE_TYPES.Identifier || !collectClassReads(getDeclaredVariable(sourceCode, styles, classesParam.name), used))) {
         return;
       }
       stylesObject.properties.forEach((property) => {
@@ -228,11 +232,18 @@ export default ESLintUtils.RuleCreator.withoutDocs({
             node: property,
             messageId: 'unusedClass',
             data: { name },
-            fix: fixer => removeProperty(fixer, property),
+            suggest: [{
+              messageId: 'removeClass',
+              data: { name },
+              fix: fixer => removeProperty(fixer, property),
+            }],
           });
         }
       });
     };
+
+    // Hooks kept in a module-level variable, named once all of them are known
+    const localHooks: Hook[] = [];
 
     return {
       CallExpression(node) {
@@ -245,12 +256,19 @@ export default ESLintUtils.RuleCreator.withoutDocs({
           context.report({ node: stylesObject, messageId: 'empty' });
         }
         const hook = resolveHook(sourceCode, node);
-        if (hook.id && hook.variable) {
-          checkHookName(hook.id, hook.variable);
+        if (hook.id) {
+          localHooks.push(hook);
         }
         // a hook never called is left to no-unused-vars
         if (stylesObject && hook.calls?.length) {
           checkClasses(node, stylesObject, hook.calls);
+        }
+      },
+      'Program:exit'() {
+        // with several hooks, a single `useStyles` would not tell them apart
+        const [hook] = localHooks;
+        if (localHooks.length === 1 && hook.id && hook.variable) {
+          checkHookName(hook.id, hook.variable);
         }
       },
     };
