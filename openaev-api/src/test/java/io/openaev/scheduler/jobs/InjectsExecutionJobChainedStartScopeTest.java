@@ -103,27 +103,32 @@ class InjectsExecutionJobChainedStartScopeTest extends IntegrationTest {
         Timestamp.from(Instant.now().minus(1, ChronoUnit.HOURS)),
         tenantId);
     jdbc.update(
+        // tenant_id is NOT NULL on the chaining tables since #7900, and these seeds bypass JPA,
+        // so each one carries the tenant of the simulation the workflow belongs to.
         "INSERT INTO workflows (workflow_id, workflow_status, workflow_version,"
-            + " workflow_simulation_id) VALUES (?, 'TEMPLATE', 0, ?)",
+            + " workflow_simulation_id, tenant_id) VALUES (?, 'TEMPLATE', 0, ?, ?)",
         workflowId,
-        exerciseId);
+        exerciseId,
+        tenantId);
     jdbc.update(
         "INSERT INTO workflow_scope_rules (workflow_scope_rule_id,"
             + " workflow_scope_rule_selected_mode, workflow_scope_rule_source,"
-            + " workflow_scope_rule_value, workflow_scope_rule_value_type, workflow_id)"
-            + " VALUES (?, 'ALLOWLIST', 'ASSET', ?, 'ASSET_ID', ?)",
+            + " workflow_scope_rule_value, workflow_scope_rule_value_type, workflow_id,"
+            + " tenant_id) VALUES (?, 'ALLOWLIST', 'ASSET', ?, 'ASSET_ID', ?, ?)",
         UUID.randomUUID().toString(),
         assetId,
-        workflowId);
+        workflowId,
+        tenantId);
     // No condition and no contract snapshot: the step is ready at once, and its targeting is
     // resolved from the live contract
     jdbc.update(
         "INSERT INTO steps (step_id, step_action_class, step_status, step_limit_execution,"
-            + " step_data, step_workflow_id) VALUES (?, 'INJECT_EXECUTION', 'TEMPLATE', 1,"
-            + " CAST(? AS jsonb), ?)",
+            + " step_data, step_workflow_id, tenant_id) VALUES (?, 'INJECT_EXECUTION',"
+            + " 'TEMPLATE', 1, CAST(? AS jsonb), ?, ?)",
         UUID.randomUUID().toString(),
         "{\"inject_injector_contract\":{\"injector_contract_id\":\"" + contractId + "\"}}",
-        workflowId);
+        workflowId,
+        tenantId);
 
     previousReadyConsumer = readyConsumer();
     queueChainingService.setCallbackForReadyQueue(events -> events);
