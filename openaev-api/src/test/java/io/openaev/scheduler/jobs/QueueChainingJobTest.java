@@ -7,6 +7,8 @@ import static org.mockito.Mockito.doThrow;
 
 import io.openaev.IntegrationTest;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TenantScopedTransaction;
+import io.openaev.context.TxCtx;
 import io.openaev.database.model.Cwe;
 import io.openaev.database.model.Scenario;
 import io.openaev.database.model.Step;
@@ -64,6 +66,7 @@ class QueueChainingJobTest extends IntegrationTest {
   @Autowired private ScenarioRepository scenarioRepository;
   @Autowired private TenantRepository tenantRepository;
   @Autowired private CweRepository cweRepository;
+  @Autowired private TenantScopedTransaction tenantTx;
   @MockitoSpyBean private StepService stepService;
 
   private final List<String> committedCweIds = new ArrayList<>();
@@ -72,7 +75,18 @@ class QueueChainingJobTest extends IntegrationTest {
   @AfterEach
   void cleanup() {
     TenantContext.clearCurrentTenant();
-    cweRepository.deleteAllById(committedCweIds);
+    // cwes is v2-active and these rows were committed under whichever tenant the thread-local
+    // carried at the time, which is the very thing under test. With no scope the delete reads
+    // nothing and silently leaves them behind, so it runs under an enumerated all-tenants scope.
+    if (!committedCweIds.isEmpty()) {
+      List<String> toDelete = List.copyOf(committedCweIds);
+      tenantTx.execute(
+          TxCtx.allTenants(),
+          () -> {
+            cweRepository.deleteAllById(toDelete);
+            return null;
+          });
+    }
     committedCweIds.clear();
     stepDelayQueueRepository.deleteAll(stepDelayQueueRepository.findAll());
     // Workflow FKs (scenario_id) must be cleared before the scenario itself is deleted.

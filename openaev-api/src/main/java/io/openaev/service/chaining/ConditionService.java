@@ -99,13 +99,22 @@ public class ConditionService {
 
   /**
    * The tenant of an event's workflow. An event linked to no step has no other parent to take its
-   * tenant from.
+   * tenant from, so a blank id is legitimate and returns null.
+   *
+   * <p>An id that is given but names no workflow is refused here, as a 404. Letting it through
+   * returns null, and the tenant derivation then throws on persist, which turns a bad request into
+   * a 500.
    */
   private Tenant workflowTenant(String workflowId) {
     if (workflowId == null || workflowId.isBlank()) {
       return null;
     }
-    return workflowRepository.findById(workflowId).map(Workflow::getTenant).orElse(null);
+    // orElseThrow on the workflow, not on its tenant: Optional.map collapses a workflow that
+    // exists with no tenant into an empty Optional, which would report a missing row as a 404.
+    return workflowRepository
+        .findById(workflowId)
+        .orElseThrow(() -> new EntityNotFoundException("Workflow not found: " + workflowId))
+        .getTenant();
   }
 
   /**
