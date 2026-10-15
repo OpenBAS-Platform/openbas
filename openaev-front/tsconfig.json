@@ -30,7 +30,9 @@
     "builder/prod/build",
     "src/static/ext/*",
     "vite.config.ts",
-    "__generated__"
+    "__generated__",
+    // imports the ESLint plugin, which packages/eslint-plugin-custom-rules/tsconfig.json checks
+    "eslint.config.js"
   ],
   "references": [
     {

@@ -37,6 +37,9 @@ export default [
   // rules recommended by eslint-plugin-i18next
   i18next.configs['flat/recommended'],
 
+  // rules of the local package eslint-plugin-custom-rules
+  customRules.configs.recommended,
+
   // other config
   {
     plugins: {
@@ -44,8 +47,6 @@ export default [
       'react-refresh': reactRefresh.plugin,
       // eslint-plugin-simple-import-sort
       'simple-import-sort': simpleImportSort,
-      // local package eslint-plugin-custom-rules
-      'custom-rules': customRules,
     },
     rules: {
     // react-refresh rules
@@ -57,10 +58,6 @@ export default [
       // eslint-plugin-simple-import-sort rules
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
-
-      // local package eslint-plugin-custom-rules rules
-      'custom-rules/classes-rule': 1,
-      'custom-rules/no-mutable-exports': 'error',
 
       // @typescript-eslint rules
       '@typescript-eslint/naming-convention': ['error', {
