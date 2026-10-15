@@ -92,7 +92,7 @@ const WidgetSeriesSelection: FunctionComponent<{
             mode: 'and',
             filters: [
               buildFilter(BASE_ENTITY_FILTER_KEY, [entity], 'eq'),
-              ...searchPaginationInput.filterGroup?.filters ?? [],
+              ...(searchPaginationInput.filterGroup?.filters ?? []),
             ],
           },
     });
@@ -158,7 +158,7 @@ const WidgetSeriesSelection: FunctionComponent<{
             />
           </div>
         )}
-      <Box padding={2}>
+      <Box sx={{ padding: 2 }}>
         <TextFieldFds
           label={t('Label (entities)')}
           value={label}
