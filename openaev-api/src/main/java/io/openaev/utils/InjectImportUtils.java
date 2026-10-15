@@ -11,12 +11,22 @@ import java.time.temporal.Temporal;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+import org.springframework.web.util.HtmlUtils;
 
 public final class InjectImportUtils {
+
+  private static final String DEFAULT_FONT_COLOR = "#000000";
 
   private InjectImportUtils() {}
 
@@ -98,19 +108,83 @@ public final class InjectImportUtils {
    */
   public static String extractAndConvertStringColumnValue(
       Row row, RuleAttribute ruleAttribute, Map<String, JsonNode> mapFieldByKey) {
-    String columnValue =
-        Arrays.stream(ruleAttribute.getColumns().split("\\+"))
-            .map(column -> getValueAsString(row, column))
-            .collect(Collectors.joining());
-
     // Given that richText fields are editable using CKEditor which expects HTML,
-    // we're converting return line into <br>.
-    // TODO : convert properly the whole cell into HTML including formatting (bold, ...)
-    if (mapFieldByKey.get(ruleAttribute.getName()).get("richText") != null
-        && mapFieldByKey.get(ruleAttribute.getName()).get("richText").asBoolean()) {
-      columnValue = columnValue.replaceAll("\n", "<br/>");
+    // we're converting the cell content (formatting and return lines) into HTML.
+    JsonNode field = mapFieldByKey.get(ruleAttribute.getName());
+    boolean richText = field.get("richText") != null && field.get("richText").asBoolean();
+    return Arrays.stream(ruleAttribute.getColumns().split("\\+"))
+        .map(column -> richText ? getValueAsHtml(row, column) : getValueAsString(row, column))
+        .collect(Collectors.joining());
+  }
+
+  private static String getValueAsHtml(Row row, String cellColumn) {
+    if (cellColumn != null && !cellColumn.isBlank()) {
+      Cell cell = row.getCell(CellReference.convertColStringToIndex(cellColumn));
+      if (cell != null && cell.getCellType() == CellType.STRING) {
+        return richTextToHtml(cell);
+      }
     }
-    return columnValue;
+    return getValueAsString(row, cellColumn);
+  }
+
+  private static String richTextToHtml(Cell cell) {
+    RichTextString richText = cell.getRichStringCellValue();
+    String text = richText.getString();
+    Workbook workbook = cell.getSheet().getWorkbook();
+    Font cellFont = workbook.getFontAt(cell.getCellStyle().getFontIndex());
+    int runs = richText.numFormattingRuns();
+    StringBuilder html = new StringBuilder();
+    int start = 0;
+    for (int run = 0; run <= runs; run++) {
+      int end = run < runs ? richText.getIndexOfFormattingRun(run) : text.length();
+      if (end > start) {
+        html.append(
+            fontToHtml(
+                text.substring(start, end), fontOfRun(richText, run - 1, workbook, cellFont)));
+      }
+      start = Math.max(start, end);
+    }
+    return html.toString();
+  }
+
+  private static Font fontOfRun(
+      RichTextString richText, int run, Workbook workbook, Font cellFont) {
+    Font font = null;
+    if (run >= 0 && richText instanceof XSSFRichTextString xssfRichText) {
+      font = xssfRichText.getFontOfFormattingRun(run);
+    } else if (run >= 0 && richText instanceof HSSFRichTextString hssfRichText) {
+      font = workbook.getFontAt(hssfRichText.getFontOfFormattingRun(run));
+    }
+    return font != null ? font : cellFont;
+  }
+
+  private static String fontToHtml(String text, Font font) {
+    String html = HtmlUtils.htmlEscape(text).replaceAll("\r?\n", "<br/>");
+    String color = fontColor(font);
+    if (color != null && !DEFAULT_FONT_COLOR.equals(color)) {
+      html = "<span style=\"color:" + color + "\">" + html + "</span>";
+    }
+    if (font.getUnderline() != Font.U_NONE) {
+      html = "<u>" + html + "</u>";
+    }
+    if (font.getItalic()) {
+      html = "<em>" + html + "</em>";
+    }
+    if (font.getBold()) {
+      html = "<strong>" + html + "</strong>";
+    }
+    return html;
+  }
+
+  private static String fontColor(Font font) {
+    if (font instanceof XSSFFont xssfFont) {
+      XSSFColor color = xssfFont.getXSSFColor();
+      byte[] rgb = color == null ? null : color.getRGB();
+      return rgb == null || rgb.length != 3
+          ? null
+          : String.format("#%02x%02x%02x", rgb[0] & 0xFF, rgb[1] & 0xFF, rgb[2] & 0xFF);
+    }
+    return null;
   }
 
   /**
