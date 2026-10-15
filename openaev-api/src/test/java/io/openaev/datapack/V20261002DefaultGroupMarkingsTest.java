@@ -3,7 +3,6 @@ package io.openaev.datapack;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.openaev.IntegrationTest;
-import io.openaev.context.TenantContext;
 import io.openaev.context.TenantScopedTransaction;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.Group;
@@ -15,9 +14,12 @@ import io.openaev.database.repository.TenantRepository;
 import io.openaev.processor.MigrationProcessor;
 import io.openaev.processor.datapack.V20261002_Default_group_markings;
 import io.openaev.service.DataPackService;
+import io.openaev.utils.TenantIsolationTestHelper;
+import io.openaev.utils.fixtures.tenants.TenantFixture;
 import jakarta.persistence.EntityManager;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,10 +40,16 @@ class V20261002DefaultGroupMarkingsTest extends IntegrationTest {
   @Autowired private MarkingDefinitionRepository markingDefinitionRepository;
   @Autowired private TenantScopedTransaction tenantTx;
   @Autowired private EntityManager entityManager;
+  @Autowired private TenantIsolationTestHelper tenantIsolationTestHelper;
+
+  // A dedicated, non-default tenant: V20260330_Default_tenant_data deliberately never creates
+  // Admin/Manager/Observer groups for the DEFAULT tenant (see
+  // V20261002_Default_group_markings#assignMarkingToGroup), so a "groups not yet created" premise
+  // only holds for a tenant that isn't the default one.
+  private Tenant tenant;
 
   @AfterEach
   void cleanup() {
-    Tenant tenant = new Tenant(TenantContext.getCurrentTenant());
     tenantTx.execute(
         TxCtx.forTenant(tenant.getId()),
         () -> {
@@ -66,13 +74,18 @@ class V20261002DefaultGroupMarkingsTest extends IntegrationTest {
               .executeUpdate();
           return null;
         });
+    // The default-tenant test below points `tenant` at the real, shared default tenant row —
+    // never delete it, only the dedicated per-test tenants created with TenantFixture.
+    if (!Tenant.DEFAULT_TENANT_UUID.equals(tenant.getId())) {
+      tenantIsolationTestHelper.deleteCommittedTenants(tenant.getId());
+    }
   }
 
   @Test
   @DisplayName("given_defaultGroupsAndMarkingsExist_should_grantEachGroupItsConfiguredMarking")
   void given_defaultGroupsAndMarkingsExist_should_grantEachGroupItsConfiguredMarking()
       throws Exception {
-    Tenant tenant = new Tenant(TenantContext.getCurrentTenant());
+    tenant = tenantRepository.save(TenantFixture.getTenant("group-markings-" + UUID.randomUUID()));
 
     // Arrange: groups and marking definitions as they would exist after
     // V20260330_Default_tenant_data and V20260914_Default_tenant_markings have already run.
@@ -107,7 +120,7 @@ class V20261002DefaultGroupMarkingsTest extends IntegrationTest {
   @DisplayName("given_groupsNotYetCreatedByPrerequisitePack_should_notRegisterPackSoItRetriesLater")
   void given_groupsNotYetCreatedByPrerequisitePack_should_notRegisterPackSoItRetriesLater()
       throws Exception {
-    Tenant tenant = new Tenant(TenantContext.getCurrentTenant());
+    tenant = tenantRepository.save(TenantFixture.getTenant("group-markings-" + UUID.randomUUID()));
 
     // Arrange: markings exist (V20260914 ran) but V20260330 hasn't created the groups yet —
     // a transient ordering/failure case this pack must not paper over by registering anyway.
@@ -133,11 +146,33 @@ class V20261002DefaultGroupMarkingsTest extends IntegrationTest {
   }
 
   @Test
+  @DisplayName("given_defaultTenantWithNoGroups_should_registerPackByDesign")
+  void given_defaultTenantWithNoGroups_should_registerPackByDesign() throws Exception {
+    tenant = new Tenant(Tenant.DEFAULT_TENANT_UUID);
+
+    // Arrange: no groups, no markings — V20260330_Default_tenant_data deliberately never creates
+    // Admin/Manager/Observer groups for the default tenant, so this absence is already the desired
+    // end state, not a prerequisite pack still pending.
+
+    MigrationProcessor processor =
+        new MigrationProcessor(
+            List.of(groupMarkingsDataPack), Collections.emptyList(), tenantRepository, tenantTx);
+
+    // Act
+    processor.createDependencyForTenant(tenant);
+
+    // Assert: registered despite no groups/markings existing, since the default tenant's missing
+    // groups are by design, not a transient ordering issue to retry later.
+    assertThat(dataPackService.findByIdAndTenant(groupMarkingsDataPack.getPackId(), tenant))
+        .isPresent();
+  }
+
+  @Test
   @DisplayName(
       "given_markingsNotYetCreatedByPrerequisitePack_should_notRegisterPackSoItRetriesLater")
   void given_markingsNotYetCreatedByPrerequisitePack_should_notRegisterPackSoItRetriesLater()
       throws Exception {
-    Tenant tenant = new Tenant(TenantContext.getCurrentTenant());
+    tenant = tenantRepository.save(TenantFixture.getTenant("group-markings-" + UUID.randomUUID()));
 
     // Arrange: groups exist (V20260330 ran) but V20260914 hasn't created the markings yet.
     tenantTx.execute(
