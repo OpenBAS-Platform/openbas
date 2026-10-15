@@ -1,7 +1,6 @@
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import vitest from '@vitest/eslint-plugin';
-import customRules from 'eslint-plugin-custom-rules';
 import i18next from 'eslint-plugin-i18next';
 import playwright from 'eslint-plugin-playwright';
 import react from 'eslint-plugin-react';
@@ -9,6 +8,12 @@ import { reactRefresh } from 'eslint-plugin-react-refresh';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
 import ts from 'typescript-eslint';
+
+import { checkNodeVersion } from './scripts/check-node-version.js';
+
+checkNodeVersion();
+// imported once the version is checked: an older Node fails to load its TypeScript sources
+const { default: customRules } = await import('eslint-plugin-custom-rules');
 
 export default [
   // rules recommended by @eslint/js
