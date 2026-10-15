@@ -149,7 +149,6 @@ export default [
         process: true,
       },
     },
-    linterOptions: { reportUnusedDisableDirectives: 'error' },
   },
 
   // unit tests config
