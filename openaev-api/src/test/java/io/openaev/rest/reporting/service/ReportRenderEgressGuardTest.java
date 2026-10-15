@@ -16,6 +16,8 @@ import org.mockito.ArgumentCaptor;
 @DisplayName("Report render egress guard (SSRF guard at the real fetch boundary)")
 class ReportRenderEgressGuardTest {
 
+  private static final String RENDER_TOKEN = "Bearer secret-render-token";
+
   // Loopback default: no custom render-base-url, plain HTTP on port 8080.
   private final ReportRenderEgressGuard loopbackGuard =
       new ReportRenderEgressGuard("", 8080, false);
@@ -89,53 +91,63 @@ class ReportRenderEgressGuardTest {
   }
 
   @Test
-  void resumes_the_trusted_origin_with_the_render_token_untouched() {
+  void attaches_the_render_token_to_a_request_to_the_trusted_origin() {
+    Route route = mock(Route.class);
+    Request request = mock(Request.class);
+    when(route.request()).thenReturn(request);
+    when(request.url()).thenReturn("https://render.internal:9443/reporting/abc/render");
+    when(request.headers()).thenReturn(Map.of("accept", "text/html"));
+
+    customOriginGuard.handle(route, RENDER_TOKEN);
+
+    ArgumentCaptor<Route.ResumeOptions> captor = ArgumentCaptor.forClass(Route.ResumeOptions.class);
+    verify(route).resume(captor.capture());
+    Map<String, String> forwardedHeaders = captor.getValue().headers;
+    assertEquals(RENDER_TOKEN, forwardedHeaders.get("authorization"));
+    assertEquals("text/html", forwardedHeaders.get("accept"));
+  }
+
+  @Test
+  void replaces_an_authorization_header_the_page_set_itself_on_the_trusted_origin() {
+    Route route = mock(Route.class);
+    Request request = mock(Request.class);
+    when(route.request()).thenReturn(request);
+    when(request.url()).thenReturn("https://render.internal:9443/api/reportings/abc");
+    when(request.headers()).thenReturn(Map.of("Authorization", "Bearer something-else"));
+
+    customOriginGuard.handle(route, RENDER_TOKEN);
+
+    ArgumentCaptor<Route.ResumeOptions> captor = ArgumentCaptor.forClass(Route.ResumeOptions.class);
+    verify(route).resume(captor.capture());
+    Map<String, String> forwardedHeaders = captor.getValue().headers;
+    assertEquals(1, forwardedHeaders.size());
+    assertEquals(RENDER_TOKEN, forwardedHeaders.get("authorization"));
+  }
+
+  @Test
+  void resumes_the_trusted_origin_untouched_when_there_is_no_token_to_attach() {
     Route route = mock(Route.class);
     Request request = mock(Request.class);
     when(route.request()).thenReturn(request);
     when(request.url()).thenReturn("https://render.internal:9443/reporting/abc/render");
 
-    customOriginGuard.handle(route);
+    customOriginGuard.handle(route, null);
 
     verify(route).resume();
     verify(route, never()).resume(any(Route.ResumeOptions.class));
   }
 
   @Test
-  void strips_the_authorization_header_before_a_public_host_ever_sees_it() {
+  void never_attaches_the_render_token_to_a_public_host() {
     Route route = mock(Route.class);
     Request request = mock(Request.class);
     when(route.request()).thenReturn(request);
     when(request.url()).thenReturn("https://8.8.8.8/logo.png");
-    when(request.headers())
-        .thenReturn(Map.of("authorization", "Bearer secret-render-token", "accept", "image/png"));
 
-    customOriginGuard.handle(route);
+    customOriginGuard.handle(route, RENDER_TOKEN);
 
-    ArgumentCaptor<Route.ResumeOptions> captor = ArgumentCaptor.forClass(Route.ResumeOptions.class);
-    verify(route).resume(captor.capture());
-    Map<String, String> forwardedHeaders = captor.getValue().headers;
-    assertFalse(forwardedHeaders.containsKey("authorization"));
-    assertTrue(forwardedHeaders.containsKey("accept"));
-  }
-
-  @Test
-  void does_not_forward_the_authorization_header_to_a_non_trusted_public_host() {
-    Route route = mock(Route.class);
-    Request request = mock(Request.class);
-    when(route.request()).thenReturn(request);
-    when(request.url()).thenReturn("https://8.8.8.8/logo.png");
-    // Mixed-case header name: Playwright normally lower-cases it, but the strip must not rely on
-    // that - it has to catch the render token under any casing.
-    when(request.headers()).thenReturn(Map.of("Authorization", "Bearer secret-render-token"));
-
-    customOriginGuard.handle(route);
-
-    ArgumentCaptor<Route.ResumeOptions> captor = ArgumentCaptor.forClass(Route.ResumeOptions.class);
-    verify(route).resume(captor.capture());
-    boolean hasAuthorizationHeader =
-        captor.getValue().headers.keySet().stream().anyMatch("authorization"::equalsIgnoreCase);
-    assertFalse(hasAuthorizationHeader);
+    verify(route).resume();
+    verify(route, never()).resume(any(Route.ResumeOptions.class));
   }
 
   @Test
@@ -145,7 +157,7 @@ class ReportRenderEgressGuardTest {
     when(route.request()).thenReturn(request);
     when(request.url()).thenReturn("http://127.0.0.1/hook");
 
-    customOriginGuard.handle(route);
+    customOriginGuard.handle(route, RENDER_TOKEN);
 
     verify(route).abort("blockedbyclient");
     verify(route, never()).resume();

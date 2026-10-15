@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -31,54 +32,82 @@ import org.springframework.stereotype.Component;
  * WebhookTargetValidator}, there is no opt-out - report rendering has no legitimate reason to reach
  * an internal endpoint besides the platform's own origin, already allow-listed above.
  *
- * <p>The browser context also carries a context-wide {@code Authorization: Bearer <render token>}
- * header (see {@code PlaywrightReportingRenderer}), which Chromium replays on every request in the
- * context - including requests to a verified-public, tenant-controlled host such as a dark-theme
- * logo url. That would hand the render token to whoever controls that host. The guard therefore
- * strips the header on every request that is not the trusted origin itself, so the token only ever
- * reaches the platform's own API.
+ * <p>The render token is deliberately NOT a context-wide header: Chromium would replay such a
+ * header on every request of the context, including those to a verified-public, tenant-controlled
+ * host such as a dark-theme logo url, handing the token to whoever controls that host. Instead the
+ * guard attaches the {@code Authorization} header itself, and only on requests to the trusted
+ * origin (an allow-list rather than a strip-list), so the token can only ever reach the platform's
+ * own API.
  */
 @Slf4j
 @Component
 public class ReportRenderEgressGuard {
 
+  /** Resolves a host to its addresses, like {@link InetAddress#getAllByName(String)}. */
+  @FunctionalInterface
+  interface HostResolver {
+    InetAddress[] resolve(String host) throws UnknownHostException;
+  }
+
   private final String trustedScheme;
   private final String trustedHost;
   private final int trustedPort;
+  private final HostResolver hostResolver;
 
+  @Autowired
   public ReportRenderEgressGuard(
       @Value("${openaev.reporting.render-base-url:}") final String renderBaseUrl,
       @Value("${server.port:8080}") final int serverPort,
       @Value("${server.ssl.enabled:false}") final boolean sslEnabled) {
+    this(renderBaseUrl, serverPort, sslEnabled, InetAddress::getAllByName);
+  }
+
+  /** Package-private so tests can decide what a host resolves to without touching real DNS. */
+  ReportRenderEgressGuard(
+      final String renderBaseUrl,
+      final int serverPort,
+      final boolean sslEnabled,
+      final HostResolver hostResolver) {
     URI trustedOrigin = resolveTrustedOrigin(renderBaseUrl, serverPort, sslEnabled);
     this.trustedScheme = trustedOrigin.getScheme().toLowerCase(Locale.ROOT);
     this.trustedHost = trustedOrigin.getHost();
     this.trustedPort = effectivePort(this.trustedScheme, trustedOrigin.getPort());
+    this.hostResolver = hostResolver;
   }
 
-  /** Registers the guard on a fresh render context, for the lifetime of that context. */
-  public void install(final BrowserContext context) {
-    context.route("**/*", this::handle);
+  /**
+   * Registers the guard on a fresh render context, for the lifetime of that context.
+   *
+   * @param trustedAuthorization the {@code Authorization} header value to attach to requests to the
+   *     trusted origin, or null to attach nothing
+   */
+  public void install(final BrowserContext context, final String trustedAuthorization) {
+    context.route("**/*", route -> handle(route, trustedAuthorization));
   }
 
-  /** Package-private so the resume/abort/header-stripping behavior can be unit-tested. */
-  void handle(final Route route) {
+  /** Package-private so the resume/abort/header behavior can be unit-tested. */
+  void handle(final Route route, final String trustedAuthorization) {
     String rawUrl = route.request().url();
     switch (classify(rawUrl)) {
       case BLOCKED -> {
         log.warn("Report render blocked a request to a disallowed target: {}", rawUrl);
         route.abort("blockedbyclient");
       }
-      case TRUSTED -> route.resume();
-      case PUBLIC -> {
-        // Strip the context-wide render-token header before it reaches a tenant-controlled public
-        // host (e.g. a dark-theme logo url): Chromium would otherwise replay it verbatim, handing
-        // the render token to whoever controls that host.
-        Map<String, String> headers = new HashMap<>(route.request().headers());
-        headers.keySet().removeIf("authorization"::equalsIgnoreCase);
-        route.resume(new Route.ResumeOptions().setHeaders(headers));
-      }
+      case TRUSTED -> resumeWithAuthorization(route, trustedAuthorization);
+      case PUBLIC -> route.resume();
     }
+  }
+
+  private static void resumeWithAuthorization(final Route route, final String authorization) {
+    if (authorization == null) {
+      route.resume();
+      return;
+    }
+    // ResumeOptions.headers replaces the whole header set, so start from the request's own.
+    Map<String, String> headers = new HashMap<>(route.request().headers());
+    headers.keySet().removeIf("authorization"::equalsIgnoreCase);
+    headers.put("authorization", authorization);
+    route.resume(new Route.ResumeOptions().setHeaders(headers));
   }
 
   /** Package-private so the allow/deny decision can be unit-tested without a real browser. */
@@ -114,7 +143,8 @@ public class ReportRenderEgressGuard {
   }
 
   /**
-   * Egress verdict for a single request: block it, let it through as-is, or let it through bare.
+   * Egress verdict for a single request: block it, let it through with the render token, or let it
+   * through without it.
    */
   enum Verdict {
     BLOCKED,
@@ -122,10 +152,10 @@ public class ReportRenderEgressGuard {
     PUBLIC
   }
 
-  private static boolean isPublicHost(final String host) {
+  private boolean isPublicHost(final String host) {
     InetAddress[] addresses;
     try {
-      addresses = InetAddress.getAllByName(host);
+      addresses = this.hostResolver.resolve(host);
     } catch (UnknownHostException e) {
       // Fail closed: unlike webhook dispatch (where an unresolvable host simply fails the call
       // naturally), this guard also gates the platform's own trusted-origin traffic on the same
