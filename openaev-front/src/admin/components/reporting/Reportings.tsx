@@ -71,6 +71,7 @@ const Reportings = () => {
   };
   const onDelete = (reportingId: string) => {
     setReportings(prev => prev.filter(reporting => reporting.reporting_id !== reportingId));
+    queryableHelpers.paginationHelpers.incrementTotalElements(-1);
   };
 
   // Headers

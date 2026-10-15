@@ -116,7 +116,10 @@ const Organizations = () => {
           topBarButtons={(
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.TENANT_SETTINGS}>
               <CreateOrganization
-                onCreate={(result: Organization) => setOrganizations(prev => [result, ...prev])}
+                onCreate={(result: Organization) => {
+                  setOrganizations(prev => [result, ...prev]);
+                  queryableHelpers.paginationHelpers.incrementTotalElements(1);
+                }}
               />
             </Can>
           )}
@@ -149,7 +152,10 @@ const Organizations = () => {
                       organization={organization}
                       tagsMap={tagsMap}
                       onUpdate={(result: Organization) => setOrganizations(prev => prev.map(o => (o.organization_id !== result.organization_id ? o : result)))}
-                      onDelete={(result: string) => setOrganizations(prev => prev.filter(o => (o.organization_id !== result)))}
+                      onDelete={(result: string) => {
+                        setOrganizations(prev => prev.filter(o => (o.organization_id !== result)));
+                        queryableHelpers.paginationHelpers.incrementTotalElements(-1);
+                      }}
                       openEditOnInit={organization.organization_id === searchId}
                     />
                   )}

@@ -91,7 +91,13 @@ const CustomDomains = () => {
           entityPrefix="custom_domain"
           topBarButtons={(
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.TENANT_SETTINGS}>
-              <CustomDomainCreate onCreate={upsert} onUpdate={upsert} />
+              <CustomDomainCreate
+                onCreate={(result) => {
+                  upsert(result);
+                  queryableHelpers.paginationHelpers.incrementTotalElements(1);
+                }}
+                onUpdate={upsert}
+              />
             </Can>
           )}
         />
@@ -119,7 +125,10 @@ const CustomDomains = () => {
               secondaryAction={(
                 <CustomDomainPopover
                   customDomain={domain}
-                  onDelete={result => setCustomDomains(prev => prev.filter(d => d.custom_domain_id !== result))}
+                  onDelete={(result) => {
+                    setCustomDomains(prev => prev.filter(d => d.custom_domain_id !== result));
+                    queryableHelpers.paginationHelpers.incrementTotalElements(-1);
+                  }}
                   onUpdate={upsert}
                 />
               )}

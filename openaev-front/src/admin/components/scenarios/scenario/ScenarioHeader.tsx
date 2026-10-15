@@ -269,7 +269,7 @@ const ScenarioHeader = ({
         // Leave null: hasExistingLogic treats the unknown count as existing logic (fail safe).
       }
     }
-    let saved: AutonomousRunCreateInput | null = null;
+    let saved: AutonomousRunCreateInput | null;
     try {
       saved = (await fetchScenarioAutonomousConfig(scenarioId)).data;
     } catch {
