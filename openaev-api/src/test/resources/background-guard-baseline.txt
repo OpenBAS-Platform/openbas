@@ -139,6 +139,9 @@ io.openaev.xtmhub.collector.XtmHubCollector  # delegates-to-XtmHubService#refres
 io.openaev.xtmone.XtmOneConfig  # touches-no-tenant-table: config bean; @PostConstruct only normalizes the URL, no DB access
 io.openaev.xtmone.XtmOneConnectivityService  # delegates-to-XtmOneService#autoRegister: platform-wide XTM One registration; reads only platform settings resolved against DEFAULT_TENANT_UUID, touches no TenantBase entity
 
+# --- Network plumbing: DNS lookup hand-off, no entity ---------------------------------------------
+io.openaev.security.ssrf.TimeoutHostResolver  # touches-no-tenant-table: the daemon lookup threads of its bounded pool only run InetAddress.getAllByName (DNS resolution) for the report render egress guard and hand the addresses back to the caller, no entity, repository or tenant context is involved
+
 # --- Inline executor hand-offs (no executor field): filesystem or transport plumbing, no entity ----
 io.openaev.config.MvcConfig  # touches-no-tenant-table: @Bean factory building the Spring MVC async-request executor (Executors.newFixedThreadPool(20)); the config bean itself does no DB access, and the async controller work that runs on the pool carries its own request-thread scope
 io.openaev.config.ThreadPoolTaskSchedulerConfig  # touches-no-tenant-table: @Bean factory for the shared thread pools (task scheduler and the stream / notification-engine / manager-integrations executors); the config does no DB access, and the ThreadPoolTaskScheduler/ThreadPoolTaskExecutor beans it returns are ApplicationListeners only through Spring's ExecutorConfigurationSupport context-close shutdown hook, not a business event listener. Beans that submit work to these pools carry their own scope and are enumerated separately
