@@ -17,9 +17,10 @@ import org.springframework.stereotype.Component;
  * equivalent legitimate case for a theme asset, so this validator has no opt-out.
  *
  * <p>This save-time check is only a first filter, not the security boundary: the asset url is
- * actually fetched later, by the headless browser that renders reports, which is where {@code
- * ReportRenderEgressGuard} re-resolves the host at fetch time (catching a host that now resolves
- * differently, or a redirect to an internal target) and is the mechanism that cannot be bypassed. A
+ * actually fetched later, for the headless browser that renders reports. There, {@code
+ * ReportRenderEgressGuard} makes the browser fetch it through a client that resolves the host once
+ * and connects only to the public addresses it validated, so a host that now resolves differently
+ * (or answers differently to each lookup) or a redirect to an internal target cannot get through. A
  * host that fails to resolve here is let through for the same reason {@code WebhookTargetValidator}
  * lets it through: it cannot be used as-is, and DNS may change by the time it is actually
  * requested.

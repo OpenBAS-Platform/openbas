@@ -2,8 +2,7 @@ package io.openaev.rest.reporting.service;
 
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.Route;
-import io.openaev.security.ssrf.PublicAddressPolicy;
-import java.net.InetAddress;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
@@ -11,7 +10,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -22,57 +20,51 @@ import org.springframework.stereotype.Component;
  * <p>The render page necessarily navigates a trusted-but-internal origin (loopback, or {@code
  * openaev.reporting.render-base-url}): a page-wide "block every internal address" rule cannot apply
  * here, it has to single out that one legitimate internal target and treat everything else - most
- * notably a tenant-controlled theme asset url rendered as an {@code <img>} - as untrusted. Every
- * other request is only allowed once its host is resolved, right now, to a verified public address.
+ * notably a tenant-controlled theme asset url rendered as an {@code <img>} - as untrusted.
  *
- * <p>Installed as a Playwright request handler on every render {@link BrowserContext}: this re-
- * resolves the host at the moment Chromium is about to fetch it, which catches both a host that
- * resolved publicly when the url was saved but now resolves internally, and a redirect to an
- * internal target (Playwright routes every redirect hop as its own new request). Unlike {@code
- * WebhookTargetValidator}, there is no opt-out - report rendering has no legitimate reason to reach
- * an internal endpoint besides the platform's own origin, already allow-listed above.
+ * <p>Installed as a Playwright request handler on every render {@link BrowserContext}, it sorts
+ * each request into:
+ *
+ * <ul>
+ *   <li>trusted: the platform's own origin, which the browser reaches directly, with the render
+ *       token attached;
+ *   <li>external: anything else. The browser never connects to it. {@link ExternalResourceFetcher}
+ *       fetches it, resolving the host once and only to public addresses, and the response is
+ *       handed back to the browser. Resolving and connecting in one place is what rules out DNS
+ *       rebinding: a name checked here and resolved again by the browser could answer differently
+ *       the second time. Redirects are followed by that fetch too, each hop validated: a redirect
+ *       handed back to the browser would be followed by it without going through this guard;
+ *   <li>blocked: what cannot even be parsed as an http(s) target.
+ * </ul>
+ *
+ * <p>Unlike {@code WebhookTargetValidator}, there is no opt-out - report rendering has no
+ * legitimate reason to reach an internal endpoint besides the platform's own origin.
  *
  * <p>The render token is deliberately NOT a context-wide header: Chromium would replay such a
- * header on every request of the context, including those to a verified-public, tenant-controlled
- * host such as a dark-theme logo url, handing the token to whoever controls that host. Instead the
- * guard attaches the {@code Authorization} header itself, and only on requests to the trusted
- * origin (an allow-list rather than a strip-list), so the token can only ever reach the platform's
- * own API.
+ * header on every request of the context, handing the token to whoever controls a tenant-supplied
+ * logo url. Instead the guard attaches the {@code Authorization} header itself, and only on
+ * requests to the trusted origin (an allow-list rather than a strip-list). External requests are
+ * made by {@link ExternalResourceFetcher}, which never forwards credentials.
  */
 @Slf4j
 @Component
 public class ReportRenderEgressGuard {
 
-  /** Resolves a host to its addresses, like {@link InetAddress#getAllByName(String)}. */
-  @FunctionalInterface
-  interface HostResolver {
-    InetAddress[] resolve(String host) throws UnknownHostException;
-  }
-
   private final String trustedScheme;
   private final String trustedHost;
   private final int trustedPort;
-  private final HostResolver hostResolver;
+  private final ExternalResourceFetcher externalResourceFetcher;
 
-  @Autowired
   public ReportRenderEgressGuard(
       @Value("${openaev.reporting.render-base-url:}") final String renderBaseUrl,
       @Value("${server.port:8080}") final int serverPort,
-      @Value("${server.ssl.enabled:false}") final boolean sslEnabled) {
-    this(renderBaseUrl, serverPort, sslEnabled, InetAddress::getAllByName);
-  }
-
-  /** Package-private so tests can decide what a host resolves to without touching real DNS. */
-  ReportRenderEgressGuard(
-      final String renderBaseUrl,
-      final int serverPort,
-      final boolean sslEnabled,
-      final HostResolver hostResolver) {
+      @Value("${server.ssl.enabled:false}") final boolean sslEnabled,
+      final ExternalResourceFetcher externalResourceFetcher) {
     URI trustedOrigin = resolveTrustedOrigin(renderBaseUrl, serverPort, sslEnabled);
     this.trustedScheme = trustedOrigin.getScheme().toLowerCase(Locale.ROOT);
     this.trustedHost = trustedOrigin.getHost();
     this.trustedPort = effectivePort(this.trustedScheme, trustedOrigin.getPort());
-    this.hostResolver = hostResolver;
+    this.externalResourceFetcher = externalResourceFetcher;
   }
 
   /**
@@ -85,7 +77,7 @@ public class ReportRenderEgressGuard {
     context.route("**/*", route -> handle(route, trustedAuthorization));
   }
 
-  /** Package-private so the resume/abort/header behavior can be unit-tested. */
+  /** Package-private so the resume/fulfill/abort behavior can be unit-tested. */
   void handle(final Route route, final String trustedAuthorization) {
     String rawUrl = route.request().url();
     switch (classify(rawUrl)) {
@@ -94,7 +86,7 @@ public class ReportRenderEgressGuard {
         route.abort("blockedbyclient");
       }
       case TRUSTED -> resumeWithAuthorization(route, trustedAuthorization);
-      case PUBLIC -> route.resume();
+      case EXTERNAL -> fulfillFromExternalFetch(route, rawUrl);
     }
   }
 
@@ -110,13 +102,36 @@ public class ReportRenderEgressGuard {
     route.resume(new Route.ResumeOptions().setHeaders(headers));
   }
 
-  /** Package-private so the allow/deny decision can be unit-tested without a real browser. */
-  boolean isAllowed(final String rawUrl) {
-    return classify(rawUrl) != Verdict.BLOCKED;
+  private void fulfillFromExternalFetch(final Route route, final String rawUrl) {
+    String method = route.request().method().toUpperCase(Locale.ROOT);
+    if (!"GET".equals(method) && !"HEAD".equals(method)) {
+      // A render only ever loads resources. Anything that writes has no business leaving.
+      log.warn("Report render blocked a {} request to an external target: {}", method, rawUrl);
+      route.abort("blockedbyclient");
+      return;
+    }
+    ExternalResourceFetcher.FetchedResource resource;
+    try {
+      resource = this.externalResourceFetcher.fetch(method, rawUrl, route.request().headers());
+    } catch (UnknownHostException e) {
+      // Unresolvable, or resolving to an internal address: refused by the resolver.
+      log.warn("Report render blocked a request to {}: {}", rawUrl, e.getMessage());
+      route.abort("blockedbyclient");
+      return;
+    } catch (IOException | RuntimeException e) {
+      log.warn("Report render could not fetch {}: {}", rawUrl, e.toString());
+      route.abort("failed");
+      return;
+    }
+    route.fulfill(
+        new Route.FulfillOptions()
+            .setStatus(resource.status())
+            .setHeaders(resource.headers())
+            .setBodyBytes(resource.body()));
   }
 
   /**
-   * Package-private so the trusted/public distinction can be unit-tested without a real browser.
+   * Package-private so the trusted/external distinction can be unit-tested without a real browser.
    */
   Verdict classify(final String rawUrl) {
     URI uri;
@@ -139,35 +154,17 @@ public class ReportRenderEgressGuard {
         && effectivePort(scheme, uri.getPort()) == this.trustedPort) {
       return Verdict.TRUSTED;
     }
-    return isPublicHost(host) ? Verdict.PUBLIC : Verdict.BLOCKED;
+    return Verdict.EXTERNAL;
   }
 
   /**
-   * Egress verdict for a single request: block it, let it through with the render token, or let it
-   * through without it.
+   * Egress verdict for a single request: block it, let the browser reach the platform with the
+   * render token, or fetch it on the browser's behalf.
    */
   enum Verdict {
     BLOCKED,
     TRUSTED,
-    PUBLIC
-  }
-
-  private boolean isPublicHost(final String host) {
-    InetAddress[] addresses;
-    try {
-      addresses = this.hostResolver.resolve(host);
-    } catch (UnknownHostException e) {
-      // Fail closed: unlike webhook dispatch (where an unresolvable host simply fails the call
-      // naturally), this guard also gates the platform's own trusted-origin traffic on the same
-      // route, so an unresolvable non-trusted host is denied outright rather than let through.
-      return false;
-    }
-    for (InetAddress address : addresses) {
-      if (PublicAddressPolicy.isInternal(address)) {
-        return false;
-      }
-    }
-    return addresses.length > 0;
+    EXTERNAL
   }
 
   private static URI resolveTrustedOrigin(
