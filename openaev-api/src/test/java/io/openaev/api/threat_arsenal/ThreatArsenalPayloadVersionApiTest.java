@@ -681,6 +681,116 @@ class ThreatArsenalPayloadVersionApiTest extends IntegrationTest {
   }
 
   @Nested
+  @DisplayName("Version numbers count every approved content")
+  class VersionNumbers {
+
+    /**
+     * Sends an approved action back to pending with another command, as an edit did before versions
+     * existed (Task 2): the content changes in place.
+     */
+    private void editInPlaceAsBeforeVersions(String actionId, String command) {
+      Payload payload =
+          (Payload)
+              org.hibernate.Hibernate.unproxy(
+                  injectorContractRepository.findById(actionId).orElseThrow().getPayload());
+      ((Command) payload).setContent(command);
+      payload.setApprovalStatus(Payload.PAYLOAD_APPROVAL_STATUS.PENDING);
+      payload.setApprovedFingerprint(null);
+      payloadRepository.save(payload);
+      flushAndClear();
+    }
+
+    private String approvalFingerprint(String actionId) throws Exception {
+      return JsonPath.read(detail(actionId), "$.action_approval_fingerprint");
+    }
+
+    @Test
+    @DisplayName("Given a new action approved for the first time, it should be version 1")
+    void given_firstApproval_should_beVersionOne() throws Exception {
+      // Arrange
+      Domain domain = domainComposer.forDomain(DomainFixture.getRandomDomain()).persist().get();
+      String created =
+          mvc.perform(
+                  post(url(""))
+                      .with(authentication(author))
+                      .with(csrf())
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(
+                          asJsonString(
+                              ThreatArsenalInputFixture.createDefaultCommandLineAction(
+                                  List.of(domain.getId())))))
+              .andExpect(status().is2xxSuccessful())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+      String actionId = JsonPath.read(created, "$.injector_contract_id");
+
+      // Act
+      approveAs(approver, actionId, approvalFingerprint(actionId))
+          .andExpect(status().is2xxSuccessful());
+      flushAndClear();
+
+      // Assert
+      assertThat((Integer) JsonPath.read(detail(actionId), "$.action_active_version")).isEqualTo(1);
+      assertThat((List<Object>) JsonPath.read(versions(actionId), "$")).isEmpty();
+    }
+
+    @Test
+    @DisplayName(
+        "Given an action approved again after being sent back to pending, each approval should be a new version, and the next pending version should follow")
+    void given_pendingPayloadApprovedAgain_should_countNewVersions() throws Exception {
+      // Arrange
+      String actionId = approvedAction();
+      editInPlaceAsBeforeVersions(actionId, "echo second");
+      approveAs(approver, actionId, approvalFingerprint(actionId))
+          .andExpect(status().is2xxSuccessful());
+      flushAndClear();
+      editInPlaceAsBeforeVersions(actionId, "echo third");
+
+      // Act
+      approveAs(approver, actionId, approvalFingerprint(actionId))
+          .andExpect(status().is2xxSuccessful());
+      flushAndClear();
+      updateAs(author, actionId, update("echo fourth", "Description"))
+          .andExpect(status().is2xxSuccessful());
+      flushAndClear();
+
+      // Assert
+      String detail = detail(actionId);
+      assertThat((Integer) JsonPath.read(detail, "$.action_active_version")).isEqualTo(3);
+      assertThat((Integer) JsonPath.read(detail, "$.action_pending_version.version_number"))
+          .isEqualTo(4);
+      String versions = versions(actionId);
+      assertThat((List<Integer>) JsonPath.read(versions, "$[*].version_number"))
+          .containsExactly(4, 3, 2);
+      assertThat((List<String>) JsonPath.read(versions, "$[*].version_status"))
+          .containsExactly("PENDING", "APPROVED", "APPROVED");
+    }
+
+    @Test
+    @DisplayName(
+        "Given an action sent back to pending, an approver's edit approving it should be a new version")
+    void given_approverEditOfPendingPayloadApprovedBefore_should_countNewVersion()
+        throws Exception {
+      // Arrange
+      String actionId = approvedAction();
+      editInPlaceAsBeforeVersions(actionId, "echo second");
+
+      // Act
+      updateAs(approver, actionId, update("echo by approver", "Description"))
+          .andExpect(status().is2xxSuccessful());
+      flushAndClear();
+
+      // Assert
+      String detail = detail(actionId);
+      assertThat((String) JsonPath.read(detail, "$.action_approval_status")).isEqualTo("APPROVED");
+      assertThat((Integer) JsonPath.read(detail, "$.action_active_version")).isEqualTo(2);
+      assertThat((List<Integer>) JsonPath.read(versions(actionId), "$[*].version_number"))
+          .containsExactly(2);
+    }
+  }
+
+  @Nested
   @DisplayName("Approve or reject a pending version (US5.2)")
   class Decisions {
 

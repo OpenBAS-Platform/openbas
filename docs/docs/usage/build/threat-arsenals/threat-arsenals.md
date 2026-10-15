@@ -88,6 +88,7 @@ Editing an approved payload never stops what already uses it. The payload keeps 
 * **Approvers edit directly.** When a user with *Approve content* changes what an approved payload runs, the change applies directly as a new approved version, and replaces a pending version if there is one.
 * **Collectors.** A collector update of an approved payload creates a pending version (origin *Collector*). The same update sent again changes nothing; a different one replaces the pending version.
 * **In the list**, an approved Action with a pending version shows **New version pending**, and the *New version pending* filter finds them.
+* **Version numbers.** Each approved content is a new version: the first approved content is v1, and every later approval of a different content (a pending version, or a pending payload approved again) gets the next number. Rejected or replaced versions keep the number they were given.
 * **Duplicate** copies the active version.
 * **Argument values.** Injects keep the argument values they already store: when a new version changes the default value of an argument, existing injects keep their value; only new injects get the new default.
 
