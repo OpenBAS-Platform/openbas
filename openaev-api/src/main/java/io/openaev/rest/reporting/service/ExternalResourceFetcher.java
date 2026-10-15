@@ -1,7 +1,9 @@
 package io.openaev.rest.reporting.service;
 
+import io.openaev.security.ssrf.HostResolver;
 import io.openaev.security.ssrf.PublicOnlyDnsResolver;
 import io.openaev.security.ssrf.TimeoutHostResolver;
+import io.openaev.security.ssrf.UnrestrictedDnsResolver;
 import jakarta.annotation.PreDestroy;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,6 +27,7 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
 import org.apache.hc.core5.util.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,8 +38,9 @@ import org.springframework.stereotype.Component;
  * time, after {@link ReportRenderEgressGuard} validated it, and a hostile DNS server could answer
  * an internal address to that second resolution (DNS rebinding). Here the request is made by an
  * HTTP client whose {@link DnsResolver} validates the very addresses it then connects to ({@link
- * PublicOnlyDnsResolver}), so there is no gap to exploit. The guard hands the response back to the
- * browser.
+ * PublicOnlyDnsResolver}: public addresses only, unless the operator opted in to internal targets
+ * with {@code openaev.theme.asset-allow-internal-targets}), so there is no gap to exploit. The
+ * guard hands the response back to the browser.
  *
  * <p>Redirects are followed here, never by the browser: a 3xx handed back to Chromium is followed
  * by Chromium itself, straight to wherever {@code Location} points and without going through the
@@ -115,13 +119,25 @@ public class ExternalResourceFetcher {
   private final CloseableHttpClient client;
   private final int maxBodyBytes;
 
+  /**
+   * @param allowInternalTargets {@code openaev.theme.asset-allow-internal-targets}: when on, hosts
+   *     resolving to internal addresses are fetched like any other (on-premise networks with no
+   *     public place to host a logo). Off by default.
+   */
   @Autowired
-  public ExternalResourceFetcher() {
-    this(
-        new PublicOnlyDnsResolver(
-            new TimeoutHostResolver(
-                InetAddress::getAllByName, DNS_LOOKUP_TIMEOUT, MAX_CONCURRENT_DNS_LOOKUPS)),
-        DEFAULT_MAX_BODY_BYTES);
+  public ExternalResourceFetcher(
+      @Value("${openaev.theme.asset-allow-internal-targets:false}")
+          final boolean allowInternalTargets) {
+    this(dnsResolver(allowInternalTargets), DEFAULT_MAX_BODY_BYTES);
+  }
+
+  private static DnsResolver dnsResolver(final boolean allowInternalTargets) {
+    HostResolver boundedLookup =
+        new TimeoutHostResolver(
+            InetAddress::getAllByName, DNS_LOOKUP_TIMEOUT, MAX_CONCURRENT_DNS_LOOKUPS);
+    return allowInternalTargets
+        ? new UnrestrictedDnsResolver(boundedLookup)
+        : new PublicOnlyDnsResolver(boundedLookup);
   }
 
   /** Package-private so tests can reach a local server and use a small size limit. */

@@ -8,9 +8,9 @@ import java.net.InetAddress;
 /**
  * Shared classification of "internal" (private/loopback/link-local/reserved) vs. public network
  * addresses, used by every SSRF guard in the platform: {@link
- * io.openaev.notification.engine.WebhookTargetValidator} (webhook notifier targets, with an
- * explicit on-premise opt-out) and the report-render egress guard (tenant-controlled asset URLs
- * fetched by the headless render browser, with no opt-out).
+ * io.openaev.notification.engine.WebhookTargetValidator} (webhook notifier targets) and the theme
+ * asset url validator and report-render egress guard (tenant-controlled asset URLs fetched by the
+ * headless render browser). Each has its own explicit on-premise opt-out, off by default.
  *
  * <p>Classification only - callers decide how and when to resolve a host and what to do with an
  * internal or unresolvable result.

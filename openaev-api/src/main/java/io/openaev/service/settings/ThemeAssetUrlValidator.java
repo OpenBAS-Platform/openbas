@@ -5,28 +5,40 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.Locale;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Guards tenant-controlled theme asset urls (logo, login aside image, ...) against SSRF: only
- * http(s) urls targeting a public address are allowed.
+ * Guards tenant-controlled theme asset urls (logo, login aside image, ...) against SSRF: only https
+ * urls are allowed, and by default only those targeting a public address.
  *
- * <p>Deliberately independent from {@link io.openaev.notification.engine.WebhookTargetValidator}:
- * {@code openaev.notification.webhook-allow-internal-targets} exists for on-premise deployments
- * that legitimately dispatch webhooks to internal endpoints an admin configured. There is no
- * equivalent legitimate case for a theme asset, so this validator has no opt-out.
+ * <p>On-premise deployments in a closed network often have no public place to host a logo. They can
+ * opt in with {@code openaev.theme.asset-allow-internal-targets}, the counterpart of {@code
+ * openaev.notification.webhook-allow-internal-targets} for webhooks: it skips the check on internal
+ * addresses only, the scheme and host checks still apply. It is off by default, so the platform
+ * stays protected unless an operator who needs it turns it on knowingly.
  *
  * <p>This save-time check is only a first filter, not the security boundary: the asset url is
  * actually fetched later, for the headless browser that renders reports. There, {@code
  * ReportRenderEgressGuard} makes the browser fetch it through a client that resolves the host once
- * and connects only to the public addresses it validated, so a host that now resolves differently
- * (or answers differently to each lookup) or a redirect to an internal target cannot get through. A
- * host that fails to resolve here is let through for the same reason {@code WebhookTargetValidator}
- * lets it through: it cannot be used as-is, and DNS may change by the time it is actually
- * requested.
+ * and connects only to the addresses it validated (public ones, unless the same opt-in is on), so a
+ * host that now resolves differently (or answers differently to each lookup) or a redirect to an
+ * internal target cannot get through. A host that fails to resolve here is let through for the same
+ * reason {@code WebhookTargetValidator} lets it through: it cannot be used as-is, and DNS may
+ * change by the time it is actually requested.
+ *
+ * <p>Urls saved before https became mandatory are not rewritten: they keep loading at render time,
+ * still checked against internal addresses, until the theme is saved again.
  */
 @Component
 public class ThemeAssetUrlValidator {
+
+  private final boolean allowInternalTargets;
+
+  public ThemeAssetUrlValidator(
+      @Value("${openaev.theme.asset-allow-internal-targets:false}") boolean allowInternalTargets) {
+    this.allowInternalTargets = allowInternalTargets;
+  }
 
   /** Validates a theme asset url, throwing {@link IllegalArgumentException} when not allowed. */
   public URI validateUrl(String url) {
@@ -37,14 +49,16 @@ public class ThemeAssetUrlValidator {
       throw new IllegalArgumentException("Theme asset url is not a valid URI");
     }
     String scheme = uri.getScheme() != null ? uri.getScheme().toLowerCase(Locale.ROOT) : "";
-    if (!"http".equals(scheme) && !"https".equals(scheme)) {
-      throw new IllegalArgumentException("Theme asset url must be http(s)");
+    if (!"https".equals(scheme)) {
+      throw new IllegalArgumentException("Theme asset url must be https");
     }
     String host = uri.getHost();
     if (host == null || host.isBlank()) {
       throw new IllegalArgumentException("Theme asset url must have a host");
     }
-    requirePublicTarget(host);
+    if (!this.allowInternalTargets) {
+      requirePublicTarget(host);
+    }
     return uri;
   }
 

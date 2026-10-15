@@ -37,8 +37,11 @@ import org.springframework.stereotype.Component;
  *   <li>blocked: what cannot even be parsed as an http(s) target.
  * </ul>
  *
- * <p>Unlike {@code WebhookTargetValidator}, there is no opt-out - report rendering has no
- * legitimate reason to reach an internal endpoint besides the platform's own origin.
+ * <p>Report rendering has no reason to reach an internal endpoint besides the platform's own
+ * origin, so by default external fetches are refused internal addresses. On-premise networks with
+ * no public place to host a logo can opt in with {@code
+ * openaev.theme.asset-allow-internal-targets}, which applies to every external fetch of the render,
+ * not only to the theme urls.
  *
  * <p>The render token is deliberately NOT a context-wide header: Chromium would replay such a
  * header on every request of the context, handing the token to whoever controls a tenant-supplied
@@ -52,8 +55,9 @@ import org.springframework.stereotype.Component;
  * <p>Known limit: a request the browser itself makes to the trusted origin carries the token
  * whoever referenced it. A tenant url that points straight at that origin could thus have the
  * platform's own API requested as an image with the render token. Saved theme urls must be public,
- * so this needs a publicly resolvable {@code openaev.reporting.render-base-url}, and the response
- * is only ever rendered as an image, never readable by the tenant.
+ * so this needs a publicly resolvable {@code openaev.reporting.render-base-url} - or the opt-in to
+ * internal targets, which also lets a theme url name the render origin itself. The response is only
+ * ever rendered as an image, never readable by the tenant.
  */
 @Slf4j
 @Component

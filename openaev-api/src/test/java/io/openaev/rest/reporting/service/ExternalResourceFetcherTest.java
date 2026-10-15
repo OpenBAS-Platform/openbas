@@ -207,6 +207,51 @@ class ExternalResourceFetcherTest {
   }
 
   @Test
+  void refuses_an_internal_target_by_default() throws Exception {
+    // The production wiring, with openaev.theme.asset-allow-internal-targets left off.
+    ExternalResourceFetcher defaultFetcher = new ExternalResourceFetcher(false);
+    try {
+      assertThrows(
+          UnknownHostException.class,
+          () -> defaultFetcher.fetch("GET", url("127.0.0.1", "/logo.png"), Map.of()));
+
+      assertTrue(this.receivedHeaders.isEmpty());
+    } finally {
+      defaultFetcher.close();
+    }
+  }
+
+  @Test
+  void fetches_an_internal_target_once_the_operator_opted_in() throws Exception {
+    // The production wiring, with openaev.theme.asset-allow-internal-targets turned on: an
+    // on-premise network whose logo lives on an internal server.
+    ExternalResourceFetcher onPremiseFetcher = new ExternalResourceFetcher(true);
+    try {
+      ExternalResourceFetcher.FetchedResource resource =
+          onPremiseFetcher.fetch("GET", url("127.0.0.1", "/logo.png"), Map.of());
+
+      assertEquals(200, resource.status());
+      assertArrayEquals("png-bytes".getBytes(StandardCharsets.UTF_8), resource.body());
+    } finally {
+      onPremiseFetcher.close();
+    }
+  }
+
+  @Test
+  void still_never_forwards_credentials_once_the_operator_opted_in() throws Exception {
+    // The opt-in only lifts the address check: credentials still never leave.
+    ExternalResourceFetcher onPremiseFetcher = new ExternalResourceFetcher(true);
+    try {
+      onPremiseFetcher.fetch(
+          "GET", url("127.0.0.1", "/logo.png"), Map.of("authorization", "Bearer secret"));
+
+      assertFalse(this.receivedHeaders.get(0).containsKey("Authorization"));
+    } finally {
+      onPremiseFetcher.close();
+    }
+  }
+
+  @Test
   void fails_fast_when_dns_never_answers_instead_of_holding_the_caller() throws Exception {
     // The fetch runs on the browser driver's dispatch thread: a DNS server that never answers must
     // fail the request after the lookup timeout, not after the operating system's own patience.
