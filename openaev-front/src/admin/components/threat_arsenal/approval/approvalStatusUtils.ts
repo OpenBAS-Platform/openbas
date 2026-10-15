@@ -38,6 +38,12 @@ export const approvalStatusSeverity = (status: ApprovalStatus): ChipSeverity => 
 
 export const approvalStatusLabel = (status: ApprovalStatus): string => STATUS_LABELS[status] ?? status;
 
+/**
+ * The status shown for an action: its latest version's. An approved action with a new version
+ * waiting shows PENDING; the approved version keeps running until that version is decided.
+ */
+export const displayedApprovalStatus = <S extends ApprovalStatus | null | undefined>(status: S, pendingVersion?: boolean): S | 'PENDING' => (pendingVersion ? 'PENDING' : status);
+
 export const approvalOriginLabel = (origin: ApprovalOrigin): string => ORIGIN_LABELS[origin] ?? origin;
 
 const VERSION_STATUS_LABELS: Record<VersionStatus, string> = {

@@ -53,6 +53,7 @@ import DocumentType from '../components/documents/DocumentType';
 import ContractOutputElementType from '../findings/ContractOutputElementType';
 import PayloadStatusComponent from '../payloads/PayloadStatusComponent';
 import ApprovalStatusChip from './approval/ApprovalStatusChip';
+import { displayedApprovalStatus } from './approval/approvalStatusUtils';
 import { getStatusColor, getStatusLabel } from './threatArsenalStatusUtils';
 
 // Human labels for the predefined expectation types carried by a payload/contract.
@@ -141,7 +142,11 @@ const ThreatArsenalActionOverview: FunctionComponent<Props> = ({
   const statusLabel = getStatusLabel(status);
   // A payload that is not approved shows its approval status instead of Verified / Unverified /
   // Deprecated: the approval decides whether it can be used.
-  const approvalStatus = action.action_payload?.payload_approval_status ?? payload?.payload_approval_status;
+  // A new version waiting shows as Pending (the latest version's status).
+  const approvalStatus = displayedApprovalStatus(
+    action.action_payload?.payload_approval_status ?? payload?.payload_approval_status,
+    action.action_payload?.payload_pending_version ?? payload?.payload_pending_version,
+  );
   const approvalWins = approvalStatus === 'PENDING' || approvalStatus === 'REJECTED';
   const name = tPick(action.action_labels);
   const description = payload?.payload_description ?? '';

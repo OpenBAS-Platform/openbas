@@ -24,6 +24,7 @@ const toPayload = (action: ThreatArsenalActionFullOutput): Payload => {
     payload_status: action.action_status,
     // Always set for payload-based actions, the only ones converted here.
     payload_approval_status: action.action_approval_status ?? 'PENDING',
+    payload_pending_version: !!action.action_pending_version,
     payload_type: action.action_type,
     payload_external_id: action.action_external_id,
     payload_arguments: action.action_arguments,

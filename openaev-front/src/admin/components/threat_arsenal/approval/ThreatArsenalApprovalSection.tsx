@@ -28,7 +28,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, PERMISSION_REQUIRED, SUBJECTS } from '../../../../utils/permissions/types';
 import ApprovalStatusChip from './ApprovalStatusChip';
-import { APPROVAL_COMMENT_MAX_LENGTH, approvalOriginLabel, approvalStatusLabel, isPayloadUsed, versionStatusLabel } from './approvalStatusUtils';
+import { APPROVAL_COMMENT_MAX_LENGTH, approvalOriginLabel, approvalStatusLabel, displayedApprovalStatus, isPayloadUsed, versionStatusLabel } from './approvalStatusUtils';
 import PayloadUsage from './PayloadUsage';
 import PayloadVersionComparison from './PayloadVersionComparison';
 
@@ -236,14 +236,19 @@ const ThreatArsenalApprovalSection: FunctionComponent<Props> = ({ action, onDeci
       }}
       >
         <Field label="Status">
-          <ApprovalStatusChip status={status} />
+          {/* The latest version's status: Pending while a new version waits (the approved one keeps running). */}
+          <ApprovalStatusChip status={displayedApprovalStatus(status, !!pendingVersion)} />
         </Field>
         <Field label="Last decision">
           <Text variant="content-base">{latest ? describe(latest) : '-'}</Text>
         </Field>
         {status === 'APPROVED' && (
           <Field label="Active version">
-            <Text variant="content-base">{`v${activeNumber}`}</Text>
+            <Text variant="content-base">
+              {pendingVersion
+                ? t('v{number} (approved, still in use)', { number: String(activeNumber) })
+                : `v${activeNumber}`}
+            </Text>
           </Field>
         )}
         {pendingVersion && (

@@ -263,6 +263,10 @@ class ThreatArsenalPayloadVersionApiTest extends IntegrationTest {
         .getContentAsString();
   }
 
+  private String approvalStatus(String actionId) throws Exception {
+    return JsonPath.read(detail(actionId), "$.action_approval_status");
+  }
+
   private String commandContent(String actionId) throws Exception {
     return JsonPath.read(detail(actionId), "$.command_content");
   }
@@ -598,6 +602,81 @@ class ThreatArsenalPayloadVersionApiTest extends IntegrationTest {
               (List<String>)
                   JsonPath.read(page, "$.content[*].action_payload.payload_approval_status"))
           .containsOnly("APPROVED");
+    }
+
+    @Test
+    @DisplayName(
+        "Given an action with a pending version, the approval filter and counts should treat it as pending while its stored status stays approved")
+    void given_pendingVersion_should_countAndFilterAsPending() throws Exception {
+      // Arrange
+      String withVersion = approvedAction();
+      String without = approvedAction();
+      updateAs(author, withVersion, update("echo changed", "Description"))
+          .andExpect(status().is2xxSuccessful());
+      flushAndClear();
+      String countsBefore = facetCounts();
+
+      // Act
+      List<String> pending = idsWithApprovalStatus("PENDING");
+      List<String> approved = idsWithApprovalStatus("APPROVED");
+
+      // Assert: filtered as displayed
+      assertThat(pending).contains(withVersion).doesNotContain(without);
+      assertThat(approved).contains(without).doesNotContain(withVersion);
+      // Assert: what runs is unchanged, the stored status stays approved
+      assertThat(approvalStatus(withVersion)).isEqualTo("APPROVED");
+      // Assert: counted as pending; editing the other action moves one more count
+      updateAs(author, without, update("echo changed too", "Description"))
+          .andExpect(status().is2xxSuccessful());
+      flushAndClear();
+      String countsAfter = facetCounts();
+      assertThat(count(countsAfter, "PENDING")).isEqualTo(count(countsBefore, "PENDING") + 1);
+      assertThat(count(countsAfter, "APPROVED")).isEqualTo(count(countsBefore, "APPROVED") - 1);
+    }
+
+    /** A facet count; a status no action has is absent from the answer. */
+    private long count(String counts, String approvalStatus) {
+      Map<String, Number> approvals = JsonPath.read(counts, "$.approvals");
+      return approvals.getOrDefault(approvalStatus, 0).longValue();
+    }
+
+    private List<String> idsWithApprovalStatus(String approvalStatus) throws Exception {
+      Filters.Filter filter = new Filters.Filter();
+      filter.setKey("action_payload_approval_status");
+      filter.setOperator(Filters.FilterOperator.eq);
+      filter.setMode(Filters.FilterMode.or);
+      filter.setValues(List.of(approvalStatus));
+      Filters.FilterGroup filterGroup = new Filters.FilterGroup();
+      filterGroup.setMode(Filters.FilterMode.and);
+      filterGroup.setFilters(new ArrayList<>(List.of(filter)));
+      String page =
+          mvc.perform(
+                  post(url("/search"))
+                      .with(csrf())
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(
+                          asJsonString(
+                              PaginationFixture.getDefault()
+                                  .size(1000)
+                                  .filterGroup(filterGroup)
+                                  .build())))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+      return JsonPath.read(page, "$.content[*].injector_contract_id");
+    }
+
+    private String facetCounts() throws Exception {
+      return mvc.perform(
+              post(url("/facet-counts"))
+                  .with(csrf())
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(asJsonString(PaginationFixture.getDefault().build())))
+          .andExpect(status().isOk())
+          .andReturn()
+          .getResponse()
+          .getContentAsString();
     }
   }
 
