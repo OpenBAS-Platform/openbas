@@ -16,7 +16,7 @@
     "start": "vite",
     "build": "vite build",
     "lint": "cross-env DEBUG=eslint:eslint TIMING=1 eslint --max-warnings 0 --cache .",
-    "depcruise": "depcruise src tests_e2e scripts vite.config.ts vitest.config.ts playwright.config.ts eslint.config.js knip.ts .dependency-cruiser.cjs --config .dependency-cruiser.cjs --ignore-known .dependency-cruiser-known-violations.json",
+    "depcruise": "depcruise src tests_e2e scripts vite.config.ts vitest.config.ts playwright.config.ts eslint.config.js knip.ts .dependency-cruiser.ts --config .dependency-cruiser.ts --ignore-known .dependency-cruiser-known-violations.json",
     "control": "yarn npm audit --recursive --environment production",
     "check-ts": "tsc && tsc -p packages/eslint-plugin-custom-rules",
     "knip": "knip",
