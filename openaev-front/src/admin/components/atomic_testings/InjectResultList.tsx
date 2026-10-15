@@ -375,7 +375,10 @@ const InjectResultList: FunctionComponent<Props> = ({
                       <AtomicTestingPopover
                         atomic={injectResultOutput}
                         actions={['Duplicate', 'Export', 'Delete']}
-                        onDelete={result => setInjects(injects.filter(e => e.inject_id !== result))}
+                        onDelete={(result) => {
+                          setInjects(injects.filter(e => e.inject_id !== result));
+                          queryableHelpers.paginationHelpers.incrementTotalElements(-1);
+                        }}
                         inList
                       />
                     ) : null}

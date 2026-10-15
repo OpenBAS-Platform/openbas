@@ -195,7 +195,10 @@ const PhishingLandingPages = () => {
                     landingPage={landingPage}
                     inList
                     openEditOnInit={landingPage.phishing_landing_page_id === searchId}
-                    onDelete={result => setLandingPages(landingPages.filter(v => v.phishing_landing_page_id !== result))}
+                    onDelete={(result) => {
+                      setLandingPages(landingPages.filter(v => v.phishing_landing_page_id !== result));
+                      queryableHelpers.paginationHelpers.incrementTotalElements(-1);
+                    }}
                   />
                 )}
               >
