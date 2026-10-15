@@ -160,6 +160,28 @@ This token belongs to the service account of the Tenant, which has the **Service
 and its Implants download a Document only by its exact ID, for example the file of a File Drop or Executable Action. They
 cannot list or search Documents.
 
+### Configuration file protection
+
+The agent stores its token in `openaev-agent-config.toml`, in the installation folder. The installer restricts access
+to this file before it writes the token, so other local users cannot read it:
+
+| OS              | Installation mode                             | Who can access `openaev-agent-config.toml`                                        |
+|-----------------|-----------------------------------------------|-----------------------------------------------------------------------------------|
+| Linux and macOS | All                                           | The file owner only (`0600`): root, the service user, or the logged-in user       |
+| Windows         | **Advanced installation as System (service)** | SYSTEM and administrators                                                         |
+| Windows         | **Advanced installation as User (service)**   | SYSTEM and administrators. The service user can read the file but not change it   |
+| Windows         | **Standard installation (session)**           | SYSTEM, administrators and the logged-in user                                     |
+
+To edit the file by hand, for example to change the [cleanup configuration](#cleanup-configuration), open it as one of
+these accounts, then restart the agent.
+
+!!! note
+
+    On Windows, each installation creates the configuration file again. Upgrades of the **Advanced installation as
+    System (service)** and **Standard installation (session)** modes do the same. Upgrades of the **Advanced installation
+    as User (service)** mode keep the existing file and its permissions: to restrict the file of an agent installed in
+    this mode with an older release, install the agent again.
+
 ### Signed agents
 
 Every OpenAEV Agent executable (the agent binaries and the Windows installers) is signed when its release is

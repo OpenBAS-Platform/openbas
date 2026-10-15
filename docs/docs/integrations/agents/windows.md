@@ -41,6 +41,11 @@ This page lists the Windows requirements, the installation modes and how to unin
     * The target user must have the **“Log on as a service”** policy enabled
     * See:
       [https://learn.microsoft.com/en-us/system-center/scsm/enable-service-log-on-sm](https://learn.microsoft.com/en-us/system-center/scsm/enable-service-log-on-sm)
+    * The target must be a local or domain **user account**, written `.\user` or `DOMAIN\user`. The installation stops
+      for a group (such as `BUILTIN\Users`), a virtual account (`NT SERVICE\...`), a managed service account and the
+      built-in service accounts
+* The agent configuration file holds the agent token and is readable only by SYSTEM, administrators and the account
+  that runs the agent (see [Configuration file protection](openaev-agent.md#configuration-file-protection))
 
 ## Antivirus
 
