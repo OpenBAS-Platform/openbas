@@ -15,21 +15,14 @@ const nonInfraTestIgnore = isArm ? [/infra\/.*/, armUnsupportedTests] : [/infra\
 // budget is larger, because they poll for a real agent to execute (up to 240s).
 const INFRA_TEST_TIMEOUT = 420_000;
 
-// Desktop Safari is the only preset with deviceScaleFactor 2, so WebKit paints the
-// 1920x1080 viewport at 3840x2160: four times the pixels of the other browsers, all
-// rendered in software on the CI runners and screencast for trace and video. WebKit
-// goes back to 1 and records no video; the trace keeps a screenshot per action.
-// WebKit on Linux also sometimes holds a request for ~20s (#8507), past the shared
-// 15s budget, so its actions and assertions get 30s. The other browsers keep 15s,
-// so a real slowdown still fails there.
-const WEBKIT_ACTION_TIMEOUT = 30_000;
+// Record video only when CI re-runs a failed job, not on the first attempt.
+const isFirstCiAttempt = !!process.env.CI && Number(process.env.GITHUB_RUN_ATTEMPT ?? '1') <= 1;
+
+// Desktop Safari defaults to deviceScaleFactor 2, which is slow to render on the CI runners.
 const webkitUse = {
   ...devices['Desktop Safari'],
   deviceScaleFactor: 1,
-  video: 'off',
-  actionTimeout: WEBKIT_ACTION_TIMEOUT,
-  navigationTimeout: WEBKIT_ACTION_TIMEOUT,
-} as const;
+};
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -70,7 +63,7 @@ export default defineConfig({
        (not 'on-first-retry': with retries disabled that would never trigger) */
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    video: isFirstCiAttempt ? 'off' : 'retain-on-failure',
     ignoreHTTPSErrors: true,
 
     /**
@@ -138,7 +131,6 @@ export default defineConfig({
     {
       name: 'webkit',
       testIgnore: nonInfraTestIgnore,
-      expect: { timeout: WEBKIT_ACTION_TIMEOUT },
       use: {
         ...webkitUse,
         storageState: 'tests_e2e/.auth/user.json',
@@ -210,7 +202,6 @@ export default defineConfig({
       name: 'infra-webkit',
       testMatch: /infra\/.*\.spec\.ts/,
       timeout: INFRA_TEST_TIMEOUT,
-      expect: { timeout: WEBKIT_ACTION_TIMEOUT },
       use: {
         ...webkitUse,
         storageState: 'tests_e2e/.auth/user.json',
