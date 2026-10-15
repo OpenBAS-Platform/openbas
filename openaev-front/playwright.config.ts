@@ -15,14 +15,15 @@ const nonInfraTestIgnore = isArm ? [/infra\/.*/, armUnsupportedTests] : [/infra\
 // budget is larger, because they poll for a real agent to execute (up to 240s).
 const INFRA_TEST_TIMEOUT = 420_000;
 
-// Record video only when CI re-runs a failed job, not on the first attempt.
 const isFirstCiAttempt = !!process.env.CI && Number(process.env.GITHUB_RUN_ATTEMPT ?? '1') <= 1;
 
 // Desktop Safari defaults to deviceScaleFactor 2, which is slow to render on the CI runners.
+// Its video is recorded only when CI re-runs a failed job, not on the first attempt.
 const webkitUse = {
   ...devices['Desktop Safari'],
   deviceScaleFactor: 1,
-};
+  video: isFirstCiAttempt ? 'off' : 'retain-on-failure',
+} as const;
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -63,7 +64,7 @@ export default defineConfig({
        (not 'on-first-retry': with retries disabled that would never trigger) */
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    video: isFirstCiAttempt ? 'off' : 'retain-on-failure',
+    video: 'retain-on-failure',
     ignoreHTTPSErrors: true,
 
     /**
