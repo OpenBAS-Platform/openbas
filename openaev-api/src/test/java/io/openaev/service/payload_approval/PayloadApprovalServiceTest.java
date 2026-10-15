@@ -31,6 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class PayloadApprovalServiceTest {
 
   @Mock private PayloadApprovalRepository payloadApprovalRepository;
+  @Mock private PayloadApprovalNotificationService payloadApprovalNotificationService;
   @InjectMocks private PayloadApprovalService service;
 
   private User approver;

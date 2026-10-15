@@ -14,4 +14,8 @@ public interface PayloadApprovalRepository extends CrudRepository<PayloadApprova
 
   /** The latest entry of a payload's approval history. */
   Optional<PayloadApproval> findFirstByPayloadIdOrderByCreatedAtDesc(String payloadId);
+
+  /** The latest entry of a payload with the given status (e.g. who sent it to pending). */
+  Optional<PayloadApproval> findFirstByPayloadIdAndStatusOrderByCreatedAtDesc(
+      String payloadId, io.openaev.database.model.Payload.PAYLOAD_APPROVAL_STATUS status);
 }

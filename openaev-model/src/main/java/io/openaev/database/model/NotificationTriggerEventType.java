@@ -9,5 +9,11 @@ public enum NotificationTriggerEventType {
   CREATE,
   UPDATE,
   DELETE,
-  SCORE_DEGRADATION
+  SCORE_DEGRADATION,
+  // Payload approval notifications: sent by the platform to approvers and authors, never
+  // subscribed to through a trigger (refused by trigger validation).
+  APPROVAL_PENDING,
+  APPROVED,
+  REJECTED,
+  SUPERSEDED
 }

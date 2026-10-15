@@ -137,6 +137,13 @@ public class NotificationTriggerService {
     }
   }
 
+  private static boolean isPlatformOnly(NotificationTriggerEventType eventType) {
+    return switch (eventType) {
+      case APPROVAL_PENDING, APPROVED, REJECTED, SUPERSEDED -> true;
+      case CREATE, UPDATE, DELETE, SCORE_DEGRADATION -> false;
+    };
+  }
+
   private void validate(NotificationTrigger trigger) {
     if (trigger.getType() == NotificationTriggerType.LIVE) {
       if (trigger.getWatchedResourceType() == null
@@ -148,6 +155,12 @@ public class NotificationTriggerService {
       if (trigger.getEventTypes() == null || trigger.getEventTypes().isEmpty()) {
         throw new IllegalArgumentException(
             "Live notification triggers require at least one event type");
+      }
+      // Payload approval operations are sent by the platform to approvers and authors; they
+      // cannot be subscribed to.
+      if (trigger.getEventTypes().stream().anyMatch(NotificationTriggerService::isPlatformOnly)) {
+        throw new IllegalArgumentException(
+            "Payload approval events are sent by the platform and cannot be subscribed to");
       }
       // Score degradation is a scenario-only semantic event
       if (trigger.getEventTypes().contains(NotificationTriggerEventType.SCORE_DEGRADATION)

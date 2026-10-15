@@ -1,5 +1,5 @@
 import { deepPurple, green, indigo, orange, red } from '@mui/material/colors';
-import { BellAlertOutline, BellCogOutline, BellOutline, BellPlusOutline, BellRemoveOutline, FileTableBoxMultipleOutline } from 'mdi-material-ui';
+import { BellAlertOutline, BellCancelOutline, BellCheckOutline, BellCogOutline, BellOutline, BellPlusOutline, BellRemoveOutline, FileTableBoxMultipleOutline } from 'mdi-material-ui';
 import { type ReactNode } from 'react';
 
 import {
@@ -14,6 +14,7 @@ import {
   TEAM_BASE_URL,
 } from '../../../../constants/BaseUrls';
 import { type NotificationOutput } from '../../../../utils/api-types';
+import { ACTION_PARAM } from '../../threat_arsenal/threatArsenalDeepLink';
 
 /** A single matched event inside a notification content group. */
 export interface NotificationEvent {
@@ -54,6 +55,10 @@ export const OPERATION_COLORS: Record<string, string> = {
   UPDATE: deepPurple[500],
   DELETE: red[500],
   SCORE_DEGRADATION: orange[500],
+  APPROVAL_PENDING: orange[500],
+  APPROVED: green[500],
+  REJECTED: red[500],
+  SUPERSEDED: deepPurple[500],
   MULTIPLE: indigo[500],
 };
 
@@ -66,6 +71,10 @@ export const OPERATION_LABELS: Record<string, string> = {
   UPDATE: 'Modification',
   DELETE: 'Deletion',
   SCORE_DEGRADATION: 'Score degradation',
+  APPROVAL_PENDING: 'Pending approval',
+  APPROVED: 'Approved',
+  REJECTED: 'Rejected',
+  SUPERSEDED: 'Superseded',
   MULTIPLE: 'Multiple',
 };
 
@@ -82,7 +91,14 @@ export const operationIcon = (operation: string): ReactNode => {
     case 'DELETE':
       return <BellRemoveOutline style={{ color }} />;
     case 'SCORE_DEGRADATION':
+    case 'APPROVAL_PENDING':
       return <BellAlertOutline style={{ color }} />;
+    case 'APPROVED':
+      return <BellCheckOutline style={{ color }} />;
+    case 'REJECTED':
+      return <BellCancelOutline style={{ color }} />;
+    case 'SUPERSEDED':
+      return <BellCogOutline style={{ color }} />;
     case 'MULTIPLE':
       return <FileTableBoxMultipleOutline style={{ color }} />;
     default:
@@ -103,6 +119,8 @@ const RESOURCE_TYPE_URLS: Record<string, (id: string) => string> = {
   TEAM: id => `${TEAM_BASE_URL}/${id}`,
   PLAYER: id => `${PERSON_BASE_URL}/${id}`,
   SECURITY_PLATFORM: id => `${SECURITY_PLATFORM_BASE_URL}/${id}`,
+  // Payload approval notifications open the action's drawer in the Threat Arsenal.
+  THREAT_ARSENAL: id => `/admin/threat-arsenal?${ACTION_PARAM}=${encodeURIComponent(id)}`,
 };
 
 /**

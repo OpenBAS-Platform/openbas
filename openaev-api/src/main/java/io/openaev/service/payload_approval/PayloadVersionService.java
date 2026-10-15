@@ -9,6 +9,7 @@ import io.openaev.database.model.Executable;
 import io.openaev.database.model.FileDrop;
 import io.openaev.database.model.Payload;
 import io.openaev.database.model.Payload.PAYLOAD_APPROVAL_STATUS;
+import io.openaev.database.model.PayloadApprovalNotification.EVENT;
 import io.openaev.database.model.PayloadExecutableContent;
 import io.openaev.database.model.PayloadVersion;
 import io.openaev.database.model.PayloadVersion.ORIGIN;
@@ -52,6 +53,7 @@ public class PayloadVersionService {
 
   private final PayloadVersionRepository payloadVersionRepository;
   private final PayloadApprovalService payloadApprovalService;
+  private final PayloadApprovalNotificationService payloadApprovalNotificationService;
   private final DocumentService documentService;
 
   /** The executable content of a payload before an edit, to restore it when held back. */
@@ -121,6 +123,10 @@ public class PayloadVersionService {
     version.setStatus(STATUS.PENDING);
     payloadVersionRepository.save(version);
     payload.setPendingVersion(true);
+    if (pending.isEmpty()) {
+      // Approvers are told once; a version replacing a pending one only tells its author.
+      payloadApprovalNotificationService.recordPending(payload, actor, version.getNumber());
+    }
     return true;
   }
 
@@ -155,6 +161,8 @@ public class PayloadVersionService {
     payload.setLastModifiedBy(version.getAuthor());
     decide(version, STATUS.APPROVED, decider, boundedComment);
     payloadApprovalService.recordVersionApproval(payload, decider, boundedComment, version);
+    payloadApprovalNotificationService.recordOutcome(
+        payload, EVENT.APPROVED, decider, version.getAuthor(), version.getNumber(), null);
     return version;
   }
 
@@ -167,7 +175,10 @@ public class PayloadVersionService {
       throw new BadRequestException("A reason is required to reject a version.");
     }
     payload.setPendingVersion(false);
-    return decide(version, STATUS.REJECTED, decider, bounded(trimmed));
+    String boundedReason = bounded(trimmed);
+    payloadApprovalNotificationService.recordOutcome(
+        payload, EVENT.REJECTED, decider, version.getAuthor(), version.getNumber(), boundedReason);
+    return decide(version, STATUS.REJECTED, decider, boundedReason);
   }
 
   /** The pending version of a payload, if any. */
@@ -197,6 +208,13 @@ public class PayloadVersionService {
         .ifPresent(
             previous -> {
               decide(previous, STATUS.SUPERSEDED, actor, null);
+              payloadApprovalNotificationService.recordOutcome(
+                  payload,
+                  EVENT.SUPERSEDED,
+                  actor,
+                  previous.getAuthor(),
+                  previous.getNumber(),
+                  null);
               // Flushed now: Hibernate inserts before it updates, and the new pending version
               // would hit the one-pending-version-per-payload index.
               payloadVersionRepository.flush();
