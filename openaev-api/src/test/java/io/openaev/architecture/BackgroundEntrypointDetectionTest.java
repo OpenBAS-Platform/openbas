@@ -868,7 +868,7 @@ class BackgroundEntrypointDetectionTest {
     // asserted behaviourally instead, through the real endpoint, by
     // DashboardAttackPathIsolationTest.
     Map<String, String> baseline = BackgroundEntrypointTenantScopeArchTest.loadBaseline();
-    assertUntilActive(baseline, "io.openaev.rest.stream.StreamApi", "injects");
+    assertUntilActive(baseline, "io.openaev.service.StreamService", "injects");
   }
 
   private static void assertUntilActive(
