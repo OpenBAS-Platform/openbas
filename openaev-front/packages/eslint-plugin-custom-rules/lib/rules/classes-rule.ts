@@ -146,11 +146,19 @@ const resolveHook = (sourceCode: SourceCode, node: TSESTree.CallExpression): Hoo
   const calls: TSESTree.CallExpression[] = [];
   for (const { identifier } of references) {
     if (identifier.parent.type !== AST_NODE_TYPES.CallExpression || identifier.parent.callee !== identifier) {
-      return { id, variable, calls: null };
+      return {
+        id,
+        variable,
+        calls: null,
+      };
     }
     calls.push(identifier.parent);
   }
-  return { id, variable, calls };
+  return {
+    id,
+    variable,
+    calls,
+  };
 };
 
 export default ESLintUtils.RuleCreator.withoutDocs({
@@ -158,9 +166,7 @@ export default ESLintUtils.RuleCreator.withoutDocs({
     type: 'suggestion',
     fixable: 'code',
     hasSuggestions: true,
-    docs: {
-      description: 'Require tss-react makeStyles hooks to be named useStyles and to define only the classes they use',
-    },
+    docs: { description: 'Require tss-react makeStyles hooks to be named useStyles and to define only the classes they use' },
     messages: {
       name: 'A makeStyles hook used only in its module must be named \'{{expected}}\'.',
       empty: 'makeStyles defines no class.',
@@ -253,7 +259,10 @@ export default ESLintUtils.RuleCreator.withoutDocs({
         }
         const stylesObject = getStylesObject(node.arguments[0]);
         if (stylesObject?.properties.length === 0) {
-          context.report({ node: stylesObject, messageId: 'empty' });
+          context.report({
+            node: stylesObject,
+            messageId: 'empty',
+          });
         }
         const hook = resolveHook(sourceCode, node);
         if (hook.id) {

@@ -1,11 +1,7 @@
 import rule from '../../../lib/rules/classes-rule.ts';
 import RuleTester from '../../rule-tester.ts';
 
-const ruleTester = new RuleTester({
-  languageOptions: {
-    parserOptions: { ecmaFeatures: { jsx: true } },
-  },
-});
+const ruleTester = new RuleTester({ languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } } });
 
 const tss = (code: string) => `import { makeStyles } from 'tss-react/mui';\n${code}`;
 
@@ -190,7 +186,10 @@ const C = () => {
 const useFooStyles = makeStyles()(() => ({ a: {} }));
 const A = () => { const { classes } = useFooStyles(); return classes.a; };
 const B = () => { const { classes } = useFooStyles(); return classes.a; };`),
-      errors: [{ messageId: 'name', data: { expected: 'useStyles' } }],
+      errors: [{
+        messageId: 'name',
+        data: { expected: 'useStyles' },
+      }],
       output: tss(`
 const useStyles = makeStyles()(() => ({ a: {} }));
 const A = () => { const { classes } = useStyles(); return classes.a; };

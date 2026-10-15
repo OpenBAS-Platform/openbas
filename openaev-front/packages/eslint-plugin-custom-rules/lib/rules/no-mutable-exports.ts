@@ -8,12 +8,8 @@ const MUTABLE_KINDS = new Set(['let', 'var']);
 export default ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: 'suggestion',
-    docs: {
-      description: 'Forbid exporting mutable (`let` or `var`) bindings',
-    },
-    messages: {
-      mutable: 'Exporting mutable \'{{kind}}\' binding, use \'const\' instead.',
-    },
+    docs: { description: 'Forbid exporting mutable (`let` or `var`) bindings' },
+    messages: { mutable: 'Exporting mutable \'{{kind}}\' binding, use \'const\' instead.' },
     schema: [],
   },
   defaultOptions: [],
@@ -25,7 +21,11 @@ export default ESLintUtils.RuleCreator.withoutDocs({
     const reportDeclaration = (declaration: TSESTree.Node) => {
       if (declaration.type === AST_NODE_TYPES.VariableDeclaration && MUTABLE_KINDS.has(declaration.kind) && !reported.has(declaration)) {
         reported.add(declaration);
-        context.report({ node: declaration, messageId: 'mutable', data: { kind: declaration.kind } });
+        context.report({
+          node: declaration,
+          messageId: 'mutable',
+          data: { kind: declaration.kind },
+        });
       }
     };
 

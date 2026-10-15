@@ -26,23 +26,38 @@ ruleTester.run('no-mutable-exports', rule, {
   invalid: [
     {
       code: 'export let a = 1;',
-      errors: [{ messageId: 'mutable', data: { kind: 'let' } }],
+      errors: [{
+        messageId: 'mutable',
+        data: { kind: 'let' },
+      }],
     },
     {
       code: 'export var a = 1;',
-      errors: [{ messageId: 'mutable', data: { kind: 'var' } }],
+      errors: [{
+        messageId: 'mutable',
+        data: { kind: 'var' },
+      }],
     },
     {
       code: 'let a = 1; export { a };',
-      errors: [{ messageId: 'mutable', data: { kind: 'let' } }],
+      errors: [{
+        messageId: 'mutable',
+        data: { kind: 'let' },
+      }],
     },
     {
       code: 'var a = 1; export { a as b };',
-      errors: [{ messageId: 'mutable', data: { kind: 'var' } }],
+      errors: [{
+        messageId: 'mutable',
+        data: { kind: 'var' },
+      }],
     },
     {
       code: 'let a = 1; export default a;',
-      errors: [{ messageId: 'mutable', data: { kind: 'let' } }],
+      errors: [{
+        messageId: 'mutable',
+        data: { kind: 'let' },
+      }],
     },
     {
       code: 'let a = 1, b = 2; export { a, b };',
@@ -54,7 +69,10 @@ ruleTester.run('no-mutable-exports', rule, {
     },
     {
       code: 'export let a: string = \'\';',
-      errors: [{ messageId: 'mutable', data: { kind: 'let' } }],
+      errors: [{
+        messageId: 'mutable',
+        data: { kind: 'let' },
+      }],
     },
   ],
 });

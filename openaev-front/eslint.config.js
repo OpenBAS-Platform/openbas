@@ -179,7 +179,6 @@ export default [
     ignores: [
       'node_modules',
       'coverage',
-      'packages',
       'public',
       'src/static/ext',
       'builder/prod/build',

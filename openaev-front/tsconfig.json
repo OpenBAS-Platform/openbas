@@ -21,6 +21,11 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
+  // the default "**/*" skips dot files
+  "include": [
+    "**/*",
+    ".dependency-cruiser.ts"
+  ],
   "exclude": [
     "node_modules",
     "coverage",
