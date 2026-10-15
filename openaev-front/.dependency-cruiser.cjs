@@ -15,7 +15,6 @@ const DEV_FILES = [
   '^eslint\\.config\\.js$',
   '^knip\\.ts$',
   '^\\.dependency-cruiser\\.cjs$',
-  '^builder/',
   '^scripts/',
 ];
 
@@ -68,7 +67,6 @@ module.exports = {
     doNotFollow: { path: ['node_modules'] },
     exclude: {
       path: [
-        '^builder/[^/]+/build/',
         '__generated__',
         '^src/static/ext/',
         '^coverage/',

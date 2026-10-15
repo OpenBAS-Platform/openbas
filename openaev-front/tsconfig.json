@@ -26,7 +26,6 @@
     "coverage",
     "packages",
     "public",
-    "builder/dev/build",
     "builder/prod/build",
     "src/static/ext/*",
     "vite.config.ts",

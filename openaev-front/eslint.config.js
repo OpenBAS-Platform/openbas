@@ -187,7 +187,6 @@ export default [
       'public',
       'src/static/ext',
       'builder/prod/build',
-      'builder/dev/build',
       '__generated__',
       // fds-migration bridge (filigran-design-system pnpm generate:mui-bridge) —
       // pure generated data, regenerate upstream instead of hand-fixing lint
