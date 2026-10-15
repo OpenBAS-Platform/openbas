@@ -8,14 +8,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sun.net.httpserver.HttpServer;
+import io.openaev.security.ssrf.PublicOnlyDnsResolver;
+import io.openaev.security.ssrf.TimeoutHostResolver;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -199,5 +204,39 @@ class ExternalResourceFetcherTest {
   void refuses_a_resource_larger_than_the_limit() {
     assertThrows(
         IOException.class, () -> this.fetcher.fetch("GET", url("public.test", "/huge"), Map.of()));
+  }
+
+  @Test
+  void fails_fast_when_dns_never_answers_instead_of_holding_the_caller() throws Exception {
+    // The fetch runs on the browser driver's dispatch thread: a DNS server that never answers must
+    // fail the request after the lookup timeout, not after the operating system's own patience.
+    CountDownLatch dnsNeverAnswers = new CountDownLatch(1);
+    ExternalResourceFetcher stuckDnsFetcher =
+        new ExternalResourceFetcher(
+            new PublicOnlyDnsResolver(
+                new TimeoutHostResolver(
+                    host -> {
+                      try {
+                        dnsNeverAnswers.await();
+                      } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                      }
+                      return new InetAddress[0];
+                    },
+                    Duration.ofMillis(200),
+                    2)),
+            MAX_BODY_BYTES);
+    try {
+      long start = System.nanoTime();
+      assertThrows(
+          UnknownHostException.class,
+          () -> stuckDnsFetcher.fetch("GET", "http://slow-dns.example.com/logo.png", Map.of()));
+      long elapsedMillis = Duration.ofNanos(System.nanoTime() - start).toMillis();
+
+      assertTrue(elapsedMillis < 2_000, "released after the lookup timeout: " + elapsedMillis);
+    } finally {
+      dnsNeverAnswers.countDown();
+      stuckDnsFetcher.close();
+    }
   }
 }

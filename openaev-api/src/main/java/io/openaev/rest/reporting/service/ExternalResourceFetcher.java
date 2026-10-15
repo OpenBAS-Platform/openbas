@@ -1,10 +1,12 @@
 package io.openaev.rest.reporting.service;
 
 import io.openaev.security.ssrf.PublicOnlyDnsResolver;
+import io.openaev.security.ssrf.TimeoutHostResolver;
 import jakarta.annotation.PreDestroy;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Locale;
@@ -44,7 +46,9 @@ import org.springframework.stereotype.Component;
  * browser is left with nothing to follow.
  *
  * <p>The client carries no cookies, no credentials and no proxy configuration, and forwards only
- * the request headers that make sense for a resource fetch.
+ * the request headers that make sense for a resource fetch. Nothing it does may hold the browser
+ * driver's dispatch thread for long: connection, reads, the whole body and the DNS lookup are each
+ * bounded, and a lookup that exceeds its timeout fails the fetch like an unresolvable host.
  */
 @Component
 public class ExternalResourceFetcher {
@@ -54,6 +58,16 @@ public class ExternalResourceFetcher {
 
   private static final Timeout CONNECT_TIMEOUT = Timeout.ofSeconds(5);
   private static final Timeout SOCKET_TIMEOUT = Timeout.ofSeconds(15);
+
+  /**
+   * How long a host lookup may block. The fetch runs on the browser driver's dispatch thread, which
+   * serves every request of the render: an unbounded lookup (the operating system resolver gives up
+   * after many seconds) would stall them all.
+   */
+  private static final Duration DNS_LOOKUP_TIMEOUT = Duration.ofSeconds(3);
+
+  /** Lookups allowed to wait on DNS at once; beyond that they are refused, not queued. */
+  private static final int MAX_CONCURRENT_DNS_LOOKUPS = 8;
 
   /** Wall-clock budget for reading a whole body: the socket timeout only bounds each read. */
   private static final Duration BODY_TIMEOUT = Duration.ofSeconds(30);
@@ -103,7 +117,11 @@ public class ExternalResourceFetcher {
 
   @Autowired
   public ExternalResourceFetcher() {
-    this(new PublicOnlyDnsResolver(), DEFAULT_MAX_BODY_BYTES);
+    this(
+        new PublicOnlyDnsResolver(
+            new TimeoutHostResolver(
+                InetAddress::getAllByName, DNS_LOOKUP_TIMEOUT, MAX_CONCURRENT_DNS_LOOKUPS)),
+        DEFAULT_MAX_BODY_BYTES);
   }
 
   /** Package-private so tests can reach a local server and use a small size limit. */
