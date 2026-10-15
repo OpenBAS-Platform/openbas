@@ -162,7 +162,10 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart, autonomousRun = null, 
       // @ts-expect-error: should pass Exercise model IF we have update as action
       exercise={exercise}
       actions={isScenarioChaining ? ['Export', 'Delete'] : ['Duplicate', 'Export', 'Delete']}
-      onDelete={result => setExercises(exercises.filter(e => (e.exercise_id !== result)))}
+      onDelete={(result) => {
+        setExercises(exercises.filter(e => (e.exercise_id !== result)));
+        queryableHelpers.paginationHelpers.incrementTotalElements(-1);
+      }}
       inList
     />
   );

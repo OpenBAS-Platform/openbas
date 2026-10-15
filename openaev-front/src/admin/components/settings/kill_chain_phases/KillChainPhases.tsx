@@ -92,7 +92,11 @@ const KillChainPhases = () => {
 
   return (
     <div style={{ display: 'flex' }}>
-      <div style={{ flexGrow: 1 }}>
+      <div style={{
+        flexGrow: 1,
+        minWidth: 0,
+      }}
+      >
         <Breadcrumbs
           variant="list"
           elements={[{ label: t(SETTINGS_LABEL) }, { label: t('Taxonomies') }, {
@@ -114,7 +118,10 @@ const KillChainPhases = () => {
               />
               <Can I={ACTIONS.MANAGE} a={SUBJECTS.TENANT_SETTINGS}>
                 <CreateKillChainPhase
-                  onCreate={(result: KillChainPhase) => setKillChainPhases(prev => [result, ...prev])}
+                  onCreate={(result: KillChainPhase) => {
+                    setKillChainPhases(prev => [result, ...prev]);
+                    queryableHelpers.paginationHelpers.incrementTotalElements(1);
+                  }}
                 />
               </Can>
             </Box>
@@ -151,7 +158,10 @@ const KillChainPhases = () => {
                     <KillChainPhasePopover
                       killChainPhase={killChainPhase}
                       onUpdate={(result: KillChainPhase) => setKillChainPhases(prev => prev.map(k => (k.phase_id !== result.phase_id ? k : result)))}
-                      onDelete={(result: string) => setKillChainPhases(prev => prev.filter(k => (k.phase_id !== result)))}
+                      onDelete={(result: string) => {
+                        setKillChainPhases(prev => prev.filter(k => (k.phase_id !== result)));
+                        queryableHelpers.paginationHelpers.incrementTotalElements(-1);
+                      }}
                     />
                   )}
                 />

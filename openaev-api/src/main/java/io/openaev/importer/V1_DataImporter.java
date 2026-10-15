@@ -30,6 +30,7 @@ import io.openaev.ee.EnterpriseEditionException;
 import io.openaev.ee.EnterpriseEditionService;
 import io.openaev.injectors.challenge.model.ChallengeContent;
 import io.openaev.injectors.channel.model.ChannelContent;
+import io.openaev.rest.document.DocumentService;
 import io.openaev.rest.domain.DomainService;
 import io.openaev.rest.domain.enums.PresetDomain;
 import io.openaev.rest.exercise.exports.VariableWithValueMixin;
@@ -485,12 +486,15 @@ public class V1_DataImporter implements Importer {
   }
 
   /**
-   * Upserts a {@link Domain} from an object-shaped JSON node (find-by-name or create). Shared by
-   * {@link #importDomains} (object-format entries) and {@link
-   * #resolveInjectContractDomainsFromInjectFormat} so the upsert logic is defined once.
+   * Upserts a {@link Domain} from an object-shaped JSON node (find by name or matching key, or
+   * create, see {@link DomainService#upsert(String, String, Tenant)}). Shared by {@link
+   * #importDomains} (object-format entries) and {@link
+   * #resolveInjectContractDomainsFromInjectFormat} so the upsert logic is defined once. A legacy
+   * spelling of a preset ("Table-Top") resolves to the preset ("Tabletop").
    *
    * @param nodeDomain an object node carrying {@code domain_name} and {@code domain_color}
-   * @return the existing (matched by name) or newly created domain for the current tenant
+   * @return the existing (matched by name or matching key) or newly created domain for the current
+   *     tenant
    */
   private Domain upsertDomainFromNode(JsonNode nodeDomain) {
     return this.domainService.upsert(
@@ -1007,7 +1011,7 @@ public class V1_DataImporter implements Importer {
     Document document = new Document();
     document.setTenant(new Tenant(writeTenant));
     document.setTarget(target);
-    document.setName(nodeDoc.get("document_name").textValue());
+    document.setName(DocumentService.safeFileName(nodeDoc.get("document_name").textValue()));
     document.setDescription(nodeDoc.get("document_description").textValue());
     if (savedExercise != null) {
       document.setExercises(new HashSet<>(Set.of(savedExercise)));

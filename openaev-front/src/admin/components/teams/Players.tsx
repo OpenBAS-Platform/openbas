@@ -197,9 +197,7 @@ const Players = () => {
               <CreatePlayer
                 onCreate={(result) => {
                   setPlayers([result, ...players]);
-                  queryableHelpers.paginationHelpers.handleChangeTotalElements(
-                    queryableHelpers.paginationHelpers.getTotalElements() + 1,
-                  );
+                  queryableHelpers.paginationHelpers.incrementTotalElements(1);
                 }}
               />
             </Can>
@@ -275,9 +273,7 @@ const Players = () => {
                       : p)))}
                     onDelete={(result) => {
                       setPlayers(players.filter(p => (p.user_id !== result)));
-                      queryableHelpers.paginationHelpers.handleChangeTotalElements(
-                        Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - 1),
-                      );
+                      queryableHelpers.paginationHelpers.incrementTotalElements(-1);
                     }}
                   />
                 )}

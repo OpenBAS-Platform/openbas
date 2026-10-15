@@ -82,11 +82,13 @@ const CustomDashboards = () => {
     [],
   );
 
+  const { incrementTotalElements } = queryableHelpers.paginationHelpers;
   const handleDelete = useCallback(
     (id: string) => {
       setCustomDashboards(prev => prev.filter(d => d.custom_dashboard_id !== id));
+      incrementTotalElements(-1);
     },
-    [],
+    [incrementTotalElements],
   );
 
   const [viewMode, setViewMode] = useState<ViewMode>(readViewMode);
