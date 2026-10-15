@@ -134,7 +134,12 @@ const Notifiers = () => {
           entityPrefix="notifier"
           topBarButtons={(
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.TENANT_SETTINGS}>
-              <NotifierCreate onCreate={result => setNotifiers([...notifiers, result])} />
+              <NotifierCreate
+                onCreate={(result) => {
+                  setNotifiers([...notifiers, result]);
+                  queryableHelpers.paginationHelpers.incrementTotalElements(1);
+                }}
+              />
             </Can>
           )}
         />
@@ -165,7 +170,10 @@ const Notifiers = () => {
                   onUpdate={result => setNotifiers(notifiers.map(existing => (
                     existing.notifier_id !== result.notifier_id ? existing : result
                   )))}
-                  onDelete={result => setNotifiers(notifiers.filter(existing => existing.notifier_id !== result))}
+                  onDelete={(result) => {
+                    setNotifiers(notifiers.filter(existing => existing.notifier_id !== result));
+                    queryableHelpers.paginationHelpers.incrementTotalElements(-1);
+                  }}
                 />
               )}
               divider

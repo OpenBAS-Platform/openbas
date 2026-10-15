@@ -106,7 +106,10 @@ const Vulnerabilities = () => {
           topBarButtons={(
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.TENANT_SETTINGS}>
               <CreateVulnerability
-                onCreate={(result: VulnerabilitySimple) => setVulnerabilities([result, ...vulnerabilities])}
+                onCreate={(result: VulnerabilitySimple) => {
+                  setVulnerabilities([result, ...vulnerabilities]);
+                  queryableHelpers.paginationHelpers.incrementTotalElements(1);
+                }}
               />
             </Can>
           )}
@@ -138,7 +141,10 @@ const Vulnerabilities = () => {
                 <VulnerabilityPopover
                   vulnerability={vulnerability}
                   onUpdate={(result: VulnerabilitySimple) => setVulnerabilities(vulnerabilities.map(a => (a.vulnerability_id !== result.vulnerability_id ? a : result)))}
-                  onDelete={(result: string) => setVulnerabilities(vulnerabilities.filter(a => (a.vulnerability_id !== result)))}
+                  onDelete={(result: string) => {
+                    setVulnerabilities(vulnerabilities.filter(a => (a.vulnerability_id !== result)));
+                    queryableHelpers.paginationHelpers.incrementTotalElements(-1);
+                  }}
                 />
               )}
             >

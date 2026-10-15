@@ -99,6 +99,7 @@ const Endpoints = () => {
   ];
 
   const [endpoints, setEndpoints] = useState<EndpointOutput[]>([]);
+  const [reloadCount, setReloadCount] = useState<number>(0);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('asset', buildSearchPagination({
     sorts: initSorting('asset_name'),
     textSearch: search,
@@ -259,6 +260,7 @@ const Endpoints = () => {
         fetch={searchEndpointsToLoad}
         searchPaginationInput={searchPaginationInput}
         setContent={setEndpoints}
+        reloadContentCount={reloadCount}
         entityPrefix="asset"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
@@ -277,7 +279,14 @@ const Endpoints = () => {
               </Can>
             </Box>
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
-              <EndpointCreation onCreate={result => setEndpoints([result as EndpointOutput, ...endpoints])} agentless={true} />
+              <EndpointCreation
+                onCreate={(result) => {
+                  setEndpoints([result as EndpointOutput, ...endpoints]);
+                  queryableHelpers.paginationHelpers.incrementTotalElements(1);
+                }}
+                onAiTargetCreate={() => setReloadCount(count => count + 1)}
+                agentless={true}
+              />
             </Can>
           </Box>
         )}
@@ -348,7 +357,10 @@ const Endpoints = () => {
                         endpoint={{ ...endpoint }}
                         agentless={endpoint.asset_agents?.length === 0}
                         onUpdate={result => setEndpoints(endpoints.map(e => (e.asset_id !== result.asset_id ? e : result as EndpointOutput)))}
-                        onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
+                        onDelete={(result) => {
+                          setEndpoints(endpoints.filter(e => (e.asset_id !== result)));
+                          queryableHelpers.paginationHelpers.incrementTotalElements(-1);
+                        }}
                       />
                     )}
                     disablePadding
