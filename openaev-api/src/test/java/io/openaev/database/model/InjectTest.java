@@ -17,9 +17,9 @@ import io.openaev.utils.fixtures.composers.PauseComposer;
 import io.openaev.utils.fixtures.composers.ScenarioComposer;
 import io.openaev.utilstest.RabbitMQTestListener;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,19 +49,19 @@ public class InjectTest extends IntegrationTest {
     @DisplayName("Inject sorting is stable")
     public void stableSort() {
       List<InjectComposer.Composer> injectsCollectionA =
-          Arrays.stream(new String[500])
-              .map(
+          IntStream.range(1, 500)
+              .mapToObj(
                   it ->
                       injectComposer.forInject(
                           () -> {
                             Inject i = InjectFixture.getDefaultInject();
-                            i.setDependsDuration(randomUtils.getRandomLong(0, 100));
+                            i.setDependsDuration((long) it % 10);
                             return i;
                           }))
               .toList();
       List<InjectComposer.Composer> injectsCollectionB =
-          Arrays.stream(new String[1000])
-              .map(it -> injectComposer.forInject(InjectFixture.getDefaultInject()))
+          IntStream.range(1, 1000)
+              .mapToObj(it -> injectComposer.forInject(InjectFixture.getDefaultInject()))
               .toList();
       ExerciseComposer.Composer exerciseWrapper =
           exerciseComposer
