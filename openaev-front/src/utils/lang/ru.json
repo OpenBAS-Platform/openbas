@@ -29,6 +29,7 @@
   "{count} managed assets": "{count} активов под управлением",
   "{count} members": "Участники {count}",
   "{count} more occurrences in this time bucket": "Ещё {count} вхождений в этом интервале времени",
+  "{count} occurrences": "Вхождений: {count}",
   "{count} of {total} injects use expectations that no longer match the validation requirements defined by their actions.": "{count} из {total} инъектов используют ожидания, которые больше не соответствуют требованиям валидации, определённым их действиями.",
   "{count} of {total} injects use expectations that no longer match the validation requirements defined by their threat arsenal items.": "{count} из {total} инъектов используют ожидания, которые больше не соответствуют требованиям валидации, определённым их элементами арсенала.",
   "{count} players": "{count} игроков",

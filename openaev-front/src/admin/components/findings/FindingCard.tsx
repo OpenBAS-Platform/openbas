@@ -1,13 +1,16 @@
+import { Chip, type ChipSeverity, Tooltip, TooltipContent, TooltipTrigger } from '@filigran/design-system';
 import { CheckCircleOutlined, RadioButtonUncheckedOutlined } from '@mui/icons-material';
-import { Box, Card, CardActionArea, Checkbox, Chip, Tooltip, Typography } from '@mui/material';
+import { Box, Card, CardActionArea, CardContent, Checkbox, Stack, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { type MouseEvent } from 'react';
+import moment from 'moment-timezone';
+import { type MouseEvent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import FindingIcon from '../../../components/FindingIcon';
 import { useFormatter } from '../../../components/i18n';
+import prowlerIcon from '../../../static/images/prowler.png';
 import { type AggregatedFindingOutput } from '../../../utils/api-types';
-import FindingTriageControl from './FindingTriageControl';
+import { buildTenantApiPath } from '../../../utils/url-helper';
 import getFindingTypeLabel from './FindingTypeLabel';
 
 type CardFinding = AggregatedFindingOutput & {
@@ -17,21 +20,41 @@ type CardFinding = AggregatedFindingOutput & {
   finding_occurrences?: number;
 };
 
-const severityAccent = (severity: string | null | undefined, fallback: string): string => {
-  switch (severity?.toLowerCase()) {
-    case 'critical':
-      return '#f44336';
-    case 'high':
-      return '#ff9800';
-    case 'medium':
-      return '#facc15';
-    case 'low':
-      return '#4caf50';
-    case 'unknown':
-      return '#607d8b';
-    default:
-      return fallback;
+// Severity is the only colored element of the card, carried by its chip.
+const SEVERITY_CHIP: Record<string, ChipSeverity> = {
+  critical: 'critical',
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+};
+
+// Logo of the scanner that produced the Finding, like the connector logo of an Integration card:
+// Prowler ships its own image, other injectors serve theirs, and the type icon is the fallback.
+const SourceLogo = ({ finding }: { finding: CardFinding }) => {
+  const [failed, setFailed] = useState(false);
+  const source = finding.finding_source;
+  const isProwler = [source?.injector_name, source?.injector_type]
+    .some(value => value?.toLowerCase().includes('prowler'));
+  const logoSrc = isProwler
+    ? prowlerIcon
+    : source?.injector_type && buildTenantApiPath(`/api/injectors/${source.injector_type}/image`);
+
+  if (!logoSrc || failed) {
+    return <FindingIcon findingType={finding.finding_type} />;
   }
+  return (
+    <img
+      src={logoSrc}
+      alt={source?.injector_name ?? ''}
+      onError={() => setFailed(true)}
+      style={{
+        width: 40,
+        height: 40,
+        objectFit: 'contain',
+        borderRadius: 4,
+      }}
+    />
+  );
 };
 
 interface Props {
@@ -39,188 +62,213 @@ interface Props {
   checked: boolean;
   anySelected: boolean;
   onToggleEntity: (event: MouseEvent<HTMLElement>) => void;
-  onTriageChange: (status: NonNullable<AggregatedFindingOutput['finding_triage_status']>) => void;
 }
 
-const FindingCard = ({ finding, checked, anySelected, onToggleEntity, onTriageChange }: Props) => {
+const FindingCard = ({ finding, checked, anySelected, onToggleEntity }: Props) => {
   const { t, nsdt } = useFormatter();
   const theme = useTheme();
   const navigate = useNavigate();
-  const accent = severityAccent(finding.finding_severity, theme.palette.primary.main);
   const showCheckbox = checked || anySelected;
-  const location = finding.finding_location ?? finding.finding_location_key;
+
+  const locations = (finding.finding_location ?? finding.finding_location_key ?? '')
+    .split(', ')
+    .filter(location => location.length > 0);
+  const severity = finding.finding_severity?.toLowerCase();
+  const triageStatus = finding.finding_triage_status ?? 'UNTRIAGED';
 
   return (
-    <Card
-      variant="outlined"
+    // Same frame as the Integrations catalog card (CatalogConnectorCard): neutral surface,
+    // lift and primary glow on hover.
+    <Box
       data-testid="finding-card"
       sx={{
-        'position': 'relative',
-        'display': 'flex',
         'height': '100%',
-        'flexDirection': 'column',
-        'overflow': 'hidden',
-        'borderRadius': 1,
-        'borderColor': checked ? accent : theme.palette.divider,
-        'transition': theme.transitions.create(['border-color', 'box-shadow', 'transform']),
-        '&:hover': {
-          borderColor: alpha(accent, 0.3),
-          boxShadow: `0 0 30px ${alpha(accent, 0.12)}`,
+        '& .MuiCard-root': {
+          border: `1px solid ${checked ? theme.palette.primary.main : alpha(theme.palette.text.primary, 0.08)}`,
+          transition: 'transform 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+        },
+        '&:hover .MuiCard-root': {
           transform: 'translateY(-2px)',
+          borderColor: alpha(theme.palette.primary.main, 0.3),
+          boxShadow: `0 0 30px ${alpha(theme.palette.primary.main, 0.12)}`,
         },
         '&:hover .finding-card-checkbox': { opacity: 1 },
-        '& .MuiSvgIcon-root': { color: accent },
       }}
     >
-      <Box
-        aria-hidden
+      <Card
+        variant="outlined"
         sx={{
-          position: 'relative',
-          height: 58,
-          borderBottom: `1px solid ${alpha(accent, 0.18)}`,
-          background: `linear-gradient(135deg, ${alpha(accent, 0.2)} 0%, ${alpha(accent, 0.03)} 100%)`,
-        }}
-      >
-        <Box sx={{
-          position: 'absolute',
-          bottom: -20,
-          left: 16,
+          height: 220,
+          borderRadius: 1,
           display: 'flex',
-          width: 40,
-          height: 40,
-          alignItems: 'center',
-          justifyContent: 'center',
-          border: `1px solid ${alpha(accent, 0.35)}`,
-          borderRadius: 1.5,
-          backgroundColor: 'background.paper',
-          boxShadow: `0 4px 12px -4px ${alpha(accent, 0.4)}`,
-        }}
-        >
-          <FindingIcon findingType={finding.finding_type} />
-        </Box>
-        {finding.finding_severity && (
-          <Chip
-            label={finding.finding_severity}
-            size="small"
-            sx={{
-              position: 'absolute',
-              top: 12,
-              right: 12,
-              height: 22,
-              border: `1px solid ${alpha(accent, 0.45)}`,
-              backgroundColor: alpha(accent, 0.2),
-              color: accent,
-              fontSize: 10,
-              fontWeight: 700,
-              textTransform: 'uppercase',
-            }}
-          />
-        )}
-      </Box>
-      <Box
-        className="finding-card-checkbox"
-        onClick={(event) => {
-          event.stopPropagation();
-          onToggleEntity(event);
-        }}
-        sx={{
-          'position': 'absolute',
-          'top': 8,
-          'left': 8,
-          'zIndex': 2,
-          'opacity': showCheckbox ? 1 : 0,
-          'transition': theme.transitions.create('opacity'),
-          '& .MuiCheckbox-root': {
-            color: alpha('#fff', 0.85),
-            padding: 0.5,
-          },
+          backgroundColor: theme.palette.mode === 'dark' ? theme.palette.background.secondary : undefined,
         }}
       >
-        <Checkbox
-          checked={checked}
-          disableRipple
-          size="small"
-          icon={<RadioButtonUncheckedOutlined />}
-          checkedIcon={<CheckCircleOutlined />}
-          slotProps={{ input: { 'aria-label': finding.finding_value } }}
-        />
-      </Box>
-      <CardActionArea
-        onClick={() => navigate(`/admin/findings/${finding.finding_id}`)}
-        sx={{
-          display: 'flex',
-          flex: 1,
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
-          gap: 1,
-          paddingTop: 3.5,
-          paddingInline: 2,
-          paddingBottom: 2,
-        }}
-      >
-        <Tooltip title={finding.finding_value}>
-          <Typography sx={{
-            minHeight: 38,
-            overflow: 'hidden',
-            fontFamily: 'Consolas, monaco, monospace',
-            fontSize: 13.5,
-            fontWeight: 600,
-            lineHeight: 1.4,
-            textOverflow: 'ellipsis',
-            wordBreak: 'break-word',
-          }}
-          >
-            {finding.finding_value}
-          </Typography>
-        </Tooltip>
-        <Typography variant="caption" color="text.secondary">
-          {getFindingTypeLabel(t, finding.finding_type, finding.finding_cloud_provider)}
-        </Typography>
-        <Typography
-          variant="body2"
+        <CardActionArea
+          onClick={() => navigate(`/admin/findings/${finding.finding_id}`)}
           sx={{
-            overflow: 'hidden',
-            minHeight: 20,
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            display: 'flex',
+            alignItems: 'stretch',
           }}
         >
-          {location ?? t('No asset')}
-        </Typography>
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 1,
-          marginTop: 'auto',
-          paddingTop: 1,
-        }}
-        >
-          <Typography variant="caption" color="text.secondary">
-            {t('{count} occurrences', { count: finding.finding_occurrences ?? 0 })}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {nsdt(finding.finding_updated_at)}
-          </Typography>
-        </Box>
-      </CardActionArea>
-      <Box
-        onClick={event => event.stopPropagation()}
-        sx={{
-          borderTop: `1px solid ${theme.palette.divider}`,
-          padding: 1,
-        }}
-      >
-        <FindingTriageControl
-          variant="inList"
-          findingId={finding.finding_id}
-          legacyFindingId={finding.finding_legacy_id}
-          status={finding.finding_triage_status}
-          onStatusChange={onTriageChange}
-        />
-      </Box>
-    </Card>
+          <CardContent
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+              padding: 3,
+              height: '100%',
+              width: '100%',
+            }}
+          >
+            <Stack direction="row" gap={1.5} alignItems="flex-start" sx={{ width: '100%' }}>
+              <Box
+                sx={{
+                  width: 56,
+                  height: 56,
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 1,
+                  backgroundColor: alpha(theme.palette.text.primary, 0.04),
+                }}
+              >
+                <SourceLogo finding={finding} />
+              </Box>
+              <Box sx={{
+                flex: 1,
+                minWidth: 0,
+              }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'primary.main',
+                    fontSize: 12,
+                    fontWeight: 500,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    marginBottom: 0.5,
+                  }}
+                >
+                  {getFindingTypeLabel(t, finding.finding_type, finding.finding_cloud_provider)}
+                </Typography>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Typography
+                      sx={{
+                        fontSize: 15,
+                        fontWeight: 600,
+                        lineHeight: 1.35,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        wordBreak: 'break-word',
+                      }}
+                    >
+                      {finding.finding_value}
+                    </Typography>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="start">{finding.finding_value}</TooltipContent>
+                </Tooltip>
+              </Box>
+              {/* Selection, where the Integration card shows its support icon: visible on hover or
+                  as soon as one card is selected. */}
+              <Box
+                className="finding-card-checkbox"
+                onMouseDown={event => event.stopPropagation()}
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  onToggleEntity(event);
+                }}
+                sx={{
+                  flexShrink: 0,
+                  marginTop: -0.75,
+                  marginRight: -0.75,
+                  opacity: showCheckbox ? 1 : 0,
+                  transition: theme.transitions.create('opacity'),
+                }}
+              >
+                <Checkbox
+                  checked={checked}
+                  disableRipple
+                  size="small"
+                  icon={<RadioButtonUncheckedOutlined />}
+                  checkedIcon={<CheckCircleOutlined />}
+                  slotProps={{ input: { 'aria-label': finding.finding_value } }}
+                />
+              </Box>
+            </Stack>
+
+            <Box sx={{
+              flexGrow: 1,
+              overflow: 'hidden',
+              width: '100%',
+            }}
+            >
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                  lineHeight: 1.5,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {locations.length === 0
+                  ? t('No asset')
+                  : `${locations[0]}${locations.length > 1 ? ` +${locations.length - 1}` : ''}`}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                {t('{count} occurrences', { count: finding.finding_occurrences ?? 0 })}
+              </Typography>
+            </Box>
+
+            {/* Footer: severity and triage chips on the left, last detection on the right -
+                the Integration card's use-case chips | status layout. */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: theme.spacing(1),
+              width: '100%',
+            }}
+            >
+              <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
+                {finding.finding_severity && (
+                  <Chip
+                    label={finding.finding_severity.toUpperCase()}
+                    severity={(severity ? SEVERITY_CHIP[severity] : undefined) ?? 'neutral'}
+                  />
+                )}
+                <Chip label={t(triageStatus)} />
+              </Stack>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      marginLeft: 'auto',
+                      flexShrink: 0,
+                      color: 'text.secondary',
+                      fontSize: 12,
+                    }}
+                  >
+                    {moment(finding.finding_updated_at).fromNow()}
+                  </Typography>
+                </TooltipTrigger>
+                <TooltipContent>{`${t('Last seen')}: ${nsdt(finding.finding_updated_at)}`}</TooltipContent>
+              </Tooltip>
+            </div>
+          </CardContent>
+        </CardActionArea>
+      </Card>
+    </Box>
   );
 };
 

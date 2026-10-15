@@ -29,6 +29,7 @@
   "{count} managed assets": "{count} managed assets",
   "{count} members": "{count} members",
   "{count} more occurrences in this time bucket": "{count} more occurrences in this time bucket",
+  "{count} occurrences": "{count} occurrences",
   "{count} of {total} injects use expectations that no longer match the validation requirements defined by their actions.": "{count} of {total} injects use expectations that no longer match the validation requirements defined by their actions.",
   "{count} of {total} injects use expectations that no longer match the validation requirements defined by their threat arsenal items.": "{count} of {total} injects use expectations that no longer match the validation requirements defined by their threat arsenal items.",
   "{count} players": "{count} players",

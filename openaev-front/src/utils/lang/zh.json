@@ -29,6 +29,7 @@
   "{count} managed assets": "{count} 管理资产",
   "{count} members": "{count} 成员",
   "{count} more occurrences in this time bucket": "此时间段内还有{count}次出现",
+  "{count} occurrences": "{count} 次出现",
   "{count} of {total} injects use expectations that no longer match the validation requirements defined by their actions.": "{total} 个注入中有 {count} 个使用的期望不再符合其动作定义的验证要求。",
   "{count} of {total} injects use expectations that no longer match the validation requirements defined by their threat arsenal items.": "{total} 个注入中有 {count} 个使用的期望不再符合其武器库条目定义的验证要求。",
   "{count} players": "{count} 名玩家",

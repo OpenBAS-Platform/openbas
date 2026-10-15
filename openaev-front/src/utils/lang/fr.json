@@ -29,6 +29,7 @@
   "{count} managed assets": "{count} actifs gérés",
   "{count} members": "{count} membres",
   "{count} more occurrences in this time bucket": "{count} occurrences supplémentaires dans cet intervalle",
+  "{count} occurrences": "{count} occurrences",
   "{count} of {total} injects use expectations that no longer match the validation requirements defined by their actions.": "{count} stimulis sur {total} utilisent des attentes qui ne correspondent plus aux exigences de validation définies par leurs actions.",
   "{count} of {total} injects use expectations that no longer match the validation requirements defined by their threat arsenal items.": "{count} stimulis sur {total} utilisent des attentes qui ne correspondent plus aux exigences de validation définies par leurs éléments de l’arsenal.",
   "{count} players": "{count} joueurs",

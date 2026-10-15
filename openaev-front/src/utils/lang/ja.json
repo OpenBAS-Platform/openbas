@@ -29,6 +29,7 @@
   "{count} managed assets": "{count} 件の管理対象アセット",
   "{count} members": "{count} メンバー",
   "{count} more occurrences in this time bucket": "この時間帯にさらに{count}件の発生",
+  "{count} occurrences": "{count} 件の発生",
   "{count} of {total} injects use expectations that no longer match the validation requirements defined by their actions.": "{total} 件中 {count} 件のインジェクトが、アクションで定義された検証要件と一致しない期待値を使用しています。",
   "{count} of {total} injects use expectations that no longer match the validation requirements defined by their threat arsenal items.": "{total} 件中 {count} 件のインジェクトが、脅威アーセナルアイテムで定義された検証要件と一致しない期待値を使用しています。",
   "{count} players": "{count} 人の人物",

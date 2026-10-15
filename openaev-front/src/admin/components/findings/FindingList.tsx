@@ -764,7 +764,13 @@ const FindingList = ({ searchDistinctFindings, filterLocalStorageKey, contextId,
         : (
             <Box sx={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              // Same breakpoints as the Integrations catalog grid.
+              gridTemplateColumns: {
+                xs: 'minmax(0, 1fr)',
+                sm: 'repeat(2, minmax(0, 1fr))',
+                lg: 'repeat(3, minmax(0, 1fr))',
+                xl: 'repeat(4, minmax(0, 1fr))',
+              },
               gap: 2,
             }}
             >
@@ -778,15 +784,6 @@ const FindingList = ({ searchDistinctFindings, filterLocalStorageKey, contextId,
                   }
                   anySelected={numberOfSelectedElements > 0}
                   onToggleEntity={event => onToggleEntity(finding, event)}
-                  onTriageChange={(newStatus) => {
-                    setFindings(current => current.map(currentFinding =>
-                      currentFinding.finding_id === finding.finding_id
-                        ? {
-                            ...currentFinding,
-                            finding_triage_status: newStatus,
-                          }
-                        : currentFinding));
-                  }}
                 />
               ))}
             </Box>

@@ -29,6 +29,7 @@
   "{count} managed assets": "{count} 관리 자산",
   "{count} members": "{count} 구성원",
   "{count} more occurrences in this time bucket": "이 시간 구간에 {count}개의 추가 발생",
+  "{count} occurrences": "{count}회 발생",
   "{count} of {total} injects use expectations that no longer match the validation requirements defined by their actions.": "{total}개 중 {count}개의 주입이 액션에 정의된 유효성 검사 요구 사항과 일치하지 않는 기대치를 사용하고 있습니다.",
   "{count} of {total} injects use expectations that no longer match the validation requirements defined by their threat arsenal items.": "{total}개 중 {count}개의 주입이 무기고 항목에 정의된 유효성 검사 요구 사항과 일치하지 않는 기대치를 사용하고 있습니다.",
   "{count} players": "{count} 플레이어",
