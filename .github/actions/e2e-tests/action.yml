@@ -97,6 +97,11 @@ runs:
           || echo "⚠️ System dependency refresh failed; continuing with the runner image's own libraries"
       shell: bash
       working-directory: openaev-front
+    # WebKit runs headed on CI (see playwright.config.ts), so it needs a virtual display.
+    - name: Install Xvfb (WebKit)
+      if: ${{ inputs.browser == 'webkit' }}
+      run: command -v xvfb-run || sudo apt-get install -y xvfb
+      shell: bash
     - name: Install Playwright browsers (${{ inputs.browser }} + chromium for setup)
       if: steps.playwright-cache.outputs.cache-hit != 'true'
       run: |
@@ -290,7 +295,11 @@ runs:
           ARGS="$ARGS tests_e2e/auth\.setup\.ts $FILTERS"
         fi
 
-        yarn playwright test $ARGS
+        if [ "$BROWSER" = "webkit" ]; then
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" yarn playwright test $ARGS
+        else
+          yarn playwright test $ARGS
+        fi
       shell: bash
       working-directory: openaev-front
       env:
@@ -298,6 +307,7 @@ runs:
         E2E_COVERAGE: "true"
         SHARD_INCLUDES: ${{ inputs.includes }}
         SHARD_EXCLUDES: ${{ inputs.excludes }}
+        BROWSER: ${{ inputs.browser }}
     - name: Upload Playwright report (${{ inputs.browser }})
       if: ${{ !cancelled() }}
       uses: actions/upload-artifact@v7

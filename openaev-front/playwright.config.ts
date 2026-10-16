@@ -20,10 +20,13 @@ const isFirstCiAttempt = !!process.env.CI && Number(process.env.GITHUB_RUN_ATTEM
 // Desktop Safari defaults to deviceScaleFactor 2, which is slow to render on the CI runners.
 // Its video is recorded only when CI re-runs a failed job, not on the first attempt.
 // WebKit on Linux sometimes stalls a request for ~20s (#8507), so it gets 30s timeouts.
+// Headless WebKit on Linux (WPE) can skip animation frames (microsoft/playwright#33057),
+// so CI runs it headed under Xvfb.
 const WEBKIT_TIMEOUT = 30_000;
 const webkitUse = {
   ...devices['Desktop Safari'],
   deviceScaleFactor: 1,
+  headless: process.env.CI ? false : process.env.HEADLESS === 'true',
   video: isFirstCiAttempt ? 'off' : 'retain-on-failure',
   actionTimeout: WEBKIT_TIMEOUT,
   navigationTimeout: WEBKIT_TIMEOUT,
