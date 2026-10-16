@@ -356,8 +356,8 @@ public abstract class AbstractTechnicalBehavior
   }
 
   /**
-   * A single pass already recomputes every parent of the inject for the expectation
-   * type, so it runs once per distinct (inject, type) instead of once per expectation.
+   * A single pass already recomputes every parent of the inject for the expectation type, so it
+   * runs once per distinct (inject, type) instead of once per expectation.
    */
   @Override
   public List<? extends BaseInjectExpectation> recomputeParentScores(
