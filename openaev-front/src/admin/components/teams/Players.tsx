@@ -1,7 +1,7 @@
 import { Checkbox } from '@filigran/design-system';
 import { HelpOutlineOutlined, PersonOutlined } from '@mui/icons-material';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { type CSSProperties, useContext, useMemo, useState } from 'react';
+import { type CSSProperties, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -27,7 +27,7 @@ import { type PlayerOutput, type SearchPaginationInput } from '../../../utils/ap
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import useEntityToggle from '../../../utils/hooks/useEntityToggle';
-import { AbilityContext, Can } from '../../../utils/permissions/permissionsContext';
+import { Can, useAbility } from '../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import ToolBar from '../common/ToolBar';
 import CreatePlayer from './players/CreatePlayer';
@@ -148,7 +148,7 @@ const Players = () => {
   };
 
   // Bulk selection
-  const ability = useContext(AbilityContext);
+  const ability = useAbility();
   const canManage = ability.can(ACTIONS.MANAGE, SUBJECTS.TEAMS_AND_PLAYERS);
   const {
     selectedElements,
@@ -191,15 +191,19 @@ const Players = () => {
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
         topBarButtons={(
-          <Box display="flex" gap={1} alignItems="center">
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1,
+              alignItems: 'center',
+            }}
+          >
             <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.TEAMS_AND_PLAYERS}>
               <CreatePlayer
                 onCreate={(result) => {
                   setPlayers([result, ...players]);
-                  queryableHelpers.paginationHelpers.handleChangeTotalElements(
-                    queryableHelpers.paginationHelpers.getTotalElements() + 1,
-                  );
+                  queryableHelpers.paginationHelpers.incrementTotalElements(1);
                 }}
               />
             </Can>
@@ -275,9 +279,7 @@ const Players = () => {
                       : p)))}
                     onDelete={(result) => {
                       setPlayers(players.filter(p => (p.user_id !== result)));
-                      queryableHelpers.paginationHelpers.handleChangeTotalElements(
-                        Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - 1),
-                      );
+                      queryableHelpers.paginationHelpers.incrementTotalElements(-1);
                     }}
                   />
                 )}

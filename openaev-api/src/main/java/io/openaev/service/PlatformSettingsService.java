@@ -31,14 +31,16 @@ import io.openaev.rest.settings.response.OAuthProvider;
 import io.openaev.rest.settings.response.PlatformSettings;
 import io.openaev.rest.settings.response.PublicPlatformSettings;
 import io.openaev.rest.stream.ai.AiConfig;
+import io.openaev.utils.InstanceCreationDate;
 import io.openaev.xtmhub.XtmHubConnectivityService;
 import io.openaev.xtmhub.config.XtmHubConfig;
 import io.openaev.xtmone.XtmOneConfig;
 import io.openaev.xtmone.XtmOneIdentity;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
@@ -47,8 +49,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties;
+import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties;
+import org.springframework.boot.security.saml2.autoconfigure.Saml2RelyingPartyProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -72,6 +74,7 @@ public class PlatformSettingsService {
   private final XtmHubConnectivityService xtmHubConnectivityService;
   private final XtmOneConfig xtmOneConfig;
   private final XtmOneIdentity xtmOneIdentity;
+  private final OpenTelemetry openTelemetry;
 
   @Value("${server.servlet.session.timeout:1440m}")
   private java.time.Duration sessionTimeout;
@@ -333,7 +336,7 @@ public class PlatformSettingsService {
       platformSettings.setChatbotAiCguStatus("pending");
     }
     platformSettings.setExecutorTaniumEnable(false);
-    platformSettings.setTelemetryManagerEnable(true);
+    platformSettings.setTelemetryManagerEnable(openTelemetry instanceof OpenTelemetrySdk);
 
     // Admin-only settings
     OpenAEVPrincipal user = currentUser();
@@ -391,9 +394,9 @@ public class PlatformSettingsService {
   }
 
   /**
-   * Get this instance's creation date, written at first startup as a {@link Timestamp} string. It
-   * bounds the validity of a {@code ci} XTM license, which must not outlive the pipeline that
-   * created the instance.
+   * Get this instance's creation date, written once at first startup (see {@link
+   * InstanceCreationDate}). It bounds the validity of a {@code ci} XTM license, which must not
+   * outlive the pipeline that created the instance.
    *
    * @return the creation date, or empty when it is missing or unreadable
    */
@@ -401,15 +404,7 @@ public class PlatformSettingsService {
     return this.settingRepository
         .findByKeyAndTenantIsNull(PLATFORM_INSTANCE_CREATION.key())
         .map(Setting::getValue)
-        .filter(StringUtils::hasText)
-        .flatMap(
-            value -> {
-              try {
-                return Optional.of(Timestamp.valueOf(value.trim()).toInstant());
-              } catch (IllegalArgumentException e) {
-                return Optional.empty();
-              }
-            });
+        .flatMap(InstanceCreationDate::parse);
   }
 
   public Map<String, Setting> findSettingsByKeys(List<String> keys) {

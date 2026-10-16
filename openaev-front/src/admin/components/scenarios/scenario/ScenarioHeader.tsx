@@ -269,7 +269,7 @@ const ScenarioHeader = ({
         // Leave null: hasExistingLogic treats the unknown count as existing logic (fail safe).
       }
     }
-    let saved: AutonomousRunCreateInput | null = null;
+    let saved: AutonomousRunCreateInput | null;
     try {
       saved = (await fetchScenarioAutonomousConfig(scenarioId)).data;
     } catch {
@@ -342,11 +342,9 @@ const ScenarioHeader = ({
       ? helper.getWorkflowConfiguration(scenarioWorkflowId)
       : undefined,
   }));
-  // A chained scenario keeps its attack-path logic (Update / Delete / Export); a time-based one may
-  // also be duplicated by hand.
-  const scenarioPopoverActions: ('Duplicate' | 'Update' | 'Delete' | 'Export')[] = isScenarioChaining
-    ? ['Update', 'Delete', 'Export']
-    : ['Duplicate', 'Update', 'Delete', 'Export'];
+  // Chained and time-based scenarios are both duplicated through the same endpoint: a chained one
+  // gets its logic map copied along with its metadata.
+  const scenarioPopoverActions: ('Duplicate' | 'Update' | 'Delete' | 'Export')[] = ['Duplicate', 'Update', 'Delete', 'Export'];
   // Grant-only users without any of the manage / launch / delete permissions get no overflow menu
   // at all instead of a popover full of disabled entries.
   const canDisplayScenarioActions = canManage || canLaunch || canDelete;
@@ -1013,9 +1011,9 @@ const ScenarioHeader = ({
       />
       <Dialog
         open={openInstantiateSimulationAndStart}
-        TransitionComponent={Transition}
         onClose={() => setOpenInstantiateSimulationAndStart(false)}
-        PaperProps={{ elevation: 1 }}
+        slots={{ transition: Transition }}
+        slotProps={{ paper: { elevation: 1 } }}
       >
         <DialogContent>
           <DialogContentText>

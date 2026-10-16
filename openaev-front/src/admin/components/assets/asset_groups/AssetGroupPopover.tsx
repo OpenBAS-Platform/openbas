@@ -1,4 +1,4 @@
-import { type FunctionComponent, useContext, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 
 import { deleteAssetGroup, updateAssetGroup, updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import ButtonPopover, { type VariantButtonPopover } from '../../../../components/common/ButtonPopover';
@@ -9,7 +9,7 @@ import { emptyFilterGroup } from '../../../../components/common/queryable/filter
 import { useFormatter } from '../../../../components/i18n';
 import { type AssetGroup, type AssetGroupInput, type AssetGroupOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { AbilityContext } from '../../../../utils/permissions/permissionsContext';
+import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import EndpointsPicker from '../endpoints/EndpointsPicker';
 import AssetGroupForm from './AssetGroupForm';
@@ -27,7 +27,7 @@ export interface AssetGroupPopoverProps {
   onUpdate?: (result: AssetGroup) => void;
   onDelete?: (result: string) => void;
   disabled?: boolean;
-  actions?: 'update' | 'delete' | 'manage-asset' | 'remove'[];
+  actions?: ('update' | 'delete' | 'manage-asset' | 'remove')[];
 }
 
 const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
@@ -46,7 +46,7 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-  const ability = useContext(AbilityContext);
+  const ability = useAbility();
 
   const initialValues = (({
     asset_group_name,

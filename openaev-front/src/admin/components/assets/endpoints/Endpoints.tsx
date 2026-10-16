@@ -1,7 +1,7 @@
 import { Checkbox } from '@filigran/design-system';
 import { HelpOutlineOutlined } from '@mui/icons-material';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { type CSSProperties, useContext, useState } from 'react';
+import { type CSSProperties, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -28,7 +28,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
 import useMarkingDefinitions from '../../../../utils/hooks/useMarkingDefinitions';
-import { AbilityContext, Can } from '../../../../utils/permissions/permissionsContext';
+import { Can, useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { isFeatureEnabled } from '../../../../utils/utils';
 import EndpointListItemFragments from '../../common/endpoints/EndpointListItemFragments';
@@ -70,7 +70,10 @@ const Endpoints = () => {
   const markingEnabled = isFeatureEnabled('MARKING');
   // Resolved once for the whole page; the Markings column maps ids per row. Skipped entirely when
   // the flag is off so the platform issues no marking-definitions request at all.
-  const markingDefinitions = useMarkingDefinitions({ skip: !markingEnabled });
+  const markingDefinitions = useMarkingDefinitions({
+    skip: !markingEnabled,
+    assignableOnly: true,
+  });
 
   // Load the executors once for the whole page; the per-row Executors column
   // reads them from the store (previously each row fetched them, firing
@@ -96,6 +99,7 @@ const Endpoints = () => {
   ];
 
   const [endpoints, setEndpoints] = useState<EndpointOutput[]>([]);
+  const [reloadCount, setReloadCount] = useState<number>(0);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('asset', buildSearchPagination({
     sorts: initSorting('asset_name'),
     textSearch: search,
@@ -118,7 +122,7 @@ const Endpoints = () => {
   };
 
   // Bulk selection
-  const ability = useContext(AbilityContext);
+  const ability = useAbility();
   const canManage = ability.can(ACTIONS.MANAGE, SUBJECTS.ASSETS);
   const {
     selectedElements,
@@ -256,11 +260,18 @@ const Endpoints = () => {
         fetch={searchEndpointsToLoad}
         searchPaginationInput={searchPaginationInput}
         setContent={setEndpoints}
+        reloadContentCount={reloadCount}
         entityPrefix="asset"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
         topBarButtons={(
-          <Box display="flex" gap={1} alignItems="center">
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1,
+              alignItems: 'center',
+            }}
+          >
             {/* A plain row of actions: this was a ToggleButtonGroup used as a frame,
                 which announced a group of choices that never existed. */}
             <Box sx={{
@@ -274,7 +285,14 @@ const Endpoints = () => {
               </Can>
             </Box>
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
-              <EndpointCreation onCreate={result => setEndpoints([result as EndpointOutput, ...endpoints])} agentless={true} />
+              <EndpointCreation
+                onCreate={(result) => {
+                  setEndpoints([result as EndpointOutput, ...endpoints]);
+                  queryableHelpers.paginationHelpers.incrementTotalElements(1);
+                }}
+                onAiTargetCreate={() => setReloadCount(count => count + 1)}
+                agentless={true}
+              />
             </Can>
           </Box>
         )}
@@ -345,7 +363,10 @@ const Endpoints = () => {
                         endpoint={{ ...endpoint }}
                         agentless={endpoint.asset_agents?.length === 0}
                         onUpdate={result => setEndpoints(endpoints.map(e => (e.asset_id !== result.asset_id ? e : result as EndpointOutput)))}
-                        onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
+                        onDelete={(result) => {
+                          setEndpoints(endpoints.filter(e => (e.asset_id !== result)));
+                          queryableHelpers.paginationHelpers.incrementTotalElements(-1);
+                        }}
                       />
                     )}
                     disablePadding

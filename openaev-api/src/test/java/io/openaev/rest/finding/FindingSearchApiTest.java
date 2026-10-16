@@ -258,7 +258,7 @@ class FindingSearchApiTest extends IntegrationTest {
               .persist()
               .get();
 
-      Exercise simulation = scenario.getExercises().getFirst();
+      Exercise simulation = scenario.getExercises().iterator().next();
       Inject inject = simulation.getInjects().getFirst();
       String endpointId = inject.getAssets().getFirst().getId();
 

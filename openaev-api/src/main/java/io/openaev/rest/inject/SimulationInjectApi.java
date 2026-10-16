@@ -148,6 +148,7 @@ public class SimulationInjectApi extends RestBehavior {
             .sorted(Inject.executionComparator)
             .toList();
     KillChainPhaseInitializer.initializeFromInjects(injects);
+    InjectLinksInitializer.initialize(injects);
     return injects;
   }
 
@@ -346,7 +347,7 @@ public class SimulationInjectApi extends RestBehavior {
       return executor.directExecute(injection);
     } catch (Exception e) {
       log.warn(e.getMessage(), e);
-      return injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
+      return injectStatusService.failInjectStatus(savedInject, e.getMessage());
     }
   }
 

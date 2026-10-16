@@ -64,6 +64,7 @@ public enum ResourceType {
   PLATFORM_GROUP,
   PLATFORM_USER,
   XTM_HUB_REGISTRATION,
+  NEWS_FEED,
   SNAPSHOT_OBSERVATION,
   // Special resource types
   UNKNOWN,
@@ -75,6 +76,7 @@ public enum ResourceType {
   SESSION,
   TOKEN,
   PLATFORM_SESSION,
+  AUTONOMOUS_RUN,
   SKIP_RBAC; // Used to skip RBAC checks.
 
   public static ResourceType fromString(@NotNull String name) {

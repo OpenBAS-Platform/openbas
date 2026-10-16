@@ -1,12 +1,12 @@
 // fds:keep-mui the Enterprise Edition upsell tooltip stays out of this wave by ruling
 import { Button } from '@filigran/design-system';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Tooltip } from '@mui/material';
-import { type ReactElement, useContext, useState } from 'react';
+import { type ReactElement, useState } from 'react';
 
 import { useFormatter } from '../../../../components/i18n';
 import useAI from '../../../../utils/hooks/useAI';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
-import { AbilityContext } from '../../../../utils/permissions/permissionsContext';
+import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 
 const EETooltip = ({
@@ -19,7 +19,7 @@ const EETooltip = ({
   forAi?: boolean;
 }) => {
   const { t } = useFormatter();
-  const ability = useContext(AbilityContext);
+  const ability = useAbility();
 
   const { openDialog: openEnterpriseEditionDialog } = useEnterpriseEdition();
   const [openEnableAI, setOpenEnableAI] = useState(false);
@@ -50,11 +50,11 @@ const EETooltip = ({
           </span>
         </Tooltip>
         <Dialog
-          PaperProps={{ elevation: 1 }}
           open={openEnableAI}
           onClose={() => setOpenEnableAI(false)}
           fullWidth={true}
           maxWidth="sm"
+          slotProps={{ paper: { elevation: 1 } }}
         >
           <DialogTitle>
             {t('Enable AI powered platform')}
@@ -83,11 +83,11 @@ const EETooltip = ({
           </span>
         </Tooltip>
         <Dialog
-          PaperProps={{ elevation: 1 }}
           open={openConfigAI}
           onClose={() => setOpenConfigAI(false)}
           fullWidth={true}
           maxWidth="sm"
+          slotProps={{ paper: { elevation: 1 } }}
         >
           <DialogTitle>
             {t('Enable AI powered platform')}

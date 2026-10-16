@@ -11,7 +11,7 @@ import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { type Inject, type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type LessonsSendInput, type LessonsTemplate, type Objective, type Team, type User } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { AbilityContext, Can } from '../../../../utils/permissions/permissionsContext';
+import { Can, useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import ConfigurationSection, { SECTION_HEADER_WITH_ACTION_HEIGHT } from '../../common/ConfigurationSection';
 import { LessonContext, PermissionsContext } from '../../common/Context';
@@ -79,7 +79,7 @@ const Lessons: FunctionComponent<Props> = ({
   const [openSendLessons, setOpenSendLessons] = useState<boolean>(false);
   const [openAnonymize, setOpenAnonymize] = useState<boolean>(false);
   const [selectedQuestion, setSelectedQuestion] = useState<LessonsQuestion | null>(null);
-  const ability = useContext(AbilityContext);
+  const ability = useAbility();
 
   useEffect(() => {
     if (openApplyTemplate) {
@@ -125,6 +125,8 @@ const Lessons: FunctionComponent<Props> = ({
     const msInHour = 1000 * 60 * 60;
     return Math.round(Math.abs(endDate.getTime() - startDate.getTime()) / msInHour);
   };
+  const hasNoRecipients = !lessonsCategories.some(category => (category.lessons_category_teams ?? [])
+    .some(teamId => (teamsMap[teamId]?.team_users_number ?? 0) > 0));
   const canApplyTemplate = permissions.canManage && ability.can(ACTIONS.ACCESS, SUBJECTS.LESSONS_LEARNED);
   return (
     <Box sx={{
@@ -232,6 +234,11 @@ const Lessons: FunctionComponent<Props> = ({
                 'Sending the questionnaire will emit an email to each player with a unique link to access and fill it.',
               )}
             </Alert>
+            {hasNoRecipients && (
+              <Alert severity="warning" sx={{ marginBottom: 2 }}>
+                {t('Make sure at least one category targets a team with players before sending the questionnaire.')}
+              </Alert>
+            )}
             <Box sx={{
               display: 'grid',
               gap: 2,
@@ -239,7 +246,7 @@ const Lessons: FunctionComponent<Props> = ({
             }}
             >
               <Field label={t('Questionnaire')}>
-                <Button type="button" priority="secondary" size="sm" startIcon={<SendOutlined fontSize="small" />} onClick={() => setOpenSendLessons(true)}>
+                <Button type="button" priority="secondary" size="sm" disabled={hasNoRecipients} startIcon={<SendOutlined fontSize="small" />} onClick={() => setOpenSendLessons(true)}>
                   {t('Send')}
                 </Button>
               </Field>
@@ -323,13 +330,13 @@ const Lessons: FunctionComponent<Props> = ({
 
       {/* Dialogs */}
       <Dialog
-        TransitionComponent={Transition}
         keepMounted={false}
         open={selectedObjective !== null}
         onClose={() => setSelectedObjective(null)}
         fullWidth
         maxWidth="md"
-        PaperProps={{ elevation: 1 }}
+        slots={{ transition: Transition }}
+        slotProps={{ paper: { elevation: 1 } }}
       >
         <DialogTitle>{t('Objective achievement evaluation')}</DialogTitle>
         <DialogContent>
@@ -349,9 +356,9 @@ const Lessons: FunctionComponent<Props> = ({
       />
       <Dialog
         open={openResetAnswers}
-        TransitionComponent={Transition}
         onClose={() => setOpenResetAnswers(false)}
-        PaperProps={{ elevation: 1 }}
+        slots={{ transition: Transition }}
+        slotProps={{ paper: { elevation: 1 } }}
       >
         <DialogContent>
           <DialogContentText>
@@ -369,9 +376,9 @@ const Lessons: FunctionComponent<Props> = ({
       </Dialog>
       <Dialog
         open={openEmptyLessons}
-        TransitionComponent={Transition}
         onClose={() => setOpenEmptyLessons(false)}
-        PaperProps={{ elevation: 1 }}
+        slots={{ transition: Transition }}
+        slotProps={{ paper: { elevation: 1 } }}
       >
         <DialogContent>
           <DialogContentText>
@@ -391,11 +398,11 @@ const Lessons: FunctionComponent<Props> = ({
       </Dialog>
       <Dialog
         open={openSendLessons}
-        TransitionComponent={Transition}
         onClose={() => setOpenSendLessons(false)}
         fullWidth
         maxWidth="md"
-        PaperProps={{ elevation: 1 }}
+        slots={{ transition: Transition }}
+        slotProps={{ paper: { elevation: 1 } }}
       >
         <DialogTitle>{t('Send the lessons learned questionnaire')}</DialogTitle>
         <DialogContent style={{ overflowX: 'hidden' }}>
@@ -424,9 +431,9 @@ const Lessons: FunctionComponent<Props> = ({
       />
       <Dialog
         open={openAnonymize}
-        TransitionComponent={Transition}
         onClose={() => setOpenAnonymize(false)}
-        PaperProps={{ elevation: 1 }}
+        slots={{ transition: Transition }}
+        slotProps={{ paper: { elevation: 1 } }}
       >
         <DialogContent>
           <DialogContentText>

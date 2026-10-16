@@ -843,8 +843,8 @@ const FindingList = ({ searchDistinctFindings, filterLocalStorageKey, contextId,
       {compact && !loading && total > findings.length && (
         <Typography
           variant="caption"
-          color="text.secondary"
           sx={{
+            color: 'text.secondary',
             display: 'block',
             px: 2,
             py: 1,

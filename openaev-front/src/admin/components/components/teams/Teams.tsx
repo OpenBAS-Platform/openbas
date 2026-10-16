@@ -1,7 +1,7 @@
 import { Checkbox } from '@filigran/design-system';
 import { GroupsOutlined, HelpOutlineOutlined } from '@mui/icons-material';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { type CSSProperties, useContext, useMemo, useState } from 'react';
+import { type CSSProperties, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -24,7 +24,7 @@ import { useHelper } from '../../../../store';
 import { type SearchPaginationInput, type Team } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
-import { AbilityContext, Can } from '../../../../utils/permissions/permissionsContext';
+import { Can, useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import ToolBar from '../../common/ToolBar';
 import CreateTeam from './CreateTeam';
@@ -56,7 +56,7 @@ const Teams = () => {
   const bodyItemsStyles = useBodyItemsStyles();
   const { t, nsdt } = useFormatter();
   const dispatch = useAppDispatch();
-  const ability = useContext(AbilityContext);
+  const ability = useAbility();
 
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
 
@@ -186,14 +186,18 @@ const Teams = () => {
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
         topBarButtons={(
-          <Box display="flex" gap={1} alignItems="center">
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1,
+              alignItems: 'center',
+            }}
+          >
             <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.TEAMS_AND_PLAYERS}>
               <CreateTeam onCreate={(result) => {
                 setTeams([result, ...teams]);
-                queryableHelpers.paginationHelpers.handleChangeTotalElements(
-                  queryableHelpers.paginationHelpers.getTotalElements() + 1,
-                );
+                queryableHelpers.paginationHelpers.incrementTotalElements(1);
               }}
               />
             </Can>
@@ -265,9 +269,7 @@ const Teams = () => {
                     onUpdate={result => onTeamUpdated(result)}
                     onDelete={(result) => {
                       setTeams(teams.filter(v => (v.team_id !== result)));
-                      queryableHelpers.paginationHelpers.handleChangeTotalElements(
-                        Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - 1),
-                      );
+                      queryableHelpers.paginationHelpers.incrementTotalElements(-1);
                     }}
                     openEditOnInit={team.team_id === searchId}
                   />

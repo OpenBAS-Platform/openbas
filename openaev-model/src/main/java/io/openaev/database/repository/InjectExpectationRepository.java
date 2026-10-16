@@ -1,6 +1,5 @@
 package io.openaev.database.repository;
 
-import io.openaev.database.model.ArticleInjectExpectation;
 import io.openaev.database.model.BaseInjectExpectation;
 import io.openaev.database.model.ChallengeInjectExpectation;
 import io.openaev.database.model.TechnicalInjectExpectation;
@@ -268,15 +267,6 @@ public interface InjectExpectationRepository
       @Param("exerciseId") String exerciseId,
       @Param("challengeId") String challengeId);
 
-  @Query(
-      value =
-          "select i from InjectExpectation i where i.inject.id in (:injectIds) "
-              + "and i.article.id in (:articlesIds) and i.team.id in (:teamIds) and i.type = 'ARTICLE'")
-  List<ArticleInjectExpectation> findChannelExpectations(
-      @Param("injectIds") List<String> injectIds,
-      @Param("teamIds") List<String> teamIds,
-      @Param("articlesIds") List<String> articlesIds);
-
   // -- BY TARGET TYPE
 
   @Query(
@@ -501,16 +491,21 @@ public interface InjectExpectationRepository
                                         AND ic.tenant_id = i.tenant_id
     ),
     ap_agg AS (
-        SELECT ic_ap.injector_contract_id, array_agg(DISTINCT ic_ap.attack_pattern_id) AS attack_pattern_ids
+        -- Keyed on (contract, tenant), like the link table itself: a contract id is shared across
+        -- tenants, so aggregating on the id alone would carry another tenant's mapping into this
+        -- tenant's document.
+        SELECT ic_ap.injector_contract_id, ic_ap.tenant_id, array_agg(DISTINCT ic_ap.attack_pattern_id) AS attack_pattern_ids
         FROM injectors_contracts_attack_patterns ic_ap
-        WHERE ic_ap.injector_contract_id IN (SELECT contract_id FROM base WHERE contract_id IS NOT NULL)
-        GROUP BY ic_ap.injector_contract_id
+        WHERE (ic_ap.injector_contract_id, ic_ap.tenant_id)
+              IN (SELECT contract_id, tenant_id FROM base WHERE contract_id IS NOT NULL)
+        GROUP BY ic_ap.injector_contract_id, ic_ap.tenant_id
     ),
     dom_agg AS (
-        SELECT ic_d.injector_contract_id, array_agg(DISTINCT ic_d.domain_id) AS domain_ids
+        SELECT ic_d.injector_contract_id, ic_d.tenant_id, array_agg(DISTINCT ic_d.domain_id) AS domain_ids
         FROM injectors_contracts_domains ic_d
-        WHERE ic_d.injector_contract_id IN (SELECT contract_id FROM base WHERE contract_id IS NOT NULL)
-        GROUP BY ic_d.injector_contract_id
+        WHERE (ic_d.injector_contract_id, ic_d.tenant_id)
+              IN (SELECT contract_id, tenant_id FROM base WHERE contract_id IS NOT NULL)
+        GROUP BY ic_d.injector_contract_id, ic_d.tenant_id
     ),
     track_agg AS (
         SELECT ins.status_inject AS inject_id, max(ins.tracking_sent_date) AS tracking_sent_date
@@ -573,8 +568,8 @@ public interface InjectExpectationRepository
            sa.scenario_id,
            COALESCE(spself.ids, ARRAY[]::text[]) || COALESCE(asp.security_platform_ids, ARRAY[]::text[]) AS security_platform_ids
     FROM base b
-    LEFT JOIN ap_agg apa ON apa.injector_contract_id = b.contract_id
-    LEFT JOIN dom_agg da ON da.injector_contract_id = b.contract_id
+    LEFT JOIN ap_agg apa ON apa.injector_contract_id = b.contract_id AND apa.tenant_id = b.tenant_id
+    LEFT JOIN dom_agg da ON da.injector_contract_id = b.contract_id AND da.tenant_id = b.tenant_id
     LEFT JOIN track_agg ta ON ta.inject_id = b.inject_id
     LEFT JOIN scen_agg sa ON sa.exercise_id = b.exercise_id
     LEFT JOIN sp_self spself ON spself.inject_expectation_id = b.inject_expectation_id

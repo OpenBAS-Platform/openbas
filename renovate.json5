@@ -40,7 +40,7 @@
         {
             customType: 'regex',
             managerFilePatterns: ['/^pom\.xml$/'],
-            matchStrings: ['<jackson-bom\.version>(?<currentValue>.*?)</jackson-bom\.version>'],
+            matchStrings: ['<jackson-2-bom\.version>(?<currentValue>.*?)</jackson-2-bom\.version>'],
             depNameTemplate: 'com.fasterxml.jackson:jackson-bom',
             datasourceTemplate: 'maven',
             versioningTemplate: 'maven',
@@ -48,8 +48,8 @@
         {
             customType: 'regex',
             managerFilePatterns: ['/^pom\.xml$/'],
-            matchStrings: ['<tomcat\.version>(?<currentValue>.*?)</tomcat\.version>'],
-            depNameTemplate: 'org.apache.tomcat.embed:tomcat-embed-core',
+            matchStrings: ['<jackson-bom\.version>(?<currentValue>.*?)</jackson-bom\.version>'],
+            depNameTemplate: 'tools.jackson:jackson-bom',
             datasourceTemplate: 'maven',
             versioningTemplate: 'maven',
         },
@@ -112,6 +112,34 @@
             datasourceTemplate: 'maven',
             versioningTemplate: 'maven',
         },
+        {
+            customType: 'regex',
+            managerFilePatterns: ['/^pom\.xml$/'],
+            matchStrings: ['<tomcat\.version>(?<currentValue>.*?)</tomcat\.version>'],
+            depNameTemplate: 'org.apache.tomcat.embed:tomcat-embed-core',
+            datasourceTemplate: 'maven',
+            versioningTemplate: 'maven',
+        },
+        {
+            customType: 'regex',
+            managerFilePatterns: ['/^pom\.xml$/'],
+            matchStrings: ['<postgresql\.version>(?<currentValue>.*?)</postgresql\.version>'],
+            depNameTemplate: 'org.postgresql:postgresql',
+            datasourceTemplate: 'maven',
+            versioningTemplate: 'maven',
+        },
+        // eslint-plugin-react cannot detect the React version on ESLint 10, so eslint.config.js pins
+        // it as major.minor. Tracking it as the react package keeps it in step with the installed
+        // React: only major.minor releases are kept, and patches leave the pin unchanged.
+        {
+            customType: 'regex',
+            managerFilePatterns: ['/^openaev-front/eslint\\.config\\.js$/'],
+            matchStrings: ['react: \\{[^}]*?version: \'(?<currentValue>\\d+\\.\\d+)\''],
+            depNameTemplate: 'react',
+            datasourceTemplate: 'npm',
+            versioningTemplate: 'regex:^(?<major>\\d+)\\.(?<minor>\\d+)$',
+            extractVersionTemplate: '^(?<version>\\d+\\.\\d+)\\.\\d+$',
+        },
     ],
     packageRules: [
         {
@@ -123,19 +151,6 @@
             matchPackageNames: [
                 '/^io\\.openaev:/',
             ],
-        },
-        // tomcat.version overrides the Spring Boot BOM so Tomcat can be patched ahead of Boot releases.
-        // It must stay on the line Boot manages: 10.1.x (Servlet 6.0) for Boot 3.5.
-        // Tomcat 11 is Servlet 6.1, the Spring Boot 4 baseline.
-        {
-            description: 'Pin tomcat-embed-core until Spring Boot 4 upgrade',
-            matchDatasources: [
-                'maven',
-            ],
-            matchPackageNames: [
-                'org.apache.tomcat.embed:tomcat-embed-core',
-            ],
-            allowedVersions: '<11',
         },
         {
             description: 'apexcharts >= 5 uses a commercial license (not MIT). Block major updates.',
@@ -373,6 +388,27 @@
                 '@filigran/chatbot',
             ],
             groupName: null,
+        },
+        // The React version pinned in eslint.config.js (customManagers above) must move in the same
+        // PR as react itself. Majors already share the react monorepo group; minors go to the front
+        // batch, which only matches the npm manager.
+        {
+            description: 'The React version pinned for eslint-plugin-react follows the front batch',
+            matchManagers: [
+                'custom.regex',
+            ],
+            matchDepNames: [
+                'react',
+            ],
+            matchUpdateTypes: [
+                'minor',
+            ],
+            groupName: 'front-end production dependencies (non-major)',
+            groupSlug: 'front-prod-non-major',
+            schedule: [
+                '* * * * 0',
+            ],
+            rebaseWhen: 'auto',
         },
     ],
     // do lock file maintenance once a week on Sunday

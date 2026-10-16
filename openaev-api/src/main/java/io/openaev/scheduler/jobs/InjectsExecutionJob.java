@@ -30,7 +30,6 @@ import io.openaev.scheduler.jobs.exception.ErrorMessagesPreExecutionException;
 import io.openaev.service.chaining.WorkflowService;
 import io.openaev.telemetry.metric_collectors.ActionMetricCollector;
 import io.openaev.utils.AgentUtils;
-import jakarta.persistence.EntityManager;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -46,7 +45,6 @@ import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Session;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -83,7 +81,6 @@ public class InjectsExecutionJob implements Job {
   private final io.openaev.executors.Executor executor;
   private final ActionMetricCollector actionMetricCollector;
   private final WorkflowService workflowService;
-  private final EntityManager entityManager;
   private final TenantScopedJobRunner tenantScopedJobRunner;
 
   private final List<ExecutionStatus> executionStatusesNotReady =
@@ -100,8 +97,8 @@ public class InjectsExecutionJob implements Job {
   private final Optional<AuditLogger> auditLogger;
 
   public List<Exercise> autoStartDueExercises() {
-    // Disable tenant filter — called from InjectsExecutionJob which runs cross-tenant
-    entityManager.unwrap(Session.class).disableFilter("tenantFilter");
+    // Cross-tenant: no transaction is open here, so no v1 filter narrows the read. Once exercises
+    // is activated this sweep needs the primitive.
     return promoteDueExercisesToRunning();
   }
 
@@ -365,18 +362,6 @@ public class InjectsExecutionJob implements Job {
     Map<String, List<ExecutableInject>> byExercises =
         injects.stream()
             .filter(
-                executableInject -> {
-                  Inject inject = executableInject.getInjection().getInject();
-                  if (inject.getTenant() != null) {
-                    return true;
-                  }
-                  String message =
-                      "Inject " + inject.getId() + " has no tenant, cannot be executed";
-                  log.warn(message);
-                  injectStatusService.failInjectStatus(inject.getId(), message);
-                  return false;
-                })
-            .filter(
                 executableInject ->
                     // If we got dependencies, we check that the parents are not part of the
                     // current batch of injects running. If so, we're filtering them out and
@@ -412,22 +397,36 @@ public class InjectsExecutionJob implements Job {
                   .forEach(
                       executableInject -> {
                         Inject inject = executableInject.getInjection().getInject();
-                        tenantScopedJobRunner.runInTenant(
-                            inject.getTenant().getId(),
-                            () -> {
-                              try {
-                                this.executeInject(executableInject);
-                              } catch (RuntimeException e) {
-                                Throwable cause = e.getCause() != null ? e.getCause() : e;
-                                log.warn(cause.getMessage(), cause);
-                                injectStatusService.failInjectStatus(
-                                    inject.getId(), cause.getMessage());
-                              } catch (Exception e) {
-                                log.warn(e.getMessage(), e);
-                                injectStatusService.failInjectStatus(
-                                    inject.getId(), e.getMessage());
-                              }
-                            });
+                        String tenantId = inject.getTenant().getId();
+                        try {
+                          tenantScopedJobRunner.runInTenant(
+                              tenantId,
+                              () -> {
+                                try {
+                                  this.executeInject(executableInject);
+                                } catch (Exception e) {
+                                  // Same transaction: the traces written before the failure and
+                                  // the ERROR status commit together.
+                                  Throwable cause =
+                                      e instanceof RuntimeException && e.getCause() != null
+                                          ? e.getCause()
+                                          : e;
+                                  log.warn(cause.getMessage(), cause);
+                                  injectStatusService.persistErrorStatusInTransaction(
+                                      inject.getId(), cause.getMessage());
+                                }
+                              });
+                        } catch (RuntimeException e) {
+                          // The transaction could not commit (rollback-only, commit or
+                          // after-commit failure): persist the ERROR status in a fresh one.
+                          Throwable cause = e.getCause() != null ? e.getCause() : e;
+                          log.warn(cause.getMessage(), cause);
+                          tenantScopedJobRunner.runInTenant(
+                              tenantId,
+                              () ->
+                                  injectStatusService.persistErrorStatusInTransaction(
+                                      inject.getId(), cause.getMessage()));
+                        }
                       });
 
               // Update the exercise once all injects of the batch are processed.

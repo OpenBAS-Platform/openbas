@@ -2,6 +2,7 @@ package io.openaev.rest.inject.service;
 
 import static io.openaev.database.model.CollectExecutionStatus.COLLECTING;
 import static io.openaev.database.model.ExecutionStatus.*;
+import static io.openaev.database.model.Filters.isEmptyFilterGroup;
 import static io.openaev.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_ASSETS;
 import static io.openaev.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_ASSET_GROUPS;
 import static io.openaev.database.model.InjectorContract.CONTRACT_ELEMENT_CONTENT_KEY_TARGETED_PROPERTY;
@@ -81,7 +82,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -90,9 +90,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -108,11 +106,13 @@ import org.springframework.util.CollectionUtils;
 public class InjectService {
   private static final String CREDENTIAL_ACCESS_DENIED = "CREDENTIAL_ACCESS_DENIED";
   private static final String CREDENTIAL_INACTIVE = "CREDENTIAL_INACTIVE";
+  static final String AGENT_ACCESS_DENIED = "Agent is not allowed to act on this inject";
 
   private final TeamRepository teamRepository;
   private final ExecutionTraceRepository executionTraceRepository;
   private final AssetService assetService;
   private final AssetGroupService assetGroupService;
+  private final InjectAgentResolverService injectAgentResolverService;
   private final AiTargetRepository aiTargetRepository;
   private final CollectorService collectorService;
   private final EnterpriseEditionService enterpriseEditionService;
@@ -133,6 +133,7 @@ public class InjectService {
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
   private final PayloadRepository payloadRepository;
+  private final AgentService agentService;
   private final SmtpService smtpService;
   private final ImapService imapService;
   private final HealthCheckUtils healthCheckUtils;
@@ -141,13 +142,7 @@ public class InjectService {
   private final ThreatArsenalService threatArsenalService;
   private final ApplicationEventPublisher eventPublisher;
   private final BulkOperationMonitor bulkOperationMonitor;
-
-  private InjectStatusService injectStatusService;
-
-  @Autowired
-  public void setInjectStatusService(@Lazy InjectStatusService injectStatusService) {
-    this.injectStatusService = injectStatusService;
-  }
+  private final InjectStatusService injectStatusService;
 
   private final LicenseCacheManager licenseCacheManager;
   @Resource protected ObjectMapper mapper;
@@ -285,6 +280,81 @@ public class InjectService {
       return null;
     }
     return this.injectRepository.findById(injectId).orElse(null);
+  }
+
+  /**
+   * Object-level authorization gate shared by the implant endpoints (executable payload retrieval
+   * and execution callback). The service-account bearer token carrying AGENT_RUNTIME_ACCESS is
+   * shared across every agent, so the {@code @AccessControl} capability check alone does not prove
+   * the caller is entitled to act on a specific inject for a specific agent. Reject the request
+   * (403) unless the given primary agent's asset is targeted by the inject, either directly or
+   * through one of its asset groups (static or dynamic membership).
+   *
+   * <p>Runs on every implant callback, under the per-inject lock: only ids are read, the inject and
+   * the agent are never loaded. The cheapest check (direct and static-group targets) runs first;
+   * the inject's asset groups and the agent's asset are only loaded when it fails.
+   *
+   * <p>Every failure (unknown inject, unknown or non-primary agent, agent without asset, agent not
+   * targeted) maps to the same 403 and message, so the endpoints do not reveal whether an inject or
+   * agent id exists.
+   *
+   * @param injectId the inject the agent is acting on
+   * @param agentId the agent reported by the implant
+   * @throws ForbiddenException if the agent is not a target of the inject
+   */
+  public void checkAgentTargetsInject(String injectId, String agentId) {
+    if (injectId == null || agentId == null || !isInjectTarget(injectId, agentId)) {
+      denyAgentAccess(injectId, agentId);
+    }
+  }
+
+  /**
+   * Object-level authorization gate of the implant execution callback. Same contract as {@link
+   * #checkAgentTargetsInject}, except that an agent granted the inject at launch keeps the right to
+   * report on it: its outputs and its final COMPLETE must not be lost, nor the inject left pending,
+   * because the inject's targets were edited (or a dynamic group stopped matching) mid-execution.
+   * The agent is accepted when it holds an expectation or an execution trace on the inject, or when
+   * it is currently a target. The payload retrieval keeps the strict {@link
+   * #checkAgentTargetsInject}: nothing was granted yet at that point.
+   *
+   * @param injectId the inject the agent is reporting on
+   * @param agentId the agent reported by the implant
+   * @throws ForbiddenException if the agent was neither granted nor targeted by the inject
+   */
+  public void checkAgentMayReportOnInject(String injectId, String agentId) {
+    if (injectId == null
+        || agentId == null
+        || !(agentService.isPrimaryAgentGrantedInject(agentId, injectId)
+            || isInjectTarget(injectId, agentId))) {
+      denyAgentAccess(injectId, agentId);
+    }
+  }
+
+  private void denyAgentAccess(String injectId, String agentId) {
+    log.warn("Agent access to inject denied: inject {}, agent {}", injectId, agentId);
+    throw new ForbiddenException(AGENT_ACCESS_DENIED);
+  }
+
+  private boolean isInjectTarget(String injectId, String agentId) {
+    if (agentService.isPrimaryAgentAssetStaticallyTargetedByInject(agentId, injectId)) {
+      return true;
+    }
+    // Dynamic membership costs one id-constrained query per dynamic group, so the (potentially
+    // large) dynamic member lists are never materialized.
+    List<AssetGroup> dynamicGroups =
+        assetGroupService.assetGroupsOfInject(injectId).stream()
+            .filter(group -> !isEmptyFilterGroup(group.getDynamicFilter()))
+            .toList();
+    if (dynamicGroups.isEmpty()) {
+      return false;
+    }
+    return agentService
+        .findPrimaryAgentAsset(agentId)
+        .map(
+            asset ->
+                dynamicGroups.stream()
+                    .anyMatch(group -> assetGroupService.isAssetInDynamicGroup(asset, group)))
+        .orElse(false);
   }
 
   /**
@@ -500,7 +570,7 @@ public class InjectService {
     if (enterpriseEditionService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
       return;
     }
-    List<Agent> agents = this.getAgentsByInject(inject);
+    List<Agent> agents = injectAgentResolverService.getAgentsByInject(inject);
     List<String> eeExecutors = enterpriseEditionService.detectEEExecutors(agents);
 
     if (!eeExecutors.isEmpty()) {
@@ -623,19 +693,9 @@ public class InjectService {
   }
 
   private Inject saveInjectAndStatusAsQueuing(Inject inject) {
-    Inject savedInject = injectRepository.save(inject);
-    InjectStatus injectStatus = saveInjectStatusAsQueuing(savedInject);
-    savedInject.setStatus(injectStatus);
-    return savedInject;
-  }
-
-  private InjectStatus saveInjectStatusAsQueuing(Inject inject) {
-    InjectStatus injectStatus = new InjectStatus();
-    injectStatus.setInject(inject);
-    injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setName(ExecutionStatus.QUEUING);
-    this.injectStatusRepository.save(injectStatus);
-    return injectStatus;
+    InjectStatus injectStatus = injectStatusService.createInjectStatusAsQueuing(inject);
+    inject.setStatus(injectStatus);
+    return injectRepository.save(inject);
   }
 
   /**
@@ -1008,11 +1068,10 @@ public class InjectService {
     }
   }
 
-  public void resetInjectByExerciseId(String simulationId) {
+  public void resetInjectByExercise(String simulationId) {
     List<Inject> injects = injectRepository.findAllInjectBySimulationId(simulationId);
     if (injects.isEmpty()) return;
     injects.forEach(Inject::clean);
-    injectStatusService.deleteAllInjectStatusByInjects(injects);
     injectRepository.saveAll(injects);
   }
 
@@ -1090,34 +1149,6 @@ public class InjectService {
         }
       }
     }
-  }
-
-  public List<Agent> getAgentsByInject(Inject inject) {
-    List<Agent> agents = new ArrayList<>();
-    Set<String> agentIds = new HashSet<>();
-
-    Consumer<Asset> extractAgents =
-        asset -> {
-          // Only endpoints carry agents; skip non-endpoint assets (e.g. AI targets).
-          if (!(Hibernate.unproxy(asset) instanceof Endpoint endpoint)) {
-            return;
-          }
-          List<Agent> collectedAgents =
-              Optional.ofNullable(endpoint.getAgents()).orElse(Collections.emptyList());
-          for (Agent agent : collectedAgents) {
-            if (isPrimaryAgent(agent) && !agentIds.contains(agent.getId())) {
-              agents.add(agent);
-              agentIds.add(agent.getId());
-            }
-          }
-        };
-
-    new ArrayList<>(inject.getAssets()).forEach(extractAgents);
-    inject.getAssetGroups().stream()
-        .flatMap(assetGroup -> assetGroupService.assetsFromAssetGroup(assetGroup.getId()).stream())
-        .forEach(extractAgents);
-
-    return agents;
   }
 
   public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(

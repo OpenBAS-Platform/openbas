@@ -19,7 +19,7 @@ import {
 } from '@mui/icons-material';
 import { Box, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 
 import { type AutonomousRun } from '../../../../actions/autonomous/autonomous-types';
@@ -63,7 +63,7 @@ import {
 } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { AbilityContext } from '../../../../utils/permissions/permissionsContext';
+import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import useSimulationPermissions from '../../../../utils/permissions/useSimulationPermissions';
 import { truncate } from '../../../../utils/String';
@@ -190,7 +190,7 @@ export const Buttons = ({ exerciseId, exerciseStatus, exerciseName, onLoading, i
       case 'RUNNING':
         return `${exerciseName} ${t('will be started, do you want to continue?')}`;
       case 'PAUSED':
-        return `${t('Injects will be paused, do you want to continue?')}`;
+        return `${t('Injects would be paused do you confirm?')}`;
       case 'SCHEDULED':
         return `${exerciseName} ${t('data will be reset, do you want to restart?')}`;
       // Stopping keeps everything that ran - only Reset clears it - so this must not borrow the
@@ -207,9 +207,9 @@ export const Buttons = ({ exerciseId, exerciseStatus, exerciseName, onLoading, i
       {dangerousButton()}
       <Dialog
         open={Boolean(openChangeStatus)}
-        TransitionComponent={Transition}
         onClose={() => setOpenChangeStatus(null)}
-        PaperProps={{ elevation: 1 }}
+        slots={{ transition: Transition }}
+        slotProps={{ paper: { elevation: 1 } }}
       >
         <DialogContent>
           <DialogContentText>
@@ -263,7 +263,7 @@ const ExerciseHeader = ({ onLoading, isLoading, autonomousRun = null }: {
     };
   });
   const permissions = useSimulationPermissions(exerciseId, exercise);
-  const ability = useContext(AbilityContext);
+  const ability = useAbility();
 
   // A simulation run from a scenario keeps a pointer to its parent. Autonomous runs carry it on the
   // run instead of (or as well as) the exercise, so fall back to the run's scenario id. When present
@@ -388,9 +388,8 @@ const ExerciseHeader = ({ onLoading, isLoading, autonomousRun = null }: {
   if (isAutonomous) {
     // Observe-only: no manual edit / duplicate, and deletion (which tears down the run) is a
     // parent-scenario control, so the simulation overflow offers only a read-only Export.
+    // "Give me an editable copy of this AI run" is covered by convert-to-manual on the scenario.
     actions = ['Export'];
-  } else if (isSimulationChaining) {
-    actions = ['Update', 'Export', 'Delete'];
   }
   const canDisplaySimulationActions = permissions.canManage || permissions.canLaunch || permissions.canDelete;
 

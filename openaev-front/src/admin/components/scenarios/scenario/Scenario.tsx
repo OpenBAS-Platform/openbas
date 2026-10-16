@@ -3,7 +3,7 @@ import { AutoAwesome, LayersClearOutlined, PlayArrowOutlined, RocketLaunchOutlin
 import { Avatar, Box, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
-import { type Dispatch, type SetStateAction, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 
 import { type AgentHelper } from '../../../../actions/agents/agent-helper';
@@ -50,7 +50,7 @@ import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
-import { AbilityContext } from '../../../../utils/permissions/permissionsContext';
+import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { isEmptyField } from '../../../../utils/utils';
 import isXtmOneAvailable from '../../ariane/xtmOneAvailability';
@@ -84,7 +84,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart, autonomousRun = null, 
   const theme = useTheme();
   const { t } = useFormatter();
   const { scenarioId } = useParams() as { scenarioId: ScenarioType['scenario_id'] };
-  const ability = useContext(AbilityContext);
+  const ability = useAbility();
   const dispatch = useAppDispatch();
 
   // Fetching data
@@ -162,7 +162,10 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart, autonomousRun = null, 
       // @ts-expect-error: should pass Exercise model IF we have update as action
       exercise={exercise}
       actions={isScenarioChaining ? ['Export', 'Delete'] : ['Duplicate', 'Export', 'Delete']}
-      onDelete={result => setExercises(exercises.filter(e => (e.exercise_id !== result)))}
+      onDelete={(result) => {
+        setExercises(exercises.filter(e => (e.exercise_id !== result)));
+        queryableHelpers.paginationHelpers.incrementTotalElements(-1);
+      }}
       inList
     />
   );
@@ -423,7 +426,10 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart, autonomousRun = null, 
             >
               {hasNeverRun ? t('This scenario has not run yet') : t('No results to display yet')}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{ color: 'text.secondary' }}
+            >
               {t('The insights below are a sample preview. Launch a simulation to populate them with your real posture.')}
             </Typography>
           </Box>

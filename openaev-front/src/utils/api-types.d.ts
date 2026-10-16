@@ -3132,10 +3132,7 @@ export interface ConnectorInstanceLog {
 }
 
 export interface ConnectorInstanceLogsInput {
-  /**
-   * The connector instance logs
-   * @uniqueItems true
-   */
+  /** The connector instance logs, oldest first */
   connector_instance_logs?: string[];
 }
 
@@ -5736,6 +5733,7 @@ export interface ExecutorOutput {
   connector_instance?: ConnectorInstanceOutput;
   executor_background_color?: string;
   executor_doc?: string;
+  executor_enterprise?: boolean;
   /**
    * Executor id
    * @minLength 1
@@ -6673,6 +6671,7 @@ export interface Grant {
     | "SCENARIO"
     | "SIMULATION"
     | "ATOMIC_TESTING"
+    | "AUTONOMOUS_RUN"
     | "THREAT_ARSENAL"
     | "PAYLOAD"
     | "UNKNOWN";
@@ -6700,6 +6699,7 @@ export interface GroupGrantInput {
     | "SCENARIO"
     | "SIMULATION"
     | "ATOMIC_TESTING"
+    | "AUTONOMOUS_RUN"
     | "THREAT_ARSENAL"
     | "PAYLOAD"
     | "UNKNOWN";
@@ -6793,6 +6793,7 @@ export interface ImportMapper {
   /** @format date-time */
   import_mapper_created_at?: string;
   import_mapper_id: string;
+  /** @uniqueItems true */
   import_mapper_inject_importers?: InjectImporter[];
   import_mapper_inject_type_column: string;
   /** @minLength 1 */
@@ -8761,6 +8762,7 @@ export interface NotificationTriggerInput {
     | "PLATFORM_GROUP"
     | "PLATFORM_USER"
     | "XTM_HUB_REGISTRATION"
+    | "NEWS_FEED"
     | "SNAPSHOT_OBSERVATION"
     | "UNKNOWN"
     | "SIMULATION_OR_SCENARIO"
@@ -8770,6 +8772,7 @@ export interface NotificationTriggerInput {
     | "SESSION"
     | "TOKEN"
     | "PLATFORM_SESSION"
+    | "AUTONOMOUS_RUN"
     | "SKIP_RBAC";
   /** Digest firing time (UTC): DAY=HH:mm, WEEK=<1-7>-HH:mm, MONTH=<1-31>-HH:mm */
   notification_trigger_time?: string;
@@ -8873,6 +8876,7 @@ export interface NotificationTriggerOutput {
     | "PLATFORM_GROUP"
     | "PLATFORM_USER"
     | "XTM_HUB_REGISTRATION"
+    | "NEWS_FEED"
     | "SNAPSHOT_OBSERVATION"
     | "UNKNOWN"
     | "SIMULATION_OR_SCENARIO"
@@ -8882,6 +8886,7 @@ export interface NotificationTriggerOutput {
     | "SESSION"
     | "TOKEN"
     | "PLATFORM_SESSION"
+    | "AUTONOMOUS_RUN"
     | "SKIP_RBAC";
   /** Digest firing time (UTC) */
   notification_trigger_time?: string;
@@ -9948,7 +9953,7 @@ export interface PageableObject {
   /** @format int32 */
   pageSize?: number;
   paged?: boolean;
-  sort?: SortObject[];
+  sort?: SortObject;
   unpaged?: boolean;
 }
 
@@ -10525,6 +10530,7 @@ export interface PlatformSettings {
     | "OPENAEV_TRIALS_XTMHUB"
     | "CREDENTIAL_ASSET"
     | "MARKING"
+    | "RATE_LIMITING"
     | "BULK_SNAPSHOT_EXPORT"
   )[];
   /** True if the Tanium Executor is enabled */
@@ -10911,6 +10917,7 @@ export interface PublicPlatformSettings {
     | "OPENAEV_TRIALS_XTMHUB"
     | "CREDENTIAL_ASSET"
     | "MARKING"
+    | "RATE_LIMITING"
     | "BULK_SNAPSHOT_EXPORT"
   )[];
   /** Map of the messages to display on the screen by their level (the level available are DEBUG, INFO, WARN, ERROR, FATAL) */
@@ -12565,11 +12572,9 @@ export interface SortField {
 }
 
 export interface SortObject {
-  ascending?: boolean;
-  direction?: string;
-  ignoreCase?: boolean;
-  nullHandling?: string;
-  property?: string;
+  empty?: boolean;
+  sorted?: boolean;
+  unsorted?: boolean;
 }
 
 export interface SourceFacetOutput {
@@ -13084,6 +13089,7 @@ export interface Team {
    * @format int64
    */
   team_exercise_injects_number?: number;
+  /** @uniqueItems true */
   team_exercises?: string[];
   team_exercises_users?: string[];
   /**
@@ -13127,6 +13133,7 @@ export interface Team {
    * @format int64
    */
   team_scenario_injects_number?: number;
+  /** @uniqueItems true */
   team_scenarios?: string[];
   /** @uniqueItems true */
   team_tags?: string[];

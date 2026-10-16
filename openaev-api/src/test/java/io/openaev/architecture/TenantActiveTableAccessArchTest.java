@@ -36,6 +36,7 @@ import io.openaev.database.model.SecurityPlatform;
 import io.openaev.database.model.Vulnerability;
 import io.openaev.database.model.Widget;
 import io.openaev.database.model.attackpath.AttackPathExecution;
+import io.openaev.database.repository.AgentRepository;
 import io.openaev.database.repository.AssetAgentJobRepository;
 import io.openaev.database.repository.AttackPatternRepository;
 import io.openaev.database.repository.ChallengeRepository;
@@ -81,6 +82,7 @@ import io.openaev.database.repository.attackpath.AttackPathExecutionRepository;
 import io.openaev.database.repository.attackpath.AttackPathFindingRepository;
 import io.openaev.database.repository.autonomous.AutonomousDirectiveRepository;
 import io.openaev.database.repository.autonomous.AutonomousEventRepository;
+import io.openaev.database.repository.autonomous.AutonomousObjectiveTemplateRepository;
 import io.openaev.database.repository.autonomous.AutonomousRunRepository;
 import io.openaev.engine.model.attackpattern.AttackPatternHandler;
 import io.openaev.engine.model.finding.FindingHandler;
@@ -127,12 +129,14 @@ import io.openaev.processor.datapack.V20260101_Starter_pack;
 import io.openaev.processor.datapack.V20260330_Default_tenant_data;
 import io.openaev.processor.datapack.V20260708_Dynamic_injectors_base_url;
 import io.openaev.processor.datapack.V20260914_Default_tenant_markings;
+import io.openaev.processor.datapack.V20261002_Default_group_markings;
 import io.openaev.rest.asset.endpoint.EndpointApi;
 import io.openaev.rest.asset.security_platforms.SecurityPlatformApi;
 import io.openaev.rest.atomic_testing.AtomicTestingApi;
 import io.openaev.rest.attack_pattern.AttackPatternApi;
 import io.openaev.rest.attack_pattern.AttackPatternInitializer;
 import io.openaev.rest.attack_pattern.service.AttackPatternService;
+import io.openaev.rest.attack_pattern.service.AttackPatternUpsertService;
 import io.openaev.rest.challenge.ChallengeApi;
 import io.openaev.rest.challenge.ScenarioChallengeApi;
 import io.openaev.rest.challenge.SimulationChallengeApi;
@@ -165,6 +169,8 @@ import io.openaev.rest.inject.InjectApi;
 import io.openaev.rest.inject.ScenarioInjectApi;
 import io.openaev.rest.inject.SimulationInjectApi;
 import io.openaev.rest.inject.exports.InjectsFileExport;
+import io.openaev.rest.inject.service.ExecutableInjectService;
+import io.openaev.rest.inject.service.InjectExecutionService;
 import io.openaev.rest.inject.service.InjectService;
 import io.openaev.rest.inject.service.InjectStatusService;
 import io.openaev.rest.inject.service.ScenarioInjectService;
@@ -200,8 +206,10 @@ import io.openaev.rest.user.MeApi;
 import io.openaev.rest.user.PlayerApi;
 import io.openaev.rest.user.PlayerService;
 import io.openaev.rest.vulnerability.service.VulnerabilityService;
+import io.openaev.scheduler.jobs.AgentInactivityMonitorJob;
 import io.openaev.scheduler.jobs.ComchecksExecutionJob;
 import io.openaev.search.FullTextSearchService;
+import io.openaev.service.AgentService;
 import io.openaev.service.ChallengeService;
 import io.openaev.service.ChannelService;
 import io.openaev.service.DataPackService;
@@ -223,6 +231,7 @@ import io.openaev.service.attackpath.AttackPathSecurityPlatformResolver;
 import io.openaev.service.attackpath.ingestion.AttackPathExecutionIngestionService;
 import io.openaev.service.attackpath.ingestion.AttackPathFindingIngestionService;
 import io.openaev.service.autonomous.AutonomousEventService;
+import io.openaev.service.autonomous.AutonomousObjectiveTemplateService;
 import io.openaev.service.autonomous.AutonomousRunReconciliationWriter;
 import io.openaev.service.autonomous.AutonomousRunService;
 import io.openaev.service.autonomous.AutonomousTimeoutService;
@@ -233,6 +242,7 @@ import io.openaev.service.connector_instances.ConnectorInstanceService;
 import io.openaev.service.connectors.ConnectorOrchestrationService;
 import io.openaev.service.custom_domain.CustomDomainPublicLookupService;
 import io.openaev.service.expectation.ChallengeBehavior;
+import io.openaev.service.inject.BatchingInjectStatusService;
 import io.openaev.service.marking_definition.MarkingDefinitionService;
 import io.openaev.service.notification.NotificationService;
 import io.openaev.service.notification.NotificationTriggerService;
@@ -343,7 +353,9 @@ class TenantActiveTableAccessArchTest {
           "reporting_generations",
           "datapacks",
           "teams",
-          "attack_patterns");
+          "attack_patterns",
+          "agents",
+          "autonomous_objective_templates");
 
   @ArchTest
   static void every_active_table_is_guarded(JavaClasses classes) throws Exception {
@@ -541,6 +553,11 @@ class TenantActiveTableAccessArchTest {
               // tenantTx.execute/setScopeOnCurrentTransaction with TxCtx.forTenant(...)), so it
               // needs no waiver.
               V20260914_Default_tenant_markings.class,
+              // Provisioning datapack: grants each default group (Admin/Manager/Observer) the TLP
+              // marking matching its role. Runs under the same tenant-scoped transaction primitive
+              // as the two datapacks above (MigrationProcessor -> tenantTx.execute/
+              // setScopeOnCurrentTransaction with TxCtx.forTenant(...)), so it needs no waiver.
+              V20261002_Default_group_markings.class,
               // Background primitive: reads the tenant's markings to assign the system clearance a
               // background transaction runs at (all markings of the tenants in scope — a scheduler
               // is not a user). Scoped, and in the strongest sense the rule asks for: the read
@@ -1616,7 +1633,7 @@ class TenantActiveTableAccessArchTest {
               KillChainPhaseService.class,
               // Reads phases by id for an upserted attack pattern; driven by the TxCtx-carrying
               // AttackPatternApi#upsertAttackPatterns:
-              AttackPatternService.class)
+              AttackPatternUpsertService.class)
           .should()
           .dependOnClassesThat()
           .areAssignableTo(KillChainPhaseRepository.class)
@@ -1647,6 +1664,7 @@ class TenantActiveTableAccessArchTest {
               InjectService.class,
               ScenarioService.class,
               AttackPatternService.class,
+              AttackPatternUpsertService.class,
               WorkflowExportInitializer.class,
               EsAttackPathService.class,
               V1_DataImporter.class)
@@ -1670,6 +1688,7 @@ class TenantActiveTableAccessArchTest {
               // Services behind wired handlers; every lookup names the tenant it writes to, or
               // relies on the handler's scope:
               AttackPatternService.class,
+              AttackPatternUpsertService.class,
               InjectorContractService.class,
               PayloadCreationService.class,
               PayloadUpdateService.class,
@@ -1875,6 +1894,40 @@ class TenantActiveTableAccessArchTest {
           .because(
               "autonomous_directives is tenant-active: an accessor without a tenant scope silently"
                   + " reads zero rows. New accessors must carry a scope and be allowlisted here");
+
+  @ArchTest
+  static final ArchRule agents_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // The only writer. Every create stamps the tenant from the registering executor's
+              // own tenant before the save (EndpointService/CalderaExecutorService
+              // setNewAgentAttributes), so no write depends on the removed v1 listener; the native
+              // delete and the asset touch run inside the deleting caller's scope.
+              AgentService.class,
+              // Inject-target search rooted on Agent, reached from TxCtx-carrying HTTP only.
+              AgentTargetSearchAdaptor.class,
+              // Counts active agents for the autonomous capability report, inside the TxCtx scope
+              // of POST /api/autonomous-runs/capabilities/resolve.
+              CapabilityResolverService.class,
+              // Inject-execution callbacks: the batch mixes tenants and loads each group's agents
+              // inside TxCtx.forTenant(the group's inject tenant).
+              BatchingInjectStatusService.class,
+              // Execution-trace writers reading the agent by id, on the TxCtx-carrying callback
+              // and inject-execution paths.
+              InjectStatusService.class,
+              InjectExecutionService.class,
+              ExecutableInjectService.class,
+              // Quartz heartbeat monitor: reads and updates one tenant's stale agents inside
+              // TenantScopedTransaction#forEachTenant.
+              AgentInactivityMonitorJob.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(AgentRepository.class)
+          .because(
+              "agents is tenant-active: an accessor without a tenant scope silently reads zero"
+                  + " rows, and an unscoped DELETE purges nothing while reporting success. New"
+                  + " accessors must carry a scope and be allowlisted here");
 
   @ArchTest
   static final ArchRule asset_agent_jobs_repository_access_is_reviewed =
@@ -2233,4 +2286,20 @@ class TenantActiveTableAccessArchTest {
           .because(
               "teams is tenant-active: an accessor without a tenant scope silently reads zero rows."
                   + " New accessors must carry a scope and be allowlisted here");
+
+  static final ArchRule autonomous_objective_templates_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // Sole accessor: the objective-template gallery service, reached only from
+              // AutonomousRunApi.objectiveTemplates, whose TxCtx carries @RequireTenantSelector so
+              // the scope pins exactly one tenant for both the read and the lazy built-in seed.
+              AutonomousObjectiveTemplateService.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(AutonomousObjectiveTemplateRepository.class)
+          .because(
+              "autonomous_objective_templates is tenant-active: an accessor without a tenant scope"
+                  + " silently reads zero rows, and the seed it drives would attribute its rows to"
+                  + " the wrong tenant. New accessors must carry a scope and be allowlisted here");
 }

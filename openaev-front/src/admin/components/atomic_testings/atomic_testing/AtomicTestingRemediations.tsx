@@ -4,7 +4,7 @@ import { Box, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 // eslint-disable-next-line import/no-named-as-default
 import DOMPurify from 'dompurify';
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router';
 
 import type { SecurityPlatformHelper } from '../../../../actions/assets/asset-helper';
@@ -23,7 +23,7 @@ import {
 } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { AbilityContext } from '../../../../utils/permissions/permissionsContext';
+import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import RestrictionAccess from '../../../../utils/permissions/RestrictionAccess';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { buildTenantApiPath } from '../../../../utils/url-helper';
@@ -44,7 +44,7 @@ const AtomicTestingRemediations = () => {
   const [activeTab, setActiveTab] = useState<number>(0);
   const [detectionRemediations, setDetectionRemediations] = useState<DetectionRemediationOutput[]>([]);
   const [hasFetchedRemediations, setHasFetchedRemediations] = useState(false);
-  const ability = useContext(AbilityContext);
+  const ability = useAbility();
 
   const isRemediationTab = location.pathname.includes('/remediations');
 
@@ -120,7 +120,7 @@ const AtomicTestingRemediations = () => {
       if (!tabsData || !tabsData[activeTabIndex]) return map;
 
       map.set(tabsData[activeTabIndex].asset_id, {
-        ...map.get(tabsData[activeTabIndex].asset_id) || {},
+        ...(map.get(tabsData[activeTabIndex].asset_id) || {}),
         isLoading: isLoading,
       } as SnapshotEditionRemediationType);
 
@@ -133,7 +133,7 @@ const AtomicTestingRemediations = () => {
       const map = new Map(prev || []);
       if (!tabsData) return map;
       map.set(securityPlatformId, {
-        ...map.get(securityPlatformId) || {},
+        ...(map.get(securityPlatformId) || {}),
         isLoading: isLoading,
         AIRules: AIRules,
       } as SnapshotEditionRemediationType);
@@ -221,7 +221,10 @@ const AtomicTestingRemediations = () => {
         color: 'text.disabled',
       }}
       />
-      <Typography variant="body2" color="text.secondary">
+      <Typography
+        variant="body2"
+        sx={{ color: 'text.secondary' }}
+      >
         {t('No detection rule available for this security platform yet.')}
       </Typography>
     </Paper>
