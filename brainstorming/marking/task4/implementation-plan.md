@@ -552,7 +552,7 @@ A user can only see one agentless asset => make sure the admin sees "asset not t
 
 ## Chunk 9 — UX/UI: show who launched and what was skipped
 
-Size: M, check for refactoring the assets lists. S for the dev.
+Size: M, check for refactoring the assets lists. S for the dev only.
 
 **Status**: not started. **The PO needs to design it** before any code: the points below are the needs, not
 a design.
@@ -595,7 +595,7 @@ contracts, so the marking filter does not apply.
 
 Size: M.
 
-**Status**: POC done. Tracked as a separate issue and PR, outside this plan's scope because it needs product definition.
+**Status**: POC done in a PR. It needs product definition.
 The RBAC and grands have not been implemented yet, a first adjustment must be done before implementing markings 
 for dashboards.
 
