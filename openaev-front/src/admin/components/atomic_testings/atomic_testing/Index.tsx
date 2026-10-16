@@ -7,7 +7,6 @@ import { fetchInjectResultOverviewOutput } from '../../../../actions/atomic_test
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { type InjectResultOverviewOutput } from '../../../../utils/api-types';
-import useInjectHasTargets from '../../../../utils/hooks/useInjectHasTargets';
 import { FIVE_SECONDS } from '../../../../utils/Time';
 import { TeamContext } from '../../common/Context';
 import { InjectResultOverviewOutputContext } from '../InjectResultOverviewOutputContext';
@@ -24,7 +23,6 @@ const Index = () => {
   const [pristine, setPristine] = useState(true);
   const [loading, setLoading] = useState(true);
   const [injectResultOverviewOutput, setInjectResultOverviewOutput] = useState<InjectResultOverviewOutput>();
-  const injectHasTargets = useInjectHasTargets(injectId, injectResultOverviewOutput?.inject_updated_at);
 
   useEffect(() => {
     setLoading(true);
@@ -77,7 +75,6 @@ const Index = () => {
       <InjectResultOverviewOutputContext.Provider value={{
         injectResultOverviewOutput,
         updateInjectResultOverviewOutput,
-        injectHasTargets,
       }}
       >
         <AtomicTestingHeader injectResultOverview={injectResultOverviewOutput} setInjectResultOverview={setInjectResultOverviewOutput} />

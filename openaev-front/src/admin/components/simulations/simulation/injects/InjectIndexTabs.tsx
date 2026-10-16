@@ -1,5 +1,4 @@
 import { Tabs, TabsList, TabsTrigger } from '@filigran/design-system';
-import { useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 
 import { BACK_LABEL, BACK_URI } from '../../../../../components/Breadcrumbs';
@@ -7,7 +6,6 @@ import { useFormatter } from '../../../../../components/i18n';
 import type { Exercise as ExerciseType, InjectResultOverviewOutput } from '../../../../../utils/api-types';
 import useEnterpriseEdition from '../../../../../utils/hooks/useEnterpriseEdition';
 import { externalContractTypesWithFindings } from '../../../../../utils/injector_contract/InjectorContractUtils';
-import { InjectResultOverviewOutputContext } from '../../../atomic_testings/InjectResultOverviewOutputContext';
 import EEChip from '../../../common/entreprise_edition/EEChip';
 
 interface Props {
@@ -25,8 +23,7 @@ const InjectIndexTabs = ({ injectResultOverview, exercise, backlabel, backuri }:
   const tabValue = location.pathname;
   const current = (path: string) => (tabValue === path ? 'page' : undefined);
   const hasPayload = !!injectResultOverview.inject_injector_contract?.injector_contract_payload;
-  const { injectHasTargets } = useContext(InjectResultOverviewOutputContext);
-  const hasOverview = injectHasTargets !== false;
+  const hasOverview = injectResultOverview.inject_has_targets;
   const hasFindings = hasPayload || externalContractTypesWithFindings.includes(injectResultOverview.inject_type ?? '');
 
   const computePath = (path: string) => {

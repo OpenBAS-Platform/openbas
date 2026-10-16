@@ -1,5 +1,4 @@
 import { Tabs, TabsList, TabsTrigger } from '@filigran/design-system';
-import { useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 
 import { useFormatter } from '../../../../components/i18n';
@@ -7,7 +6,6 @@ import type { InjectResultOverviewOutput } from '../../../../utils/api-types';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 import { externalContractTypesWithFindings } from '../../../../utils/injector_contract/InjectorContractUtils';
 import EEChip from '../../common/entreprise_edition/EEChip';
-import { InjectResultOverviewOutputContext } from '../InjectResultOverviewOutputContext';
 
 interface Props { injectResultOverview: InjectResultOverviewOutput }
 
@@ -15,7 +13,6 @@ const AtomicTestingTabs = ({ injectResultOverview }: Props) => {
   const { t } = useFormatter();
   const location = useLocation();
   const navigate = useNavigate();
-  const { injectHasTargets } = useContext(InjectResultOverviewOutputContext);
 
   const {
     isValidated: isValidatedEnterpriseEdition,
@@ -27,7 +24,7 @@ const AtomicTestingTabs = ({ injectResultOverview }: Props) => {
   const tabValue = location.pathname;
   const current = (path: string) => (tabValue === path ? 'page' : undefined);
   const hasPayload = !!injectResultOverview.inject_injector_contract?.injector_contract_payload;
-  const hasOverview = injectHasTargets !== false;
+  const hasOverview = injectResultOverview.inject_has_targets;
   const hasFindings = hasPayload || externalContractTypesWithFindings.includes(injectResultOverview.inject_type ?? '');
 
   const handleRemediationClick = (event: React.SyntheticEvent) => {
