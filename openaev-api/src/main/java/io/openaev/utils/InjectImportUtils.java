@@ -19,14 +19,10 @@ import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.springframework.web.util.HtmlUtils;
 
 public final class InjectImportUtils {
-
-  private static final String DEFAULT_FONT_COLOR = "#000000";
 
   private InjectImportUtils() {}
 
@@ -133,6 +129,10 @@ public final class InjectImportUtils {
     Workbook workbook = cell.getSheet().getWorkbook();
     Font cellFont = workbook.getFontAt(cell.getCellStyle().getFontIndex());
     int runs = richText.numFormattingRuns();
+    if (runs == 0 && !isFormatted(cellFont)) {
+      // An unformatted cell keeps its raw content, which may already be HTML.
+      return text.replaceAll("\r?\n", "<br/>");
+    }
     StringBuilder html = new StringBuilder();
     int start = 0;
     for (int run = 0; run <= runs; run++) {
@@ -158,12 +158,12 @@ public final class InjectImportUtils {
     return font != null ? font : cellFont;
   }
 
+  private static boolean isFormatted(Font font) {
+    return font.getBold() || font.getItalic() || font.getUnderline() != Font.U_NONE;
+  }
+
   private static String fontToHtml(String text, Font font) {
     String html = HtmlUtils.htmlEscape(text).replaceAll("\r?\n", "<br/>");
-    String color = fontColor(font);
-    if (color != null && !DEFAULT_FONT_COLOR.equals(color)) {
-      html = "<span style=\"color:" + color + "\">" + html + "</span>";
-    }
     if (font.getUnderline() != Font.U_NONE) {
       html = "<u>" + html + "</u>";
     }
@@ -174,17 +174,6 @@ public final class InjectImportUtils {
       html = "<strong>" + html + "</strong>";
     }
     return html;
-  }
-
-  private static String fontColor(Font font) {
-    if (font instanceof XSSFFont xssfFont) {
-      XSSFColor color = xssfFont.getXSSFColor();
-      byte[] rgb = color == null ? null : color.getRGB();
-      return rgb == null || rgb.length != 3
-          ? null
-          : String.format("#%02x%02x%02x", rgb[0] & 0xFF, rgb[1] & 0xFF, rgb[2] & 0xFF);
-    }
-    return null;
   }
 
   /**
