@@ -227,6 +227,9 @@ public interface InjectExpectationRepository
   @Query(value = "select i from InjectExpectation i where i.inject.id = :injectId")
   List<BaseInjectExpectation> findAllByInjectId(@Param("injectId") @NotBlank final String injectId);
 
+  @Query(value = "select i from InjectExpectation i where i.inject.id in (:injectIds)")
+  List<BaseInjectExpectation> findAllByInjectIds(@Param("injectId") @NotBlank final Set<String> injectIds);
+
   /**
    * Pre-loads agent / asset / assetGroup relations of all {@link TechnicalInjectExpectation}
    * instances for a given inject into the Hibernate session cache via JOIN FETCH. Must be called
