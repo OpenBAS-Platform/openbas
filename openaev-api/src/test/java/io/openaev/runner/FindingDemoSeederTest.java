@@ -60,19 +60,18 @@ class FindingDemoSeederTest {
     }
 
     @Test
-    @DisplayName("Should require a supported profile even when the property is enabled")
-    void given_propertyWithoutSupportedProfile_should_notCreateSeeder() {
+    @DisplayName("Should never seed under the test profile, even when the property is enabled")
+    void given_testProfileAndProperty_should_notCreateSeeder() {
       contextRunner
-          .withPropertyValues("openaev.dev.seed-findings=true")
+          .withPropertyValues("spring.profiles.active=test", "openaev.dev.seed-findings=true")
           .run(context -> assertThat(context).doesNotHaveBean(FindingDemoSeeder.class));
     }
 
     @Test
-    @DisplayName("Should be enabled explicitly for feature branch environments")
-    void given_featureBranchProfileAndProperty_should_createSeeder() {
+    @DisplayName("Should seed any non-test environment when the property is enabled")
+    void given_propertyWithoutTestProfile_should_createSeeder() {
       contextRunner
-          .withPropertyValues(
-              "spring.profiles.active=test-feature-branch", "openaev.dev.seed-findings=true")
+          .withPropertyValues("spring.profiles.active=ci", "openaev.dev.seed-findings=true")
           .run(context -> assertThat(context).hasSingleBean(FindingDemoSeeder.class));
     }
   }

@@ -56,10 +56,15 @@ import org.springframework.stereotype.Component;
  *
  * <p>Every sample is submitted through the normal Inject callback pipeline so the demo exercises
  * output validation, legacy Finding compatibility, stable identity aggregation and occurrence
- * persistence. The profile and property gates keep synthetic data out of production deployments.
+ * persistence.
+ *
+ * <p>PoC branch only: the seed is on by default ({@code openaev.dev.seed-findings=true} in
+ * application.properties) so that PR staging environments, whose configuration cannot be set at
+ * deploy time, show every finding type. The {@code test} profile never seeds. Remove the default
+ * before merging anything from this branch.
  */
 @Component
-@Profile({"dev", "test-feature-branch"})
+@Profile("!test")
 @ConditionalOnProperty(prefix = "openaev.dev", name = "seed-findings", havingValue = "true")
 @RequiredArgsConstructor
 @Slf4j

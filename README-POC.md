@@ -341,7 +341,7 @@ Type, **Severity**, Value, Field, **Source**, First seen, Last seen, **Inject** 
 
 ## Demo data
 
-When `openaev.dev.seed-findings=true` and the `dev` or `test-feature-branch` profile is active, `FindingDemoSeeder` creates demo Findings in the default tenant at startup. It sends real execution callbacks, so the data goes through the full ingestion pipeline. It is idempotent (injects are matched by title).
+On this branch `openaev.dev.seed-findings` is `true` by default (`application.properties`), so `FindingDemoSeeder` creates demo Findings in the default tenant at startup in every environment except the `test` profile, PR staging environments included. Remove that default before merging anything from this branch. It sends real execution callbacks, so the data goes through the full ingestion pipeline. It is idempotent (injects are matched by title).
 
 Every dataset is replayed over **three scans** (2026-08-20, 2026-09-03, 2026-09-17), so each Finding has a filled **Timeline**, and almost every Finding is observed on **at least two Locations**, so **Also Detected On** is filled too.
 
@@ -416,7 +416,7 @@ All endpoints also exist under `/api/tenants/{tenantId}/…`.
 
 | Property | Default | Description |
 |---|---|---|
-| `openaev.dev.seed-findings` | `false` | Seed demo Findings (profiles `dev`, `test-feature-branch`) |
+| `openaev.dev.seed-findings` | `true` on this branch | Seed demo Findings (any profile except `test`) |
 | `openaev.finding.soft-delete-grace-days` | `30` | Days a manually archived Finding stays before soft-delete |
 | Tenant setting `finding_archive_days` | `30` | Archive after (days), set from the Findings page |
 
