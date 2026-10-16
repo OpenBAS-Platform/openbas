@@ -29,11 +29,18 @@ public interface InjectExpectationRepository
   // whole table). Without it, any query embedding these predicates that also touches a
   // tenant-active table (e.g. collectors) is refused with TENANT_FILTERING_REFUSED (#7007).
   String RESULTS_HAS_NO_RESULT_FOR_SOURCE =
-      "NOT EXISTS (SELECT 1 FROM LATERAL jsonb_array_elements(e.inject_expectation_results::jsonb) r "
-          + "WHERE r->>'sourceId' = :sourceId AND COALESCE(r->>'result', '') <> '') ";
+      """
+      NOT EXISTS (SELECT 1 FROM inject_expectation_results ier
+      WHERE ier.inject_expectation_result_result IS NOT NULL
+        AND ier.inject_expectation_result_source_id = :sourceId
+        AND ier.inject_expectation_result_inject_expectation_id = e.inject_expectation_id)
+      """;
   String RESULTS_HAS_NO_RESULT_AT_ALL =
-      "NOT EXISTS (SELECT 1 FROM LATERAL jsonb_array_elements(e.inject_expectation_results::jsonb) r "
-          + "WHERE COALESCE(r->>'result', '') <> '') ";
+      """
+      NOT EXISTS (SELECT 1 FROM inject_expectation_results ier
+      WHERE ier.inject_expectation_result_result IS NOT NULL
+        AND ier.inject_expectation_result_inject_expectation_id = e.inject_expectation_id)
+      """;
 
   @NotNull
   Optional<BaseInjectExpectation> findById(@NotNull String id);
