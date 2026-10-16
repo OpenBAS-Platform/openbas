@@ -6,6 +6,7 @@ import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openaev.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import java.time.Instant;
 import java.util.Map;
 import lombok.*;
 import org.hibernate.annotations.Type;
@@ -57,7 +58,7 @@ public class InjectExpectationResult implements Base {
   @Setter
   @Column(name = "inject_expectation_result_date")
   @JsonProperty("inject_expectation_result_date")
-  private String date;
+  private Instant date;
 
   @Setter
   @Column(name = "inject_expectation_result_score")
@@ -67,7 +68,6 @@ public class InjectExpectationResult implements Base {
   @Setter
   @Column(name = "inject_expectation_result_result")
   @JsonProperty("inject_expectation_result_result")
-  @NotBlank
   private String result;
 
   @Setter

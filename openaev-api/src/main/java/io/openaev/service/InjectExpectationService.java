@@ -1866,7 +1866,7 @@ public class InjectExpectationService {
           String sourceType =
               optionalSourceResult.map(InjectExpectationResult::getSourceType).orElse(null);
           String detectionTimestamp =
-              optionalSourceResult.map(InjectExpectationResult::getDate).orElse(null);
+              optionalSourceResult.map(result -> result.getDate().toString()).orElse(null);
 
           Map<String, Object> contextData = new LinkedHashMap<>();
           contextData.put("inject_id", injectId);
@@ -1916,7 +1916,7 @@ public class InjectExpectationService {
           InjectExpectationResult.builder()
               .sourceId(sourceId)
               .sourceName(sourceName)
-              .date(Instant.now().toString())
+              .date(Instant.now())
               .build();
     }
     logExpectationResultEvent(expectation, sourceResult);

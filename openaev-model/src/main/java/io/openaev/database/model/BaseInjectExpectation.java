@@ -11,6 +11,7 @@ import io.openaev.database.audit.ModelBaseListener;
 import io.openaev.helper.MonoIdSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -20,9 +21,7 @@ import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.*;
 
 @Getter
 @Entity(name = "InjectExpectation")
@@ -123,7 +122,8 @@ public class BaseInjectExpectation implements Base, Cloneable {
   private String description;
 
   @Setter
-  @OneToMany(mappedBy = "injectExpectation")
+  @OneToMany(mappedBy = "injectExpectation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SUBSELECT)
   @JsonProperty("inject_expectation_results")
   private List<InjectExpectationResult> results = new ArrayList<>();
 

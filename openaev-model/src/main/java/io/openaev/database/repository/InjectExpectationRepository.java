@@ -381,7 +381,7 @@ public interface InjectExpectationRepository
               + "i.inject_expectation_type AS inject_expectation_type, "
               + "i.user_id AS user_id, "
               + "i.inject_expectation_score AS inject_expectation_score, "
-              + "i.inject_expectation_results AS inject_expectation_results, "
+              + "'[]'::jsonb AS inject_expectation_results, "
               + "i.inject_expectation_expected_score AS inject_expectation_expected_score, "
               + "i.inject_expectation_group AS inject_expectation_group "
               + "FROM injects_expectations i "

@@ -9,7 +9,7 @@ import java.time.Instant;
 public class InjectExpectationResultFixture {
   public static InjectExpectationResult getExpiredResult() {
     return InjectExpectationResult.builder()
-        .date(Instant.now().toString())
+        .date(Instant.now())
         .result(ExpectationsExpirationManagerService.EXPIRED)
         .sourceId(COLLECTOR_ID)
         .sourceName("Expiration Manager")
