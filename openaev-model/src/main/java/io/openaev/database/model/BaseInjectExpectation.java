@@ -121,11 +121,22 @@ public class BaseInjectExpectation implements Base, Cloneable {
   @JsonProperty("inject_expectation_description")
   private String description;
 
-  @Setter
   @OneToMany(mappedBy = "injectExpectation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @Fetch(FetchMode.SUBSELECT)
   @JsonProperty("inject_expectation_results")
   private List<InjectExpectationResult> results = new ArrayList<>();
+
+  public void addResult(InjectExpectationResult result) {
+    result.setInjectExpectation(this);
+    this.results.add(result);
+  }
+
+  public void setResults(List<InjectExpectationResult> results) {
+    for (InjectExpectationResult result : results) {
+      result.setInjectExpectation(this);
+    }
+    this.results = results;
+  }
 
   @Setter
   @Column(name = "inject_expectation_score")

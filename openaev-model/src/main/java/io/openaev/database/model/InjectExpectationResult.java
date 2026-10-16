@@ -78,6 +78,7 @@ public class InjectExpectationResult implements Base {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "inject_expectation_result_inject_expectation_id")
+  @Setter
   @JsonIgnore
   private BaseInjectExpectation injectExpectation;
 }

@@ -59,7 +59,7 @@ public class InjectExpectationComposer extends ComposerBase<BaseInjectExpectatio
 
     // FIXME: make this persistable
     public Composer withResult(InjectExpectationResult result) {
-      this.baseInjectExpectation.getResults().add(result);
+      this.baseInjectExpectation.addResult(result);
       return this;
     }
 

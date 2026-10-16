@@ -26,7 +26,7 @@ public class V6_20261015084049806__Add_expectation_results_table extends BaseJav
             inject_expectation_result_result VARCHAR(255) NULL,
             inject_expectation_result_score NUMERIC NULL,
             inject_expectation_result_metadata JSONB,
-            inject_expectation_result_inject_expectation_id VARCHAR(255) REFERENCES injects_expectations(inject_expectation_id)
+            inject_expectation_result_inject_expectation_id VARCHAR(255) NOT NULL REFERENCES injects_expectations(inject_expectation_id)
         );
         """);
 

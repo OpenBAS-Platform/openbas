@@ -222,7 +222,7 @@ public final class ExpectationResultBuilder {
               .date(now())
               .score(input.getScore())
               .build();
-      baseInjectExpectation.getResults().add(existing);
+      baseInjectExpectation.addResult(existing);
     }
   }
 
@@ -258,7 +258,7 @@ public final class ExpectationResultBuilder {
               .score(score)
               .metadata(input.getMetadata())
               .build();
-      baseInjectExpectation.getResults().add(existing);
+      baseInjectExpectation.addResult(existing);
     }
   }
 
@@ -299,7 +299,7 @@ public final class ExpectationResultBuilder {
               .score(score)
               .metadata(input.getMetadata())
               .build();
-      baseInjectExpectation.getResults().add(existing);
+      baseInjectExpectation.addResult(existing);
     }
   }
 
