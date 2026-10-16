@@ -6,7 +6,6 @@ import static java.time.Instant.now;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openaev.annotation.Queryable;
 import io.openaev.database.audit.ModelBaseListener;
 import io.openaev.helper.MonoIdSerializer;
@@ -22,7 +21,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -125,8 +123,7 @@ public class BaseInjectExpectation implements Base, Cloneable {
   private String description;
 
   @Setter
-  @Type(JsonType.class)
-  @Column(name = "inject_expectation_results")
+  @OneToMany(mappedBy = "injectExpectation")
   @JsonProperty("inject_expectation_results")
   private List<InjectExpectationResult> results = new ArrayList<>();
 
