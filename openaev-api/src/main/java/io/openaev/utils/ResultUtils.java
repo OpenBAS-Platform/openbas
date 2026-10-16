@@ -34,7 +34,6 @@ import org.springframework.stereotype.Component;
 public class ResultUtils {
 
   private final InjectExpectationRepository injectExpectationRepository;
-  private final InjectExpectationResultRepository injectExpectationResultRepository;
   private final InjectExpectationMapper injectExpectationMapper;
 
   /**
