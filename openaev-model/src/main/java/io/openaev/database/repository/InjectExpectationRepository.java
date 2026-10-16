@@ -486,7 +486,7 @@ public interface InjectExpectationRepository
     base AS (
         -- One row per ranked expectation (1:1 joins only — no fan-out).
         SELECT ie.inject_expectation_id, ie.inject_expectation_name, ie.inject_expectation_description, ie.inject_expectation_type,
-               ie.inject_expectation_results, ie.inject_expectation_score, ie.inject_expectation_expected_score, ie.inject_expiration_time,
+               '[]'::json as inject_expectation_results, ie.inject_expectation_score, ie.inject_expectation_expected_score, ie.inject_expiration_time,
                ie.inject_expectation_group, ie.inject_expectation_created_at,
                ie.exercise_id, ie.inject_id, ie.user_id, ie.team_id, ie.agent_id, ie.asset_id, ie.asset_group_id,
                i.tenant_id, i.inject_title, i.inject_injector_contract AS contract_id,
@@ -558,7 +558,7 @@ public interface InjectExpectationRepository
          AND child_ie.inject_expectation_type = b.inject_expectation_type
          AND (b.asset_id IS NULL OR child_ie.asset_id = b.asset_id)
          AND (b.asset_group_id IS NULL OR child_ie.asset_group_id = b.asset_group_id)
-        LEFT JOIN LATERAL jsonb_array_elements(child_ie.inject_expectation_results::jsonb) AS child_r(elem) ON true
+        LEFT JOIN LATERAL jsonb_array_elements('[]'::jsonb) AS child_r(elem) ON true
         LEFT JOIN collectors child_c ON child_r.elem->>'sourceId' = child_c.collector_id::text
                                     AND child_c.tenant_id = b.tenant_id
         LEFT JOIN assets child_a ON child_r.elem->>'sourceId' = child_a.asset_id::text
