@@ -443,7 +443,8 @@ public class InjectExpectationService {
     // Same propagation contract as computeTechnicalExpectation: agentless expectations only
     // propagate asset -> group, agent expectations roll up the full chain.
     propagateTechnicalExpectation(updated, updated.getAgent() == null, null);
-    logAutomaticExpectationResult(updated, securityPlatform.getId(), securityPlatform.getName());
+    logAutomaticExpectationResult(
+        updated, securityPlatform.getId(), securityPlatform.getName(), SECURITY_PLATFORM);
     return technicalExpectation;
   }
 
@@ -1821,19 +1822,23 @@ public class InjectExpectationService {
    */
   public void logAutomaticExpectationResult(
       @NotNull final BaseInjectExpectation expectation, @NotNull final Collector collector) {
-    logAutomaticExpectationResult(expectation, collector.getId(), collector.getName());
+    logAutomaticExpectationResult(expectation, collector.getId(), collector.getName(), COLLECTOR);
   }
 
   private void logAutomaticExpectationResult(
       @NotNull final BaseInjectExpectation expectation,
       @NotBlank final String sourceId,
-      @Nullable final String sourceName) {
+      @Nullable final String sourceName,
+      @NotBlank final String sourceType) {
     InjectExpectationResult sourceResult = findResultBySourceId(expectation.getResults(), sourceId);
     if (sourceResult == null) {
+      // A parent concluded by the recompute of its children carries no result of the source: the
+      // audit still attributes the conclusion to it
       sourceResult =
           InjectExpectationResult.builder()
               .sourceId(sourceId)
               .sourceName(sourceName)
+              .sourceType(sourceType)
               .date(Instant.now().toString())
               .build();
     }
