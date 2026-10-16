@@ -236,7 +236,8 @@ public interface InjectRepository
   @Query(
       value =
           "select i.inject_id from injects i where i.inject_injector_contract = '49229430-b5b5-431f-ba5b-f36f599b0233'"
-              + " and i.inject_content like :challengeId",
+              + " and i.inject_content like :challengeId"
+              + " and i.tenant_id = :#{#tenantContext.currentTenant}",
       nativeQuery = true)
   List<String> findAllIdsForChallengeId(@Param("challengeId") String challengeId);
 
@@ -410,6 +411,7 @@ public interface InjectRepository
     FROM injects i
     INNER JOIN findings f ON f.finding_inject_id = i.inject_id
     WHERE (:title IS NULL OR LOWER(i.inject_title) LIKE LOWER(CONCAT('%', COALESCE(:title, ''), '%')))
+      AND i.tenant_id = :#{#tenantContext.currentTenant}
       ORDER BY i.inject_created_at DESC;
     """,
       nativeQuery = true)
@@ -425,6 +427,7 @@ public interface InjectRepository
     LEFT JOIN scenarios_exercises se ON se.exercise_id = i.inject_exercise
     WHERE (i.inject_exercise = :sourceId OR se.scenario_id = :sourceId OR fa.asset_id = :sourceId)
       AND (:title IS NULL OR LOWER(i.inject_title) LIKE LOWER(CONCAT('%', COALESCE(:title, ''), '%')))
+      AND i.tenant_id = :#{#tenantContext.currentTenant}
       ORDER BY i.inject_created_at DESC;
     """,
       nativeQuery = true)
@@ -449,7 +452,8 @@ public interface InjectRepository
           "SELECT i.inject_exercise, i.inject_content FROM injects i "
               + "WHERE i.inject_exercise IN :exerciseIds "
               + "AND (i.inject_content LIKE '%\"ai_target\"%' "
-              + "OR i.inject_content LIKE '%\"target_selector\"%')",
+              + "OR i.inject_content LIKE '%\"target_selector\"%') "
+              + "AND i.tenant_id = :#{#tenantContext.currentTenant}",
       nativeQuery = true)
   List<Object[]> findContentTargetContentsByExerciseIds(Set<String> exerciseIds);
 
