@@ -1,0 +1,52 @@
+name: Docs freshness
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: docs-freshness
+  cancel-in-progress: true
+
+jobs:
+  report:
+    name: Docs freshness report
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Build the report
+        run: |
+          python docs/scripts/docs-freshness.py --output docs-freshness.md
+          cat docs-freshness.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Update the report issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="Docs freshness report"
+          NUMBER=$(gh issue list --state open --search "\"$TITLE\" in:title" --json number,title \
+            --jq ".[] | select(.title == \"$TITLE\") | .number" | head -1)
+          if [ -n "$NUMBER" ]; then
+            gh issue edit "$NUMBER" --body-file docs-freshness.md
+          else
+            gh issue create --title "$TITLE" --body-file docs-freshness.md
+          fi
