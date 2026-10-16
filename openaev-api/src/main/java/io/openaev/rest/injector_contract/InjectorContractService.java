@@ -1427,11 +1427,13 @@ public class InjectorContractService implements DependenciesManager {
 
     Set<Domain> domains =
         new HashSet<>(domainService.findAllByNamesAndTenantId(domainNames, tenantId));
+    // One batched lookup, like the domains above: this runs inside the tenant-creation
+    // transaction and once per copied contract, so a query per tag name is a loop over the
+    // database.
     Set<Tag> tags =
-        tagNames.stream()
-            .map(name -> tagRepository.findByNameAndTenantId(name, tenantId))
-            .flatMap(Optional::stream)
-            .collect(Collectors.toSet());
+        tagNames.isEmpty()
+            ? Set.of()
+            : new HashSet<>(tagRepository.findByNameInAndTenantId(tagNames, tenantId));
     List<AttackPattern> attackPatterns =
         attackPatternIds.isEmpty()
             ? new ArrayList<>()
