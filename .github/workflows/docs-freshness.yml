@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: read
-  issues: write
 
 concurrency:
   group: docs-freshness
@@ -38,15 +37,3 @@ jobs:
           python docs/scripts/docs-freshness.py --output docs-freshness.md
           cat docs-freshness.md >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Update the report issue
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          TITLE="Docs freshness report"
-          NUMBER=$(gh issue list --state open --search "\"$TITLE\" in:title" --json number,title \
-            --jq ".[] | select(.title == \"$TITLE\") | .number" | head -1)
-          if [ -n "$NUMBER" ]; then
-            gh issue edit "$NUMBER" --body-file docs-freshness.md
-          else
-            gh issue create --title "$TITLE" --body-file docs-freshness.md
-          fi

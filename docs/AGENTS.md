@@ -158,7 +158,7 @@ last_verified: 2026-10-14   # every fact on the page was checked against the cod
 - Set `last_verified` only after checking every fact on the page against the code. A page edited without updating it shows as "Changed since verified".
 - When a page is known to be wrong and cannot be fixed now, add `doc_status: outdated` and a short `doc_notes`.
 - Breaking-change guides use `doc_status: release-managed`: they change only at release time.
-- `python docs/scripts/docs-freshness.py` prints the report. The `Docs freshness` workflow refreshes it every week in the `Docs freshness report` issue.
+- `python docs/scripts/docs-freshness.py` prints the report: pages to check first, oldest first. The `Docs freshness` workflow shows it every week in its job summary.
 
 ## User journeys
 
