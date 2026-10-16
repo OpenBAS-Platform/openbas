@@ -21,7 +21,9 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import org.hibernate.annotations.*;
 
 @Data
@@ -85,6 +87,66 @@ public class Finding implements TenantBase {
   @JsonProperty("finding_name")
   protected String name;
 
+  // -- CLOUD MISCONFIGURATION (OCSF) --
+  // All nullable: populated only by OutputProcessors that parse a structured cloud-scanner
+  // payload (currently OCSFOutputProcessor, fed by Prowler's native OCSF Detection Finding JSON -
+  // see ContractOutputType#OCSF). Findings produced by every other processor (CVE, Vulnerability,
+  // credentials, ...) simply leave these null; FindingOverview only renders the "Cloud details"
+  // panel when severity is non-null.
+
+  @Queryable(filterable = true, sortable = true, label = "severity")
+  @Column(name = "finding_severity")
+  @JsonProperty("finding_severity")
+  private String severity;
+
+  // The scanned cloud resource identifier (e.g. an S3 bucket ARN), as reported by
+  // resources[].uid/arn in the OCSF payload - distinct from finding_value, which stays the
+  // human-readable check title used for the type+value dedup key.
+  @Queryable(filterable = true, sortable = true, label = "resource")
+  @Column(name = "finding_resource")
+  @JsonProperty("finding_resource")
+  private String resource;
+
+  @Queryable(filterable = true, sortable = true, label = "cloud account")
+  @Column(name = "finding_cloud_account")
+  @JsonProperty("finding_cloud_account")
+  private String cloudAccount;
+
+  // The cloud provider the resource belongs to (e.g. "aws", "azure", "gcp", "kubernetes"), as
+  // derived from OCSF resources[].cloud_partition. Conflicting resource partitions are never
+  // collapsed to an arbitrary provider.
+  @Queryable(filterable = true, sortable = true, label = "cloud provider")
+  @Column(name = "finding_cloud_provider")
+  @JsonProperty("finding_cloud_provider")
+  private String cloudProvider;
+
+  @Queryable(filterable = true, sortable = true, label = "cloud region")
+  @Column(name = "finding_cloud_region")
+  @JsonProperty("finding_cloud_region")
+  private String cloudRegion;
+
+  // Free text, not filterable/sortable: a remediation description is a paragraph, not a facet.
+  @Column(name = "finding_remediation", columnDefinition = "text")
+  @JsonProperty("finding_remediation")
+  private String remediation;
+
+  // Comma-joined list of violated compliance requirements (e.g. "CIS 2.1.1, NIST 800-53") - kept
+  // as a single text column rather than text[] since it is display-only, mirroring the deprecated
+  // finding_labels precedent's simplicity without reusing its (deprecated) column.
+  @Column(name = "finding_compliance", columnDefinition = "text")
+  @JsonProperty("finding_compliance")
+  private String compliance;
+
+  // The full, untouched OCSF Detection Finding JSON as emitted by Prowler (see
+  // OCSFOutputProcessor's class-level javadoc: the Prowler injector never transforms this
+  // payload). Kept verbatim, not re-derived from the structured fields above, so a user can always
+  // inspect exactly what the scanner reported - including data not otherwise surfaced (e.g. full
+  // resource metadata, OCSF activity/category ids). Free text, not filterable/sortable/searchable:
+  // this is a raw debugging/audit artifact, not a facet.
+  @Column(name = "finding_raw_data", columnDefinition = "text")
+  @JsonProperty("finding_raw_data")
+  private String rawData;
+
   @Schema(implementation = String[].class)
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
@@ -113,6 +175,29 @@ public class Finding implements TenantBase {
   @Queryable(filterable = true, dynamicValues = true, sortable = true, path = "inject.id")
   private Inject inject;
 
+  // Read-only navigation side of the 1:1 relation owned by FindingTriage#finding. Exists solely so
+  // the generic @Queryable filter engine (FilterUtilsJpa) can join through it to filter by
+  // finding_triage_status; the actual status shown to clients is resolved via
+  // FindingTriageService/FindingMapper, since a Finding with no FindingTriage row is virtually
+  // UNTRIAGED rather than having a real DB value (see FindingTriageService#getCurrentStatus
+  // javadoc). FindingDistinctSearchService special-cases the UNTRIAGED filter value to also match
+  // findings with no row at all - a plain equality on this path would silently miss them.
+  @JsonIgnore
+  @OneToOne(mappedBy = "finding", fetch = FetchType.LAZY)
+  @JsonProperty("finding_triage_status")
+  @Queryable(
+      filterable = true,
+      path = "triage.status",
+      refEnumClazz = FindingTriageStatus.class,
+      label = "triage status")
+  // Excluded to break the Finding <-> FindingTriage toString/equals/hashCode recursion (Lombok
+  // @Data on both sides): mirrors the convention used for the mappedBy/inverse-navigation side of
+  // a bidirectional relation elsewhere in this codebase (see SecurityPlatform#collectors /
+  // #injectors), leaving the owning side (FindingTriage#finding) unexcluded.
+  @EqualsAndHashCode.Exclude
+  @ToString.Exclude
+  private FindingTriage triage;
+
   // -- AUDIT --
 
   @Queryable(filterable = true, sortable = true, label = "created at")
@@ -122,12 +207,47 @@ public class Finding implements TenantBase {
   @NotNull
   private Instant creationDate = now();
 
+  // "Last seen": bumped only by the scanner/ingestion path (re-detection upsert, agent
+  // reporting) - see FindingRepository#upsertFinding. Deliberately NOT touched by human actions
+  // (triage, comments) anymore: those instead update humanUpdateDate below, via a native bulk
+  // update that bypasses this column's @UpdateTimestamp, so the two signals stay independent.
   @Queryable(filterable = true, sortable = true, label = "updated at")
   @UpdateTimestamp
   @Column(name = "finding_updated_at", nullable = false)
   @JsonProperty("finding_updated_at")
   @NotNull
   private Instant updateDate = now();
+
+  // Last time a user acted on this finding (triage status change, comment added/edited/deleted -
+  // see FindingTriageService/FindingCommentService). Kept separate from updateDate/"Last seen"
+  // (scanner detection) so the "Updated at" filter can surface human activity only. Set via
+  // FindingRepository#touchHumanUpdate (native update, not a managed-entity save), so it never
+  // triggers updateDate's @UpdateTimestamp. Nullable: many findings never receive a human action.
+  @Queryable(filterable = true, sortable = true, label = "human updated at")
+  @Column(name = "finding_human_updated_at")
+  @JsonProperty("finding_human_updated_at")
+  private Instant humanUpdateDate;
+
+  // Manual archive flag: set when a user archives this finding (bulk "Archive" action), cleared
+  // back to null on "Un-archive". Distinct from - and unioned with, at display time - the
+  // frontend-computed "stale" archive (finding_updated_at older than the tenant's archive-days
+  // setting). Nullable: most findings are never manually archived.
+  @Queryable(filterable = true, sortable = true, label = "archived at")
+  @Column(name = "finding_archived_at")
+  @JsonProperty("finding_archived_at")
+  private Instant archivedAt;
+
+  // Set by FindingSoftDeleteJob once this finding has sat manually archived (archivedAt) for more
+  // than the job's configured grace period (30 days by default) without being un-archived. Once
+  // set, FindingDistinctSearchService#searchDistinctFindings (the main Finding page's Active AND
+  // Archived tabs) excludes this row entirely - it remains fully visible from its
+  // inject/simulation/scenario-scoped views, which never apply this filter. Cleared back to null
+  // by FindingArchiveService as soon as the finding is un-archived (a fresh un-archive always
+  // resets this "stasis" clock). Nullable: most findings are never archived long enough to reach
+  // this state.
+  @Column(name = "finding_soft_deleted_at")
+  @JsonProperty("finding_soft_deleted_at")
+  private Instant softDeletedAt;
 
   // Relation
   @Schema(implementation = String[].class)
@@ -140,6 +260,25 @@ public class Finding implements TenantBase {
   @JsonProperty("finding_assets")
   @Queryable(filterable = true, dynamicValues = true, path = "assets.id")
   private List<Asset> assets = new ArrayList<>();
+
+  // -- TRIFORCE IDENTITY (Phase 1) --
+  // The "Location" leg of the Type+Value+Location stable identity, for asset-based finding types
+  // only (network/host, credential, file, domain, share, computer - see
+  // finding_triforce_design.md). Nullable: findings with no resolvable single asset (0 or >1
+  // linked assets - see V6_20260819150900000__Add_finding_location_asset javadoc, and cloud/OCSF
+  // findings, whose Location is the (cloudProvider, cloudAccount, resource) triple instead) keep
+  // this null and fall back to today's (type, value)-only distinct grouping. Deliberately a plain
+  // @ManyToOne to a single Asset rather than reusing the `assets` many-to-many above: Location
+  // must be singular by construction (Decision #1 - 1 asset = 1 Location = 1 Finding), whereas
+  // `assets` is a legacy many-to-many that this field is meant to eventually replace for these
+  // types.
+  @Queryable(filterable = true, sortable = true, path = "locationAsset.id", label = "location")
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "finding_location_asset_id")
+  @JsonProperty("finding_location_asset_id")
+  @JsonSerialize(using = MonoIdSerializer.class)
+  @Schema(implementation = String.class)
+  private Asset locationAsset;
 
   // UpdatedAt now used to sync with linked object
   public void setAssets(List<Asset> assets) {
@@ -198,5 +337,18 @@ public class Finding implements TenantBase {
       return Collections.emptySet();
     }
     return getInject().getAssetGroups().stream().collect(Collectors.toSet());
+  }
+
+  // The inject's injector can be null: either the inject has no injector resolved yet, or the
+  // connector that produced it was uninstalled (Inject#injector degrades to null via @NotFound
+  // instead of throwing, see Inject.java). Findings created manually via the API without a real
+  // inject/injector must simply show no source, not fail.
+  @JsonProperty("finding_source")
+  @Queryable(filterable = true, dynamicValues = true, path = "inject.injector.id", label = "source")
+  public Injector getSource() {
+    if (getInject() == null) {
+      return null;
+    }
+    return getInject().getInjector();
   }
 }

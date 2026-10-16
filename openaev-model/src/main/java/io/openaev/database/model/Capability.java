@@ -214,6 +214,8 @@ public enum Capability {
       pair(ResourceType.FINDING, Action.WRITE),
       pair(ResourceType.FINDING, Action.CREATE)),
   DELETE_FINDINGS(MANAGE_FINDINGS, true, pair(ResourceType.FINDING, Action.DELETE)),
+  MANAGE_FINDING_TRIAGE(ACCESS_FINDINGS, true, pair(ResourceType.FINDING, Action.TRIAGE)),
+  MANAGE_FINDING_ARCHIVE(ACCESS_FINDINGS, true, pair(ResourceType.FINDING, Action.ARCHIVE)),
 
   // Vulnerability and attack snapshot — bulk export consumed by external GRC integrations.
   // SEARCH only: the snapshot has no per-resource endpoint, so no resourceId is ever resolved and

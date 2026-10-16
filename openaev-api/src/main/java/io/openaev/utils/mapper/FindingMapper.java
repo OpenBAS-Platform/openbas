@@ -5,12 +5,14 @@ import io.openaev.database.repository.FindingRepository;
 import io.openaev.rest.atomic_testing.form.TargetSimple;
 import io.openaev.rest.finding.form.AggregatedFindingOutput;
 import io.openaev.rest.finding.form.FindingOutput;
+import io.openaev.rest.finding.form.FindingSiblingOutput;
 import io.openaev.rest.finding.form.FindingSummaryOutput;
 import io.openaev.rest.finding.form.RelatedFindingOutput;
 import io.openaev.utils.SensitiveValueMaskingUtils;
 import io.openaev.utils.TargetType;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class FindingMapper {
   private final ExerciseMapper exerciseMapper;
   private final ScenarioMapper scenarioMapper;
   private final InjectMapper injectMapper;
+  private final InjectorMapper injectorMapper;
 
   /**
    * Group-wide impact counts of a finding, resolved by the service and handed over as one value so
@@ -99,7 +102,7 @@ public class FindingMapper {
   public AggregatedFindingOutput toAggregatedFindingOutput(
       Finding finding, List<Asset> relatedAssets) {
     return toAggregatedFindingOutput(
-        finding, relatedAssets, finding.getCreationDate(), finding.getUpdateDate());
+        finding, relatedAssets, finding.getCreationDate(), finding.getUpdateDate(), Map.of());
   }
 
   /**
@@ -111,27 +114,67 @@ public class FindingMapper {
    */
   public AggregatedFindingOutput toAggregatedFindingOutput(
       Finding finding, List<Asset> relatedAssets, Instant firstSeen, Instant lastSeen) {
+    return toAggregatedFindingOutput(finding, relatedAssets, firstSeen, lastSeen, Map.of());
+  }
+
+  public AggregatedFindingOutput toAggregatedFindingOutput(
+      Finding finding,
+      List<Asset> relatedAssets,
+      Instant firstSeen,
+      Instant lastSeen,
+      Map<String, FindingTriageStatus> triageStatusByFindingId) {
     return AggregatedFindingOutput.builder()
         .id(finding.getId())
         .value(SensitiveValueMaskingUtils.maskIfNeeded(finding.getType(), finding.getValue()))
         .type(finding.getType())
         .creationDate(firstSeen)
         .updateDate(lastSeen)
+        .humanUpdateDate(finding.getHumanUpdateDate())
+        .archivedAt(finding.getArchivedAt())
         // Findings can attach to ANY asset type (agentless websites, AI targets, cloud/network
         // assets), so no instanceof Endpoint filtering here.
         .assets(
             relatedAssets.stream()
                 .map(endpointMapper::toEndpointSimple)
                 .collect(Collectors.toSet()))
+        .findingTriageStatus(
+            triageStatusByFindingId.getOrDefault(finding.getId(), FindingTriageStatus.UNTRIAGED))
+        // Derived from the same relatedAssets used above (not finding.getAssetGroups(), which
+        // only reflects the single underlying finding's own inject) so the aggregated view shows
+        // every asset group across all assets sharing this (type, value) pair.
+        .assetGroups(
+            relatedAssets.stream()
+                .flatMap(asset -> asset.getAssetGroups().stream())
+                .distinct()
+                .map(assetGroupMapper::toAssetGroupSimple)
+                .collect(Collectors.toSet()))
+        .source(
+            Optional.ofNullable(finding.getInject())
+                .map(Inject::getInjector)
+                .map(injectorMapper::toInjectorSimple)
+                .orElse(null))
+        .severity(finding.getSeverity())
+        .resource(finding.getResource())
+        .cloudAccount(finding.getCloudAccount())
+        .cloudProvider(finding.getCloudProvider())
+        .cloudRegion(finding.getCloudRegion())
+        .remediation(finding.getRemediation())
+        .compliance(finding.getCompliance())
         .build();
   }
 
   public RelatedFindingOutput toRelatedFindingOutput(Finding finding) {
+    return toRelatedFindingOutput(finding, Map.of());
+  }
+
+  public RelatedFindingOutput toRelatedFindingOutput(
+      Finding finding, Map<String, FindingTriageStatus> triageStatusByFindingId) {
     return RelatedFindingOutput.builder()
         .id(finding.getId())
         .value(SensitiveValueMaskingUtils.maskIfNeeded(finding.getType(), finding.getValue()))
         .type(finding.getType())
         .updateDate(finding.getUpdateDate())
+        .humanUpdateDate(finding.getHumanUpdateDate())
         .assets(
             finding.getAssets().stream()
                 .map(asset -> endpointMapper.toEndpointSimple(asset))
@@ -172,7 +215,62 @@ public class FindingMapper {
                             .type(TargetType.PLAYERS)
                             .build())
                 .collect(Collectors.toSet()))
+        .source(
+            Optional.ofNullable(finding.getInject())
+                .map(Inject::getInjector)
+                .map(injectorMapper::toInjectorSimple)
+                .orElse(null))
         .creationDate(finding.getCreationDate())
+        .findingTriageStatus(
+            triageStatusByFindingId.getOrDefault(finding.getId(), FindingTriageStatus.UNTRIAGED))
+        .build();
+  }
+
+  /**
+   * Maps a sibling Finding for the "Also Detected On" panel (finding_triforce_design.md, Task 1):
+   * unlike {@link #toAggregatedFindingOutput}, this does NOT aggregate assets/asset groups across
+   * every finding sharing the same (type, value) - each row here already represents exactly one
+   * Location (see {@code FindingSpecification#sameTypeValueDifferentLocation}), so only that single
+   * finding's own assets/location are relevant.
+   */
+  public FindingSiblingOutput toFindingSiblingOutput(
+      Finding finding, FindingTriageStatus triageStatus, boolean archived) {
+    return FindingSiblingOutput.builder()
+        .id(finding.getId())
+        .value(finding.getValue())
+        .type(finding.getType())
+        .creationDate(finding.getCreationDate())
+        .updateDate(finding.getUpdateDate())
+        .humanUpdateDate(finding.getHumanUpdateDate())
+        .archivedAt(finding.getArchivedAt())
+        .assets(
+            finding.getAssets().stream()
+                .map(endpointMapper::toEndpointSimple)
+                .collect(Collectors.toSet()))
+        .assetGroups(
+            finding.getAssets().stream()
+                .flatMap(asset -> asset.getAssetGroups().stream())
+                .distinct()
+                .map(assetGroupMapper::toAssetGroupSimple)
+                .collect(Collectors.toSet()))
+        .source(
+            Optional.ofNullable(finding.getInject())
+                .map(Inject::getInjector)
+                .map(injectorMapper::toInjectorSimple)
+                .orElse(null))
+        .findingTriageStatus(triageStatus)
+        .severity(finding.getSeverity())
+        .resource(finding.getResource())
+        .cloudAccount(finding.getCloudAccount())
+        .cloudProvider(finding.getCloudProvider())
+        .cloudRegion(finding.getCloudRegion())
+        .remediation(finding.getRemediation())
+        .compliance(finding.getCompliance())
+        .location(
+            Optional.ofNullable(finding.getLocationAsset())
+                .map(endpointMapper::toEndpointSimple)
+                .orElse(null))
+        .archived(archived)
         .build();
   }
 }

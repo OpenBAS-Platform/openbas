@@ -11,7 +11,11 @@ import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 const chipIconStyle = { fontSize: '1rem' };
 
 interface Props {
-  finding: RelatedFindingOutput;
+  finding: {
+    finding_inject?: RelatedFindingOutput['finding_inject'];
+    finding_simulation?: RelatedFindingOutput['finding_simulation'];
+    finding_scenario?: RelatedFindingOutput['finding_scenario'];
+  };
   type: string;
 }
 

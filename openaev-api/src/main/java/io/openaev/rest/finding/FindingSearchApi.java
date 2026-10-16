@@ -9,11 +9,16 @@ import io.openaev.aop.LogExecutionTime;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.Action;
 import io.openaev.database.model.Finding;
+import io.openaev.database.model.FindingTriage;
+import io.openaev.database.model.FindingTriageStatus;
 import io.openaev.database.model.ResourceType;
 import io.openaev.database.repository.FindingRepository;
+import io.openaev.database.repository.FindingTriageRepository;
 import io.openaev.database.specification.FindingSpecification;
 import io.openaev.rest.finding.form.AggregatedFindingOutput;
+import io.openaev.rest.finding.form.FindingSiblingOutput;
 import io.openaev.rest.finding.form.PageAggregatedFindingOutput;
+import io.openaev.rest.finding.form.PageFindingSiblingOutput;
 import io.openaev.rest.finding.form.PageRelatedFindingOutput;
 import io.openaev.rest.helper.RestBehavior;
 import io.openaev.utils.mapper.FindingMapper;
@@ -23,6 +28,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,9 +42,19 @@ import org.springframework.web.bind.annotation.*;
 public class FindingSearchApi extends RestBehavior {
 
   private final FindingRepository findingRepository;
+  private final FindingTriageRepository findingTriageRepository;
   private final FindingDistinctSearchService findingDistinctSearchService;
 
   private final FindingMapper findingMapper;
+
+  // Bulk-fetches triage statuses for a page's findings in a single query, avoiding N+1 (one
+  // findByFinding_Id call per finding) - see FindingTriageRepository#findByFinding_IdIn.
+  private Map<String, FindingTriageStatus> triageStatusByFindingId(Page<Finding> page) {
+    return findingTriageRepository
+        .findByFinding_IdIn(page.getContent().stream().map(Finding::getId).toList())
+        .stream()
+        .collect(Collectors.toMap(triage -> triage.getFinding().getId(), FindingTriage::getStatus));
+  }
 
   @LogExecutionTime
   @PostMapping({FINDING_URI + "/search", TENANT_FINDING_URI + "/search"})
@@ -58,11 +75,14 @@ public class FindingSearchApi extends RestBehavior {
     if (distinct) {
       return findingDistinctSearchService.searchDistinctFindings(searchPaginationInput);
     }
-    return buildPaginationJPA(
+    Page<Finding> page =
+        buildPaginationJPA(
             (specification, pageable) -> this.findingRepository.findAll(specification, pageable),
             searchPaginationInput,
-            Finding.class)
-        .map(findingMapper::toRelatedFindingOutput);
+            Finding.class);
+    Map<String, FindingTriageStatus> triageStatusByFindingId = triageStatusByFindingId(page);
+    return page.map(
+        finding -> findingMapper.toRelatedFindingOutput(finding, triageStatusByFindingId));
   }
 
   @LogExecutionTime
@@ -92,14 +112,17 @@ public class FindingSearchApi extends RestBehavior {
       return findingDistinctSearchService.searchDistinctFindingsByInject(
           injectId, searchPaginationInput);
     }
-    return buildPaginationJPA(
+    Page<Finding> page =
+        buildPaginationJPA(
             (Specification<Finding> specification, Pageable pageable) ->
                 this.findingRepository.findAll(
                     FindingSpecification.findFindingsForInject(injectId).and(specification),
                     pageable),
             searchPaginationInput,
-            Finding.class)
-        .map(findingMapper::toRelatedFindingOutput);
+            Finding.class);
+    Map<String, FindingTriageStatus> triageStatusByFindingId = triageStatusByFindingId(page);
+    return page.map(
+        finding -> findingMapper.toRelatedFindingOutput(finding, triageStatusByFindingId));
   }
 
   @LogExecutionTime
@@ -129,14 +152,17 @@ public class FindingSearchApi extends RestBehavior {
       return findingDistinctSearchService.searchDistinctFindingsBySimulation(
           simulationId, searchPaginationInput);
     }
-    return buildPaginationJPA(
+    Page<Finding> page =
+        buildPaginationJPA(
             (Specification<Finding> specification, Pageable pageable) ->
                 this.findingRepository.findAll(
                     FindingSpecification.findFindingsForSimulation(simulationId).and(specification),
                     pageable),
             searchPaginationInput,
-            Finding.class)
-        .map(findingMapper::toRelatedFindingOutput);
+            Finding.class);
+    Map<String, FindingTriageStatus> triageStatusByFindingId = triageStatusByFindingId(page);
+    return page.map(
+        finding -> findingMapper.toRelatedFindingOutput(finding, triageStatusByFindingId));
   }
 
   @LogExecutionTime
@@ -166,14 +192,17 @@ public class FindingSearchApi extends RestBehavior {
       return findingDistinctSearchService.searchDistinctFindingsByScenario(
           scenarioId, searchPaginationInput);
     }
-    return buildPaginationJPA(
+    Page<Finding> page =
+        buildPaginationJPA(
             (Specification<Finding> specification, Pageable pageable) ->
                 this.findingRepository.findAll(
                     FindingSpecification.findFindingsForScenario(scenarioId).and(specification),
                     pageable),
             searchPaginationInput,
-            Finding.class)
-        .map(findingMapper::toRelatedFindingOutput);
+            Finding.class);
+    Map<String, FindingTriageStatus> triageStatusByFindingId = triageStatusByFindingId(page);
+    return page.map(
+        finding -> findingMapper.toRelatedFindingOutput(finding, triageStatusByFindingId));
   }
 
   @LogExecutionTime
@@ -203,13 +232,36 @@ public class FindingSearchApi extends RestBehavior {
       return findingDistinctSearchService.searchDistinctFindingsByEndpoint(
           endpointId, searchPaginationInput);
     }
-    return buildPaginationJPA(
+    Page<Finding> page =
+        buildPaginationJPA(
             (Specification<Finding> specification, Pageable pageable) ->
                 this.findingRepository.findAll(
                     FindingSpecification.findFindingsForEndpoint(endpointId).and(specification),
                     pageable),
             searchPaginationInput,
-            Finding.class)
-        .map(findingMapper::toRelatedFindingOutput);
+            Finding.class);
+    Map<String, FindingTriageStatus> triageStatusByFindingId = triageStatusByFindingId(page);
+    return page.map(
+        finding -> findingMapper.toRelatedFindingOutput(finding, triageStatusByFindingId));
+  }
+
+  @LogExecutionTime
+  @PostMapping({
+    FINDING_URI + "/{findingId}/also-detected-on/search",
+    TENANT_FINDING_URI + "/{findingId}/also-detected-on/search"
+  })
+  @Transactional
+  @AccessControl(
+      resourceId = "#findingId",
+      actionPerformed = Action.READ,
+      resourceType = ResourceType.FINDING)
+  @ApiResponse(
+      responseCode = "200",
+      content = @Content(schema = @Schema(implementation = PageFindingSiblingOutput.class)))
+  public Page<FindingSiblingOutput> findingAlsoDetectedOn(
+      TxCtx ctx,
+      @PathVariable @NotNull final String findingId,
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return findingDistinctSearchService.findAlsoDetectedOn(findingId, searchPaginationInput);
   }
 }

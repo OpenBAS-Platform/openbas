@@ -52,6 +52,8 @@ public interface InjectRepository
 
   Optional<Inject> findByIdAndTenantId(@NotNull String id, @NotNull String tenantId);
 
+  boolean existsByTitleAndTenantId(@NotBlank String title, @NotBlank String tenantId);
+
   /**
    * The inject's id and its tenant, and nothing else. For the one read that has to cross every
    * tenant because its input carries no tenant: an inbound email routed by the inject id in its

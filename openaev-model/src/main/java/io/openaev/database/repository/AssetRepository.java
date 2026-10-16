@@ -27,6 +27,9 @@ public interface AssetRepository
    */
   Optional<Asset> findByIdAndTenantId(@NotNull String id, @NotNull String tenantId);
 
+  Optional<Asset> findByExternalReferenceAndTenantId(
+      @NotNull String externalReference, @NotNull String tenantId);
+
   /**
    * Feeds the {@code asset} search index with the whole asset inventory: every asset type except
    * security platforms, which have their own index and never surface in the inventory (mirrors
@@ -154,6 +157,16 @@ public interface AssetRepository
   List<Object[]> assetsByInjectIds(Set<String> injectIds);
 
   List<Asset> findByTenantId(String tenantId);
+
+  /**
+   * Resolves cloud assets by their external reference (e.g. an AWS ARN), used by
+   * OCSFOutputProcessor to link a Prowler finding's {@code resources[].uid}/{@code .arn} back to an
+   * existing OpenAEV asset, when one was pre-created with a matching {@code
+   * asset_external_reference}. JPQL (not native) so the tenant filter still applies.
+   */
+  @Query("SELECT a FROM Asset a WHERE a.externalReference IN :externalReferences")
+  List<Asset> findByExternalReferenceIn(
+      @Param("externalReferences") List<String> externalReferences);
 
   /**
    * Business criticality, display name and seen IP for a set of asset ids, as {@code [assetId,

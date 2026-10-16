@@ -1,5 +1,5 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from '@filigran/design-system';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, InfoOutlined } from '@mui/icons-material';
 import { type CSSProperties, type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -29,6 +29,12 @@ const useStyles = makeStyles()(theme => ({
     fontSize: FDS.scalars['--text-2'],
     textTransform: 'capitalize' as const,
   },
+  headerInfoIcon: {
+    fontSize: 14,
+    marginLeft: 4,
+    opacity: 0.6,
+  },
+  inactiveSortIcon: { opacity: 0.3 },
   headerItem: { color: theme.palette.text.secondary },
 }));
 
@@ -65,7 +71,20 @@ const SortHeadersComponentV2: FunctionComponent<Props> = ({
           onClick={() => sortHelpers.handleSort(header.field)}
         >
           <div className={classes.headerItemText}>{t(header.label)}</div>
-          {sortHelpers.getSortBy() === header.field ? sortComponent(sortHelpers.getSortAsc()) : ''}
+          {header.tooltip && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <InfoOutlined
+                  className={classes.headerInfoIcon}
+                  onClick={e => e.stopPropagation()}
+                />
+              </TooltipTrigger>
+              <TooltipContent>{t(header.tooltip)}</TooltipContent>
+            </Tooltip>
+          )}
+          {sortHelpers.getSortBy() === header.field
+            ? sortComponent(sortHelpers.getSortAsc())
+            : (<ArrowDropDownOutlined className={classes.inactiveSortIcon} />)}
         </div>
       );
     }
