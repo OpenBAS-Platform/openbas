@@ -228,7 +228,8 @@ public interface InjectExpectationRepository
   List<BaseInjectExpectation> findAllByInjectId(@Param("injectId") @NotBlank final String injectId);
 
   @Query(value = "select i from InjectExpectation i where i.inject.id in (:injectIds)")
-  List<BaseInjectExpectation> findAllByInjectIds(@Param("injectId") @NotBlank final Set<String> injectIds);
+  List<BaseInjectExpectation> findAllByInjectIds(
+      @Param("injectId") @NotBlank final Set<String> injectIds);
 
   /**
    * Pre-loads agent / asset / assetGroup relations of all {@link TechnicalInjectExpectation}

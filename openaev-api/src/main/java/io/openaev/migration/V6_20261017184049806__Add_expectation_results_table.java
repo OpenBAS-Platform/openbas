@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class V6_20261015084049806__Add_expectation_results_table extends BaseJavaMigration {
+public class V6_20261017184049806__Add_expectation_results_table extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {

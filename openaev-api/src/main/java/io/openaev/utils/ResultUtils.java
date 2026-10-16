@@ -3,9 +3,7 @@ package io.openaev.utils;
 import static java.util.Collections.emptyList;
 
 import io.openaev.database.model.*;
-import io.openaev.database.raw.RawInjectExpectationIndexing;
 import io.openaev.database.repository.InjectExpectationRepository;
-import io.openaev.database.repository.InjectExpectationResultRepository;
 import io.openaev.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openaev.utils.InjectExpectationResultUtils.ExpectationResultsByType;
 import io.openaev.utils.mapper.InjectExpectationMapper;
@@ -50,8 +48,7 @@ public class ResultUtils {
       return emptyList();
     }
     return injectExpectationMapper.extractExpectationResultByTypes(
-      injectIds,
-      injectExpectationRepository.findAllByInjectIds(injectIds));
+        injectIds, injectExpectationRepository.findAllByInjectIds(injectIds));
   }
 
   /**
