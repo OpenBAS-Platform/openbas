@@ -6,8 +6,7 @@ import { useAppDispatch } from '../hooks';
 
 export const REFRESH_ME_THROTTLE_MS = 60_000;
 
-// Reloads the current user (and so their capabilities) when the window regains focus or
-// after a refused write, at most once per throttle window
+// Reloads the user's capabilities on focus or after a refused write, at most once per window
 const useRefreshMe = (enabled: boolean) => {
   const dispatch = useAppDispatch();
   const lastRefresh = useRef(Date.now());
