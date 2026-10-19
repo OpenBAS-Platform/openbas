@@ -227,10 +227,6 @@ public interface InjectExpectationRepository
   @Query(value = "select i from InjectExpectation i where i.inject.id = :injectId")
   List<BaseInjectExpectation> findAllByInjectId(@Param("injectId") @NotBlank final String injectId);
 
-  @Query(value = "select i from InjectExpectation i where i.inject.id in :injectIds")
-  List<BaseInjectExpectation> findAllByInjectIds(
-      @Param("injectIds") @NotBlank final Set<String> injectIds);
-
   /**
    * Pre-loads agent / asset / assetGroup relations of all {@link TechnicalInjectExpectation}
    * instances for a given inject into the Hibernate session cache via JOIN FETCH. Must be called
@@ -403,6 +399,19 @@ public interface InjectExpectationRepository
   // counting them again dilutes a failed group into a PARTIAL global score.
   List<RawInjectExpectationIndexing> rawForComputeGlobalByInjectIds(
       @Param("injectIds") Set<String> injectIds);
+
+  @Query(
+      value =
+          """
+    select i from InjectExpectation i
+      where i.inject.id in :injectIds
+      and i.user IS NULL
+      and i.agent IS NULL
+      and (i.asset IS NULL OR i.assetGroup IS NULL
+          or i.asset member of i.inject.assets)
+    """)
+  List<BaseInjectExpectation> forComputeGlobalByInjectIds(
+      @Param("injectIds") @NotBlank final Set<String> injectIds);
 
   @Query(
       value =

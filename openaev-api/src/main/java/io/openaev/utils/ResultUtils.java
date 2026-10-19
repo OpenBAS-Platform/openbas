@@ -48,7 +48,7 @@ public class ResultUtils {
       return emptyList();
     }
     return injectExpectationMapper.extractExpectationResultByTypes(
-        injectIds, injectExpectationRepository.findAllByInjectIds(injectIds));
+        injectIds, injectExpectationRepository.forComputeGlobalByInjectIds(injectIds));
   }
 
   /**
