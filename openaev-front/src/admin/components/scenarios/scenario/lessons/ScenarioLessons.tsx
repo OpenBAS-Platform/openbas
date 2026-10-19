@@ -6,7 +6,7 @@ import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-
 import { type UserHelper } from '../../../../../actions/helper';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
 import { type LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
-import { addScenarioObjective, deleteScenarioObjective, fetchScenarioObjectives, updateScenarioObjective } from '../../../../../actions/Objective';
+import { addScenarioObjective, deleteScenarioObjective, updateScenarioObjective } from '../../../../../actions/Objective';
 import {
   addLessonsCategory,
   addLessonsQuestion,
@@ -14,16 +14,12 @@ import {
   deleteLessonsCategory,
   deleteLessonsQuestion,
   emptyLessonsCategories,
-  fetchLessonsCategories,
-  fetchLessonsQuestions, fetchPlayersByScenario,
-  fetchScenarioTeams,
   updateLessonsCategory,
   updateLessonsCategoryTeams,
   updateLessonsQuestion,
   updateScenarioLessons,
 } from '../../../../../actions/scenarios/scenario-actions';
 import { type ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
-import { fetchTeams } from '../../../../../actions/teams/team-actions';
 import { type TeamsHelper } from '../../../../../actions/teams/team-helper';
 import { useHelper } from '../../../../../store';
 import {
@@ -36,10 +32,10 @@ import {
   type ObjectiveInput, type Scenario,
 } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import useScenarioPermissions from '../../../../../utils/permissions/useScenarioPermissions';
 import { LessonContext, type LessonContextType } from '../../../common/Context';
 import Lessons from '../../../lessons/scenarios/Lessons';
+import useScenarioStoreData from '../scenarioStoreQueries';
 
 const ScenarioLessons = () => {
   const dispatch = useAppDispatch();
@@ -76,14 +72,7 @@ const ScenarioLessons = () => {
       teams: helper.getScenarioTeams(scenarioId),
     };
   });
-  useDataLoader(() => {
-    dispatch(fetchTeams());
-    dispatch(fetchPlayersByScenario(scenarioId));
-    dispatch(fetchLessonsCategories(scenarioId));
-    dispatch(fetchLessonsQuestions(scenarioId));
-    dispatch(fetchScenarioObjectives(scenarioId));
-    dispatch(fetchScenarioTeams(scenarioId));
-  });
+  useScenarioStoreData(scenarioId, ['all-teams', 'players', 'lessons-categories', 'lessons-questions', 'objectives', 'teams']);
 
   const source = useMemo(
     () => processToGenericSource(scenario),

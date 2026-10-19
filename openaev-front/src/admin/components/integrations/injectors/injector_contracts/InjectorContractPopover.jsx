@@ -14,7 +14,7 @@ import { ACTIONS, SUBJECTS } from '../../../../../utils/permissions/types';
 import InjectorContractCustomForm from './InjectorContractCustomForm';
 import InjectorContractForm from './InjectorContractForm';
 
-const InjectorContractPopover = ({ injectorContract, onUpdate, canDelete = true, canEditCustomForm = true }) => {
+const InjectorContractPopover = ({ injectorContract, onUpdate, onDelete, canDelete = true, canEditCustomForm = true }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -95,7 +95,10 @@ const InjectorContractPopover = ({ injectorContract, onUpdate, canDelete = true,
   };
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    dispatch(deleteInjectorContract(injectorContract.injector_contract_id));
+    const deletion = dispatch(deleteInjectorContract(injectorContract.injector_contract_id));
+    if (onDelete) {
+      deletion.then(() => onDelete(injectorContract.injector_contract_id));
+    }
     handleCloseDelete();
   };
 

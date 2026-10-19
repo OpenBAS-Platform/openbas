@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 
 import type { WorkflowConfigurationHelper } from '../../../../../actions/chaining/workflow-helper';
@@ -7,8 +8,11 @@ import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-
 import { useHelper } from '../../../../../store';
 import { type Exercise, type HealthCheck } from '../../../../../utils/api-types';
 import useSimulationPermissions from '../../../../../utils/permissions/useSimulationPermissions';
+import { simulationKey } from '../../../../../utils/query/keys';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import ScopeDefinition from '../../../chaining/ScopeDefinition';
 import Healthchecks from '../../../common/healthchecks/Healthchecks';
+import { simulationHealthchecksKey, useSimulationHealthchecks } from '../simulationQueries';
 
 interface Props {
   /** Read-only inspection mode: the scope belongs to an autonomous (AI-driven) run. */
@@ -30,13 +34,31 @@ const SimulationScope = ({ readOnly = false, autonomousTimeoutSeconds }: Props) 
     }),
   );
 
-  const [healthchecks, setHealthchecks] = useState<HealthCheck[]>([]);
+  // With live updates on, the healthchecks and the scope are queries under the simulation key.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const queryClient = useQueryClient();
 
+  const [legacyHealthchecks, setLegacyHealthchecks] = useState<HealthCheck[]>([]);
   useEffect(() => {
-    if (exercise?.exercise_workflow_id) {
-      searchExerciseHealthchecks(exerciseId).then((result: { data: HealthCheck[] }) => setHealthchecks(result.data));
+    if (!liveUpdates && exercise?.exercise_workflow_id) {
+      searchExerciseHealthchecks(exerciseId).then((result: { data: HealthCheck[] }) => setLegacyHealthchecks(result.data));
     }
   }, [exerciseId, exercise, workflowConfiguration]);
+
+  // Shared with the header: one fetch for both.
+  const { data: queriedHealthchecks } = useSimulationHealthchecks(exerciseId, liveUpdates && !!exercise?.exercise_workflow_id);
+  // A local scope edit changes the simulation or its workflow configuration in the store: the
+  // healthchecks follow it, as in legacy mode. The first render is the query's own load.
+  const firstRender = useRef(true);
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+    } else if (liveUpdates) {
+      queryClient.invalidateQueries({ queryKey: simulationHealthchecksKey(exerciseId) });
+    }
+  }, [exercise, workflowConfiguration]);
+
+  const healthchecks = liveUpdates ? (queriedHealthchecks ?? []) : legacyHealthchecks;
 
   if (!exercise?.exercise_workflow_id) return null;
 
@@ -61,6 +83,7 @@ const SimulationScope = ({ readOnly = false, autonomousTimeoutSeconds }: Props) 
         readOnly={effectiveReadOnly}
         autonomous={readOnly}
         autonomousTimeoutSeconds={autonomousTimeoutSeconds}
+        queryKey={liveUpdates ? simulationKey(exerciseId) : undefined}
       />
     </div>
   );

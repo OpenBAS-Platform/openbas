@@ -38,13 +38,17 @@ import {
   type SortField,
   type Widget,
 } from '../../../../utils/api-types';
+import { isClientError, retryUnlessClientError } from '../../../../utils/query/queryErrors';
+import useNotifiedQuery, { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../utils/query/useNotifiedQuery';
 import { computeInjectExpectationLabel, computeStatusStyle } from '../../../../utils/statusUtils';
 import { tint } from '../../../../utils/tint';
 import { buildTenantApiPath } from '../../../../utils/url-helper';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import expectationIconByType, { expectationTypeIcon } from '../../common/ExpectationIconByType';
 import ExpectationTypeChip from '../../workspaces/custom_dashboards/widgets/viz/list/elements/ExpectationTypeChip';
 import InjectExpectationSourceFragment from '../../workspaces/custom_dashboards/widgets/viz/list/elements/InjectExpectationSourceFragment';
 import { getNavigationUrl } from '../../workspaces/custom_dashboards/widgets/viz/list/elements/ListNavigationHandler';
+import { assetMissedExpectationsKey, assetOverviewKey, assetVersionKey, invalidateAsset, useQueryVersion } from '../assetQueries';
 import PostureScore from '../PostureScore';
 import PostureScoreOverTimeChart from '../statistics/PostureScoreOverTimeChart';
 import useExpectationPosture from '../useExpectationPosture';
@@ -81,21 +85,42 @@ const SecurityPlatformDetail: FunctionComponent = () => {
   const bodyItemsStyles = useBodyItemsStyles();
   const { securityPlatformId } = useParams() as { securityPlatformId: string };
 
-  const [platform, setPlatform] = useState<SecurityPlatform | null>(null);
-  const [loading, setLoading] = useState(true);
+  // With live updates on, a security platform is an asset: every query of the screen starts with
+  // assetKey(id), so the topic 'asset:<id>' refetches them together. Its expectations are not
+  // announced on that topic, hence the fallback interval on the dashboard-engine figures.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+
+  const [legacyPlatform, setPlatform] = useState<SecurityPlatform | null>(null);
+  const [legacyLoading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (liveUpdates) {
+      return;
+    }
     setLoading(true);
     fetchSecurityPlatform(securityPlatformId)
       .then((result: { data: SecurityPlatform }) => setPlatform(result.data))
       .catch(() => setPlatform(null))
       .finally(() => setLoading(false));
-  }, [securityPlatformId]);
+  }, [securityPlatformId, liveUpdates]);
+
+  const platformQuery = useNotifiedQuery({
+    queryKey: assetOverviewKey(securityPlatformId),
+    queryFn: () => fetchSecurityPlatform(securityPlatformId, false).then((result: { data: SecurityPlatform }) => result.data),
+    retry: retryUnlessClientError,
+    enabled: liveUpdates,
+  });
+  const version = useQueryVersion(assetVersionKey(securityPlatformId), liveUpdates, FALLBACK_REFETCH_INTERVAL_MS);
+
+  // Deleted or no longer visible while on screen: same not-found state as on a first load.
+  const livePlatform = isClientError(platformQuery.error) ? null : platformQuery.data ?? null;
+  const platform: SecurityPlatform | null = liveUpdates ? livePlatform : legacyPlatform;
+  const loading = liveUpdates ? platformQuery.isPending : legacyLoading;
 
   const platformFilter = useMemo(() => filter(PLATFORM_FILTER_KEY, [securityPlatformId], 'contains'), [securityPlatformId]);
 
   // -- KPIs + posture: per-pillar SUCCESS vs FAILED, shared with the asset hero
-  const posture = useExpectationPosture(PLATFORM_FILTER_KEY, securityPlatformId, 'contains');
+  const posture = useExpectationPosture(PLATFORM_FILTER_KEY, securityPlatformId, 'contains', version);
   // -- Latest expectations (standard paginated list, dashboard look & feel)
   const [missed, setMissed] = useState<EsBase[]>([]);
 
@@ -241,8 +266,11 @@ const SecurityPlatformDetail: FunctionComponent = () => {
     },
   ], [t, nsdt]);
 
+  // In query mode the loading state follows the first load only (PaginationComponentV2 sets it).
   const fetchMissed = (input: SearchPaginationInput): Promise<{ data: Page<EsBase> }> => {
-    setMissedLoading(true);
+    if (!liveUpdates) {
+      setMissedLoading(true);
+    }
     const runtimeFilters = input.filterGroup?.filters ?? [];
     const searchFilters = input.textSearch
       ? [filter('base_representative', [input.textSearch], 'contains')]
@@ -280,7 +308,11 @@ const SecurityPlatformDetail: FunctionComponent = () => {
         totalPages: r.data.page_size ? Math.ceil((r.data.total ?? 0) / r.data.page_size) : 0,
         pageable: { pageNumber: r.data.page_number ?? 0 },
       } as Page<EsBase>,
-    })).finally(() => setMissedLoading(false));
+    })).finally(() => {
+      if (!liveUpdates) {
+        setMissedLoading(false);
+      }
+    });
   };
 
   const kpis = useMemo(() => {
@@ -344,7 +376,7 @@ const SecurityPlatformDetail: FunctionComponent = () => {
               ...platform,
               type: 'security-platform',
             }}
-            onUpdate={result => setPlatform(result)}
+            onUpdate={result => (liveUpdates ? invalidateAsset(securityPlatformId) : setPlatform(result))}
             onDelete={() => navigate(SECURITY_PLATFORM_BASE_URL)}
             disabled={isConnectorManaged(platform)}
           />
@@ -414,6 +446,7 @@ const SecurityPlatformDetail: FunctionComponent = () => {
             entityId={securityPlatformId}
             scopeOperator="contains"
             height={280}
+            version={version}
           />
         </SectionBlock>
       </DetailSections>
@@ -429,6 +462,8 @@ const SecurityPlatformDetail: FunctionComponent = () => {
           engineEntityName="expectation-inject"
           availableFilterNames={['inject_expectation_type', 'inject_expectation_status', 'inject_expectation_score']}
           queryableHelpers={queryableHelpers}
+          queryKey={liveUpdates ? assetMissedExpectationsKey(securityPlatformId) : undefined}
+          setLoading={liveUpdates ? setMissedLoading : undefined}
         />
         <List>
           <ListItem

@@ -1,16 +1,19 @@
 import { TooltipProvider } from '@filigran/design-system';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { useEffect, useState } from 'react';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type EsSeries } from '../../../utils/api-types';
+import { ANALYTICS_KEY } from '../../../utils/query/keys';
 
-const { mockDispatch, adHocSeriesMock, gridMountSpy } = vi.hoisted(() => ({
+const { mockDispatch, adHocSeriesMock, gridMountSpy, flags } = vi.hoisted(() => ({
   mockDispatch: vi.fn(),
   adHocSeriesMock: vi.fn(),
   gridMountSpy: vi.fn(),
+  flags: { liveUpdates: false },
 }));
 
 vi.mock('../../../components/i18n', () => ({
@@ -25,6 +28,15 @@ vi.mock('../../../components/i18n', () => ({
 vi.mock('usehooks-ts', () => ({ useLocalStorage: (_key: string, initialValue: unknown) => useState(initialValue) }));
 
 vi.mock('../../../utils/hooks', () => ({ useAppDispatch: () => mockDispatch }));
+
+vi.mock('../../../utils/utils', async (importOriginal) => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+  const original = await importOriginal<typeof import('../../../utils/utils')>();
+  return {
+    ...original,
+    isFeatureEnabled: (feature: string) => feature === 'STREAM_INVALIDATION' && flags.liveUpdates,
+  };
+});
 
 vi.mock('../../../utils/hooks/useDataLoader', () => ({
   default: (loader: () => void) => {
@@ -58,14 +70,16 @@ import DefaultHomeDashboard from '../../../admin/components/default_dashboard/De
 
 const theme = createTheme();
 
-const renderDashboard = () => render(
-  <ThemeProvider theme={theme}>
-    <TooltipProvider>
-      <MemoryRouter>
-        <DefaultHomeDashboard />
-      </MemoryRouter>
-    </TooltipProvider>
-  </ThemeProvider>,
+const renderDashboard = (client = new QueryClient()) => render(
+  <QueryClientProvider client={client}>
+    <ThemeProvider theme={theme}>
+      <TooltipProvider>
+        <MemoryRouter>
+          <DefaultHomeDashboard />
+        </MemoryRouter>
+      </TooltipProvider>
+    </ThemeProvider>
+  </QueryClientProvider>,
 );
 
 const probeResponse = (value: number): { data: EsSeries[] } => ({
@@ -151,6 +165,37 @@ describe('DefaultHomeDashboard first load (#7599)', () => {
 
     // Assert: the gauge defaults to hidden, the dashboard still renders
     expect(await screen.findByTestId('dashboard-grid')).toBeDefined();
+    expect(gridMountSpy).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('DefaultHomeDashboard with live updates on', () => {
+  beforeEach(() => {
+    flags.liveUpdates = true;
+    adHocSeriesMock.mockReset();
+    gridMountSpy.mockClear();
+  });
+
+  afterEach(() => {
+    cleanup();
+    flags.liveUpdates = false;
+  });
+
+  it('refetches the probe on an analytics invalidation without remounting the grid', async () => {
+    // Arrange
+    const client = new QueryClient();
+    adHocSeriesMock.mockResolvedValue(probeResponse(0));
+    renderDashboard(client);
+    expect(await screen.findByTestId('dashboard-grid')).toBeDefined();
+
+    // Act: the topic 'list:analytics' fires
+    await act(async () => {
+      await client.invalidateQueries({ queryKey: ANALYTICS_KEY });
+    });
+
+    // Assert
+    expect(adHocSeriesMock).toHaveBeenCalledTimes(2);
+    expect(screen.getByTestId('dashboard-grid')).toBeDefined();
     expect(gridMountSpy).toHaveBeenCalledTimes(1);
   });
 });

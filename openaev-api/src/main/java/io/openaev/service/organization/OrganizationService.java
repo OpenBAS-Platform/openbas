@@ -40,6 +40,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 @Service
@@ -84,6 +85,16 @@ public class OrganizationService {
     Organization organization = findById(organizationId);
     fetchTags(List.of(organization));
     return organization;
+  }
+
+  /**
+   * Whether the organization exists in the given tenant. The tenant is compared in the query, so
+   * the answer does not depend on the tenant scope of the transaction.
+   */
+  @Transactional(readOnly = true)
+  public boolean existsInTenant(@NotBlank final String organizationId, final String tenantId) {
+    return tenantId != null
+        && this.organizationRepository.existsByIdAndTenantId(organizationId, tenantId);
   }
 
   /**

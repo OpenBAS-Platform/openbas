@@ -24,7 +24,11 @@ import { type AssetGroup, type AssetGroupOutput, type SearchPaginationInput } fr
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
 import { Can, useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import { ASSET_GROUPS_LIST_KEY } from '../../../../utils/query/keys';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../utils/query/useNotifiedQuery';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import ToolBar from '../../common/ToolBar';
+import { assetGroupsPostureVersionKey, invalidateAssetGroupsList, useQueryVersion } from '../assetQueries';
 import PostureScoreCell from '../PostureScoreCell';
 import usePostureScores from '../usePostureScores';
 import AssetGroupCreation from './AssetGroupCreation';
@@ -55,6 +59,9 @@ const AssetGroups = () => {
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
   const [searchId] = searchParams.getAll('id');
+  // With live updates on, the list is a query that stream invalidations refetch; local changes
+  // invalidate it too instead of patching the rows.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   const availableFilterNames = [
     'asset_group_name',
@@ -69,9 +76,12 @@ const AssetGroups = () => {
   }));
 
   // Per-row posture score, batched in a single dashboard-engine query per page.
+  // With live updates on, the scores also refetch with the list (invalidation, fallback interval).
+  const postureVersion = useQueryVersion(assetGroupsPostureVersionKey, liveUpdates, FALLBACK_REFETCH_INTERVAL_MS);
   const { loading: postureLoading, scores: postureScores } = usePostureScores(
     'base_asset_group_side',
     assetGroups.map(assetGroup => assetGroup.asset_group_id),
+    postureVersion,
   );
 
   // Headers
@@ -134,6 +144,10 @@ const AssetGroups = () => {
   };
 
   const onUpdateList = () => {
+    if (liveUpdates) {
+      invalidateAssetGroupsList();
+      return;
+    }
     searchAssetGroups(searchPaginationInput).then((result: { data: Page<AssetGroup> }) => {
       const { data } = result;
       setAssetGroups(data.content);
@@ -160,6 +174,11 @@ const AssetGroups = () => {
       asset_group_ids_to_process: selectAll ? undefined : Object.keys(selectedElements),
       asset_group_ids_to_ignore: Object.keys(deSelectedElements),
     }).then((result) => {
+      if (liveUpdates) {
+        handleClearSelectedElements();
+        invalidateAssetGroupsList();
+        return;
+      }
       const deletedIds: string[] = result.data ?? [];
       const newTotal = Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - deletedIds.length);
       setAssetGroups(assetGroups.filter(ag => !deletedIds.includes(ag.asset_group_id)));
@@ -178,7 +197,9 @@ const AssetGroups = () => {
         }]}
       />
       <PaginationComponentV2
-        fetch={searchAssetGroupsToLoad}
+        fetch={liveUpdates ? searchAssetGroups : searchAssetGroupsToLoad}
+        queryKey={liveUpdates ? ASSET_GROUPS_LIST_KEY : undefined}
+        setLoading={liveUpdates ? setLoading : undefined}
         searchPaginationInput={searchPaginationInput}
         setContent={setAssetGroups}
         entityPrefix="asset_group"
@@ -195,7 +216,7 @@ const AssetGroups = () => {
             <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
               <AssetGroupCreation
-                onCreate={(result) => {
+                onCreate={liveUpdates ? onUpdateList : (result) => {
                   setAssetGroups([result, ...assetGroups]);
                   queryableHelpers.paginationHelpers.incrementTotalElements(1);
                 }}
@@ -265,7 +286,7 @@ const AssetGroups = () => {
                     <AssetGroupPopover
                       assetGroup={assetGroup}
                       onUpdate={onUpdateList}
-                      onDelete={(result) => {
+                      onDelete={liveUpdates ? onUpdateList : (result) => {
                         setAssetGroups(assetGroups.filter(ag => (ag.asset_group_id !== result)));
                         queryableHelpers.paginationHelpers.incrementTotalElements(-1);
                       }}

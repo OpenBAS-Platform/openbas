@@ -8,10 +8,10 @@ export const fetchDocuments = () => (dispatch: Dispatch) => getReferential(schem
 
 export const fetchDocument = (documentId: string) => (dispatch: Dispatch) => getReferential(schema.document, `/api/documents/${documentId}`)(dispatch);
 
-export const searchDocuments = (paginationInput: SearchPaginationInput) => {
+export const searchDocuments = (paginationInput: SearchPaginationInput, notifyError: boolean = true) => {
   const data = paginationInput;
   const uri = '/api/documents/search';
-  return simplePostCall(uri, data);
+  return simplePostCall(uri, data, undefined, notifyError);
 };
 
 export const addDocument = (data: DocumentCreateInput | FormData) => (dispatch: Dispatch) => {

@@ -1,5 +1,6 @@
 import { Tabs, TabsList, TabsTrigger } from '@filigran/design-system';
 import { Alert, AlertTitle, Box } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
 import { type FunctionComponent, lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-router';
 
@@ -20,6 +21,8 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { INHERITED_CONTEXT } from '../../../../utils/permissions/types';
 import useScenarioPermissions from '../../../../utils/permissions/useScenarioPermissions';
+import { isClientError } from '../../../../utils/query/queryErrors';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import AutonomousReasoningPanel from '../../autonomous/AutonomousReasoningPanel';
 import { isAutonomousRunActive } from '../../autonomous/autonomousStatus';
 import useAutonomousPanelWidth from '../../autonomous/useAutonomousPanelWidth';
@@ -27,6 +30,7 @@ import { useAutonomousRunForScenario } from '../../autonomous/useAutonomousRunFo
 import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../common/Context';
 import injectContextForScenario from './ScenarioContext';
 import ScenarioHeader from './ScenarioHeader';
+import { scenarioEntityKey } from './scenarioQueries';
 import buildScenarioTabs from './scenarioTabs';
 
 const ScenarioComponent = lazy(() => import('./Scenario'));
@@ -287,21 +291,42 @@ const Index = () => {
     scenarioId,
     knownAutonomous,
   );
+  // With live updates on, the scenario is a query that the topic 'scenario:<id>' refetches. Tabs
+  // keep reading it from the store, which the query fills.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const scenarioQuery = useQuery({
+    queryKey: scenarioEntityKey(scenarioId),
+    queryFn: () => dispatch(fetchScenario(scenarioId)).then(() => null),
+    enabled: liveUpdates,
+    // fetchScenario shows its own error toast: no retry, so one toast per failed load.
+    retry: false,
+  });
+  // The data loader also keeps the legacy stream open, which still pushes entity changes into
+  // the store; with live updates on, it loads nothing itself.
   useDataLoader(() => {
+    if (liveUpdates) {
+      return;
+    }
     setLoading(true);
     dispatch(fetchScenario(scenarioId)).finally(() => {
       setLoadedScenarioId(scenarioId);
       setLoading(false);
     });
-  }, [scenarioId]);
+  }, [scenarioId, liveUpdates]);
 
   const scenarioInjectContext = injectContextForScenario(scenario);
 
   // Loader until the CURRENT scenario's fetch has completed
-  if (loadedScenarioId !== scenarioId || !autonomousResolved) {
+  const scenarioLoaded = liveUpdates ? !scenarioQuery.isPending : loadedScenarioId === scenarioId;
+  if (!scenarioLoaded || !autonomousResolved) {
     return <Loader />;
   }
-  if (!loading && !scenario) {
+  // Deleted or no longer visible while on screen: the store still holds the scenario, so the
+  // query's 4xx shows the same warning as a first load.
+  const unavailable = liveUpdates
+    ? isClientError(scenarioQuery.error) || !scenario
+    : !loading && !scenario;
+  if (unavailable) {
     return (
       <Alert severity="warning">
         <AlertTitle>{t('Warning')}</AlertTitle>

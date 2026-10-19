@@ -1,7 +1,8 @@
 import { Chip } from '@filigran/design-system';
 import { DevicesOutlined, FormatListNumberedOutlined, Groups3Outlined, PersonOutlined, ShieldOutlined } from '@mui/icons-material';
-import { Box } from '@mui/material';
+import { Alert, AlertTitle, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { type QueryKey, useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 
@@ -13,39 +14,36 @@ import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
 import Loader from '../../../components/Loader';
 import type { FindingOutput, FindingSummaryOutput } from '../../../utils/api-types';
+import { type Error as NotifiableError, notifyErrorHandler } from '../../../utils/error/errorHandlerUtil';
+import { findingKey } from '../../../utils/query/keys';
+import { isClientError, retryUnlessClientError } from '../../../utils/query/queryErrors';
+import useNotifiedQuery, { FALLBACK_REFETCH_INTERVAL_MS } from '../../../utils/query/useNotifiedQuery';
 import { emptyFilled } from '../../../utils/String';
+import { isFeatureEnabled } from '../../../utils/utils';
 import ContractOutputElementType from './ContractOutputElementType';
 import FindingOccurrences from './FindingOccurrences';
 import FindingVulnerabilityPanel from './FindingVulnerabilityPanel';
 
+interface ViewProps {
+  findingId: string;
+  finding: FindingOutput;
+  summary: FindingSummaryOutput | null;
+  // With live updates on, the key of the finding screen: its sections are queries under it.
+  queryKey?: QueryKey;
+}
+
 // Full-page finding overview: one deduplicated finding (type + value) with its
 // group-wide summary (true first/last seen, occurrences, impact spread), the
 // vulnerability context when it is a CVE, and the occurrence timeline.
-const FindingOverview = () => {
+const FindingOverviewView = ({ findingId, finding, summary, queryKey }: ViewProps) => {
   const { t, fldt } = useFormatter();
   const theme = useTheme();
-  const { findingId } = useParams() as { findingId: string };
-
-  const [finding, setFinding] = useState<FindingOutput | null>(null);
-  // Group-wide aggregates are computed server-side: a Finding row is ONE
-  // occurrence (per inject), so its own dates/links cannot answer "since when
-  // and how widely has this been seen?".
-  const [summary, setSummary] = useState<FindingSummaryOutput | null>(null);
   const [cvssScore, setCvssScore] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetchFinding(findingId).then(response => setFinding(response.data as FindingOutput));
-    fetchFindingSummary(findingId).then(response => setSummary(response.data as FindingSummaryOutput));
-  }, [findingId]);
-
   const typeLabel = useMemo(
-    () => (finding ? t(ContractOutputElementType[finding.finding_type] ?? finding.finding_type) : ''),
+    () => t(ContractOutputElementType[finding.finding_type] ?? finding.finding_type),
     [finding, t],
   );
-
-  if (!finding) {
-    return <Loader />;
-  }
 
   const isCVE = finding.finding_type === 'cve';
 
@@ -137,6 +135,7 @@ const FindingOverview = () => {
         <FindingVulnerabilityPanel
           cveId={finding.finding_value}
           onCvssScore={setCvssScore}
+          queryKey={queryKey}
         />
       )}
 
@@ -147,10 +146,94 @@ const FindingOverview = () => {
           searchFindings={searchFindings}
           finding={finding}
           contextId={findingId}
+          queryKey={queryKey}
         />
       </div>
     </Box>
   );
+};
+
+interface Props { findingId: string }
+
+// Loads the finding once.
+const LoadedFindingOverview = ({ findingId }: Props) => {
+  const [finding, setFinding] = useState<FindingOutput | null>(null);
+  // Group-wide aggregates are computed server-side: a Finding row is ONE
+  // occurrence (per inject), so its own dates/links cannot answer "since when
+  // and how widely has this been seen?".
+  const [summary, setSummary] = useState<FindingSummaryOutput | null>(null);
+
+  useEffect(() => {
+    fetchFinding(findingId).then(response => setFinding(response.data as FindingOutput));
+    fetchFindingSummary(findingId).then(response => setSummary(response.data as FindingSummaryOutput));
+  }, [findingId]);
+
+  if (!finding) {
+    return <Loader />;
+  }
+  return <FindingOverviewView findingId={findingId} finding={finding} summary={summary} />;
+};
+
+// Live updates: every section is a query under the finding key, which the topic 'finding:<id>'
+// refetches, with a slow interval as fallback.
+const QueriedFindingOverview = ({ findingId }: Props) => {
+  const { t } = useFormatter();
+  const queryKey = findingKey(findingId);
+
+  const { data: finding, error, isPending } = useNotifiedQuery({
+    queryKey: [...findingKey(findingId), 'finding'],
+    queryFn: () => fetchFinding(findingId, false).then(response => response.data as FindingOutput),
+    retry: retryUnlessClientError,
+    // A failing finding (deleted, rights lost) stops polling; an invalidation still refetches it.
+    refetchInterval: query => (query.state.status === 'error' ? false : FALLBACK_REFETCH_INTERVAL_MS),
+  });
+
+  const summaryQuery = useQuery({
+    queryKey: [...findingKey(findingId), 'summary'],
+    queryFn: () => fetchFindingSummary(findingId, false).then(response => response.data as FindingSummaryOutput),
+    retry: retryUnlessClientError,
+    refetchInterval: query => (query.state.status === 'error' ? false : FALLBACK_REFETCH_INTERVAL_MS),
+  });
+
+  // A 4xx on the summary comes with the same 4xx on the finding, which the screen already reports.
+  useEffect(() => {
+    if (summaryQuery.error && !isClientError(summaryQuery.error)) {
+      notifyErrorHandler(summaryQuery.error as unknown as NotifiableError);
+    }
+  }, [summaryQuery.errorUpdatedAt]);
+
+  if (isPending) {
+    return <Loader />;
+  }
+
+  // Deleted or no longer visible, on a first load or while on screen.
+  if (isClientError(error) || !finding) {
+    return (
+      <Alert severity="warning">
+        <AlertTitle>{t('Warning')}</AlertTitle>
+        {t('Finding is currently unavailable or you do not have sufficient permissions to access it.')}
+      </Alert>
+    );
+  }
+
+  return (
+    <FindingOverviewView
+      findingId={findingId}
+      finding={finding}
+      summary={summaryQuery.data ?? null}
+      queryKey={queryKey}
+    />
+  );
+};
+
+const FindingOverview = () => {
+  const { findingId } = useParams() as { findingId: string };
+  // Constant for a session: the screen keeps one of the two paths.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+
+  return liveUpdates
+    ? <QueriedFindingOverview findingId={findingId} />
+    : <LoadedFindingOverview findingId={findingId} />;
 };
 
 export default FindingOverview;

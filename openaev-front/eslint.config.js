@@ -2,6 +2,7 @@
 
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
+import pluginQuery from '@tanstack/eslint-plugin-query';
 import vitest from '@vitest/eslint-plugin';
 import customRules from 'eslint-plugin-custom-rules';
 import i18next from 'eslint-plugin-i18next';
@@ -51,6 +52,9 @@ export default [
 
   // rules recommended by eslint-plugin-i18next
   i18next.configs['flat/recommended'],
+
+  // rules recommended by @tanstack/eslint-plugin-query
+  ...pluginQuery.configs['flat/recommended'],
 
   // other config
   {

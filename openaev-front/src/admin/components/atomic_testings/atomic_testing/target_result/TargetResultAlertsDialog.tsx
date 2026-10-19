@@ -2,13 +2,15 @@ import { IconButton } from '@filigran/design-system';
 import { CloseOutlined, NotificationsActiveOutlined, NotificationsOffOutlined, OpenInNew } from '@mui/icons-material';
 import { Box, Dialog, DialogContent, Skeleton, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
+import { type QueryKey } from '@tanstack/react-query';
 import { type FunctionComponent, useEffect, useState } from 'react';
 
-import { fetchExpectationTraces } from '../../../../../actions/atomic_testings/atomic-testing-actions';
+import { fetchExpectationTraces, fetchExpectationTracesQuery } from '../../../../../actions/atomic_testings/atomic-testing-actions';
 import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemSecurityPlatformType from '../../../../../components/ItemSecurityPlatformType';
 import type { InjectExpectationResult, InjectExpectationTrace } from '../../../../../utils/api-types';
+import useNotifiedQuery from '../../../../../utils/query/useNotifiedQuery';
 import { type InjectExpectationsStore } from '../../../common/injects/expectations/Expectation';
 import useExpectationSourceLogo from './useExpectationSourceLogo';
 
@@ -18,6 +20,8 @@ interface Props {
   expectationResult: InjectExpectationResult | null;
   open: boolean;
   handleClose: () => void;
+  // Live updates on: the traces are a query under this key, refetched when it is invalidated.
+  atomicTestingQueryKey?: QueryKey;
 }
 
 // Extracts a compact "security.microsoft.com"-style host from an alert link so
@@ -39,18 +43,34 @@ const TargetResultAlertsDialog: FunctionComponent<Props> = ({
   expectationResult,
   handleClose,
   open,
+  atomicTestingQueryKey,
 }) => {
   const { t, fldt } = useFormatter();
   const theme = useTheme();
-  const [expectationTraces, setExpectationTraces] = useState<InjectExpectationTrace[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [stateTraces, setStateTraces] = useState<InjectExpectationTrace[]>([]);
+  const [stateLoading, setStateLoading] = useState<boolean>(true);
+  const liveUpdates = atomicTestingQueryKey !== undefined;
 
   useEffect(() => {
-    setLoading(true);
+    if (liveUpdates) {
+      return;
+    }
+    setStateLoading(true);
     fetchExpectationTraces(injectExpectation.inject_expectation_id, sourceId)
-      .then((result: { data: InjectExpectationTrace[] }) => setExpectationTraces(result.data ?? []))
-      .finally(() => setLoading(false));
-  }, [injectExpectation.inject_expectation_id, sourceId]);
+      .then((result: { data: InjectExpectationTrace[] }) => setStateTraces(result.data ?? []))
+      .finally(() => setStateLoading(false));
+  }, [injectExpectation.inject_expectation_id, sourceId, liveUpdates]);
+
+  // Fetched only while the dialog is open: the provider also mounts it, closed, for the other dialogs.
+  const tracesQuery = useNotifiedQuery({
+    queryKey: [...(atomicTestingQueryKey ?? []), 'expectation-traces', injectExpectation.inject_expectation_id, sourceId],
+    queryFn: () => fetchExpectationTracesQuery(injectExpectation.inject_expectation_id, sourceId, false)
+      .then((result: { data: InjectExpectationTrace[] }) => result.data ?? []),
+    enabled: liveUpdates && open,
+  });
+
+  const expectationTraces = liveUpdates ? (tracesQuery.data ?? []) : stateTraces;
+  const loading = liveUpdates ? tracesQuery.isPending : stateLoading;
 
   const sourceName = expectationResult?.sourceName?.trim() || '-';
   const platformType = expectationResult?.sourcePlatform?.trim();

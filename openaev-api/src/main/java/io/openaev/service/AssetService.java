@@ -54,6 +54,15 @@ public class AssetService {
         .orElseThrow(() -> new ElementNotFoundException("Asset not found with id: " + assetId));
   }
 
+  /**
+   * Whether the asset (of any type) exists in the given tenant. The tenant is compared in the
+   * query, so the answer does not depend on the tenant scope of the transaction.
+   */
+  @Transactional(readOnly = true)
+  public boolean existsInTenant(@NotBlank final String assetId, final String tenantId) {
+    return tenantId != null && this.assetRepository.existsByIdAndTenantId(assetId, tenantId);
+  }
+
   public List<Asset> assets(@NotNull final List<String> assetIds) {
     return fromIterable(this.assetRepository.findAllById(assetIds));
   }

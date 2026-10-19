@@ -12,6 +12,9 @@ import { useHelper } from '../../../../../store';
 import { type PhishingEmailTemplate as PhishingEmailTemplateType } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { isClientError } from '../../../../../utils/query/queryErrors';
+import { isFeatureEnabled } from '../../../../../utils/utils';
+import { phishingEmailTemplateKey, useComponentsStoreQuery } from '../../componentsQueries';
 import PhishingEmailTemplateHeader from './PhishingEmailTemplateHeader';
 
 const PhishingEmailTemplate = lazy(() => import('./PhishingEmailTemplate'));
@@ -23,9 +26,20 @@ const Index = () => {
   const { emailTemplate } = useHelper(
     (helper: PhishingEmailTemplatesHelper) => ({ emailTemplate: helper.getPhishingEmailTemplate(emailTemplateId) }),
   );
+  // With live updates on, the entity stays in the store but loads through a query under the
+  // components key: the topic 'list:components' refreshes it.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const entityQuery = useComponentsStoreQuery(phishingEmailTemplateKey(emailTemplateId), () => dispatch(fetchPhishingEmailTemplate(emailTemplateId)), liveUpdates);
+  // The data loader also keeps the legacy stream open; with live updates on, it loads nothing itself.
   useDataLoader(() => {
-    dispatch(fetchPhishingEmailTemplate(emailTemplateId));
+    if (!liveUpdates) {
+      dispatch(fetchPhishingEmailTemplate(emailTemplateId));
+    }
   });
+  // Deleted or no longer visible while on screen: the store may still hold the entity.
+  if (liveUpdates && !entityQuery.isPending && (isClientError(entityQuery.error) || !emailTemplate)) {
+    return <NotFound />;
+  }
   if (emailTemplate) {
     return (
       <div style={{

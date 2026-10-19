@@ -18,11 +18,15 @@ import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { useHelper } from '../../../../../store';
 import { type Exercise, type ExpectationResultsByType, type Inject, type InjectExpectationResultsByAttackPattern } from '../../../../../utils/api-types';
+import { retryUnlessClientError } from '../../../../../utils/query/queryErrors';
+import useNotifiedQuery from '../../../../../utils/query/useNotifiedQuery';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import InjectResultList from '../../../atomic_testings/InjectResultList';
 import MitreCoverageMatrix from '../../../common/matrix/MitreCoverageMatrix';
 import { CONTEXTUAL_POSTURE_WIDGET_ID, contextualResultsUrl } from '../../../workspaces/custom_dashboards/results/contextualWidgets';
 import SamplePreview from '../../../workspaces/custom_dashboards/widgets/viz/sample/SamplePreview';
 import SimulationMainInformation from '../SimulationMainInformation';
+import { liveRefetchInterval, simulationAttackPatternResultsKey, simulationInjectsResultsKey, simulationResultsKey } from '../simulationQueries';
 
 // Empty-state placeholder shown inside a SectionBlock when a simulation has not
 // produced results yet, instead of a raw loader or a stack of blank charts.
@@ -79,16 +83,40 @@ const SimulationComponent = () => {
     exercise: helper.getExercise(exerciseId),
     injects: helper.getExerciseInjects(exerciseId) as Inject[],
   }));
-  const [results, setResults] = useState<ExpectationResultsByType[] | null>(null);
-  const [injectResults, setInjectResults] = useState<InjectExpectationResultsByAttackPattern[] | null>(null);
+  // With live updates on, the results are queries under simulationKey(id), refetched by the topic
+  // 'simulation:<id>' and, while the simulation runs, by the fallback interval; the state below
+  // only serves the legacy path.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const refetchInterval = liveRefetchInterval(exercise?.exercise_status);
+  const resultsQuery = useNotifiedQuery({
+    queryKey: simulationResultsKey(exerciseId),
+    queryFn: () => fetchExerciseExpectationResult(exerciseId, false).then((result: { data: ExpectationResultsByType[] }) => result.data),
+    retry: retryUnlessClientError,
+    refetchInterval,
+    enabled: liveUpdates,
+  });
+  const injectResultsQuery = useNotifiedQuery({
+    queryKey: simulationAttackPatternResultsKey(exerciseId),
+    queryFn: () => fetchExerciseInjectExpectationResults(exerciseId, false).then((result: { data: InjectExpectationResultsByAttackPattern[] }) => result.data),
+    retry: retryUnlessClientError,
+    refetchInterval,
+    enabled: liveUpdates,
+  });
+  const [legacyResults, setResults] = useState<ExpectationResultsByType[] | null>(null);
+  const [legacyInjectResults, setInjectResults] = useState<InjectExpectationResultsByAttackPattern[] | null>(null);
+  const results = liveUpdates ? resultsQuery.data ?? null : legacyResults;
+  const injectResults = liveUpdates ? injectResultsQuery.data ?? null : legacyInjectResults;
   const injectsCount = (injects as unknown as InjectCollectionLike)?.length
     ?? (injects as unknown as InjectCollectionLike)?.size
     ?? 0;
 
   useEffect(() => {
+    if (liveUpdates) {
+      return;
+    }
     fetchExerciseExpectationResult(exerciseId).then((result: { data: ExpectationResultsByType[] }) => setResults(result.data));
     fetchExerciseInjectExpectationResults(exerciseId).then((result: { data: InjectExpectationResultsByAttackPattern[] }) => setInjectResults(result.data));
-  }, [exerciseId]);
+  }, [exerciseId, liveUpdates]);
 
   let resultAttackPatternIds = [];
   if (injectResults) {
@@ -204,7 +232,8 @@ const SimulationComponent = () => {
                     param-to-param navigation must remount the list to refetch. */}
                 <InjectResultList
                   key={exerciseId}
-                  fetchInjects={input => searchExerciseInjects(exerciseId, input)}
+                  fetchInjects={(input, notifyError) => searchExerciseInjects(exerciseId, input, notifyError)}
+                  queryKey={liveUpdates ? simulationInjectsResultsKey(exerciseId) : undefined}
                   goTo={injectId => `/admin/simulations/${exerciseId}/injects/${injectId}`}
                   queryableHelpers={queryableHelpers}
                   searchPaginationInput={searchPaginationInput}

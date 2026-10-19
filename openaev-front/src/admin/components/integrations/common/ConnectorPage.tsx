@@ -16,6 +16,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import CreateConnectorInstanceDrawer from '../connector_instance/CreateConnectorInstanceDrawer';
 import ActionButton from './ActionButton';
 import builtinConnectorDescription from './builtinConnectorDescriptions';
@@ -29,6 +30,7 @@ import type { ConnectorContextLayoutType } from './ConnectorLayout';
 import ConnectorLogs from './ConnectorLogs';
 import ConnectorPopover from './ConnectorPopover';
 import ConnectorStatus from './ConnectorStatus';
+import { invalidateIntegrations } from './integrationsQueries';
 import MigrateButton from './MigrateButton';
 import isPlatformConnector from './platform-connectors';
 
@@ -53,6 +55,8 @@ const ConnectorPage = ({ extraInfoComponent }: { extraInfoComponent?: ReactNode 
   // Per-type fallback description for built-in connectors (no catalog entry).
   const builtinDescription = connector?.type ? builtinConnectorDescription(connector.type) : undefined;
   const createInstanceDrawer = useDialog();
+  // With live updates on, local changes refetch every integration query.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   const onCloseCreateInstanceDrawer = () => {
     createInstanceDrawer.handleClose();
@@ -108,7 +112,12 @@ const ConnectorPage = ({ extraInfoComponent }: { extraInfoComponent?: ReactNode 
     } else {
       next = instanceCurrentStatus === 'started' ? 'stopping' : 'starting';
     }
-    dispatch(updateRequestedStatus(instance.connector_instance_id, { connector_instance_requested_status: next }));
+    dispatch(updateRequestedStatus(instance.connector_instance_id, { connector_instance_requested_status: next }))
+      .then(() => {
+        if (liveUpdates) {
+          invalidateIntegrations();
+        }
+      });
   };
 
   const canManage = ability.can(ACTIONS.MANAGE, SUBJECTS.TENANT_SETTINGS);
@@ -143,6 +152,9 @@ const ConnectorPage = ({ extraInfoComponent }: { extraInfoComponent?: ReactNode 
   const handleDeleteConnector = () => {
     if (!connector?.id) return;
     dispatch(apiRequest.deleteSingle(connector.id)).then(() => {
+      if (liveUpdates) {
+        invalidateIntegrations();
+      }
       setIsDeleteOpen(false);
       navigate(routes.list);
     });

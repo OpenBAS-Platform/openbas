@@ -30,7 +30,10 @@ import useNetworkCheck from './utils/hooks/useCheckNetwork';
 import useRefreshMe from './utils/hooks/useRefreshMe';
 import useTenant, { pickDefaultTenantId } from './utils/hooks/useTenant';
 import PermissionsProvider from './utils/permissions/PermissionsProvider';
+import queryClient from './utils/query/queryClient';
+import startStreamClient from './utils/stream/streamClient';
 import { buildTenantUrl, DEFAULT_TENANT_UUID, extractTenantFromUrl } from './utils/url-helper';
+import { isFeatureEnabledInSettings } from './utils/utils';
 
 const RootPublic = lazy(() => import('./public/Root'));
 const XtmHubRedirect = lazy(() => import('./admin/components/xtm_hub/XtmHubRedirect'));
@@ -76,6 +79,23 @@ const Root = () => {
       dispatch(fetchPublicPlatformParameters());
     }
   }, [logged, me]);
+
+  // Live updates: one invalidation socket per tab while a user is logged in on a tenant. It closes
+  // at logout and on a tenant switch, and the cached queries go with it since their keys do not
+  // carry the user or the tenant.
+  const streamTenantId = extractTenantFromUrl();
+  const streamEnabled = !!logged && !!me && !tenantAccessDenied && !!streamTenantId
+    && isFeatureEnabledInSettings(settings, 'STREAM_INVALIDATION');
+  useEffect(() => {
+    if (!streamEnabled) {
+      return undefined;
+    }
+    const stopStreamClient = startStreamClient(queryClient);
+    return () => {
+      stopStreamClient();
+      queryClient.clear();
+    };
+  }, [streamEnabled, streamTenantId]);
 
   const { isReachable } = useNetworkCheck(settings?.xtm_hub_url && `${settings?.xtm_hub_url}/health`);
 

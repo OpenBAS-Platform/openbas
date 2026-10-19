@@ -1,6 +1,7 @@
 import { Button, Chip } from '@filigran/design-system';
 import { GridViewOutlined } from '@mui/icons-material';
 import { Box } from '@mui/material';
+import { keepPreviousData, type QueryKey, useQuery } from '@tanstack/react-query';
 import { cloneElement, type ReactElement, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -9,6 +10,7 @@ import KillChainSelect from '../../../../admin/components/common/filters/KillCha
 import MitreFilter, { MITRE_FILTER_KEY } from '../../../../admin/components/common/filters/MitreFilter';
 import useKillChains from '../../../../admin/components/common/filters/useKillChains';
 import { type AttackPattern, type Filter, type PropertySchemaDTO, type SearchPaginationInput } from '../../../../utils/api-types';
+import { type Error as NotifiableError, notifyErrorHandler } from '../../../../utils/error/errorHandlerUtil';
 import { useFormatter } from '../../../i18n';
 import ClickableModeChip from '../../chips/ClickableModeChip';
 import Drawer from '../../Drawer';
@@ -19,6 +21,7 @@ import useFilterableProperties from '../filter/useFilterableProperties';
 import { type Page } from '../Page';
 import { type QueryableHelpers } from '../QueryableHelpers';
 import TextSearchComponent from '../textSearch/TextSearchComponent';
+import { type PaginationHelpers } from './PaginationHelpers';
 import TablePaginationComponentV2 from './TablePaginationComponentV2';
 
 const useStyles = makeStyles<{ topPagination?: boolean }>()((theme, props) => ({
@@ -55,8 +58,74 @@ const useStyles = makeStyles<{ topPagination?: boolean }>()((theme, props) => ({
   },
 }));
 
+// Lists on screen also refetch on this interval, as a fallback for changes no invalidation announces.
+// The library pauses it while the tab is in the background.
+const QUERY_REFETCH_INTERVAL_MS = 60_000;
+
+type Fetch<T> = (input: SearchPaginationInput, notifyError?: boolean) => Promise<{ data: Page<T> }>;
+
+// The current page fell past the end (dataset shrank, narrower filter, state restored from
+// another screen): restart from the first page. Guarded on pageNumber > 0 so an empty dataset
+// (totalPages = 0, page 0) does not trigger an endless reset/refetch loop.
+const applyPage = <T extends object>(data: Page<T>, setContent: (data: T[]) => void, paginationHelpers: PaginationHelpers) => {
+  setContent(data.content);
+  paginationHelpers.handleChangeTotalElements(data.totalElements);
+  if (data.pageable.pageNumber > 0 && data.totalPages <= data.pageable.pageNumber) {
+    paginationHelpers.handleChangePage(0);
+  }
+};
+
+interface QueryFetcherProps<T> {
+  queryKey: QueryKey;
+  fetch: Fetch<T>;
+  searchPaginationInput: SearchPaginationInput;
+  contextId?: string;
+  setContent: (data: T[]) => void;
+  setLoading?: (loading: boolean) => void;
+  paginationHelpers: PaginationHelpers;
+}
+
+// Query mode: the list lives in the query cache, so a stream invalidation, a window refocus or
+// the refetch interval reloads it with the same input. The previous page stays on screen while
+// a new input loads, so only the very first load shows the loading state.
+const QueryFetcher = <T extends object>({
+  queryKey,
+  fetch,
+  searchPaginationInput,
+  contextId,
+  setContent,
+  setLoading,
+  paginationHelpers,
+}: QueryFetcherProps<T>) => {
+  const { data, error, errorUpdatedAt, isPending, isPlaceholderData } = useQuery({
+    queryKey: [...queryKey, searchPaginationInput, contextId],
+    // The error toast is shown once below, after the library's retries, not on every attempt.
+    queryFn: () => fetch(searchPaginationInput, false).then(result => result.data),
+    placeholderData: keepPreviousData,
+    refetchInterval: QUERY_REFETCH_INTERVAL_MS,
+  });
+
+  useEffect(() => {
+    if (data && !isPlaceholderData) {
+      applyPage(data, setContent, paginationHelpers);
+    }
+  }, [data, isPlaceholderData]);
+
+  useEffect(() => {
+    setLoading?.(isPending);
+  }, [isPending]);
+
+  useEffect(() => {
+    if (error) {
+      notifyErrorHandler(error as unknown as NotifiableError);
+    }
+  }, [errorUpdatedAt]);
+
+  return null;
+};
+
 interface Props<T> {
-  fetch: (input: SearchPaginationInput) => Promise<{ data: Page<T> }>;
+  fetch: Fetch<T>;
   searchPaginationInput: SearchPaginationInput;
   setContent: (data: T[]) => void;
   setLoading?: (loading: boolean) => void;
@@ -80,6 +149,9 @@ interface Props<T> {
   reloadContentCount?: number;
   contextId?: string;
   topPagination?: boolean;
+  // Given a key, the list is fetched through the query cache under [...queryKey, input, contextId]
+  // instead of the effect below, and `reloadContentCount` is ignored: invalidate the key instead.
+  queryKey?: QueryKey;
 }
 
 const PaginationComponentV2 = <T extends object>({
@@ -101,6 +173,7 @@ const PaginationComponentV2 = <T extends object>({
   reloadContentCount = 0,
   contextId,
   topPagination = false,
+  queryKey,
 }: Props<T>) => {
   // Standard hooks
   const { classes } = useStyles({ topPagination });
@@ -142,10 +215,16 @@ const PaginationComponentV2 = <T extends object>({
     });
   }, [entityPrefix, engineEntityName, availableFilterNamesKey]);
 
+  const queryMode = queryKey !== undefined;
+
   useEffect(() => {
     // Modify URI
     if (queryableHelpers.uriHelpers) {
       queryableHelpers.uriHelpers.updateUri();
+    }
+
+    if (queryMode) {
+      return undefined;
     }
 
     // Fetch data. The stale flag (set by the effect cleanup when the search
@@ -160,16 +239,7 @@ const PaginationComponentV2 = <T extends object>({
         if (stale) {
           return;
         }
-        const { data } = result;
-        setContent(data.content);
-        queryableHelpers.paginationHelpers.handleChangeTotalElements(data.totalElements);
-        // The current page fell past the end (dataset shrank, narrower filter,
-        // state restored from another screen): restart from the first page.
-        // Guarded on pageNumber > 0 so an empty dataset (totalPages = 0,
-        // page 0) does not trigger an endless reset/refetch loop.
-        if (data.pageable.pageNumber > 0 && data.totalPages <= data.pageable.pageNumber) {
-          queryableHelpers.paginationHelpers.handleChangePage(0);
-        }
+        applyPage(result.data, setContent, queryableHelpers.paginationHelpers);
       })
       .catch(() => {
         // The API layer (simpleCall/simplePostCall) already notified the user
@@ -191,7 +261,7 @@ const PaginationComponentV2 = <T extends object>({
     // leaves the search input untouched (e.g. navigating from one simulation
     // to another with a shared storage key) still refetches with the latest
     // closure instead of keeping the previous scope's rows.
-  }, [searchPaginationInput, reloadContentCount, contextId]);
+  }, [searchPaginationInput, reloadContentCount, contextId, queryMode]);
 
   // Filters
   const [pristine, setPristine] = useState(true);
@@ -226,6 +296,17 @@ const PaginationComponentV2 = <T extends object>({
 
   return (
     <>
+      {queryMode && (
+        <QueryFetcher
+          queryKey={queryKey}
+          fetch={fetch}
+          searchPaginationInput={searchPaginationInput}
+          contextId={contextId}
+          setContent={setContent}
+          setLoading={setLoading}
+          paginationHelpers={queryableHelpers.paginationHelpers}
+        />
+      )}
       <div className={disablePagination ? classes.parametersWithoutPagination : classes.parameters}>
         {topPagination
           && (

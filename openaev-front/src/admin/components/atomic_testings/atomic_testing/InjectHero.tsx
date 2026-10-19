@@ -10,9 +10,11 @@ import PlatformIcon from '../../../../components/PlatformIcon';
 import type { InjectResultOverviewOutput, InjectStatus as InjectStatusType, InjectStatusOutput } from '../../../../utils/api-types';
 import handle from '../../../../utils/period/Period';
 import { truncate } from '../../../../utils/String';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import InjectIcon from '../../common/injects/InjectIcon';
 import InjectStatus from '../../common/injects/status/InjectStatus';
 import PayloadDeprecatedChip from '../../payloads/PayloadDeprecatedChip';
+import useInjectExecutionStatusQuery from './context/useInjectExecutionStatusQuery';
 import InjectScoreTiles from './InjectScoreTiles';
 
 // Inject-level statuses whose concrete failure reason is worth surfacing on the
@@ -60,7 +62,10 @@ const InjectHero: FunctionComponent<Props> = ({ injectResultOverview, actions })
   const { t, tPick, nsdt, du, locale, fld } = useFormatter();
 
   const statusName = injectResultOverview.inject_status?.status_name;
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+  const isErrorStatus = !!statusName && INJECT_ERROR_STATUSES.includes(statusName);
+  // With live updates on, the global execution traces are a query under the atomic testing key.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const [stateErrorMessage, setErrorMessage] = useState<string | undefined>(undefined);
 
   // Recurring scheduling chip (atomic testings only): mirrors the scenario
   // hero Scheduled chip with the human-readable schedule as tooltip.
@@ -87,7 +92,7 @@ const InjectHero: FunctionComponent<Props> = ({ injectResultOverview, actions })
   // otherwise only show a generic "could not be completed" tooltip.
   useEffect(() => {
     setErrorMessage(undefined);
-    if (!statusName || !INJECT_ERROR_STATUSES.includes(statusName)) {
+    if (liveUpdates || !isErrorStatus) {
       return;
     }
     getInjectStatusWithGlobalExecutionTraces(injectResultOverview.inject_id)
@@ -97,7 +102,13 @@ const InjectHero: FunctionComponent<Props> = ({ injectResultOverview, actions })
         setErrorMessage(firstError?.execution_message);
       })
       .catch(() => setErrorMessage(undefined));
-  }, [injectResultOverview.inject_id, statusName]);
+  }, [injectResultOverview.inject_id, statusName, liveUpdates]);
+
+  const { data: injectStatus } = useInjectExecutionStatusQuery(injectResultOverview.inject_id, { enabled: liveUpdates && isErrorStatus });
+  const queryErrorMessage = isErrorStatus
+    ? (injectStatus?.status_main_traces ?? []).find(trace => trace.execution_message?.trim())?.execution_message
+    : undefined;
+  const errorMessage = liveUpdates ? queryErrorMessage : stateErrorMessage;
 
   const payload = injectResultOverview.inject_injector_contract?.injector_contract_payload;
   const iconType = payload

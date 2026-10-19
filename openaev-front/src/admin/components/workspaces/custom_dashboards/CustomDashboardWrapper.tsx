@@ -1,5 +1,6 @@
+import { useQuery } from '@tanstack/react-query';
 import type { AxiosResponse } from 'axios';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -12,8 +13,12 @@ import type {
   WidgetToEntitiesInput,
   WidgetToEntitiesOutput,
 } from '../../../../utils/api-types';
+import queryClient from '../../../../utils/query/queryClient';
+import { isClientError } from '../../../../utils/query/queryErrors';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import CustomDashboardComponent from './CustomDashboardComponent';
 import { CustomDashboardContext, type CustomDashboardContextType, type ParameterOption, type WidgetResultsConf } from './CustomDashboardContext';
+import { dashboardDefinitionKey, widgetScopeKey } from './dashboardQueries';
 import { LAST_QUARTER_TIME_RANGE } from './widgets/configuration/common/TimeRangeUtils';
 
 const MIN_LOADING_TIME = 800; // Minimum time to show loader to avoid blinking
@@ -77,7 +82,41 @@ const CustomDashboardWrapper = ({
     fetchAttackPaths,
   } = configuration || {};
 
-  const [customDashboard, setCustomDashboard] = useState<CustomDashboard>();
+  const [localDashboard, setLocalDashboard] = useState<CustomDashboard>();
+
+  // With live updates on, the definition is a query under dashboardKey(id) that the topic
+  // 'dashboard:<id>' refetches, and local changes write it; the widgets fetch their data under the
+  // surface's analytics scope. Off, the definition is loaded once into local state, as before.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const surface = resultsSource?.source ?? 'workspace';
+  const surfaceContextId = resultsSource?.contextId ?? contextId;
+  const definitionKey = useMemo(
+    () => dashboardDefinitionKey(customDashboardId ?? '', surface, surfaceContextId),
+    [customDashboardId, surface, surfaceContextId],
+  );
+  const widgetQueryScope = useMemo(
+    () => (liveUpdates ? widgetScopeKey(surface, surfaceContextId) : undefined),
+    [liveUpdates, surface, surfaceContextId],
+  );
+  const definitionQuery = useQuery({
+    queryKey: definitionKey,
+    // The fetch function comes from the dashboard surface, whose scope is part of the key.
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryFn: () => fetchCustomDashboard().then(response => response.data ?? null),
+    enabled: liveUpdates && !!customDashboardId,
+    // The fetch functions show their own error toast: one attempt, one toast.
+    retry: false,
+  });
+  // A 4xx (deleted, access lost) shows the dashboard as unavailable, even after a first success.
+  const liveDashboard = isClientError(definitionQuery.error) ? undefined : (definitionQuery.data ?? undefined);
+  const customDashboard = liveUpdates ? liveDashboard : localDashboard;
+  const setLiveDashboard = useCallback((action: SetStateAction<CustomDashboard | undefined>) => {
+    queryClient.setQueryData<CustomDashboard | null>(definitionKey, (previous) => {
+      const next = typeof action === 'function' ? action(previous ?? undefined) : action;
+      return next ?? null;
+    });
+  }, [definitionKey]);
+  const setCustomDashboard = liveUpdates ? setLiveDashboard : setLocalDashboard;
   const [parametersLocalStorage, setParametersLocalStorage] = useLocalStorage<Record<string, ParameterOption>>(paramLocalStorageKey, {});
   const [parameters, setParameters] = useState<Record<string, ParameterOption>>({});
   const [dataReady, setDataReady] = useState(false);
@@ -180,6 +219,10 @@ const CustomDashboardWrapper = ({
 
   useEffect(() => {
     if (customDashboardId) {
+      if (liveUpdates) {
+        // Loaded by the definition query above; see the effect below.
+        return;
+      }
       // Reset loading state when dashboard ID changes
       setDataReady(false);
       setGridReady(false);
@@ -193,7 +236,7 @@ const CustomDashboardWrapper = ({
             setGridReady(true); // No grid to wait for
             return;
           }
-          setCustomDashboard(dashboard);
+          setLocalDashboard(dashboard);
         })
         .catch(() => {
           // Fetch failed, mark as ready (will show error or no dashboard)
@@ -204,9 +247,29 @@ const CustomDashboardWrapper = ({
       // No dashboard ID, mark as ready immediately
       setDataReadyWithDelay();
       setGridReady(true); // No grid to wait for
-      setCustomDashboard(undefined);
+      setLocalDashboard(undefined);
     }
-  }, [customDashboardId, fetchCustomDashboard]);
+  }, [customDashboardId, fetchCustomDashboard, liveUpdates]);
+
+  // Live updates: reset the loading state on a new dashboard id only. A surface may hand a new
+  // fetch function on every render, and the definition query does not depend on it.
+  useEffect(() => {
+    if (liveUpdates && customDashboardId) {
+      setDataReady(false);
+      setGridReady(false);
+      loadingStartTime.current = Date.now();
+    }
+  }, [customDashboardId, liveUpdates]);
+
+  // Live updates: a definition query settled without a dashboard (not found, failed) shows the
+  // no-dashboard slot; one with a dashboard is handled by the parameters initialization above.
+  const definitionSettledEmpty = liveUpdates && !!customDashboardId && !definitionQuery.isPending && !liveDashboard;
+  useEffect(() => {
+    if (definitionSettledEmpty) {
+      setDataReadyWithDelay();
+      setGridReady(true);
+    }
+  }, [definitionSettledEmpty, customDashboardId]);
 
   const contextValue: CustomDashboardContextType = useMemo(() => ({
     customDashboard,
@@ -224,8 +287,11 @@ const CustomDashboardWrapper = ({
     fetchAttackPaths,
     openWidgetResults: handleOpenWidgetResults,
     setGridReady,
+    widgetQueryScope,
   }), [
     customDashboard,
+    setCustomDashboard,
+    widgetQueryScope,
     parameters,
     setParametersLocalStorage,
     contextId,

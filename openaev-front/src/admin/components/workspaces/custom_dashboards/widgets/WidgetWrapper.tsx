@@ -1,5 +1,6 @@
 import { TablePagination } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { type QueryKey, useQuery } from '@tanstack/react-query';
 import { type SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ROWS_PER_PAGE_OPTIONS, useLocalPaginationState } from '../../../../../components/common/queryable/pagination/usePaginationState';
@@ -12,6 +13,7 @@ import {
   type EsSeries, type Pagination,
   type Widget,
 } from '../../../../../utils/api-types';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../../utils/query/useNotifiedQuery';
 import { CustomDashboardContext, type ParameterOption } from '../CustomDashboardContext';
 import { determinePercentage } from './viz/domains/SecurityDomainsWidgetUtils';
 import { SampleReportContext } from './viz/sample/SampleContext';
@@ -35,6 +37,19 @@ const buildParams = (parameters: Record<string, ParameterOption>): Record<string
     Object.entries(parameters).map(([key, val]) => [key, val.value]),
   );
 };
+
+// Query mode: the widget definition is one key segment, so a placeholder (the previous data kept
+// on screen while the next one loads) is only taken from a query of the same definition. Data of
+// another type or configuration (a widget being edited) may not fit the visualization.
+const DEFINITION_INDEX = 1;
+const widgetDataKey = (scope: QueryKey, widget: Widget, input: {
+  params: Record<string, string>;
+  pagination: Pagination | null;
+}) => [...scope, widget.widget_id, JSON.stringify({
+  type: widget.widget_type,
+  config: widget.widget_config,
+}), input] as const;
+const definitionOf = (scope: QueryKey, queryKey: QueryKey | undefined) => queryKey?.[scope.length + DEFINITION_INDEX];
 
 type WidgetDataResponse = EsAttackPath[] | EsCountInterval | EsAvgs | EsEntities | EsSeries[];
 type WidgetFetchConfig = {
@@ -61,7 +76,8 @@ const WidgetWrapper = ({
   // The visualization knows whether it is previewing sample data; the title row
   // is where the marker belongs, so the card carries the flag between them.
   const [sample, setSample] = useState(false);
-  const { customDashboardParameters, fetchCount, fetchSeries, fetchEntities, fetchAttackPaths, fetchAverage } = useContext(CustomDashboardContext);
+  const { customDashboardParameters, fetchCount, fetchSeries, fetchEntities, fetchAttackPaths, fetchAverage, widgetQueryScope } = useContext(CustomDashboardContext);
+  const queryMode = widgetQueryScope !== undefined;
   // A dashboard tile is small and its pagination lives in the title row, so it
   // paginates at a tile-friendly page size (loading 100 rows into a tile never
   // fit and hid the pagination whenever the total was below 100). The hook is
@@ -171,7 +187,7 @@ const WidgetWrapper = ({
   );
 
   useEffect(() => {
-    if (!isMountedRef.current) return;
+    if (!isMountedRef.current || queryMode) return;
     setInitialLoading(true);
     fetchWidgetData({
       page,
@@ -184,7 +200,61 @@ const WidgetWrapper = ({
         setContentLoading(false);
       }
     });
-  }, [fetchWidgetData]);
+  }, [fetchWidgetData, queryMode]);
+
+  // Query mode: the data lives in the query cache under the widget scope. A stream invalidation
+  // or the fallback interval refetches it in the background, the current data staying on screen;
+  // a new parameter or page keeps the previous data until the next one arrives.
+  const scope = widgetQueryScope ?? [];
+  const requestParams = useMemo(() => buildParams(customDashboardParameters), [customDashboardParameters]);
+  const currentPagination = useMemo(() => ({
+    page,
+    size: elementsPerPage,
+  }), [page, elementsPerPage]);
+  const queryKey = widgetDataKey(scope, widget, {
+    params: requestParams,
+    pagination: isListWidget ? currentPagination : null,
+  });
+  const fetchConfig = widgetConfig[widget.widget_type] ?? defaultConfig;
+  const widgetQuery = useQuery({
+    queryKey,
+    // The fetch functions come from the dashboard surface, whose scope is part of the key.
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryFn: () => fetchConfig.fetchFn(widget.widget_id, requestParams, currentPagination).then(response => response.data ?? null),
+    enabled: queryMode,
+    placeholderData: (previousData, previousQuery) => (
+      definitionOf(scope, previousQuery?.queryKey) === definitionOf(scope, queryKey) ? previousData : undefined
+    ),
+    refetchInterval: FALLBACK_REFETCH_INTERVAL_MS,
+    // A dashboard holds many widgets: a window refocus does not reload them all.
+    refetchOnWindowFocus: false,
+    // The fetch functions show their own error toast: one attempt, one toast.
+    retry: false,
+  });
+  const queryData = widgetQuery.data;
+  const queryVizData = useMemo<WidgetVizData>(() => {
+    if (!queryData) {
+      return { type: WidgetVizDataType.NONE };
+    }
+    return {
+      type: fetchConfig.vizType,
+      data: fetchConfig.transformData ? fetchConfig.transformData(queryData) : queryData,
+    } as WidgetVizData;
+  }, [queryData, fetchConfig]);
+
+  // A page persisted in localStorage can point past the end after the data shrinks: back to the
+  // first page, as in the fetch above.
+  useEffect(() => {
+    if (!queryMode || !queryData || widgetQuery.isPlaceholderData || fetchConfig.vizType !== WidgetVizDataType.ENTITIES) {
+      return;
+    }
+    if (currentPagination.page > 0 && ((queryData as EsEntities).total ?? 0) <= currentPagination.page * currentPagination.size) {
+      handleChangePagination({
+        page: 0,
+        size: currentPagination.size,
+      });
+    }
+  }, [queryMode, queryData, widgetQuery.isPlaceholderData]);
 
   const handleSetFullscreen = useCallback(
     (fs: boolean) => setFullscreen(widget.widget_id, fs),
@@ -197,6 +267,10 @@ const WidgetWrapper = ({
   const isResizing = widget.widget_id === idToResize;
 
   const onPaginationChange = (pagination: Pagination) => {
+    if (queryMode) {
+      handleChangePagination(pagination);
+      return;
+    }
     setContentLoading(true);
     handleChangePagination(pagination);
     // Only the latest request may clear the spinner: an older, superseded
@@ -209,22 +283,28 @@ const WidgetWrapper = ({
     });
   };
 
+  const shownVizData = queryMode ? queryVizData : vizData;
+  const shownInitialLoading = queryMode ? widgetQuery.isPending : initialLoading;
+  // Only a new page of a list shows its spinner: other widgets keep their data silently.
+  const shownContentLoading = queryMode ? isListWidget && widgetQuery.isFetching && widgetQuery.isPlaceholderData : contentLoading;
+  const shownErrorMessage = queryMode ? (widgetQuery.error?.message ?? '') : errorMessage;
+
   // List pagination lives in the title row (top right) instead of a dedicated
   // bar below the list, so it costs no vertical space inside the tile.
   const listPagination = widget.widget_type === 'list'
-    && vizData.type === WidgetVizDataType.ENTITIES
-    && vizData.data.total > vizData.data.page_size
+    && shownVizData.type === WidgetVizDataType.ENTITIES
+    && shownVizData.data.total > shownVizData.data.page_size
     ? (
         <TablePagination
           component="div"
           className="noDrag"
           rowsPerPageOptions={ROWS_PER_PAGE_OPTIONS}
-          count={vizData.data.total}
-          page={vizData.data.page_number}
-          rowsPerPage={vizData.data.page_size}
+          count={shownVizData.data.total}
+          page={shownVizData.data.page_number}
+          rowsPerPage={shownVizData.data.page_size}
           onPageChange={(_, newPage) => onPaginationChange({
             page: newPage,
-            size: vizData.data.page_size,
+            size: shownVizData.data.page_size,
           })}
           onRowsPerPageChange={event => onPaginationChange({
             page: 0,
@@ -261,7 +341,7 @@ const WidgetWrapper = ({
           handleWidgetUpdate={handleWidgetUpdate}
           handleWidgetDelete={handleWidgetDelete}
           readOnly={readOnly}
-          vizData={vizData}
+          vizData={shownVizData}
           rightSlot={listPagination}
           sample={sample}
         />
@@ -272,17 +352,17 @@ const WidgetWrapper = ({
               onMouseDown={handleMouseDown}
               onTouchStart={handleTouchStart}
             >
-              {initialLoading ? (
+              {shownInitialLoading ? (
                 <Loader variant="inElement" />
               ) : (
                 <WidgetViz
                   widget={widget}
                   fullscreen={fullscreen}
                   setFullscreen={handleSetFullscreen}
-                  vizData={vizData}
-                  errorMessage={errorMessage}
+                  vizData={shownVizData}
+                  errorMessage={shownErrorMessage}
                   onPaginationChange={onPaginationChange}
-                  contentLoading={contentLoading}
+                  contentLoading={shownContentLoading}
                 />
               )}
             </div>

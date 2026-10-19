@@ -1,6 +1,7 @@
 import { Checkbox, IconButton, Tooltip, TooltipContent, TooltipTrigger } from '@filigran/design-system';
 import { CloudUploadOutlined, HelpOutlineOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { type QueryKey } from '@tanstack/react-query';
 import { type CSSProperties, type FunctionComponent, type ReactElement, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -26,6 +27,7 @@ import {
 import useEntityToggle from '../../../utils/hooks/useEntityToggle';
 import { Can } from '../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
+import queryClient from '../../../utils/query/queryClient';
 import { isNotEmptyField } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
 import InjectImportJsonDialog from '../common/injects/InjectImportJsonDialog';
@@ -54,7 +56,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 interface Props {
   showActions?: boolean;
-  fetchInjects: (input: SearchPaginationInput) => Promise<{ data: Page<InjectResultOutput> }>;
+  fetchInjects: (input: SearchPaginationInput, notifyError?: boolean) => Promise<{ data: Page<InjectResultOutput> }>;
   // The full row is passed as second argument so cross-scope lists (e.g. the injects played on an
   // asset) can route simulation injects and atomic testings to their respective detail pages.
   goTo: (injectId: string, inject: InjectResultOutput) => string;
@@ -82,6 +84,9 @@ interface Props {
   // External trigger to refresh the paginated list when data changes outside
   // the list controls (e.g. live execution updates).
   reloadContentCount?: number;
+  // Given a key, the list is a query under this key (see PaginationComponentV2): stream
+  // invalidations refetch it, local changes invalidate it, and reloadContentCount is ignored.
+  queryKey?: QueryKey;
 }
 
 const InjectResultList: FunctionComponent<Props> = ({
@@ -96,6 +101,7 @@ const InjectResultList: FunctionComponent<Props> = ({
   deleteConfirmation,
   displayDraftAsPending,
   reloadContentCount = 0,
+  queryKey,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -237,9 +243,19 @@ const InjectResultList: FunctionComponent<Props> = ({
     },
   ], [displayDraftAsPending]);
 
+  const queryMode = queryKey !== undefined;
+
   const search = (input: SearchPaginationInput) => {
     setLoading(true);
     return fetchInjects(input).finally(() => setLoading(false));
+  };
+
+  const refresh = () => {
+    if (queryMode) {
+      queryClient.invalidateQueries({ queryKey });
+    } else {
+      setReloadCount(prev => prev + 1);
+    }
   };
 
   // Bulk selection
@@ -260,11 +276,24 @@ const InjectResultList: FunctionComponent<Props> = ({
       selectedIds: Object.keys(selectedElements),
       deSelectedIds: Object.keys(deSelectedElements),
     }).then((deletedIds) => {
-      const newTotal = Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - deletedIds.length);
-      setInjects(injects.filter(inject => !deletedIds.includes(inject.inject_id)));
-      queryableHelpers.paginationHelpers.handleChangeTotalElements(newTotal);
+      if (queryMode) {
+        refresh();
+      } else {
+        const newTotal = Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - deletedIds.length);
+        setInjects(injects.filter(inject => !deletedIds.includes(inject.inject_id)));
+        queryableHelpers.paginationHelpers.handleChangeTotalElements(newTotal);
+      }
       handleClearSelectedElements();
     });
+  };
+
+  const onDeleteRow = (injectId: string) => {
+    if (queryMode) {
+      refresh();
+    } else {
+      setInjects(injects.filter(inject => inject.inject_id !== injectId));
+      queryableHelpers.paginationHelpers.incrementTotalElements(-1);
+    }
   };
 
   const handleOpenJsonImportDialog = () => {
@@ -276,14 +305,16 @@ const InjectResultList: FunctionComponent<Props> = ({
   const handleSubmitJsonImportFile = (values: { file: File }) => {
     importAtomicTesting(values.file).then(() => {
       handleCloseJsonImportDialog();
-      setReloadCount(prev => prev + 1);
+      refresh();
     });
   };
 
   return (
     <>
       <PaginationComponentV2
-        fetch={search}
+        fetch={queryMode ? fetchInjects : search}
+        queryKey={queryKey}
+        setLoading={queryMode ? setLoading : undefined}
         searchPaginationInput={searchPaginationInput}
         setContent={setInjects}
         entityPrefix="inject"
@@ -381,10 +412,7 @@ const InjectResultList: FunctionComponent<Props> = ({
                       <AtomicTestingPopover
                         atomic={injectResultOutput}
                         actions={['Duplicate', 'Export', 'Delete']}
-                        onDelete={(result) => {
-                          setInjects(injects.filter(e => e.inject_id !== result));
-                          queryableHelpers.paginationHelpers.incrementTotalElements(-1);
-                        }}
+                        onDelete={onDeleteRow}
                         inList
                       />
                     ) : null}

@@ -1,10 +1,12 @@
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@filigran/design-system';
 import { Typography } from '@mui/material';
-import { type FunctionComponent, type MouseEvent, useEffect, useState } from 'react';
+import { type FunctionComponent, type MouseEvent, useContext, useEffect, useState } from 'react';
 
-import { getAlertLinksCount } from '../../../../../actions/atomic_testings/atomic-testing-actions';
+import { getAlertLinksCount, getAlertLinksCountQuery } from '../../../../../actions/atomic_testings/atomic-testing-actions';
 import { useFormatter } from '../../../../../components/i18n';
 import { type InjectExpectationResult } from '../../../../../utils/api-types';
+import useNotifiedQuery from '../../../../../utils/query/useNotifiedQuery';
+import InjectExpectationContext from '../context/InjectExpectationContext';
 
 interface Props {
   injectExpectationId: string;
@@ -20,11 +22,26 @@ const TargetResultAlertNumber: FunctionComponent<Props> = ({
   onShowAlerts,
 }) => {
   const { t } = useFormatter();
-  const [alertLinksNumber, setAlertLinksNumber] = useState<number | null>(0);
+  const { atomicTestingQueryKey } = useContext(InjectExpectationContext);
+  const liveUpdates = atomicTestingQueryKey !== undefined;
+  const [stateAlertLinksNumber, setStateAlertLinksNumber] = useState<number | null>(0);
 
   useEffect(() => {
-    getAlertLinksCount(injectExpectationId, expectationResult.sourceId, expectationResult.sourceType).then((result: { data: number }) => setAlertLinksNumber(result.data ?? 0));
-  }, [injectExpectationId, expectationResult.sourceId, expectationResult.sourceType]);
+    if (liveUpdates) {
+      return;
+    }
+    getAlertLinksCount(injectExpectationId, expectationResult.sourceId, expectationResult.sourceType)
+      .then((result: { data: number }) => setStateAlertLinksNumber(result.data ?? 0));
+  }, [injectExpectationId, expectationResult.sourceId, expectationResult.sourceType, liveUpdates]);
+
+  const { data: queryAlertLinksNumber } = useNotifiedQuery({
+    queryKey: [...(atomicTestingQueryKey ?? []), 'alert-count', injectExpectationId, expectationResult.sourceId, expectationResult.sourceType],
+    queryFn: () => getAlertLinksCountQuery(injectExpectationId, expectationResult.sourceId, expectationResult.sourceType, false)
+      .then((result: { data: number }) => result.data ?? 0),
+    enabled: liveUpdates,
+  });
+
+  const alertLinksNumber = liveUpdates ? (queryAlertLinksNumber ?? 0) : stateAlertLinksNumber;
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();

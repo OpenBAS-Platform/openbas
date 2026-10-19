@@ -20,9 +20,12 @@ import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import type { CustomDashboard, SearchPaginationInput } from '../../../../utils/api-types';
 import { Can } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import { DASHBOARDS_LIST_KEY } from '../../../../utils/query/keys';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import CustomDashboardCard from './CustomDashboardCard';
 import CustomDashboardCreation from './CustomDashboardCreation';
 import CustomDashboardPopover from './CustomDashboardPopover';
+import { invalidateDashboardsList } from './dashboardQueries';
 
 // Cards by default, with a persisted switch to the compact list (same pattern
 // as the security platforms screen).
@@ -45,6 +48,10 @@ const CustomDashboards = () => {
   const { t } = useFormatter();
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
+
+  // With live updates on, the list is a query under the dashboards key that stream invalidations
+  // refetch; local changes invalidate it too instead of patching the rows.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   // Pagination
   const [loading, setLoading] = useState<boolean>(true);
@@ -75,20 +82,28 @@ const CustomDashboards = () => {
 
   const handleUpdate = useCallback(
     (customDashboard: CustomDashboard) => {
+      if (liveUpdates) {
+        invalidateDashboardsList();
+        return;
+      }
       setCustomDashboards(prev => prev.map(d =>
         d.custom_dashboard_id === customDashboard.custom_dashboard_id ? customDashboard : d,
       ));
     },
-    [],
+    [liveUpdates],
   );
 
   const { incrementTotalElements } = queryableHelpers.paginationHelpers;
   const handleDelete = useCallback(
     (id: string) => {
+      if (liveUpdates) {
+        invalidateDashboardsList();
+        return;
+      }
       setCustomDashboards(prev => prev.filter(d => d.custom_dashboard_id !== id));
       incrementTotalElements(-1);
     },
-    [incrementTotalElements],
+    [incrementTotalElements, liveUpdates],
   );
 
   const [viewMode, setViewMode] = useState<ViewMode>(readViewMode);
@@ -169,7 +184,9 @@ const CustomDashboards = () => {
         }]}
       />
       <PaginationComponentV2
-        fetch={search}
+        fetch={liveUpdates ? searchCustomDashboards : search}
+        setLoading={liveUpdates ? setLoading : undefined}
+        queryKey={liveUpdates ? DASHBOARDS_LIST_KEY : undefined}
         searchPaginationInput={searchPaginationInput}
         setContent={setCustomDashboards}
         entityPrefix="custom_dashboard"

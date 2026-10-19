@@ -14,6 +14,9 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { Can } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import useStoreQuery from '../../../../utils/query/useStoreQuery';
+import { isFeatureEnabled } from '../../../../utils/utils';
+import { lessonsTemplateContentKey, loadEvictingDeleted } from '../componentsQueries';
 import CreateLessonsTemplateCategory from './categories/CreateLessonsTemplateCategory';
 import LessonsTemplateCategoryCard from './categories/LessonsTemplateCategoryCard';
 
@@ -95,9 +98,27 @@ const LessonsTemplate = () => {
       questions: helper.getLessonsTemplateQuestions(),
     };
   });
+  // With live updates on, the categories and questions stay in the store but load through a query
+  // under the template key, which also evicts the ones of this template deleted elsewhere.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  useStoreQuery(lessonsTemplateContentKey(lessonsTemplateId), async () => {
+    const categoryIds = new Set(categories.map(category => category.lessonstemplatecategory_id));
+    await loadEvictingDeleted(
+      () => dispatch(fetchLessonsTemplateCategories(lessonsTemplateId)),
+      'lessonstemplatecategorys',
+      category => category.get('lessons_template_category_template') === lessonsTemplateId,
+    );
+    await loadEvictingDeleted(
+      () => dispatch(fetchLessonsTemplateQuestions(lessonsTemplateId)),
+      'lessonstemplatequestions',
+      question => categoryIds.has(question.get('lessons_template_question_category') as string),
+    );
+  }, { enabled: liveUpdates });
   useDataLoader(() => {
-    dispatch(fetchLessonsTemplateCategories(lessonsTemplateId));
-    dispatch(fetchLessonsTemplateQuestions(lessonsTemplateId));
+    if (!liveUpdates) {
+      dispatch(fetchLessonsTemplateCategories(lessonsTemplateId));
+      dispatch(fetchLessonsTemplateQuestions(lessonsTemplateId));
+    }
   });
 
   // Utils

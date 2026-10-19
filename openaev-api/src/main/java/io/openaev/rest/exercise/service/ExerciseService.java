@@ -223,6 +223,15 @@ public class ExerciseService {
     }
   }
 
+  /**
+   * Whether the simulation exists in the given tenant. The tenant is compared in the query, so the
+   * answer does not depend on the tenant filter being active (a lookup by id is not filtered).
+   */
+  @Transactional(readOnly = true)
+  public boolean existsInTenant(@NotBlank final String exerciseId, final String tenantId) {
+    return tenantId != null && this.exerciseRepository.existsByIdAndTenantId(exerciseId, tenantId);
+  }
+
   public Exercise exercise(@NotBlank final String exerciseId) {
     return this.exerciseRepository
         .findByIdAndTenantId(exerciseId, TenantContext.getCurrentTenant())

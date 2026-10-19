@@ -12,6 +12,8 @@ import { initSorting } from '../../../../components/common/queryable/Page';
 import { useFormatter } from '../../../../components/i18n';
 import ItemDomains from '../../../../components/ItemDomains.tsx';
 import { useHelper } from '../../../../store';
+import { isFeatureEnabled } from '../../../../utils/utils';
+import { injectorContractsKey, invalidateIntegrations } from '../common/integrationsQueries';
 import CreateInjectorContract from './injector_contracts/CreateInjectorContract';
 import InjectorContractPopover from './injector_contracts/InjectorContractPopover';
 
@@ -130,6 +132,11 @@ const InjectorContracts = () => {
     },
   ];
 
+  // With live updates on, the contracts are a query under the integrations key: the topic
+  // 'list:integrations' (contracts register with their injector) refetches them, so the
+  // post-deployment polling below only runs with live updates off. Constant for a session.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+
   const POLL_INTERVAL_MS = 10_000;
   const POLL_MAX_ATTEMPTS = 30; // 5 minutes max
 
@@ -166,7 +173,7 @@ const InjectorContracts = () => {
 
   // After the first fetch: if empty, start polling (async contract registration after deployment)
   useEffect(() => {
-    if (!hasFetched) return undefined;
+    if (liveUpdates || !hasFetched) return undefined;
     if (injectorContracts.length > 0) {
       stopPolling();
       return undefined;
@@ -209,6 +216,7 @@ const InjectorContracts = () => {
     <div className={classes.container}>
       <PaginationComponent
         fetch={searchInjectorContracts}
+        queryKey={liveUpdates ? injectorContractsKey(injectorId) : undefined}
         searchPaginationInput={searchPaginationInput}
         setContent={handleContractsLoaded}
         exportProps={exportProps}
@@ -219,7 +227,11 @@ const InjectorContracts = () => {
             killChainPhasesMap={killChainPhasesMap}
             attackPatternsMap={attackPatternsMap}
             onCreated={() => {
-              setSearchPaginationInput({ ...searchPaginationInput });
+              if (liveUpdates) {
+                invalidateIntegrations();
+              } else {
+                setSearchPaginationInput({ ...searchPaginationInput });
+              }
             }}
           />
         ) : null}
@@ -339,7 +351,10 @@ const InjectorContracts = () => {
             <ListItemSecondaryAction>
               <InjectorContractPopover
                 injectorContract={injectorContract}
-                onUpdate={result => setInjectorContracts(injectorContracts.map(ic => (ic.injector_contract_id !== result.injector_contract_id ? ic : result)))}
+                onUpdate={result => (liveUpdates
+                  ? invalidateIntegrations()
+                  : setInjectorContracts(injectorContracts.map(ic => (ic.injector_contract_id !== result.injector_contract_id ? ic : result))))}
+                onDelete={liveUpdates ? invalidateIntegrations : undefined}
               />
             </ListItemSecondaryAction>
           </ListItem>

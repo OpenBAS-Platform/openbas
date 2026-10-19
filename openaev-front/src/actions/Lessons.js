@@ -6,10 +6,10 @@ export const fetchLessonsTemplates = () => (dispatch) => {
   return getReferential(schema.arrayOfLessonsTemplates, uri)(dispatch);
 };
 
-export const searchLessonsTemplates = (searchPaginationInput) => {
+export const searchLessonsTemplates = (searchPaginationInput, notifyError = true) => {
   const data = searchPaginationInput;
   const uri = '/api/lessons_templates/search';
-  return simplePostCall(uri, data);
+  return simplePostCall(uri, data, undefined, notifyError);
 };
 
 export const updateLessonsTemplate = (lessonsTemplateId, data) => (dispatch) => {

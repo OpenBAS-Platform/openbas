@@ -1,5 +1,6 @@
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { type QueryKey } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
 import { fetchAssetGroups } from '../../../actions/asset_groups/assetgroup-action';
@@ -20,6 +21,8 @@ import useDataLoader from '../../../utils/hooks/useDataLoader';
 import useLivePolling from '../../../utils/hooks/useLivePolling';
 import { useAbility } from '../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../utils/query/useNotifiedQuery';
+import useStoreQuery from '../../../utils/query/useStoreQuery';
 import ChainingUpdatedBanner from './ChainingUpdatedBanner';
 import ScopeExecutionLimits from './ScopeExecutionLimits';
 import ScopeRules from './ScopeRules';
@@ -36,6 +39,9 @@ interface ScopeDefinitionProps {
   autonomous?: boolean;
   /** OpenAEV-owned autonomous session timeout in seconds (default 24h). Only used when autonomous. */
   autonomousTimeoutSeconds?: number | null;
+  /** Given a key, the workflow's scope data is a store query under it, refetched when the key is
+   *  invalidated, instead of the live polling. */
+  queryKey?: QueryKey;
 }
 
 const ScopeDefinition = ({
@@ -43,6 +49,7 @@ const ScopeDefinition = ({
   readOnly = false,
   autonomous = false,
   autonomousTimeoutSeconds,
+  queryKey,
 }: ScopeDefinitionProps) => {
   // Standard hooks
   const theme = useTheme();
@@ -59,10 +66,24 @@ const ScopeDefinition = ({
   // below, so the drift is resolved from data on hand - no extra fetching by the banner.
   const updatedAssets = useSnapshotUpdated({ workflowConfiguration });
 
+  const queryMode = queryKey !== undefined;
+  const loadWorkflowScope = () => Promise.all([
+    dispatch(fetchWorkflowConfiguration(workflowId)),
+    dispatch(fetchWorkflowScopeEndpoints(workflowId)),
+    dispatch(fetchWorkflowScopeAssetGroups(workflowId)),
+  ]);
+
+  // Query mode: the workflow's own scope data reloads when the key is invalidated (and on the
+  // fallback interval); the reference inventories below keep their usual loading.
+  useStoreQuery([...(queryKey ?? []), 'scope', workflowId], loadWorkflowScope, {
+    enabled: queryMode && !!workflowId,
+    refetchInterval: FALLBACK_REFETCH_INTERVAL_MS,
+  });
+
   useDataLoader(() => {
-    dispatch(fetchWorkflowConfiguration(workflowId));
-    dispatch(fetchWorkflowScopeEndpoints(workflowId));
-    dispatch(fetchWorkflowScopeAssetGroups(workflowId));
+    if (!queryMode) {
+      loadWorkflowScope();
+    }
     dispatch(fetchTeams());
     dispatch(fetchPlayers());
     // The global inventories require the asset capabilities: a user merely granted on the parent
@@ -77,6 +98,7 @@ const ScopeDefinition = ({
   // re-read the workflow configuration on a visible cadence (the reference lists rarely move mid-run,
   // so only the configuration is polled). It flows through the store, so the cards reflect the latest
   // scope without a manual reload and without disturbing any open edit dialog (that is local state).
+  // Query mode polls too: workflow configuration changes emit no stream invalidation.
   useLivePolling(() => {
     dispatch(fetchWorkflowConfiguration(workflowId));
   }, { enabled: !!workflowId });

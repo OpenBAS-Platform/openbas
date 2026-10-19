@@ -8,8 +8,12 @@ import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { type GlobalScoreBySimulationEndDate, type ScenarioStatistic } from '../../../../utils/api-types';
+import { retryUnlessClientError } from '../../../../utils/query/queryErrors';
+import useNotifiedQuery, { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../utils/query/useNotifiedQuery';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import { expectationTypeColor, expectationTypeIcon } from '../../common/ExpectationIconByType';
 import SamplePreview from '../../workspaces/custom_dashboards/widgets/viz/sample/SamplePreview';
+import { scenarioStatisticKey } from './scenarioQueries';
 
 interface Props { scenarioId: string }
 
@@ -240,14 +244,30 @@ const TrendTile: FunctionComponent<{
 const ScenarioDistributionByExercise: FunctionComponent<Props> = ({ scenarioId }) => {
   const { t } = useFormatter();
 
-  const [loadingScenarioStatistics, setLoadingScenarioStatistics] = useState(true);
-  const [statistic, setStatistic] = useState<ScenarioStatistic>();
+  // With live updates on, the statistic is a query that the topic 'scenario:<id>' refetches; it
+  // also changes while a simulation runs, hence the fallback interval.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const statisticQuery = useNotifiedQuery({
+    queryKey: scenarioStatisticKey(scenarioId),
+    queryFn: () => fetchScenarioStatistic(scenarioId, false).then((result: { data: ScenarioStatistic }) => result.data),
+    retry: retryUnlessClientError,
+    refetchInterval: query => (query.state.status === 'error' ? false : FALLBACK_REFETCH_INTERVAL_MS),
+    enabled: liveUpdates,
+  });
+
+  const [legacyLoading, setLoadingScenarioStatistics] = useState(true);
+  const [legacyStatistic, setStatistic] = useState<ScenarioStatistic>();
   useEffect(() => {
+    if (liveUpdates) {
+      return;
+    }
     setLoadingScenarioStatistics(true);
     fetchScenarioStatistic(scenarioId)
       .then((result: { data: ScenarioStatistic }) => setStatistic(result.data))
       .finally(() => setLoadingScenarioStatistics(false));
-  }, [scenarioId]);
+  }, [scenarioId, liveUpdates]);
+  const statistic = liveUpdates ? statisticQuery.data : legacyStatistic;
+  const loadingScenarioStatistics = liveUpdates ? statisticQuery.isPending : legacyLoading;
 
   const rawScores = statistic?.simulations_results_latest.global_scores_by_expectation_type || {};
   const hasRealData = EXPECTATION_TYPES.some(([type]) => Array.isArray(rawScores[type]) && rawScores[type].length > 0);

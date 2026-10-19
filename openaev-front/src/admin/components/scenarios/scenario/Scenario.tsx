@@ -2,6 +2,7 @@ import { Button, IconButton, Paper, Tooltip, TooltipContent, TooltipTrigger } fr
 import { AutoAwesome, LayersClearOutlined, PlayArrowOutlined, RocketLaunchOutlined } from '@mui/icons-material';
 import { Avatar, Box, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
+import { useQuery } from '@tanstack/react-query';
 import * as R from 'ramda';
 import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
@@ -52,7 +53,8 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
-import { isEmptyField } from '../../../../utils/utils';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../utils/query/useNotifiedQuery';
+import { isEmptyField, isFeatureEnabled } from '../../../../utils/utils';
 import isXtmOneAvailable from '../../ariane/xtmOneAvailability';
 import AutonomousOutcome from '../../autonomous/AutonomousOutcome';
 import { isAutonomousRunActive } from '../../autonomous/autonomousStatus';
@@ -64,6 +66,56 @@ import SimulationList from '../../simulations/SimulationList';
 import { CONTEXTUAL_POSTURE_WIDGET_ID, contextualResultsUrl } from '../../workspaces/custom_dashboards/results/contextualWidgets';
 import SamplePreview from '../../workspaces/custom_dashboards/widgets/viz/sample/SamplePreview';
 import ScenarioDistributionByExercise from './ScenarioDistributionByExercise';
+import { invalidateScenario, scenarioLatestResultsKey, scenarioSimulationsKey, useScenarioHealthchecks } from './scenarioQueries';
+
+const LATEST_SIMULATION_SEARCH: SearchPaginationInput = {
+  size: 1,
+  page: 0,
+  sorts: [
+    {
+      property: 'exercise_end_date',
+      direction: 'DESC',
+      nullHandling: 'NULLS_LAST' as SortField['nullHandling'],
+    },
+    {
+      property: 'exercise_updated_at',
+      direction: 'DESC',
+    },
+  ],
+};
+
+interface LatestResults {
+  simulationId: string | null;
+  results: ExpectationResultsByType[] | null;
+  injectResults: InjectExpectationResultsByAttackPattern[] | null;
+}
+
+// Results of the latest simulation. A failed result call leaves its part empty, as the other part
+// may still render.
+const fetchLatestResults = async (scenarioId: string): Promise<LatestResults> => {
+  const { data } = await searchScenarioExercises(scenarioId, LATEST_SIMULATION_SEARCH) as { data: { content?: ExerciseSimple[] } };
+  const simulationId = data.content?.[0]?.exercise_id;
+  if (!simulationId) {
+    return {
+      simulationId: null,
+      results: null,
+      injectResults: null,
+    };
+  }
+  const [results, injectResults] = await Promise.all([
+    fetchExerciseExpectationResult(simulationId)
+      .then((r: { data: ExpectationResultsByType[] }) => r.data)
+      .catch(() => null),
+    fetchExerciseInjectExpectationResults(simulationId)
+      .then((r: { data: InjectExpectationResultsByAttackPattern[] }) => r.data)
+      .catch(() => null),
+  ]);
+  return {
+    simulationId,
+    results,
+    injectResults,
+  };
+};
 
 const Scenario = ({ setOpenInstantiateSimulationAndStart, autonomousRun = null, onAutonomousRunCleared, timelineEvents }: {
   setOpenInstantiateSimulationAndStart: Dispatch<SetStateAction<boolean>>;
@@ -86,6 +138,9 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart, autonomousRun = null, 
   const { scenarioId } = useParams() as { scenarioId: ScenarioType['scenario_id'] };
   const ability = useAbility();
   const dispatch = useAppDispatch();
+  // With live updates on, the overview data are queries under scenarioKey(id), refetched by the
+  // topic 'scenario:<id>'; the state below only serves the legacy path.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   // Fetching data
   const {
@@ -105,7 +160,9 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart, autonomousRun = null, 
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
 
   // Spy on modifications to reload healthchecks
-  const [healthchecks, setHealthchecks] = useState<HealthCheck[]>([]);
+  const [legacyHealthchecks, setHealthchecks] = useState<HealthCheck[]>([]);
+  const healthchecksQuery = useScenarioHealthchecks(scenarioId, liveUpdates);
+  const healthchecks = liveUpdates ? healthchecksQuery.data ?? [] : legacyHealthchecks;
 
   const scenarioWorkflowId = (scenario as unknown as Record<string, unknown>).scenario_workflow_id as string | undefined;
   const isScenarioChaining = !!scenarioWorkflowId;
@@ -134,6 +191,9 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart, autonomousRun = null, 
   });
 
   useEffect(() => {
+    if (liveUpdates) {
+      return;
+    }
     searchScenarioHealthcheks(scenarioId).then((result: { data: HealthCheck[] }) => setHealthchecks(result.data));
   }, [
     settings?.smtp_service_available,
@@ -173,14 +233,34 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart, autonomousRun = null, 
   // Latest finished simulation posture: the scenario overview reads as a live
   // AEV posture dashboard by surfacing the most recent run's prevention /
   // detection / vulnerability results + its MITRE ATT&CK coverage.
-  const [lastSimulationId, setLastSimulationId] = useState<string | null>(null);
-  const [lastResults, setLastResults] = useState<ExpectationResultsByType[] | null>(null);
-  const [lastInjectResults, setLastInjectResults] = useState<InjectExpectationResultsByAttackPattern[] | null>(null);
+  const [legacyLastSimulationId, setLastSimulationId] = useState<string | null>(null);
+  const [legacyLastResults, setLastResults] = useState<ExpectationResultsByType[] | null>(null);
+  const [legacyLastInjectResults, setLastInjectResults] = useState<InjectExpectationResultsByAttackPattern[] | null>(null);
   // Tracks whether the latest-run results fetch has settled, so we only fall back
   // to the illustrative sample preview once we know there is genuinely nothing to
   // show (never-run OR a run that produced no results) - never while still loading.
-  const [lastResultsResolved, setLastResultsResolved] = useState<boolean>(false);
+  const [legacyLastResultsResolved, setLastResultsResolved] = useState<boolean>(false);
+  // Live updates: a running simulation changes its results while on screen, hence the fallback
+  // interval. A failing query stops it (one toast), an invalidation still refetches it.
+  const latestResultsQuery = useQuery({
+    queryKey: scenarioLatestResultsKey(scenarioId),
+    queryFn: () => fetchLatestResults(scenarioId),
+    enabled: liveUpdates && areAnyExercisesInScenario,
+    // The calls show their own error toast: no retry, so one toast per failed load.
+    retry: false,
+    refetchInterval: query => (query.state.status === 'error' ? false : FALLBACK_REFETCH_INTERVAL_MS),
+  });
+  const latestResults = areAnyExercisesInScenario ? latestResultsQuery.data : undefined;
+  const lastSimulationId = liveUpdates ? latestResults?.simulationId ?? null : legacyLastSimulationId;
+  const lastResults = liveUpdates ? latestResults?.results ?? null : legacyLastResults;
+  const lastInjectResults = liveUpdates ? latestResults?.injectResults ?? null : legacyLastInjectResults;
+  const lastResultsResolved = liveUpdates
+    ? !areAnyExercisesInScenario || !latestResultsQuery.isPending
+    : legacyLastResultsResolved;
   useEffect(() => {
+    if (liveUpdates) {
+      return () => {};
+    }
     if (!areAnyExercisesInScenario) {
       setLastSimulationId(null);
       setLastResults(null);
@@ -193,21 +273,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart, autonomousRun = null, 
     // newer effect run, and every path (including failures) must resolve so the
     // sample fallback can kick in instead of silently dropping the sections.
     let cancelled = false;
-    searchScenarioExercises(scenarioId, {
-      size: 1,
-      page: 0,
-      sorts: [
-        {
-          property: 'exercise_end_date',
-          direction: 'DESC',
-          nullHandling: 'NULLS_LAST' as SortField['nullHandling'],
-        },
-        {
-          property: 'exercise_updated_at',
-          direction: 'DESC',
-        },
-      ],
-    }).then((result: { data: { content?: ExerciseSimple[] } }) => {
+    searchScenarioExercises(scenarioId, LATEST_SIMULATION_SEARCH).then((result: { data: { content?: ExerciseSimple[] } }) => {
       if (cancelled) {
         return;
       }
@@ -271,7 +337,11 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart, autonomousRun = null, 
     MESSAGING$.notifySuccess(t('AI outcome cleared; back to the normal overview'));
     // Refresh the scenario (its autonomous flag is now cleared) and forget the run locally so the
     // panel disappears at once without a reload.
-    dispatch(fetchScenario(scenarioId));
+    if (liveUpdates) {
+      invalidateScenario(scenarioId);
+    } else {
+      dispatch(fetchScenario(scenarioId));
+    }
     onAutonomousRunCleared?.();
   };
   const postureResults = isSample ? SAMPLE_POSTURE : lastResults;
@@ -623,7 +693,11 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart, autonomousRun = null, 
       {areAnyExercisesInScenario && (
         <SectionBlock title={t('Simulations')}>
           <PaginationComponentV2
-            fetch={input => search(scenarioId, input)}
+            fetch={liveUpdates
+              ? (input, notifyError) => searchScenarioExercises(scenarioId, input, notifyError)
+              : input => search(scenarioId, input)}
+            queryKey={liveUpdates ? scenarioSimulationsKey(scenarioId) : undefined}
+            setLoading={liveUpdates ? setLoadingExercises : undefined}
             searchPaginationInput={searchPaginationInput}
             setContent={setExercises}
             entityPrefix="exercise"

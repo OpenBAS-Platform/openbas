@@ -29,9 +29,12 @@ import useDataLoader from '../../../utils/hooks/useDataLoader';
 import useEntityToggle from '../../../utils/hooks/useEntityToggle';
 import { Can, useAbility } from '../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
+import { ORGANIZATIONS_LIST_KEY } from '../../../utils/query/keys';
+import { isFeatureEnabled } from '../../../utils/utils';
 import ToolBar from '../common/ToolBar';
 import CreateOrganization from './organizations/CreateOrganization';
 import OrganizationPopover from './organizations/OrganizationPopover';
+import { invalidateOrganizationsList } from './teamQueries';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -54,6 +57,9 @@ const OrganizationsList = () => {
   const dispatch = useAppDispatch();
   const bodyItemsStyles = useBodyItemsStyles();
   const { t } = useFormatter();
+  // With live updates on, the list is a query under the organizations key that stream
+  // invalidations refetch; local changes invalidate it too instead of patching the rows.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   // Tags map, needed by the edit form inside the popover
   const { tagsMap } = useHelper((helper: TagHelper) => ({ tagsMap: helper.getTagsMap() }));
@@ -137,6 +143,11 @@ const OrganizationsList = () => {
       organization_ids_to_process: selectAll ? undefined : Object.keys(selectedElements),
       organization_ids_to_ignore: Object.keys(deSelectedElements),
     })).then((result: { data?: string[] }) => {
+      if (liveUpdates) {
+        handleClearSelectedElements();
+        invalidateOrganizationsList();
+        return;
+      }
       const deletedIds: string[] = result.data ?? [];
       const newTotal = Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - deletedIds.length);
       setOrganizations(organizations.filter(organization => !deletedIds.includes(organization.organization_id)));
@@ -155,7 +166,9 @@ const OrganizationsList = () => {
         }]}
       />
       <PaginationComponentV2
-        fetch={searchOrganizationsToLoad}
+        fetch={liveUpdates ? searchOrganizations : searchOrganizationsToLoad}
+        queryKey={liveUpdates ? ORGANIZATIONS_LIST_KEY : undefined}
+        setLoading={liveUpdates ? setLoading : undefined}
         searchPaginationInput={searchPaginationInput}
         setContent={setOrganizations}
         entityPrefix="organization"
@@ -172,7 +185,7 @@ const OrganizationsList = () => {
             <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.TENANT_SETTINGS}>
               <CreateOrganization
-                onCreate={(result: Organization) => {
+                onCreate={liveUpdates ? invalidateOrganizationsList : (result: Organization) => {
                   setOrganizations([result, ...organizations]);
                   queryableHelpers.paginationHelpers.incrementTotalElements(1);
                 }}
@@ -243,8 +256,10 @@ const OrganizationsList = () => {
                   <OrganizationPopover
                     organization={organization}
                     tagsMap={tagsMap}
-                    onUpdate={(result: Organization) => setOrganizations(organizations.map(o => (o.organization_id !== result.organization_id ? o : result)))}
-                    onDelete={(result: string) => {
+                    onUpdate={liveUpdates
+                      ? invalidateOrganizationsList
+                      : (result: Organization) => setOrganizations(organizations.map(o => (o.organization_id !== result.organization_id ? o : result)))}
+                    onDelete={liveUpdates ? invalidateOrganizationsList : (result: string) => {
                       setOrganizations(organizations.filter(o => (o.organization_id !== result)));
                       queryableHelpers.paginationHelpers.incrementTotalElements(-1);
                     }}

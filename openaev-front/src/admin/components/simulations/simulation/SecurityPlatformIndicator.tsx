@@ -14,8 +14,11 @@ import { useHelper } from '../../../../store';
 import { type SecurityPlatform, type SecurityPlatformSnapshotOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import useStoreQuery from '../../../../utils/query/useStoreQuery';
 import { buildTenantApiPath } from '../../../../utils/url-helper';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import isConnectorManaged from '../../assets/security_platforms/securityPlatformUtils';
+import { simulationWorkflowConfigurationKey } from './simulationQueries';
 
 // Unified display model over the two sources: the frozen launch/end snapshot of a launched chained
 // simulation (workflow_security_platforms, see ADR-006) and the live connector-managed platforms of
@@ -44,9 +47,14 @@ interface SecurityPlatformIndicatorProps {
    * non-chained contexts resolve the live tenant platforms.
    */
   launched?: boolean;
+  /**
+   * The simulation the workflow belongs to: with live updates on, its workflow configuration is a
+   * store query under the simulation key, so the launch snapshot shows up without a reload.
+   */
+  simulationId?: string;
 }
 
-const SecurityPlatformIndicator: FunctionComponent<SecurityPlatformIndicatorProps> = ({ workflowId, launched = false }) => {
+const SecurityPlatformIndicator: FunctionComponent<SecurityPlatformIndicatorProps> = ({ workflowId, launched = false, simulationId }) => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
@@ -60,11 +68,17 @@ const SecurityPlatformIndicator: FunctionComponent<SecurityPlatformIndicatorProp
   useDataLoader(() => {
     dispatch(fetchSecurityPlatforms());
   });
+  const queryMode = isFeatureEnabled('STREAM_INVALIDATION') && !!simulationId;
+  useStoreQuery(
+    simulationWorkflowConfigurationKey(simulationId ?? '', workflowId ?? ''),
+    () => dispatch(fetchWorkflowConfiguration(workflowId ?? '')),
+    { enabled: queryMode && !!workflowId },
+  );
   useEffect(() => {
-    if (workflowId) {
+    if (!queryMode && workflowId) {
       dispatch(fetchWorkflowConfiguration(workflowId));
     }
-  }, [dispatch, workflowId]);
+  }, [dispatch, workflowId, queryMode]);
 
   // Frozen photo of a launched simulation (empty for draft / scenario / pre-snapshot runs).
   const frozenPlatforms: DisplayPlatform[] = (workflowConfiguration?.workflow_security_platforms ?? [])

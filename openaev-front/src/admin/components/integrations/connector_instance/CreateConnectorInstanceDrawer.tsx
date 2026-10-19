@@ -13,6 +13,8 @@ import type {
 } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { notifyErrorHandler } from '../../../../utils/error/errorHandlerUtil';
+import { isFeatureEnabled } from '../../../../utils/utils';
+import { invalidateIntegrations } from '../common/integrationsQueries';
 import ConnectorInstanceForm from './ConnectorInstanceForm';
 import useConnectorInstanceForm, { CONNECTOR_NAME_KEYS } from './useConnectorInstance';
 
@@ -78,6 +80,9 @@ const CreateConnectorInstanceDrawer = ({
       catalog_connector_id: catalogConnectorId,
       ...data,
     }).then(({ data }) => {
+      if (isFeatureEnabled('STREAM_INVALIDATION')) {
+        invalidateIntegrations();
+      }
       const connectorId = data.connector_instance_configurations.find(conf => conf.connector_instance_configuration_key === `${connectorType}_ID`)?.connector_instance_configuration_value;
       if (connectorId) {
         const migrationParam = migrationSource ? '?isMigration=true' : '';

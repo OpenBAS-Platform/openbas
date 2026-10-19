@@ -17,8 +17,10 @@ import { LESSONS_TEMPLATES_BASE_URL } from '../../../../constants/BaseUrls';
 import { type LessonsTemplate, type SearchPaginationInput } from '../../../../utils/api-types';
 import { Can } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import { SETTINGS_LABEL } from '../../nav/config/settings.config';
 import CustomizationMenu from '../../settings/CustomizationMenu';
+import { invalidateComponents, lessonsTemplatesKey } from '../componentsQueries';
 import CreateLessonsTemplate from './CreateLessonsTemplate';
 
 const useStyles = makeStyles()(() => ({
@@ -38,6 +40,9 @@ const inlineStyles: Record<string, CSSProperties> = {
 const LessonsTemplates = () => {
   // Standard hooks
   const { t } = useFormatter();
+  // With live updates on, the list is a query under the components key that stream invalidations
+  // refetch; local changes invalidate it too instead of patching the rows.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
 
@@ -65,6 +70,11 @@ const LessonsTemplates = () => {
     setLoading(true);
     return searchLessonsTemplates(input).finally(() => setLoading(false));
   };
+  // Query mode: only the first page shows the placeholder, refetches keep the rows on screen.
+  const setLoadedLessonTemplates = (content: LessonsTemplate[]) => {
+    setLessonTemplates(content);
+    setLoading(false);
+  };
 
   return (
     <div style={{ display: 'flex' }}>
@@ -81,12 +91,13 @@ const LessonsTemplates = () => {
           }]}
         />
         <PaginationComponent
-          fetch={searchLessonsTemplatesToLoad}
+          fetch={liveUpdates ? searchLessonsTemplates : searchLessonsTemplatesToLoad}
+          queryKey={liveUpdates ? lessonsTemplatesKey : undefined}
           searchPaginationInput={searchPaginationInput}
-          setContent={setLessonTemplates}
+          setContent={liveUpdates ? setLoadedLessonTemplates : setLessonTemplates}
           createButton={(
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.LESSONS_LEARNED}>
-              <CreateLessonsTemplate onCreate={result => setLessonTemplates([result, ...lessonTemplates])} />
+              <CreateLessonsTemplate onCreate={liveUpdates ? invalidateComponents : result => setLessonTemplates([result, ...lessonTemplates])} />
             </Can>
           )}
         />

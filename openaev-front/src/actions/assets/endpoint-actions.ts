@@ -37,8 +37,8 @@ export const searchEndpoints = (searchPaginationInput: SearchPaginationInput) =>
 // Unified asset inventory: returns EVERY asset type (endpoints, AI targets, identities, cloud /
 // web / network / generic). Endpoints keep their agents/platform; other types list with those
 // empty. Filters/sorts must reference base asset fields (no endpoint-only platform/arch facets).
-export const searchAssets = (searchPaginationInput: SearchPaginationInput) => {
-  return simplePostCall('/api/assets/search', searchPaginationInput);
+export const searchAssets = (searchPaginationInput: SearchPaginationInput, notifyError: boolean = true) => {
+  return simplePostCall('/api/assets/search', searchPaginationInput, undefined, notifyError);
 };
 
 // Generic delete for the unified inventory: removes any asset type (endpoint, AI target, or any
@@ -73,15 +73,15 @@ export const bulkDeleteAssets = (input: AssetBulkProcessingInput) => {
 
 // Generic asset overview for the unified detail page: returns any asset type with its
 // category-relevant fields (endpoints keep agents/platform; AI targets expose connection metadata).
-export const fetchAssetOverview = (assetId: string) => {
-  return simpleCall(`/api/assets/${assetId}`);
+export const fetchAssetOverview = (assetId: string, notifyError: boolean = true) => {
+  return simpleCall(`/api/assets/${assetId}`, undefined, notifyError);
 };
 
 // "Injects played" for the asset detail page: every inject (atomic testing or simulation inject)
 // that concerns the asset - targeted directly, through an asset group (static or dynamic) or
 // evidenced by the expectations persisted at execution time. Same scope as the posture score.
-export const searchInjectsForAsset = (assetId: string, searchPaginationInput: SearchPaginationInput) => {
-  return simplePostCall(`/api/assets/${assetId}/injects/search`, searchPaginationInput);
+export const searchInjectsForAsset = (assetId: string, searchPaginationInput: SearchPaginationInput, notifyError: boolean = true) => {
+  return simplePostCall(`/api/assets/${assetId}/injects/search`, searchPaginationInput, undefined, notifyError);
 };
 
 export const findEndpoints = (endpointIds: string[]) => {

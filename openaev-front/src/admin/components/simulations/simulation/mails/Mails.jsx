@@ -3,23 +3,22 @@ import { BarChartOutlined, KeyboardArrowRight, MailOutlined, ReorderOutlined } f
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useContext, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router';
 
-import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import { SectionBlock } from '../../../../../components/common/detail/EntityDetailCommon';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemTags from '../../../../../components/ItemTags';
 import SearchFilter from '../../../../../components/SearchFilter';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../../utils/query/useNotifiedQuery';
 import useSearchAndFilter from '../../../../../utils/SortingFiltering';
 import { PermissionsContext, TeamContext } from '../../../common/Context';
 import TagsFilter from '../../../common/filters/TagsFilter';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import ExecutionMenu from '../ExecutionMenu';
 import CreateQuickInject from '../injects/CreateQuickInject';
+import useSimulationStoreData from '../simulationStoreQueries';
 import teamContextForExercise from '../teams/teamContextForExercise';
 import MailDistributionByInject from './MailDistributionByInject';
 import MailDistributionByPlayer from './MailDistributionByPlayer';
@@ -116,7 +115,6 @@ const inlineStyles = {
 const Mails = () => {
   // Standard hooks
   const theme = useTheme();
-  const dispatch = useDispatch();
   const { t, fndt } = useFormatter();
   const [viewMode, setViewMode] = useState(() => localStorage.getItem(VIEW_MODE_STORAGE_KEY) ?? 'list');
   const { permissions } = useContext(PermissionsContext);
@@ -143,9 +141,10 @@ const Mails = () => {
       injects: helper.getExerciseInjects(exerciseId),
     };
   });
-  useDataLoader(() => {
-    dispatch(fetchExerciseInjects(exerciseId));
-  });
+  // Store query under simulationKey(id) with live updates on (data loader otherwise). Mails sent
+  // by the execution are announced through the injects and communications; the fallback interval
+  // covers the rest while the simulation runs.
+  useSimulationStoreData(exerciseId, ['injects'], { refetchInterval: exercise?.exercise_status === 'RUNNING' ? FALLBACK_REFETCH_INTERVAL_MS : false });
   const sortedInjects = filtering
     .filterAndSort(injects)
     .filter(i => i.inject_communications_number > 0);

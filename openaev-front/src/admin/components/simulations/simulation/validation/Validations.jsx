@@ -3,11 +3,8 @@ import { Box, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
 
-import { fetchExerciseInjectExpectations } from '../../../../../actions/Exercise';
-import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import { SectionBlock } from '../../../../../components/common/detail/EntityDetailCommon';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
@@ -15,12 +12,13 @@ import ItemTags from '../../../../../components/ItemTags';
 import Loader from '../../../../../components/Loader';
 import SearchFilter from '../../../../../components/SearchFilter';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../../utils/query/useNotifiedQuery';
 import { isNotEmptyField } from '../../../../../utils/utils';
 import TagsFilter from '../../../common/filters/TagsFilter';
 import { HUMAN_EXPECTATION } from '../../../common/injects/expectations/ExpectationUtils.tsx';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import ExecutionMenu from '../ExecutionMenu';
+import useSimulationStoreData from '../simulationStoreQueries';
 import TeamOrAssetLine from './common/TeamOrAssetLine';
 
 const cellStyle = {
@@ -31,7 +29,6 @@ const cellStyle = {
 
 const Validations = () => {
   const theme = useTheme();
-  const dispatch = useDispatch();
   const { exerciseId } = useParams();
   const [tags, setTags] = useState([]);
   const { t, fndt } = useFormatter();
@@ -55,10 +52,10 @@ const Validations = () => {
       injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
     };
   });
-  useDataLoader(() => {
-    dispatch(fetchExerciseInjectExpectations(exerciseId));
-    dispatch(fetchExerciseInjects(exerciseId));
-  });
+  // Store queries under simulationKey(id) with live updates on (data loader otherwise): the topic
+  // 'simulation:<id>' announces new and validated expectations. Expectation results written from
+  // execution traces announce nothing, hence the fallback interval while the simulation runs.
+  useSimulationStoreData(exerciseId, ['expectations', 'injects'], { refetchInterval: exercise?.exercise_status === 'RUNNING' ? FALLBACK_REFETCH_INTERVAL_MS : false });
   const filterByKeyword = n => keyword === ''
     || (n.inject_expectation_inject?.inject_title || '')
       .toLowerCase()

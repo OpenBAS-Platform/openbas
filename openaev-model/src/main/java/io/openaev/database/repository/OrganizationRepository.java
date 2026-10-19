@@ -35,6 +35,8 @@ public interface OrganizationRepository
   @NotNull
   List<Organization> findAllByIdInFetchingTags(@Param("ids") @NotNull Collection<String> ids);
 
+  boolean existsByIdAndTenantId(@NotNull String id, @NotNull String tenantId);
+
   // Native array_agg builds the read-only projection; no ORM write/listener side effects are lost.
   @Query(
       value =

@@ -9,15 +9,15 @@ import * as schema from '../Schema';
 const ATOMIC_TESTING_URI = '/api/atomic-testings';
 const EXPECTATION_TRACE_URI = '/api/inject-expectations-traces';
 
-export const searchAtomicTestings = (searchPaginationInput: SearchPaginationInput) => {
+export const searchAtomicTestings = (searchPaginationInput: SearchPaginationInput, notifyError: boolean = true) => {
   const data = searchPaginationInput;
   const uri = `${ATOMIC_TESTING_URI}/search`;
-  return simplePostCall(uri, data);
+  return simplePostCall(uri, data, undefined, notifyError);
 };
 
-export const fetchInjectResultOverviewOutput = (injectId: string) => {
+export const fetchInjectResultOverviewOutput = (injectId: string, notifyError: boolean = true) => {
   const uri = `${ATOMIC_TESTING_URI}/${injectId}`;
-  return simpleCall(uri);
+  return simpleCall(uri, undefined, notifyError);
 };
 
 export const fetchAtomicTestingPayload = (injectId: string) => {
@@ -61,9 +61,9 @@ export const updateAtomicTestingRecurrence = (injectId: string, data: InjectRecu
 
 // -- EXPECTATIONS DRIFT --
 
-export const fetchAtomicTestingExpectationsDrift = (injectId: string) => {
+export const fetchAtomicTestingExpectationsDrift = (injectId: string, notifyError: boolean = true) => {
   const uri = `${ATOMIC_TESTING_URI}/${injectId}/expectations-drift`;
-  return simpleCall(uri);
+  return simpleCall(uri, undefined, notifyError);
 };
 
 export const realignAtomicTestingExpectations = (injectId: string) => {
@@ -128,4 +128,43 @@ export const importAtomicTesting = (file: File) => {
     MESSAGING$.notifyError('Could not import atomic testing');
     throw error;
   });
+};
+
+// -- QUERY VARIANTS --
+// Variants of the reads above for the atomic testing screen with live updates on: no Redux store,
+// and an optional error toast so that a query notifies once, after its retries.
+
+export const fetchAtomicTestingPayloadQuery = (injectId: string, notifyError: boolean = true) => {
+  const uri = `${ATOMIC_TESTING_URI}/${injectId}/payload`;
+  return simpleCall(uri, undefined, notifyError);
+};
+
+export const fetchTargetResultQuery = (injectId: string, targetId: string, targetType: string, notifyError: boolean = true) => {
+  const uri = `${ATOMIC_TESTING_URI}/${injectId}/target_results/${targetId}/types/${targetType}`;
+  return simpleCall(uri, undefined, notifyError);
+};
+
+export const fetchTargetResultAssetWithAgentsQuery = (injectId: string, targetId: string, expectationType: string, notifyError: boolean = true) => {
+  const uri = `${ATOMIC_TESTING_URI}/${injectId}/target_results/${targetId}/asset_with_agents?expectationType=${expectationType}`;
+  return simpleCall(uri, undefined, notifyError);
+};
+
+export const fetchExpectationTracesQuery = (injectExpectationId: string, sourceId: string, notifyError: boolean = true) => {
+  const uri = `${EXPECTATION_TRACE_URI}?injectExpectationId=${injectExpectationId}&sourceId=${sourceId}`;
+  return simpleCall(uri, undefined, notifyError);
+};
+
+export const getAlertLinksCountQuery = (
+  injectExpectationId: string,
+  sourceId: string | undefined,
+  expectationResultSourceType: string | undefined,
+  notifyError: boolean = true,
+) => {
+  const uri = `${EXPECTATION_TRACE_URI}/count?injectExpectationId=${injectExpectationId}&sourceId=${sourceId}&expectationResultSourceType=${expectationResultSourceType}`;
+  return simpleCall(uri, undefined, notifyError);
+};
+
+export const fetchSecurityPlatformsForAtomicTestingQuery = (injectId: string, notifyError: boolean = true) => {
+  const uri = `${ATOMIC_TESTING_URI}/${injectId}/security-platforms`;
+  return simpleCall(uri, undefined, notifyError);
 };

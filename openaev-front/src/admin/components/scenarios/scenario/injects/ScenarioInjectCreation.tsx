@@ -3,11 +3,8 @@ import { useNavigate, useParams, useSearchParams } from 'react-router';
 
 import { fetchScenarioChallenges } from '../../../../../actions/challenge-action';
 import { type ArticlesHelper } from '../../../../../actions/channels/article-helper';
-import { fetchScenarioDocuments } from '../../../../../actions/documents/documents-actions';
 import { type ChallengeHelper } from '../../../../../actions/helper';
-import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
 import { type ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
-import { fetchVariablesForScenario } from '../../../../../actions/variables/variable-actions';
 import { type VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import Drawer from '../../../../../components/common/Drawer';
 import { useFormatter } from '../../../../../components/i18n';
@@ -21,12 +18,12 @@ import {
 import { EndpointContext } from '../../../../../utils/context/endpoint/EndpointContext';
 import endpointContextForScenario from '../../../../../utils/context/endpoint/EndpointContextForScenario';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { ArticleContext, ChallengeContext, InjectContext, TeamContext } from '../../../common/Context';
 import InjectContractPicker from '../../../common/injects/create/InjectContractPicker';
 import InjectCreationConfig from '../../../common/injects/create/InjectCreationConfig';
 import { buildScenarioVariablesConfigurationUrl } from '../../ScenarioConfigurationTab';
 import articleContextForScenario from '../articles/articleContextForScenario';
+import useScenarioStoreData from '../scenarioStoreQueries';
 import teamContextForScenario from '../teams/teamContextForScenario';
 
 // Full-page inject creation for scenarios: the Threat-Arsenal-style contract
@@ -64,11 +61,7 @@ const ScenarioInjectCreation: FunctionComponent = () => {
       variables: helper.getScenarioVariables(scenarioId),
     }),
   );
-  useDataLoader(() => {
-    dispatch(fetchScenarioTeams(scenarioId));
-    dispatch(fetchVariablesForScenario(scenarioId));
-    dispatch(fetchScenarioDocuments(scenarioId));
-  });
+  useScenarioStoreData(scenarioId, ['teams', 'variables', 'documents']);
 
   const articleContext = articleContextForScenario(scenarioId);
   const teamContext = teamContextForScenario(scenarioId, scenario.scenario_teams_users, scenario.scenario_all_users_number, scenario.scenario_users_number);

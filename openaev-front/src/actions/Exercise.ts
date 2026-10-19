@@ -32,7 +32,7 @@ export const fetchExercises = () => (dispatch: AppDispatch) => getReferential(sc
 
 export const fetchExercisesById = (getExercisesInput: GetExercisesInput) => (dispatch: AppDispatch) => postReferential(schema.arrayOfExercises, '/api/exercises/search-by-id', getExercisesInput, undefined, false)(dispatch);
 
-export const searchExercises = (paginationInput: SearchPaginationInput) => simplePostCall('/api/exercises/search', paginationInput);
+export const searchExercises = (paginationInput: SearchPaginationInput, notifyError: boolean = true) => simplePostCall('/api/exercises/search', paginationInput, undefined, notifyError);
 
 // Resolve simulations by id to their full search projection (name + start date...),
 // as a plain promise (no redux). Used where an option label needs the start date
@@ -141,16 +141,16 @@ export const fetchPlayerExercise = (exerciseId: string, userId: string | null) =
 
 // -- HEALTHCHECKS --
 
-export const searchExerciseHealthchecks = (exerciseId: Exercise['exercise_id']) => {
+export const searchExerciseHealthchecks = (exerciseId: Exercise['exercise_id'], notifyError: boolean = true) => {
   const uri = `/api/exercises/${exerciseId}/healthchecks`;
-  return simpleCall(uri);
+  return simpleCall(uri, undefined, notifyError);
 };
 
 // -- EXPECTATIONS DRIFT --
 
-export const fetchExerciseExpectationsDrift = (exerciseId: Exercise['exercise_id']) => {
+export const fetchExerciseExpectationsDrift = (exerciseId: Exercise['exercise_id'], notifyError: boolean = true) => {
   const uri = `/api/exercises/${exerciseId}/expectations-drift`;
-  return simpleCall(uri);
+  return simpleCall(uri, undefined, notifyError);
 };
 
 export const realignExerciseExpectations = (exerciseId: Exercise['exercise_id']) => {

@@ -29,9 +29,12 @@ import useDataLoader from '../../../utils/hooks/useDataLoader';
 import useEntityToggle from '../../../utils/hooks/useEntityToggle';
 import { Can, useAbility } from '../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
+import { PERSONS_LIST_KEY } from '../../../utils/query/keys';
+import { isFeatureEnabled } from '../../../utils/utils';
 import ToolBar from '../common/ToolBar';
 import CreatePlayer from './players/CreatePlayer';
 import PlayerPopover from './players/PlayerPopover';
+import { invalidatePersonsList } from './teamQueries';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -55,6 +58,9 @@ const Players = () => {
   const dispatch = useAppDispatch();
   const bodyItemsStyles = useBodyItemsStyles();
   const { t } = useFormatter();
+  // With live updates on, the list is a query under the persons key that stream invalidations
+  // refetch; local changes invalidate it too instead of patching the rows.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   // Fetching data
   const { organizationsMap } = useHelper((helper: UserHelper & OrganizationHelper) => ({ organizationsMap: helper.getOrganizationsMap() }));
@@ -166,6 +172,11 @@ const Players = () => {
       user_ids_to_process: selectAll ? undefined : Object.keys(selectedElements),
       user_ids_to_ignore: Object.keys(deSelectedElements),
     }).then((result) => {
+      if (liveUpdates) {
+        handleClearSelectedElements();
+        invalidatePersonsList();
+        return;
+      }
       const deletedIds: string[] = result.data ?? [];
       const newTotal = Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - deletedIds.length);
       setPlayers(players.filter(p => !deletedIds.includes(p.user_id)));
@@ -184,7 +195,9 @@ const Players = () => {
         }]}
       />
       <PaginationComponentV2
-        fetch={searchPlayersToLoad}
+        fetch={liveUpdates ? searchPlayers : searchPlayersToLoad}
+        queryKey={liveUpdates ? PERSONS_LIST_KEY : undefined}
+        setLoading={liveUpdates ? setLoading : undefined}
         searchPaginationInput={searchPaginationInput}
         setContent={setPlayers}
         entityPrefix="user"
@@ -202,6 +215,10 @@ const Players = () => {
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.TEAMS_AND_PLAYERS}>
               <CreatePlayer
                 onCreate={(result) => {
+                  if (liveUpdates) {
+                    invalidatePersonsList();
+                    return;
+                  }
                   setPlayers([result, ...players]);
                   queryableHelpers.paginationHelpers.incrementTotalElements(1);
                 }}
@@ -271,13 +288,19 @@ const Players = () => {
                 secondaryAction={(
                   <PlayerPopover
                     user={player}
-                    onUpdate={result => setPlayers(players.map(p => (p.user_id === result.user_id
-                      ? {
-                          ...p,
-                          ...result,
-                        }
-                      : p)))}
+                    onUpdate={liveUpdates
+                      ? invalidatePersonsList
+                      : result => setPlayers(players.map(p => (p.user_id === result.user_id
+                        ? {
+                            ...p,
+                            ...result,
+                          }
+                        : p)))}
                     onDelete={(result) => {
+                      if (liveUpdates) {
+                        invalidatePersonsList();
+                        return;
+                      }
                       setPlayers(players.filter(p => (p.user_id !== result)));
                       queryableHelpers.paginationHelpers.incrementTotalElements(-1);
                     }}

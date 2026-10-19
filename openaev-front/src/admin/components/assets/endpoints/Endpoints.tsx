@@ -30,12 +30,15 @@ import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
 import useMarkingDefinitions from '../../../../utils/hooks/useMarkingDefinitions';
 import { Can, useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import { ASSETS_LIST_KEY } from '../../../../utils/query/keys';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../utils/query/useNotifiedQuery';
 import { isFeatureEnabled } from '../../../../utils/utils';
 import EndpointListItemFragments from '../../common/endpoints/EndpointListItemFragments';
 import EndpointAgentsExecutorsFragment from '../../common/endpoints/fragments/EndpointAgentsExecutorsFragment';
 import ToolBar from '../../common/ToolBar';
 import { humanizeEnum } from '../asset-categories';
 import AssetCategoryIcon from '../AssetCategoryIcon';
+import { assetsPostureVersionKey, invalidateAssetsList, useQueryVersion } from '../assetQueries';
 import PostureScoreCell from '../PostureScoreCell';
 import usePostureScores from '../usePostureScores';
 import AssetPopover from './AssetPopover';
@@ -74,6 +77,9 @@ const Endpoints = () => {
     skip: !markingEnabled,
     assignableOnly: true,
   });
+  // With live updates on, the list is a query that stream invalidations refetch; local changes
+  // invalidate it too instead of patching the rows.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   // Load the executors once for the whole page; the per-row Executors column
   // reads them from the store (previously each row fetched them, firing
@@ -121,6 +127,10 @@ const Endpoints = () => {
     return searchAssets(input).finally(() => setLoading(false));
   };
 
+  const refresh = () => {
+    invalidateAssetsList();
+  };
+
   // Bulk selection
   const ability = useAbility();
   const canManage = ability.can(ACTIONS.MANAGE, SUBJECTS.ASSETS);
@@ -135,9 +145,12 @@ const Endpoints = () => {
   } = useEntityToggle<EndpointOutput>('asset', endpoints, queryableHelpers.paginationHelpers.getTotalElements());
 
   // Per-row posture score, batched in a single dashboard-engine query per page.
+  // With live updates on, the scores also refetch with the list (invalidation, fallback interval).
+  const postureVersion = useQueryVersion(assetsPostureVersionKey, liveUpdates, FALLBACK_REFETCH_INTERVAL_MS);
   const { loading: postureLoading, scores: postureScores } = usePostureScores(
     'base_asset_side',
     endpoints.map(endpoint => endpoint.asset_id),
+    postureVersion,
   );
 
   const bulkDelete = () => {
@@ -146,6 +159,11 @@ const Endpoints = () => {
       asset_ids_to_process: selectAll ? undefined : Object.keys(selectedElements),
       asset_ids_to_ignore: Object.keys(deSelectedElements),
     }).then((result) => {
+      if (liveUpdates) {
+        handleClearSelectedElements();
+        refresh();
+        return;
+      }
       const deletedIds: string[] = result.data ?? [];
       const newTotal = Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - deletedIds.length);
       setEndpoints(endpoints.filter(e => !deletedIds.includes(e.asset_id)));
@@ -257,7 +275,9 @@ const Endpoints = () => {
         }]}
       />
       <PaginationComponentV2
-        fetch={searchEndpointsToLoad}
+        fetch={liveUpdates ? searchAssets : searchEndpointsToLoad}
+        queryKey={liveUpdates ? ASSETS_LIST_KEY : undefined}
+        setLoading={liveUpdates ? setLoading : undefined}
         searchPaginationInput={searchPaginationInput}
         setContent={setEndpoints}
         reloadContentCount={reloadCount}
@@ -281,12 +301,12 @@ const Endpoints = () => {
             >
               <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
               <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
-                <ImportUploaderEndpoints />
+                <ImportUploaderEndpoints onImported={liveUpdates ? refresh : undefined} />
               </Can>
             </Box>
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
               <EndpointCreation
-                onCreate={(result) => {
+                onCreate={liveUpdates ? refresh : (result) => {
                   setEndpoints([result as EndpointOutput, ...endpoints]);
                   queryableHelpers.paginationHelpers.incrementTotalElements(1);
                 }}
@@ -362,8 +382,8 @@ const Endpoints = () => {
                         inline
                         endpoint={{ ...endpoint }}
                         agentless={endpoint.asset_agents?.length === 0}
-                        onUpdate={result => setEndpoints(endpoints.map(e => (e.asset_id !== result.asset_id ? e : result as EndpointOutput)))}
-                        onDelete={(result) => {
+                        onUpdate={liveUpdates ? refresh : result => setEndpoints(endpoints.map(e => (e.asset_id !== result.asset_id ? e : result as EndpointOutput)))}
+                        onDelete={liveUpdates ? refresh : (result) => {
                           setEndpoints(endpoints.filter(e => (e.asset_id !== result)));
                           queryableHelpers.paginationHelpers.incrementTotalElements(-1);
                         }}

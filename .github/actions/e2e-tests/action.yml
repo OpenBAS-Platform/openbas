@@ -55,6 +55,13 @@ inputs:
     description: "true bypasses every cache in this action; set by Nightly, which must not consume the shared cache quota"
     required: false
     default: "false"
+  enabled-dev-features:
+    description: >
+      Comma-separated preview features turned on in the backend (openaev.enabled-dev-features)
+      and announced to the specs. Empty turns on every preview feature except STREAM_INVALIDATION
+      (see the "Resolve preview features" step).
+    required: false
+    default: ""
 
 runs:
   using: composite
@@ -180,8 +187,24 @@ runs:
 
         echo "✅ All services ready"
 
+    # The ci profile turns on every preview feature ('*'). By default the cells keep all of them
+    # except STREAM_INVALIDATION, so the list screens keep their usual fetch path; a cell that
+    # tests live updates names its own list.
+    - name: Resolve preview features
+      id: dev-features
+      shell: bash
+      env:
+        REQUESTED_DEV_FEATURES: ${{ inputs.enabled-dev-features }}
+      run: |
+        DEFAULT_DEV_FEATURES="STIX_SECURITY_COVERAGE_FOR_VULNERABILITIES,TENANT_FIELDS_FOR_SECURITY_COVERAGE,LEGACY_INGESTION_EXECUTION_TRACE,OPENAEV_TRIALS_XTMHUB,CREDENTIAL_ASSET,MARKING,RATE_LIMITING,BULK_SNAPSHOT_EXPORT"
+        LIST="${REQUESTED_DEV_FEATURES:-$DEFAULT_DEV_FEATURES}"
+        echo "🧪 Preview features: $LIST"
+        echo "list=$LIST" >> "$GITHUB_OUTPUT"
+
     - name: Start application
       shell: bash
+      env:
+        ENABLED_DEV_FEATURES: ${{ steps.dev-features.outputs.list }}
       run: |
         echo "🚀 Starting OpenAEV from Docker image..."
         docker run -d --name openaev-app --network host \
@@ -203,6 +226,7 @@ runs:
           -e OPENAEV_RATELIMIT_ENABLED \
           -e SPRING_PROFILES_ACTIVE \
           -e OPENAEV_APPLICATION_LICENSE \
+          -e "OPENAEV_ENABLED-DEV-FEATURES=$ENABLED_DEV_FEATURES" \
           openaev:ci
         echo "✅ Container started"
     - name: Wait for application to be ready
@@ -296,6 +320,7 @@ runs:
       env:
         APP_URL: http://localhost:8080
         E2E_COVERAGE: "true"
+        ENABLED_DEV_FEATURES: ${{ steps.dev-features.outputs.list }}
         SHARD_INCLUDES: ${{ inputs.includes }}
         SHARD_EXCLUDES: ${{ inputs.excludes }}
     - name: Upload Playwright report (${{ inputs.browser }})

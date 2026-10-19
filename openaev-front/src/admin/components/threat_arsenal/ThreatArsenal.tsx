@@ -6,7 +6,7 @@ import {
 } from '@mui/icons-material';
 import { Box, List, ListItem, ListItemIcon, ListItemText, Skeleton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { DomainHelper } from '../../../actions/domains/domain-helper';
 import {
@@ -33,6 +33,10 @@ import { useBulkOperationsFinishedCount } from '../../../utils/bulkOperations';
 import useEntityToggle from '../../../utils/hooks/useEntityToggle';
 import { Can, useAbility } from '../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
+import { PAYLOADS_LIST_KEY } from '../../../utils/query/keys';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../utils/query/useNotifiedQuery';
+import { isFeatureEnabled } from '../../../utils/utils';
+import { useQueryVersion } from '../assets/assetQueries';
 import useDomainIconFilter from '../common/domains/useDomainIconFilter';
 import ThreatArsenalRunTestDrawer from './bulk/ThreatArsenalRunTestDrawer';
 import CreateThreatArsenalAction from './CreateThreatArsenalAction';
@@ -44,6 +48,7 @@ import ThreatArsenalInformationDrawer from './ThreatArsenalInformationDrawer';
 import { THREAT_ARSENAL_LIST_HEADERS, THREAT_ARSENAL_LIST_INLINE_STYLES } from './threatArsenalListConfig';
 import ThreatArsenalListRow from './ThreatArsenalListRow';
 import { hasOrphanedScopeFilters, toggleOrphanedScope } from './threatArsenalOrphanedScopeUtils';
+import { invalidatePayload, invalidatePayloadsList, threatArsenalFacetsVersionKey } from './threatArsenalQueries';
 import ThreatArsenalSelectionBar from './ThreatArsenalSelectionBar';
 import ThreatArsenalSidebar from './ThreatArsenalSidebar';
 import ThreatArsenalSortSelect from './ThreatArsenalSortSelect';
@@ -64,6 +69,9 @@ const ThreatArsenal = () => {
   const theme = useTheme();
   const ability = useAbility();
   const canDeleteThreatArsenal = ability.can(ACTIONS.DELETE, SUBJECTS.THREAT_ARSENALS);
+  // With live updates on, the list and its facets are queries under the threat arsenal list key,
+  // which stream invalidations refetch; local changes invalidate it too instead of patching rows.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   const [selectedThreatArsenalAction, setSelectedThreatArsenalAction] = useState<ThreatArsenalAction | null>(null);
   const [isRunTestDrawerOpened, setRunTestDrawerOpened] = useState<boolean>(false);
@@ -101,6 +109,25 @@ const ThreatArsenal = () => {
   // (the history replayed at startup does not), so mounting never triggers a reload.
   const finishedBulkOperations = useBulkOperationsFinishedCount();
 
+  // Query mode ignores `reloadContentCount`: invalidate the list instead. The count is global,
+  // so the value found at mount is skipped.
+  const seenBulkOperations = useRef(finishedBulkOperations);
+  useEffect(() => {
+    if (liveUpdates && finishedBulkOperations !== seenBulkOperations.current) {
+      seenBulkOperations.current = finishedBulkOperations;
+      invalidatePayloadsList();
+    }
+  }, [finishedBulkOperations]);
+
+  const refresh = () => {
+    invalidatePayloadsList();
+  };
+  // An action changed or was deleted: its row and its open drawer.
+  const refreshAction = (actionId: string) => {
+    invalidatePayloadsList();
+    invalidatePayload(actionId);
+  };
+
   const totalElements = queryableHelpers.paginationHelpers.getTotalElements();
 
   const {
@@ -120,18 +147,22 @@ const ThreatArsenal = () => {
   const { domainOptions } = useHelper(
     (helper: DomainHelper) => ({ domainOptions: helper.getDomains() }),
   );
+  // The domain and author facets are loaded by shared hooks outside the query cache: with live
+  // updates on, they reload with the list (invalidation, fallback interval).
+  const facetsVersion = useQueryVersion(threatArsenalFacetsVersionKey, liveUpdates, FALLBACK_REFETCH_INTERVAL_MS);
   const { iconBarOrderedDomains } = useDomainIconFilter({
     domainOptions,
     searchPaginationInput,
     queryableHelpers,
     apiPrefix: 'threat_arsenals',
     domainFilterKey: 'action_domains',
+    reloadVersion: facetsVersion,
   });
 
   // Platform + status counts come from a global aggregation endpoint (never
   // from `threatArsenalActions`, which only holds the currently loaded page and
   // would yield misleading page-bound counts).
-  const facetCounts = useThreatArsenalFacetCounts(searchPaginationInput);
+  const facetCounts = useThreatArsenalFacetCounts(searchPaginationInput, liveUpdates);
 
   const availableFilterNames = [
     'action_injectors',
@@ -229,7 +260,25 @@ const ThreatArsenal = () => {
 
   // Full author universe + per-filter counts (backend aggregation), so the
   // sidebar keeps every author visible and greys out the zero-count ones.
-  const authorOptions = useAuthorFacetOptions(fetchThreatArsenalAuthorCounts, searchPaginationInput);
+  const authorOptions = useAuthorFacetOptions(fetchThreatArsenalAuthorCounts, searchPaginationInput, facetsVersion);
+
+  // The drawer follows the refetched row, so it does not show a stale copy of the action.
+  const drawerAction = liveUpdates && selectedThreatArsenalAction
+    ? (threatArsenalActions.find(a => a.injector_contract_id === selectedThreatArsenalAction.injector_contract_id) ?? selectedThreatArsenalAction)
+    : selectedThreatArsenalAction;
+
+  const rowCallbacks = (action: ThreatArsenalAction) => (liveUpdates
+    ? {
+        onUpdate: () => refreshAction(action.injector_contract_id),
+        onDuplicate: refresh,
+        onDelete: () => refreshAction(action.injector_contract_id),
+      }
+    : {
+        onUpdate: (result: ThreatArsenalAction) =>
+          setThreatArsenalActions(prev => prev.map(a => (a.injector_contract_id === action.injector_contract_id ? result : a))),
+        onDuplicate: (result: ThreatArsenalAction) => setThreatArsenalActions(prev => [result, ...prev]),
+        onDelete: () => setThreatArsenalActions(prev => prev.filter(a => a.injector_contract_id !== action.injector_contract_id)),
+      });
 
   const renderGridView = () => {
     if (loading) {
@@ -294,10 +343,7 @@ const ThreatArsenal = () => {
               anySelected={numberOfSelectedElements > 0}
               onSelect={() => setSelectedThreatArsenalAction(action)}
               onToggleEntity={event => onToggleEntity(action, event)}
-              onUpdate={(result: ThreatArsenalAction) =>
-                setThreatArsenalActions(prev => prev.map(a => (a.injector_contract_id === action.injector_contract_id ? result : a)))}
-              onDuplicate={(result: ThreatArsenalAction) => setThreatArsenalActions(prev => [result, ...prev])}
-              onDelete={() => setThreatArsenalActions(prev => prev.filter(a => a.injector_contract_id !== action.injector_contract_id))}
+              {...rowCallbacks(action)}
               disableUpdate={flags.disableUpdate}
               disableDuplicate={flags.disableDuplicate}
               disableJsonExport={flags.disableJsonExport}
@@ -381,10 +427,7 @@ const ThreatArsenal = () => {
               checked={isSelectedAction(action)}
               onSelect={() => setSelectedThreatArsenalAction(action)}
               onToggleEntity={event => onToggleEntity(action, event)}
-              onUpdate={(result: ThreatArsenalAction) =>
-                setThreatArsenalActions(prev => prev.map(a => (a.injector_contract_id === action.injector_contract_id ? result : a)))}
-              onDuplicate={(result: ThreatArsenalAction) => setThreatArsenalActions(prev => [result, ...prev])}
-              onDelete={() => setThreatArsenalActions(prev => prev.filter(a => a.injector_contract_id !== action.injector_contract_id))}
+              {...rowCallbacks(action)}
               disableUpdate={flags.disableUpdate}
               disableDuplicate={flags.disableDuplicate}
               disableJsonExport={flags.disableJsonExport}
@@ -433,7 +476,7 @@ const ThreatArsenal = () => {
         />
         <Can I={ACTIONS.MANAGE} a={SUBJECTS.THREAT_ARSENALS}>
           <ImportUploaderThreatArsenal
-            onImport={results => setThreatArsenalActions(prev => [...results, ...prev])}
+            onImport={liveUpdates ? refresh : results => setThreatArsenalActions(prev => [...results, ...prev])}
           />
         </Can>
       </Box>
@@ -447,9 +490,11 @@ const ThreatArsenal = () => {
           children — adding one made the gap 16. */}
       <Can I={ACTIONS.MANAGE} a={SUBJECTS.THREAT_ARSENALS}>
         <CreateThreatArsenalAction
-          onCreate={(result: ThreatArsenalAction) => {
-            setThreatArsenalActions(prev => [result, ...prev]);
-          }}
+          onCreate={liveUpdates
+            ? refresh
+            : (result: ThreatArsenalAction) => {
+                setThreatArsenalActions(prev => [result, ...prev]);
+              }}
         />
       </Can>
     </>
@@ -506,7 +551,9 @@ const ThreatArsenal = () => {
           >
             <Box sx={{ '& > div:first-of-type': { marginTop: 0 } }}>
               <PaginationComponentV2
-                fetch={fetchActions}
+                fetch={liveUpdates ? searchThreatArsenalActions : fetchActions}
+                queryKey={liveUpdates ? PAYLOADS_LIST_KEY : undefined}
+                setLoading={liveUpdates ? setLoading : undefined}
                 searchPaginationInput={searchPaginationInput}
                 setContent={setThreatArsenalActions}
                 entityPrefix="threat_arsenal"
@@ -589,11 +636,11 @@ const ThreatArsenal = () => {
         </Box>
       </Box>
 
-      {(selectedThreatArsenalAction !== null) && (
+      {(drawerAction !== null) && (
         <ThreatArsenalInformationDrawer
           open={true}
           onClose={() => setSelectedThreatArsenalAction(null)}
-          threatArsenalAction={selectedThreatArsenalAction}
+          threatArsenalAction={drawerAction}
         />
       )}
 

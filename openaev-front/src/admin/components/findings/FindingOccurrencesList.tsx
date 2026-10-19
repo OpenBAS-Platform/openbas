@@ -1,5 +1,6 @@
 import { HubOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { type QueryKey } from '@tanstack/react-query';
 import { type CSSProperties, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -24,16 +25,18 @@ const useStyles = makeStyles()(() => ({
 }));
 
 interface Props {
-  searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<RelatedFindingOutput> }>;
+  searchFindings: (input: SearchPaginationInput, notifyError?: boolean) => Promise<{ data: Page<RelatedFindingOutput> }>;
   finding: Pick<FindingOutput, 'finding_type' | 'finding_value'>;
   contextId?: string;
+  // Given the key of the finding screen, the list is a query under it (see PaginationComponentV2).
+  queryKey?: QueryKey;
 }
 
 // One row per occurrence (= per inject): the inject leads, followed by its execution context
 // (simulation / scenario / atomic) and a single merged targets column, closed by one "Seen" date -
 // per-occurrence first/last seen collapse to the same detection event, so two date columns would
 // just repeat each other.
-const FindingOccurrencesList = ({ searchFindings, finding, contextId }: Props) => {
+const FindingOccurrencesList = ({ searchFindings, finding, contextId, queryKey }: Props) => {
   const { classes } = useStyles();
   const { t, nsdt } = useFormatter();
   const bodyItemsStyles = useBodyItemsStyles();
@@ -60,10 +63,17 @@ const FindingOccurrencesList = ({ searchFindings, finding, contextId }: Props) =
     filterGroup: buildOccurrencesFilter(finding),
   }));
 
-  const searchOccurrencesToLoad = (input: SearchPaginationInput) => {
-    setLoading(true);
-    return searchFindings(input).finally(() => {
-      setLoading(false);
+  // In query mode the loading state follows the first load only (PaginationComponentV2 sets it),
+  // so a refetch keeps the rows on screen instead of flashing the loader.
+  const queryMode = queryKey !== undefined;
+  const searchOccurrencesToLoad = (input: SearchPaginationInput, notifyError?: boolean) => {
+    if (!queryMode) {
+      setLoading(true);
+    }
+    return searchFindings(input, notifyError).finally(() => {
+      if (!queryMode) {
+        setLoading(false);
+      }
     });
   };
 
@@ -128,6 +138,8 @@ const FindingOccurrencesList = ({ searchFindings, finding, contextId }: Props) =
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
         contextId={contextId}
+        queryKey={queryKey ? [...queryKey, 'occurrences'] : undefined}
+        setLoading={queryMode ? setLoading : undefined}
       />
       <List>
         <ListItem

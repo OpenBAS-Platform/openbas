@@ -20,7 +20,9 @@ import { type PhishingEmailTemplate, type SearchPaginationInput } from '../../..
 import useEntityToggle from '../../../../../utils/hooks/useEntityToggle';
 import { Can, useAbility } from '../../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../../utils/permissions/types';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import ToolBar from '../../../common/ToolBar';
+import { invalidateComponents, phishingEmailTemplatesKey } from '../../componentsQueries';
 import PhishingEmailTemplatePopover from './PhishingEmailTemplatePopover';
 
 const useStyles = makeStyles()(() => ({
@@ -41,6 +43,9 @@ const PhishingEmailTemplates = () => {
   const { t, nsdt } = useFormatter();
   const navigate = useNavigate();
   const ability = useAbility();
+  // With live updates on, the list is a query under the components key that stream invalidations
+  // refetch; local changes invalidate it too instead of patching the rows.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   // Query param
   const [searchParams] = useSearchParams();
@@ -118,6 +123,11 @@ const PhishingEmailTemplates = () => {
       email_template_ids_to_process: selectAll ? undefined : Object.keys(selectedElements),
       email_template_ids_to_ignore: Object.keys(deSelectedElements),
     }).then((result) => {
+      if (liveUpdates) {
+        handleClearSelectedElements();
+        invalidateComponents();
+        return;
+      }
       const deletedIds: string[] = result.data ?? [];
       const newTotal = Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - deletedIds.length);
       setEmailTemplates(emailTemplates.filter(emailTemplate => !deletedIds.includes(emailTemplate.phishing_email_template_id)));
@@ -129,7 +139,9 @@ const PhishingEmailTemplates = () => {
   return (
     <>
       <PaginationComponentV2
-        fetch={searchEmailTemplatesToLoad}
+        fetch={liveUpdates ? searchPhishingEmailTemplates : searchEmailTemplatesToLoad}
+        queryKey={liveUpdates ? phishingEmailTemplatesKey : undefined}
+        setLoading={liveUpdates ? setLoading : undefined}
         searchPaginationInput={searchPaginationInput}
         setContent={setEmailTemplates}
         entityPrefix="phishing_email_template"
@@ -210,7 +222,7 @@ const PhishingEmailTemplates = () => {
                     emailTemplate={emailTemplate}
                     inList
                     openEditOnInit={emailTemplate.phishing_email_template_id === searchId}
-                    onDelete={(result) => {
+                    onDelete={liveUpdates ? invalidateComponents : (result) => {
                       setEmailTemplates(emailTemplates.filter(v => v.phishing_email_template_id !== result));
                       queryableHelpers.paginationHelpers.incrementTotalElements(-1);
                     }}

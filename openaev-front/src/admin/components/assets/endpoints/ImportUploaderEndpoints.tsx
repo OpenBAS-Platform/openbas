@@ -4,14 +4,23 @@ import { importEndpoints } from '../../../../actions/assets/endpoint-actions';
 import ImportUploader from '../../../../components/common/ImportUploader';
 import { useFormatter } from '../../../../components/i18n';
 
-const ImportUploaderEndpoints = () => {
+interface Props {
+  // Called after a successful import instead of reloading the whole page.
+  onImported?: () => void;
+}
+
+const ImportUploaderEndpoints = ({ onImported }: Props) => {
   const navigate = useNavigate();
   const { t } = useFormatter();
 
   const handleUpload = (file: FormData) => {
     return importEndpoints(file, 'ENDPOINTS').then((result) => {
       if (!Object.prototype.hasOwnProperty.call(result, 'FINAL_FORM/form-error')) {
-        navigate(0);
+        if (onImported) {
+          onImported();
+        } else {
+          navigate(0);
+        }
       }
     });
   };

@@ -1,16 +1,20 @@
 import { Box, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { type ReactNode, useContext, useEffect, useRef, useState } from 'react';
+import { keepPreviousData } from '@tanstack/react-query';
+import { type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
 
-import { fetchTargetResult } from '../../../../../actions/atomic_testings/atomic-testing-actions';
+import { fetchTargetResult, fetchTargetResultQuery } from '../../../../../actions/atomic_testings/atomic-testing-actions';
 import { fetchCollectors } from '../../../../../actions/Collector';
 import Paper from '../../../../../components/common/Paper';
 import { useFormatter } from '../../../../../components/i18n';
 import type { InjectResultOverviewOutput, InjectTarget } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { atomicTestingKey } from '../../../../../utils/query/keys';
+import useNotifiedQuery, { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../../utils/query/useNotifiedQuery';
 import { isAgent, isAssetGroups, isAssets } from '../../../../../utils/target/TargetUtils';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import { type ExpectationResultType, ExpectationType, type InjectExpectationsStore } from '../../../common/injects/expectations/Expectation';
 import ExecutionStatusDetail from '../../../common/injects/status/ExecutionStatusDetail';
 import TerminalViewTab from '../../../common/injects/status/traces/TerminalViewTab';
@@ -36,6 +40,49 @@ interface SectionConfig {
   content: ReactNode;
 }
 
+const transformToSortedGroupedResults = (results: InjectExpectationsStore[]) => {
+  const groupedByType: Record<string, InjectExpectationsStore[]> = {};
+  results.forEach((result) => {
+    const type = result.inject_expectation_type;
+    if (!groupedByType[type]) {
+      groupedByType[type] = [];
+    }
+    groupedByType[type].push(result);
+  });
+
+  const sortedGroupedResults: Record<string, InjectExpectationsStore[]> = {};
+  Object.keys(groupedByType)
+    .toSorted((a, b) => Object.keys(ExpectationType).indexOf(a as ExpectationResultType) - Object.keys(ExpectationType).indexOf(b as ExpectationResultType))
+    .forEach((key) => {
+      sortedGroupedResults[key] = groupedByType[key].toSorted((a, b) => {
+        // Contract-declared order first (e.g. phishing: email -> link -> submission);
+        // unordered expectations sort after ordered ones, then by name, then by id.
+        const aOrder = a.inject_expectation_order;
+        const bOrder = b.inject_expectation_order;
+        if (aOrder != null && bOrder != null && aOrder !== bOrder) {
+          return aOrder - bOrder;
+        }
+        if (aOrder != null && bOrder == null) {
+          return -1; // ordered comes before unordered
+        }
+        if (aOrder == null && bOrder != null) {
+          return 1;
+        }
+        if (a.inject_expectation_name && b.inject_expectation_name) {
+          return a.inject_expectation_name.localeCompare(b.inject_expectation_name);
+        }
+        if (a.inject_expectation_name && !b.inject_expectation_name) {
+          return -1; // a comes before b
+        }
+        if (!a.inject_expectation_name && b.inject_expectation_name) {
+          return 1; // b comes before a
+        }
+        return a.inject_expectation_id.localeCompare(b.inject_expectation_id);
+      });
+    });
+  return sortedGroupedResults;
+};
+
 const TargetResultsDetail = ({ inject, target, isAgentless, position, total, onSelectPrevious, onSelectNext }: Props) => {
   const theme = useTheme();
   const { t } = useFormatter();
@@ -47,7 +94,12 @@ const TargetResultsDetail = ({ inject, target, isAgentless, position, total, onS
     dispatch(fetchCollectors());
   });
 
-  const [sortedGroupedTargetResults, setSortedGroupedTargetResults] = useState<Record<string, InjectExpectationsStore[]>>({});
+  // With live updates on, the results are a query under the atomic testing key: the stream
+  // invalidation refetches them, instead of each refresh of the overview.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const atomicTestingQueryKey = liveUpdates ? atomicTestingKey(inject.inject_id) : undefined;
+
+  const [stateSortedGroupedTargetResults, setStateSortedGroupedTargetResults] = useState<Record<string, InjectExpectationsStore[]>>({});
 
   const [searchParams, setSearchParams] = useSearchParams();
   const openIdParams = searchParams.get('expectation_id');
@@ -56,55 +108,31 @@ const TargetResultsDetail = ({ inject, target, isAgentless, position, total, onS
 
   const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
 
-  const transformToSortedGroupedResults = (results: InjectExpectationsStore[]) => {
-    const groupedByType: Record<string, InjectExpectationsStore[]> = {};
-    results.forEach((result) => {
-      const type = result.inject_expectation_type;
-      if (!groupedByType[type]) {
-        groupedByType[type] = [];
-      }
-      groupedByType[type].push(result);
-    });
-
-    const sortedGroupedResults: Record<string, InjectExpectationsStore[]> = {};
-    Object.keys(groupedByType)
-      .toSorted((a, b) => Object.keys(ExpectationType).indexOf(a as ExpectationResultType) - Object.keys(ExpectationType).indexOf(b as ExpectationResultType))
-      .forEach((key) => {
-        sortedGroupedResults[key] = groupedByType[key].toSorted((a, b) => {
-          // Contract-declared order first (e.g. phishing: email -> link -> submission);
-          // unordered expectations sort after ordered ones, then by name, then by id.
-          const aOrder = a.inject_expectation_order;
-          const bOrder = b.inject_expectation_order;
-          if (aOrder != null && bOrder != null && aOrder !== bOrder) {
-            return aOrder - bOrder;
-          }
-          if (aOrder != null && bOrder == null) {
-            return -1; // ordered comes before unordered
-          }
-          if (aOrder == null && bOrder != null) {
-            return 1;
-          }
-          if (a.inject_expectation_name && b.inject_expectation_name) {
-            return a.inject_expectation_name.localeCompare(b.inject_expectation_name);
-          }
-          if (a.inject_expectation_name && !b.inject_expectation_name) {
-            return -1; // a comes before b
-          }
-          if (!a.inject_expectation_name && b.inject_expectation_name) {
-            return 1; // b comes before a
-          }
-          return a.inject_expectation_id.localeCompare(b.inject_expectation_id);
-        });
-      });
-    return sortedGroupedResults;
-  };
-
   useEffect(() => {
+    if (liveUpdates) {
+      return;
+    }
     fetchTargetResult(inject.inject_id, target.target_id!, target.target_type!)
       .then((result: { data: InjectExpectationsStore[] }) => {
-        setSortedGroupedTargetResults(transformToSortedGroupedResults(result.data ?? []));
+        setStateSortedGroupedTargetResults(transformToSortedGroupedResults(result.data ?? []));
       });
-  }, [injectResultOverviewOutput, target]);
+  }, [injectResultOverviewOutput, target, liveUpdates]);
+
+  // The previous results stay on screen while another target loads, as the state above does.
+  const { data: queryTargetResults } = useNotifiedQuery({
+    queryKey: [...atomicTestingKey(inject.inject_id), 'target-result', target.target_id, target.target_type],
+    queryFn: () => fetchTargetResultQuery(inject.inject_id, target.target_id, target.target_type!, false)
+      .then((result: { data: InjectExpectationsStore[] }) => result.data ?? []),
+    enabled: liveUpdates,
+    placeholderData: keepPreviousData,
+    refetchInterval: FALLBACK_REFETCH_INTERVAL_MS,
+  });
+  const querySortedGroupedTargetResults = useMemo(
+    () => transformToSortedGroupedResults(queryTargetResults ?? []),
+    [queryTargetResults],
+  );
+
+  const sortedGroupedTargetResults = liveUpdates ? querySortedGroupedTargetResults : stateSortedGroupedTargetResults;
 
   // ?expectation_id= deep link: scroll to the section containing that expectation.
   useEffect(() => {
@@ -169,6 +197,7 @@ const TargetResultsDetail = ({ inject, target, isAgentless, position, total, onS
           }}
           injectId={inject.inject_id}
           injectStatusName={injectResultOverviewOutput?.inject_status?.status_name}
+          queryKey={atomicTestingQueryKey}
         />
       ),
     });
@@ -180,7 +209,7 @@ const TargetResultsDetail = ({ inject, target, isAgentless, position, total, onS
         key: 'terminal-view',
         label: t('Terminal view'),
         content: (
-          <TerminalViewTab injectId={inject.inject_id} target={target} />
+          <TerminalViewTab injectId={inject.inject_id} target={target} queryKey={atomicTestingQueryKey} />
         ),
       });
     }

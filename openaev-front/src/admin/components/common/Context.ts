@@ -86,7 +86,7 @@ export type PreviewChallengeContextType = {
 export type InjectTestContextType = {
   contextId: string;
   url?: string;
-  searchInjectTests?: (contextId: string, searchPaginationInput: SearchPaginationInput) => Promise<{ data: Page<InjectTestStatusOutput> }>;
+  searchInjectTests?: (contextId: string, searchPaginationInput: SearchPaginationInput, notifyError?: boolean) => Promise<{ data: Page<InjectTestStatusOutput> }>;
   fetchInjectTestStatus?: (testId: string) => Promise<{ data: InjectTestStatusOutput }>;
   testInject?: (contextId: string, injectId: string) => Promise<{ data: InjectTestStatusOutput }>;
   bulkTestInjects?: (contextId: string, data: InjectBulkProcessingInput) => Promise<{ data: InjectTestStatusOutput[] }>;
@@ -139,7 +139,7 @@ export type TeamContextType = {
 export type InjectContextType = {
   injects: InjectOutputType[];
   setInjects: (input: InjectOutputType[]) => void;
-  searchInjects: (input: SearchPaginationInput) => Promise<{ data: Page<InjectOutputType> }>;
+  searchInjects: (input: SearchPaginationInput, notifyError?: boolean) => Promise<{ data: Page<InjectOutputType> }>;
   onAddInject: (inject: Inject) => Promise<{
     result: string;
     entities: { injects: Record<string, InjectStore> };

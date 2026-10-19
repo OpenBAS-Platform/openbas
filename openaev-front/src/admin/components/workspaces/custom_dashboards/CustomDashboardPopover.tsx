@@ -12,6 +12,7 @@ import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { download } from '../../../../utils/utils';
 import CustomDashboardForm, { type CustomDashboardFormType } from './CustomDashboardForm';
+import { invalidateDashboard } from './dashboardQueries';
 
 interface Props {
   customDashboard: CustomDashboard;
@@ -43,6 +44,8 @@ const CustomDashboardPopover: FunctionComponent<Props> = ({ customDashboard, onU
         if (response.data) {
           onUpdate?.(response.data);
         }
+        // The dashboard may be cached for another surface (home, statistics tabs).
+        invalidateDashboard(customDashboard.custom_dashboard_id);
       } finally {
         toggleModal(null);
       }

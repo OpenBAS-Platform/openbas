@@ -3,11 +3,8 @@ import { useNavigate, useParams, useSearchParams } from 'react-router';
 
 import { fetchExerciseChallenges } from '../../../../../actions/challenge-action';
 import { type ArticlesHelper } from '../../../../../actions/channels/article-helper';
-import { fetchExerciseDocuments } from '../../../../../actions/documents/documents-actions';
-import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { type ChallengeHelper } from '../../../../../actions/helper';
-import { fetchVariablesForExercise } from '../../../../../actions/variables/variable-actions';
 import { type VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import Drawer from '../../../../../components/common/Drawer';
 import { useFormatter } from '../../../../../components/i18n';
@@ -21,12 +18,12 @@ import {
 import { EndpointContext } from '../../../../../utils/context/endpoint/EndpointContext';
 import endpointContextForExercise from '../../../../../utils/context/endpoint/EndpointContextForExercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { ArticleContext, ChallengeContext, InjectContext, TeamContext } from '../../../common/Context';
 import InjectContractPicker from '../../../common/injects/create/InjectContractPicker';
 import InjectCreationConfig from '../../../common/injects/create/InjectCreationConfig';
 import { buildSimulationVariablesConfigurationUrl } from '../../SimulationConfigurationTab';
 import articleContextForExercise from '../articles/articleContextForExercise';
+import useSimulationStoreData from '../simulationStoreQueries';
 import teamContextForExercise from '../teams/teamContextForExercise';
 
 // Full-page inject creation for simulations: the Threat-Arsenal-style contract
@@ -63,11 +60,7 @@ const SimulationInjectCreation: FunctionComponent = () => {
       variables: helper.getExerciseVariables(exerciseId),
     }),
   );
-  useDataLoader(() => {
-    dispatch(fetchExerciseTeams(exerciseId));
-    dispatch(fetchVariablesForExercise(exerciseId));
-    dispatch(fetchExerciseDocuments(exerciseId));
-  });
+  useSimulationStoreData(exerciseId, ['teams', 'variables', 'documents']);
 
   const articleContext = articleContextForExercise(exerciseId);
   const teamContext = teamContextForExercise(exerciseId);

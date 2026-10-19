@@ -111,6 +111,15 @@ public class TeamService {
   }
 
   /**
+   * Whether the team exists in the given tenant. The tenant is compared in the query, so the answer
+   * does not depend on the tenant scope of the transaction.
+   */
+  @Transactional(readOnly = true)
+  public boolean existsInTenant(@NotNull final String teamId, final String tenantId) {
+    return tenantId != null && this.teamRepository.existsByIdAndTenantId(teamId, tenantId);
+  }
+
+  /**
    * Bulk delete of teams, either from an explicit list of ids or from a search input (select all).
    * Contextual teams (owned by a simulation or scenario) are always excluded from the deletion
    * scope, like in the teams list search.

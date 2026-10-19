@@ -5,13 +5,10 @@ import { useParams } from 'react-router';
 
 import { fetchExerciseChallenges } from '../../../../../actions/challenge-action';
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
-import { fetchExerciseDocuments } from '../../../../../actions/documents/documents-actions';
-import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { reconcileExerciseInjects, updateInjectForExercise } from '../../../../../actions/Inject';
 import { type InjectStore } from '../../../../../actions/injects/Inject';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
-import { fetchVariablesForExercise } from '../../../../../actions/variables/variable-actions';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import { SECTION_LABEL_SX } from '../../../../../components/common/detail/detailStyles';
 import { SectionBlock } from '../../../../../components/common/detail/EntityDetailCommon';
@@ -23,7 +20,11 @@ import { EndpointContext } from '../../../../../utils/context/endpoint/EndpointC
 import endpointContextForExercise from '../../../../../utils/context/endpoint/EndpointContextForExercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { simulationKey } from '../../../../../utils/query/keys';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../../utils/query/useNotifiedQuery';
+import useStoreQuery from '../../../../../utils/query/useStoreQuery';
 import useSearchAndFilter from '../../../../../utils/SortingFiltering';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import { ArticleContext, ChallengeContext, TeamContext } from '../../../common/Context';
 import TagsFilter from '../../../common/filters/TagsFilter';
 import UpdateInject from '../../../common/injects/UpdateInject';
@@ -31,6 +32,7 @@ import SamplePreview from '../../../workspaces/custom_dashboards/widgets/viz/sam
 import { buildSimulationVariablesConfigurationUrl } from '../../SimulationConfigurationTab';
 import articleContextForExercise from '../articles/articleContextForExercise';
 import ExecutionMenu from '../ExecutionMenu';
+import useSimulationStoreData from '../simulationStoreQueries';
 import teamContextForExercise from '../teams/teamContextForExercise';
 import AttackTimeline from './AttackTimeline';
 import ExecutionBoard from './ExecutionBoard';
@@ -38,6 +40,9 @@ import ExecutionFlowStrip from './ExecutionFlowStrip';
 import ExecutionHero from './ExecutionHero';
 import { sampleTimelineInjects, sampleTimelineTeams } from './executionSampleData';
 import { useNowTick } from './executionTime';
+
+// Store query of the injects of this screen: they are reconciled, not only fetched (see below).
+const timelineInjectsKey = (simulationId: string) => [...simulationKey(simulationId), 'injects-reconciled'] as const;
 
 // Transient statuses of injects that have been dispatched but not concluded.
 const IN_FLIGHT_STATUSES = new Set(['QUEUING', 'EXECUTING', 'PENDING']);
@@ -84,21 +89,30 @@ const ExecutionOverview = ({ exerciseId: exerciseIdProp, showMenu = true }: Exec
     };
   });
 
-  // Fetching Data
-  useDataLoader(() => {
-    // Reconcile (not just fetch): injects can be deleted server-side out of band - deleting a
-    // phishing landing page cascade-deletes the injects built on its contract - and the merge-only
-    // store would otherwise keep the ghosts on this screen as "completed" until a full reload.
-    dispatch(reconcileExerciseInjects(exerciseId));
-    dispatch(fetchExerciseTeams(exerciseId));
-    dispatch(fetchVariablesForExercise(exerciseId));
-    dispatch(fetchExerciseDocuments(exerciseId));
-    dispatch(fetchExerciseInjectExpectations(exerciseId));
-  });
-
   // Shared 1-second clock driving every live element of the screen.
   const now = useNowTick();
   const running = exercise?.exercise_status === 'RUNNING';
+
+  // Fetching Data
+  // With live updates on, each dataset is a store query under simulationKey(id), refetched by the
+  // topic 'simulation:<id>' (inject status, expectations). Execution traces announce nothing, hence
+  // the fallback interval while the simulation runs. With live updates off, the data loaders below
+  // load everything once and on every SSE reconnection, as before.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const refetchInterval = running ? FALLBACK_REFETCH_INTERVAL_MS : false;
+  useSimulationStoreData(exerciseId, ['teams', 'variables', 'documents', 'expectations'], { refetchInterval });
+  // Reconcile (not just fetch): injects can be deleted server-side out of band - deleting a
+  // phishing landing page cascade-deletes the injects built on its contract - and the merge-only
+  // store would otherwise keep the ghosts on this screen as "completed" until a full reload.
+  useStoreQuery(timelineInjectsKey(exerciseId), () => dispatch(reconcileExerciseInjects(exerciseId)), {
+    enabled: liveUpdates,
+    refetchInterval,
+  });
+  useDataLoader(() => {
+    if (!liveUpdates) {
+      dispatch(reconcileExerciseInjects(exerciseId));
+    }
+  });
 
   // Sort
   const searchColumns = ['title', 'description', 'content'];

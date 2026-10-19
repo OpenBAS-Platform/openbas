@@ -12,6 +12,8 @@ import { type PhishingLandingPage } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { useAbility } from '../../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../../utils/permissions/types';
+import { isFeatureEnabled } from '../../../../../utils/utils';
+import { invalidateComponents } from '../../componentsQueries';
 
 interface Props {
   /** `toggle` in a detail header — the 36px kebab that lines up with the header controls. */
@@ -59,6 +61,10 @@ const PhishingLandingPagePopover: FunctionComponent<Props> = ({
 
   const submitDuplicate = async () => {
     await dispatch(duplicatePhishingLandingPage(landingPage.phishing_landing_page_id));
+    // The copy is a new row: with live updates on, the lists refetch to show it.
+    if (isFeatureEnabled('STREAM_INVALIDATION')) {
+      invalidateComponents();
+    }
   };
 
   const entries = [{

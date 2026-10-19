@@ -46,6 +46,8 @@ type FetchAuthorCounts = (input: SearchPaginationInput) => Promise<{ data?: Auth
 export const useAuthorFacetOptions = (
   fetchAuthorCounts: FetchAuthorCounts,
   searchPaginationInput: SearchPaginationInput,
+  // Reloads the universe and the counts when it changes (live updates).
+  reloadVersion?: number,
 ): AuthorOption[] => {
   const [universe, setUniverse] = useState<AuthorCountRow[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
@@ -63,7 +65,7 @@ export const useAuthorFacetOptions = (
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [reloadVersion]);
 
   // Per-author counts under the active filters.
   useEffect(() => {
@@ -83,7 +85,7 @@ export const useAuthorFacetOptions = (
     return () => {
       cancelled = true;
     };
-  }, [searchPaginationInput]);
+  }, [searchPaginationInput, reloadVersion]);
 
   return useMemo(
     () =>

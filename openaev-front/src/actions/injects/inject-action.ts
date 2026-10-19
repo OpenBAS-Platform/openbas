@@ -35,10 +35,10 @@ export const exportInject = (injectId: string, data: InjectIndividualExportReque
 
 // -- TARGETS --
 
-export const searchTargets = (injectId: string, targetType: string, searchPaginationInput: SearchPaginationInput) => {
+export const searchTargets = (injectId: string, targetType: string, searchPaginationInput: SearchPaginationInput, notifyError: boolean = true) => {
   const data = searchPaginationInput;
   const uri = `${INJECT_URI}/${injectId}/targets/${targetType}/search`;
-  return simplePostCall(uri, data);
+  return simplePostCall(uri, data, undefined, notifyError);
 };
 
 export const searchTargetOptions = (injectId: string, targetType: string, searchText = '') => {
@@ -69,17 +69,17 @@ export const searchInjectByIdAsOption = (ids: string[]) => {
 
 // -- EXECUTION TRACES --
 
-export const getInjectTracesFromInjectAndTarget = (injectId: string = '', targetId: string = '', targetType: string = '') => {
+export const getInjectTracesFromInjectAndTarget = (injectId: string = '', targetId: string = '', targetType: string = '', notifyError: boolean = true) => {
   const params = {
     injectId,
     targetId,
     targetType,
   };
-  return simpleCall(`${INJECT_URI}/execution-traces`, { params });
+  return simpleCall(`${INJECT_URI}/execution-traces`, { params }, notifyError);
 };
-export const getInjectStatusWithGlobalExecutionTraces = (injectId: string = '') => {
+export const getInjectStatusWithGlobalExecutionTraces = (injectId: string = '', notifyError: boolean = true) => {
   const params = { injectId };
-  return simpleCall(`${INJECT_URI}/status`, { params });
+  return simpleCall(`${INJECT_URI}/status`, { params }, notifyError);
 };
 export const getInjectStatusWithAllExecutionTraces = (injectId: string = '') => {
   const params = { injectId };
@@ -87,9 +87,9 @@ export const getInjectStatusWithAllExecutionTraces = (injectId: string = '') => 
 };
 
 // Detection Remediation
-export const fetchPayloadDetectionRemediationsByInject = (injectId: string) => {
+export const fetchPayloadDetectionRemediationsByInject = (injectId: string, notifyError: boolean = true) => {
   const uri = `${INJECT_URI}/detection-remediations/${injectId}`;
-  return simpleCall(uri);
+  return simpleCall(uri, undefined, notifyError);
 };
 
 // Documents

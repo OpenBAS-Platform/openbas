@@ -17,7 +17,10 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { Can } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import useStoreQuery from '../../../../utils/query/useStoreQuery';
 import useSearchAndFilter from '../../../../utils/SortingFiltering';
+import { isFeatureEnabled } from '../../../../utils/utils';
+import { channelsKey, loadEvictingDeleted } from '../componentsQueries';
 import ChannelIcon from './ChannelIcon';
 import CreateChannel from './CreateChannel';
 
@@ -101,8 +104,15 @@ const Channels = () => {
   const filtering = useSearchAndFilter('channel', 'name', searchColumns);
   // Fetching data
   const { channels }: { channels: Channel[] } = useHelper((helper: ChannelsHelper & UserHelper) => ({ channels: helper.getChannels() }));
+  // With live updates on, the channels stay in the store but load through a query under the
+  // components key: the topic 'list:components' refreshes them, deleted ones included.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  useStoreQuery(channelsKey, () => loadEvictingDeleted(() => dispatch(fetchChannels()), 'channels'), { enabled: liveUpdates });
+  // The data loader also keeps the legacy stream open; with live updates on, it loads nothing itself.
   useDataLoader(() => {
-    dispatch(fetchChannels());
+    if (!liveUpdates) {
+      dispatch(fetchChannels());
+    }
   });
   const sortedChannels: Channel[] = filtering.filterAndSort(channels);
   return (

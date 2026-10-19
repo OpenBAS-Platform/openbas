@@ -9,8 +9,8 @@ import { arrayOfSecurityPlatforms } from '../assets/asset-schema';
 
 const THREAT_ARSENAL_URI = '/api/threat_arsenals';
 
-export const searchThreatArsenalActions = (paginationInput: InjectorContractSearchPaginationInput) => {
-  return simplePostCall(`${THREAT_ARSENAL_URI}/search`, paginationInput);
+export const searchThreatArsenalActions = (paginationInput: InjectorContractSearchPaginationInput, notifyError: boolean = true) => {
+  return simplePostCall(`${THREAT_ARSENAL_URI}/search`, paginationInput, undefined, notifyError);
 };
 
 export const searchNonTabletopThreatArsenalActions = (paginationInput: InjectorContractSearchPaginationInput) => {
@@ -21,9 +21,9 @@ export const addThreatArsenalAction = (data: ThreatArsenalActionCreateInput) => 
   return simplePostCall(THREAT_ARSENAL_URI, data, {}, true, true);
 };
 
-export const fetchThreatArsenalAction = (actionId: string) => {
+export const fetchThreatArsenalAction = (actionId: string, notifyError: boolean = true) => {
   const uri = `${THREAT_ARSENAL_URI}/${actionId}`;
-  return simpleCall(uri);
+  return simpleCall(uri, undefined, notifyError);
 };
 
 export const updateThreatArsenalAction = (actionId: string, data: ThreatArsenalActionUpdateInput) => {
@@ -64,8 +64,8 @@ export const fetchThreatArsenalAuthorCounts = (input: SearchPaginationInput) => 
 
 // Platform + payload-status counts for the current filters, so the fixed-universe
 // sidebar facets show live counts like the domain and author facets.
-export const fetchThreatArsenalFacetCounts = (input: SearchPaginationInput) => {
-  return simplePostCall(`${THREAT_ARSENAL_URI}/facet-counts`, input);
+export const fetchThreatArsenalFacetCounts = (input: SearchPaginationInput, notifyError: boolean = true) => {
+  return simplePostCall(`${THREAT_ARSENAL_URI}/facet-counts`, input, undefined, notifyError);
 };
 
 // Security platforms carrying detection remediations for this action (scoped

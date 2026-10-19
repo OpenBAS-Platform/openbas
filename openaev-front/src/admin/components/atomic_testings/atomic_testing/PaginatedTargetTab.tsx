@@ -9,6 +9,8 @@ import { useQueryableWithLocalStorage } from '../../../../components/common/quer
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import { type InjectTarget } from '../../../../utils/api-types';
+import { atomicTestingKey } from '../../../../utils/query/keys';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import NewTargetListItem from './NewTargetListItem';
 import { TargetListSkeleton } from './TargetSkeletons';
 
@@ -26,6 +28,9 @@ interface Props {
 const PaginatedTargetTab: React.FC<Props> = (props) => {
   const theme = useTheme();
   const { t } = useFormatter();
+  // With live updates on, the page of targets is a query under the atomic testing key: the stream
+  // invalidation refetches it, and `reloadContentCount` is not used.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
   const pagination = useQueryableWithLocalStorage(props.target_type + '_' + props.inject_id + '_filters', buildSearchPagination({
     filterGroup: {
       mode: 'and',
@@ -68,7 +73,8 @@ const PaginatedTargetTab: React.FC<Props> = (props) => {
   return (
     <>
       <PaginationComponentV2
-        fetch={input => searchTargets(props.inject_id, props.target_type, input)}
+        fetch={(input, notifyError) => searchTargets(props.inject_id, props.target_type, input, notifyError)}
+        queryKey={liveUpdates ? [...atomicTestingKey(props.inject_id), 'targets', props.target_type] : undefined}
         searchPaginationInput={pagination.searchPaginationInput}
         setContent={handleSetTargets}
         setLoading={handleSetLoading}

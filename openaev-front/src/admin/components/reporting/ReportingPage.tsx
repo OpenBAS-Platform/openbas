@@ -2,6 +2,7 @@
 import { Chip, IconButton, Tooltip, TooltipContent, TooltipTrigger } from '@filigran/design-system';
 import { ArrowDropDownOutlined, FileDownloadOutlined } from '@mui/icons-material';
 import { Box, Button, ButtonGroup, CircularProgress, Menu, MenuItem, Typography } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
@@ -22,6 +23,9 @@ import { type Reporting, type ReportingGeneration } from '../../../utils/api-typ
 import { MESSAGING$ } from '../../../utils/Environment';
 import { useAbility } from '../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
+import { isClientError, retryUnlessClientError } from '../../../utils/query/queryErrors';
+import useNotifiedQuery, { FALLBACK_REFETCH_INTERVAL_MS } from '../../../utils/query/useNotifiedQuery';
+import { isFeatureEnabled } from '../../../utils/utils';
 import { TIME_RANGE_LABELS } from './render/reportingRenderLabels';
 import { REPORTING_CONTEXT_ICONS, REPORTING_CONTEXT_LABELS } from './ReportingContexts';
 import { REPORTING_FORMATS, resolveSubjectOptions } from './ReportingFormUtils';
@@ -29,6 +33,15 @@ import { ReportingFormatFragment } from './ReportingFragments';
 import ReportingGenerationsTab from './ReportingGenerationsTab';
 import ReportingPopover from './ReportingPopover';
 import ReportingPreviewTab from './ReportingPreviewTab';
+import {
+  ACTIVE_GENERATIONS_POLL_INTERVAL_MS,
+  invalidateReport,
+  invalidateReportsList,
+  isGenerationActive,
+  reportingEntityKey,
+  reportingGenerationsKey,
+  useGenerationProgress,
+} from './reportingQueries';
 import ReportingSchedulesTab from './ReportingSchedulesTab';
 
 const POLL_INTERVAL_MS = 2500;
@@ -45,22 +58,47 @@ const ReportingPage = () => {
   const navigate = useNavigate();
   const ability = useAbility();
   const canManage = ability.can(ACTIONS.MANAGE, SUBJECTS.REPORTINGS);
+  // With live updates on, the report and its generations are queries under reportKey(id): the
+  // topic 'report:<id>' refetches them, and local changes invalidate them instead of reloading.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   // -- Report ------------------------------------------------------------------
 
-  const [reporting, setReporting] = useState<Reporting | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [legacyReporting, setLegacyReporting] = useState<Reporting | null>(null);
+  const [legacyLoading, setLegacyLoading] = useState(true);
 
   const loadReporting = useCallback(() => {
-    if (!reportingId) return Promise.resolve();
+    if (!reportingId || liveUpdates) return Promise.resolve();
     return fetchReporting(reportingId)
-      .then((result: { data: Reporting }) => setReporting(result.data))
-      .catch(() => setReporting(null));
-  }, [reportingId]);
+      .then((result: { data: Reporting }) => setLegacyReporting(result.data))
+      .catch(() => setLegacyReporting(null));
+  }, [reportingId, liveUpdates]);
 
   useEffect(() => {
-    loadReporting().finally(() => setLoading(false));
+    if (liveUpdates) return;
+    loadReporting().finally(() => setLegacyLoading(false));
   }, [loadReporting]);
+
+  const reportingQuery = useNotifiedQuery({
+    queryKey: reportingEntityKey(reportingId ?? ''),
+    queryFn: () => fetchReporting(reportingId ?? '', false).then((result: { data: Reporting }) => result.data),
+    retry: retryUnlessClientError,
+    refetchInterval: query => (query.state.status === 'error' ? false : FALLBACK_REFETCH_INTERVAL_MS),
+    enabled: liveUpdates && !!reportingId,
+  });
+
+  // Deleted or no longer visible while on screen: the not found page, as on a first load. A
+  // server error keeps the last data on screen.
+  const liveReporting = isClientError(reportingQuery.error) ? null : reportingQuery.data ?? null;
+  const reporting = liveUpdates ? liveReporting : legacyReporting;
+  const loading = liveUpdates ? !!reportingId && reportingQuery.isPending : legacyLoading;
+  const reloadReporting = () => {
+    if (liveUpdates) {
+      if (reportingId) invalidateReport(reportingId);
+      return;
+    }
+    loadReporting();
+  };
 
   // -- Subject entity name --------------------------------------------------------
 
@@ -79,19 +117,43 @@ const ReportingPage = () => {
 
   // -- Generations ------------------------------------------------------------------
 
-  const [generations, setGenerations] = useState<ReportingGeneration[]>([]);
-  const loadGenerations = useCallback(() => {
-    if (!reportingId) return;
+  const [legacyGenerations, setLegacyGenerations] = useState<ReportingGeneration[]>([]);
+  const loadLegacyGenerations = useCallback(() => {
+    if (!reportingId || liveUpdates) return;
     fetchReportingGenerations(reportingId)
-      .then((result: { data: ReportingGeneration[] }) => setGenerations(result.data ?? []))
+      .then((result: { data: ReportingGeneration[] }) => setLegacyGenerations(result.data ?? []))
       .catch(() => {
         // The API layer already notified; keep the current list.
       });
-  }, [reportingId]);
+  }, [reportingId, liveUpdates]);
 
   useEffect(() => {
-    loadGenerations();
-  }, [loadGenerations]);
+    loadLegacyGenerations();
+  }, [loadLegacyGenerations]);
+
+  // Polled while a generation is pending or running, on every tab (the header shows the latest
+  // download): a generation job may write its status without an invalidation. Its errors stay
+  // silent, the report query above shows the toast.
+  const generationsQuery = useQuery({
+    queryKey: reportingGenerationsKey(reportingId ?? ''),
+    queryFn: () => fetchReportingGenerations(reportingId ?? '', false).then((result: { data: ReportingGeneration[] }) => result.data ?? []),
+    retry: retryUnlessClientError,
+    refetchInterval: (query) => {
+      if (query.state.status === 'error') return false;
+      return (query.state.data ?? []).some(isGenerationActive) ? ACTIVE_GENERATIONS_POLL_INTERVAL_MS : FALLBACK_REFETCH_INTERVAL_MS;
+    },
+    enabled: liveUpdates && !!reportingId,
+  });
+
+  const generations = liveUpdates ? generationsQuery.data ?? [] : legacyGenerations;
+  // Stable: the generations tab polls it while a generation is active (live updates off).
+  const loadGenerations = useCallback(() => {
+    if (liveUpdates) {
+      if (reportingId) invalidateReport(reportingId);
+      return;
+    }
+    loadLegacyGenerations();
+  }, [liveUpdates, reportingId, loadLegacyGenerations]);
 
   // -- Generate now + polling ---------------------------------------------------------
 
@@ -108,6 +170,30 @@ const ReportingPage = () => {
 
   // Never leak the poll interval past the component's lifetime.
   useEffect(() => stopPolling, [stopPolling]);
+
+  // Live updates: the generation started here is a query under the report's key, polled until it
+  // ends (see useGenerationProgress), instead of the interval below.
+  const [pendingGenerationId, setPendingGenerationId] = useState<string | null>(null);
+  const finishLiveGeneration = () => {
+    setPendingGenerationId(null);
+    setGenerating(false);
+    loadGenerations();
+    invalidateReportsList();
+  };
+  useGenerationProgress(reportingId, liveUpdates ? pendingGenerationId : null, {
+    onSuccess: () => {
+      finishLiveGeneration();
+      MESSAGING$.notifySuccess(t('Report successfully generated'));
+    },
+    onFailure: (error) => {
+      finishLiveGeneration();
+      MESSAGING$.notifyError(error || t('The report generation failed.'));
+    },
+    onTimeout: () => {
+      finishLiveGeneration();
+      MESSAGING$.notifyError(t('The generation is taking longer than expected - its result will appear in the generations list.'));
+    },
+  });
 
   const pollGeneration = (generationId: string) => {
     let polls = 0;
@@ -149,6 +235,11 @@ const ReportingPage = () => {
     try {
       const generation: ReportingGeneration = (await generateReporting(reportingId, { reporting_generation_format: format ?? 'PDF' })).data;
       loadGenerations();
+      if (liveUpdates) {
+        invalidateReportsList();
+        setPendingGenerationId(generation.reporting_generation_id);
+        return;
+      }
       pollGeneration(generation.reporting_generation_id);
     } catch {
       // The API layer already notified the user.
@@ -265,8 +356,18 @@ const ReportingPage = () => {
               closes the row. */}
           <ReportingPopover
             reporting={reporting}
-            onUpdate={result => setReporting(result)}
-            onDelete={() => navigate('/admin/reporting')}
+            onUpdate={(result) => {
+              if (liveUpdates) {
+                invalidateReport(result.reporting_id);
+                invalidateReportsList();
+                return;
+              }
+              setLegacyReporting(result);
+            }}
+            onDelete={() => {
+              if (liveUpdates) invalidateReportsList();
+              navigate('/admin/reporting');
+            }}
           />
           {canManage && (
             <>
@@ -331,6 +432,7 @@ const ReportingPage = () => {
           <ReportingGenerationsTab
             generations={generations}
             onReload={loadGenerations}
+            pollWhileActive={!liveUpdates}
             canManage={canManage}
             onGenerate={() => handleGenerate(defaultFormat)}
             generating={generating}
@@ -339,7 +441,7 @@ const ReportingPage = () => {
         {currentTab === 'schedules' && (
           <ReportingSchedulesTab
             reporting={reporting}
-            onChanged={() => loadReporting()}
+            onChanged={reloadReporting}
             canManage={canManage}
           />
         )}

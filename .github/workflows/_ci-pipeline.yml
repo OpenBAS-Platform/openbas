@@ -360,6 +360,7 @@ jobs:
           includes: ${{ matrix.includes }}
           excludes: ${{ matrix.excludes }}
           artifact-suffix: ${{ matrix.artifact_suffix }}
+          enabled-dev-features: ${{ matrix.enabled_dev_features }}
           no-cache: ${{ inputs.no-cache }}
 
   # ════════════════════════════════════════════════════════════════════

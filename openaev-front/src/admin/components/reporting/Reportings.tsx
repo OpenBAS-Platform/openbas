@@ -18,6 +18,8 @@ import type { Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import type { Reporting, SearchPaginationInput } from '../../../utils/api-types';
+import { REPORTS_LIST_KEY } from '../../../utils/query/keys';
+import { isFeatureEnabled } from '../../../utils/utils';
 import ReportingCard from './ReportingCard';
 import {
   latestGeneration,
@@ -27,6 +29,7 @@ import {
 import ReportingCreation from './ReportingCreation';
 import { ReportingFormatFragment, ReportingStatusChip } from './ReportingFragments';
 import ReportingPopover from './ReportingPopover';
+import { invalidateReport, invalidateReportsList } from './reportingQueries';
 
 // Cards by default, with a persisted switch to the compact list (same pattern
 // as the custom dashboards screen).
@@ -53,6 +56,10 @@ const Reportings = () => {
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
 
+  // With live updates on, the list is a query under the reports key that stream invalidations
+  // refetch; local changes invalidate it too instead of patching the rows.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+
   // Pagination
   const [loading, setLoading] = useState<boolean>(true);
   const [reportings, setReportings] = useState<Reporting[]>([]);
@@ -67,9 +74,18 @@ const Reportings = () => {
   // Mutations from the card / row popovers patch the loaded page in place
   // (no full refetch needed for a rename or a removal).
   const onUpdate = (result: Reporting) => {
+    if (liveUpdates) {
+      invalidateReportsList();
+      invalidateReport(result.reporting_id);
+      return;
+    }
     setReportings(prev => prev.map(reporting => (reporting.reporting_id === result.reporting_id ? result : reporting)));
   };
   const onDelete = (reportingId: string) => {
+    if (liveUpdates) {
+      invalidateReportsList();
+      return;
+    }
     setReportings(prev => prev.filter(reporting => reporting.reporting_id !== reportingId));
     queryableHelpers.paginationHelpers.incrementTotalElements(-1);
   };
@@ -195,7 +211,9 @@ const Reportings = () => {
         }]}
       />
       <PaginationComponentV2
-        fetch={search}
+        fetch={liveUpdates ? searchReportings : search}
+        queryKey={liveUpdates ? REPORTS_LIST_KEY : undefined}
+        setLoading={liveUpdates ? setLoading : undefined}
         searchPaginationInput={searchPaginationInput}
         setContent={setReportings}
         entityPrefix="reporting"

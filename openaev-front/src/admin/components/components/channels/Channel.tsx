@@ -17,7 +17,10 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { Can, useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import useStoreQuery from '../../../../utils/query/useStoreQuery';
 import { buildTenantApiPath } from '../../../../utils/url-helper';
+import { isFeatureEnabled } from '../../../../utils/utils';
+import { channelDocumentsKey } from '../componentsQueries';
 import ChannelAddLogo from './ChannelAddLogo';
 import ChannelParametersForm from './ChannelParametersForm';
 import ChannelPreview from './ChannelPreview';
@@ -108,8 +111,13 @@ const Channel = () => {
     channel: helper.getChannel(channelId) as ChannelType,
     documentsMap: helper.getDocumentsMap() as Record<string, Document>,
   }));
+  // With live updates on, the channel documents (logos) load through a query under the channel key.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  useStoreQuery(channelDocumentsKey(channelId), () => dispatch(fetchDocumentsChannels(channelId)), { enabled: liveUpdates });
   useDataLoader(() => {
-    dispatch(fetchDocumentsChannels(channelId));
+    if (!liveUpdates) {
+      dispatch(fetchDocumentsChannels(channelId));
+    }
   });
 
   // The preview follows the app theme by default but can be flipped to check

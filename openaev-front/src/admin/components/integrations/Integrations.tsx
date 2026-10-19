@@ -14,7 +14,10 @@ import { type CatalogConnectorOutput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import useEnterpriseEdition from '../../../utils/hooks/useEnterpriseEdition';
+import useStoreQuery from '../../../utils/query/useStoreQuery';
+import { isFeatureEnabled } from '../../../utils/utils';
 import CatalogHero from './catalog_connectors/CatalogHero';
+import { catalogConnectorsKey, useXtmComposerReachable } from './common/integrationsQueries';
 
 const Catalog = lazy(() => import('./catalog_connectors/Catalog'));
 const DeployedConnectors = lazy(() => import('./deployed/DeployedConnectors'));
@@ -35,9 +38,12 @@ const Integrations = () => {
   const dispatch = useAppDispatch();
   const { tab } = useParams() as { tab?: string };
 
-  const [loading, setLoading] = useState<boolean>(true);
+  // With live updates on, the catalog stays in the store but loads through a query under the
+  // integrations key: the topic 'list:integrations' refreshes it. Constant for a session.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const [legacyLoading, setLegacyLoading] = useState<boolean>(true);
   // null = reachability probe still in flight; the warning must not flash while unknown.
-  const [isXtmComposerUp, setIsXtmComposerUp] = useState<boolean | null>(null);
+  const [legacyXtmComposerUp, setLegacyXtmComposerUp] = useState<boolean | null>(null);
   const { isValidated: isEnterpriseEdition } = useEnterpriseEdition();
 
   // The Integration Manager warning is dismissible; the choice is persisted so
@@ -54,14 +60,24 @@ const Integrations = () => {
     (helper: CatalogConnectorsHelper) => ({ catalogConnectors: helper.getCatalogConnectors() }),
   );
 
+  const catalogQuery = useStoreQuery(catalogConnectorsKey, () => dispatch(fetchCatalogConnectors()), { enabled: liveUpdates });
+  const liveXtmComposerUp = useXtmComposerReachable(liveUpdates);
+  // The data loader also keeps the legacy stream open; with live updates on, it loads nothing itself.
   useDataLoader(() => {
-    dispatch(fetchCatalogConnectors()).finally(() => setLoading(false));
+    if (!liveUpdates) {
+      dispatch(fetchCatalogConnectors()).finally(() => setLegacyLoading(false));
+    }
   });
   useEffect(() => {
+    if (liveUpdates) {
+      return;
+    }
     isXtmComposerIsReachable()
-      .then(({ data }) => setIsXtmComposerUp(data))
-      .catch(() => setIsXtmComposerUp(false));
+      .then(({ data }) => setLegacyXtmComposerUp(data))
+      .catch(() => setLegacyXtmComposerUp(false));
   }, []);
+  const loading = liveUpdates ? catalogQuery.isPending : legacyLoading;
+  const isXtmComposerUp = liveUpdates ? liveXtmComposerUp : legacyXtmComposerUp;
 
   if (!tab || !TABS.includes(tab as IntegrationsTab)) {
     return <Navigate to="../deployed" replace />;

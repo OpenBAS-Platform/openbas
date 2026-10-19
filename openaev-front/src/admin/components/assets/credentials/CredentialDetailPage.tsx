@@ -15,9 +15,13 @@ import ItemTags from '../../../../components/ItemTags';
 import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
 import { type CredentialFullOutput, type CredentialOutput } from '../../../../utils/api-types';
+import { isClientError, retryUnlessClientError } from '../../../../utils/query/queryErrors';
+import useNotifiedQuery from '../../../../utils/query/useNotifiedQuery';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import { humanizeEnum } from '../asset-categories';
 import AssetCategoryIcon from '../AssetCategoryIcon';
 import CredentialPopover from './CredentialPopover';
+import { credentialEntityKey, invalidateCredential } from './credentialQueries';
 import CredentialStatusChip from './CredentialStatusChip';
 import convertCredentialFullOutputToCredentialInput, { type CredentialFormInitialValues } from './credentialUtils';
 
@@ -26,8 +30,25 @@ const CredentialDetailPage = () => {
   const { credentialId } = useParams() as { credentialId?: string };
   const navigate = useNavigate();
 
-  const [credential, setCredential] = useState<CredentialFullOutput | null>(null);
-  const [loading, setLoading] = useState(true);
+  // With live updates on, the credential is a query under credentialKey(id): the topic
+  // 'credential:<id>' refetches it.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+
+  const [legacyCredential, setLegacyCredential] = useState<CredentialFullOutput | null>(null);
+  const [legacyLoading, setLegacyLoading] = useState(true);
+
+  const credentialQuery = useNotifiedQuery({
+    queryKey: credentialEntityKey(credentialId ?? ''),
+    queryFn: () => fetchCredential(credentialId ?? '', false).then((result: { data: CredentialFullOutput }) => result.data),
+    retry: retryUnlessClientError,
+    enabled: liveUpdates,
+  });
+
+  // Deleted or no longer visible while on screen: the not found page, as on a first load. A
+  // server error keeps the last data on screen.
+  const liveCredential = isClientError(credentialQuery.error) ? null : credentialQuery.data ?? null;
+  const credential: CredentialFullOutput | null = liveUpdates ? liveCredential : legacyCredential;
+  const loading = liveUpdates ? credentialQuery.isPending : legacyLoading;
 
   const resolveCredentialInitialValues = async (): Promise<CredentialFormInitialValues> => {
     if (!credential) {
@@ -38,12 +59,15 @@ const CredentialDetailPage = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
+    if (liveUpdates) {
+      return;
+    }
+    setLegacyLoading(true);
     fetchCredential(credentialId ?? '')
-      .then((result: { data: CredentialFullOutput }) => setCredential(result.data))
-      .catch(() => setCredential(null))
-      .finally(() => setLoading(false));
-  }, [credentialId]);
+      .then((result: { data: CredentialFullOutput }) => setLegacyCredential(result.data))
+      .catch(() => setLegacyCredential(null))
+      .finally(() => setLegacyLoading(false));
+  }, [credentialId, liveUpdates]);
 
   if (loading) {
     return <Loader />;
@@ -90,7 +114,11 @@ const CredentialDetailPage = () => {
             credentialName={credential.credential_name}
             resolveInitialValues={resolveCredentialInitialValues}
             onUpdate={(updated: CredentialOutput) => {
-              setCredential(current => (current
+              if (liveUpdates) {
+                invalidateCredential(credential.credential_id);
+                return;
+              }
+              setLegacyCredential(current => (current
                 ? {
                     ...current,
                     ...updated,

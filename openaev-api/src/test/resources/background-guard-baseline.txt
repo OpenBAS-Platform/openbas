@@ -63,6 +63,7 @@ io.openaev.health.DependencyHealthMetrics  # touches-no-tenant-table: @PostConst
 # --- @Scheduled pollers, lifecycle threads and framework-table cleanup: no TenantBase entity -------
 io.openaev.diagnostics.PoolExhaustionWatchdog  # touches-no-tenant-table: @Scheduled sampler reads the Hikari pool MXBean and logs a thread dump on sustained saturation, no entity access
 io.openaev.config.CachingConfig  # touches-no-tenant-table: @Scheduled @CacheEvict clears the in-memory adminUsers cache and only logs, no DB access
+io.openaev.stream.StreamInvalidationBuffer  # touches-no-tenant-table: @Scheduled drain only sends topic-only invalidate messages to the in-memory registry's WebSocket sessions, no entity or DB access
 io.openaev.config.SessionManager  # touches-no-tenant-table: @Scheduled raw-JDBC cleanup of the framework spring_session / spring_session_attributes tables (no tenant_id, not TenantBase) and a session_expired audit event, no tenant-scoped entity
 io.openaev.config.ShutdownService  # touches-no-tenant-table: initiateShutdown spawns a daemon thread (new Thread) that closes the Spring context and exits the JVM, no entity access
 io.openaev.health.DependencyProbeService  # touches-no-tenant-table: @Scheduled connectivity and storage probes run select 1 and pg_database_size (no table), plus RabbitMQ, object storage and engine client calls, no entity access
@@ -98,6 +99,7 @@ io.openaev.service.StreamService  # delegates-to-PermissionService#hasPermission
 io.openaev.service.LogService  # delegates-to-PlatformSettingsService#cleanMessage: the listeners only refresh the platform audit banner; LogEvent goes to the search-engine transport, not a TenantBase row
 io.openaev.service.NotificationEventService  # delegates-to-ScenarioNotificationEventHandler#handle: the listener dispatches to the handler, which sets the scope itself through the primitive
 io.openaev.service.chaining.WorkflowScopeRuleCascadeListener  # touches-no-tenant-table: deletes WorkflowScopeRule (implements Base only, no tenant column) in the deleter's transaction
+io.openaev.stream.StreamInvalidationListener  # touches-no-tenant-table: after commit, reads the committed entity already in the event (Scenario, Inject, expectation, Finding, Exercise and scenario or simulation children, assets, teams, users, organizations and integration connectors: type, isListened, ids read from proxies or loaded collections without initializing them), an IndexEvent id or the tenant ids of an AnalyticsIndexedEvent published by the indexing loop, and records topics in the in-memory StreamInvalidationBuffer; no repository or DB access
 
 # --- Async / reporting: derive and apply the tenant explicitly ------------------------------------
 io.openaev.aop.audit_log.AuditLogger  # touches-no-tenant-table: emits LogEvent audit documents to the engine transport (not a JPA entity); the tenant id is copied from the request thread context, no tenant-scoped row is written

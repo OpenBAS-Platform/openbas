@@ -3,12 +3,12 @@ import { type SearchPaginationInput } from '../../utils/api-types';
 
 const CREDENTIAL_URI = '/api/credentials';
 
-export const searchCredentials = (searchPaginationInput: SearchPaginationInput) => {
-  return simplePostCall(`${CREDENTIAL_URI}/search`, searchPaginationInput);
+export const searchCredentials = (searchPaginationInput: SearchPaginationInput, notifyError: boolean = true) => {
+  return simplePostCall(`${CREDENTIAL_URI}/search`, searchPaginationInput, undefined, notifyError);
 };
 
-export const fetchCredential = (credentialId: string) => {
-  return simpleCall(`${CREDENTIAL_URI}/${credentialId}`);
+export const fetchCredential = (credentialId: string, notifyError: boolean = true) => {
+  return simpleCall(`${CREDENTIAL_URI}/${credentialId}`, undefined, notifyError);
 };
 
 export const fetchCredentialContracts = () => {

@@ -11,8 +11,8 @@ export const createCustomDashboard = (input: CustomDashboardInput) => {
   return simplePostCall(CUSTOM_DASHBOARD_URI, input);
 };
 
-export const searchCustomDashboards = (searchPaginationInput: SearchPaginationInput) => {
-  return simplePostCall(`${CUSTOM_DASHBOARD_URI}/search`, searchPaginationInput);
+export const searchCustomDashboards = (searchPaginationInput: SearchPaginationInput, notifyError = true) => {
+  return simplePostCall(`${CUSTOM_DASHBOARD_URI}/search`, searchPaginationInput, undefined, notifyError);
 };
 
 export const fetchCustomDashboard = (id: string) => {

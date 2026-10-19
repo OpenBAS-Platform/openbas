@@ -1,6 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 
-import { fetchTargetResultAssetWithAgents } from '../../../../../actions/atomic_testings/atomic-testing-actions';
+import {
+  fetchTargetResultAssetWithAgents,
+  fetchTargetResultAssetWithAgentsQuery,
+} from '../../../../../actions/atomic_testings/atomic-testing-actions';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
 import Loader from '../../../../../components/Loader';
 import { useHelper } from '../../../../../store';
@@ -11,7 +14,10 @@ import type {
 } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { atomicTestingKey } from '../../../../../utils/query/keys';
+import useNotifiedQuery from '../../../../../utils/query/useNotifiedQuery';
 import type { InjectExpectationsStore } from '../../../common/injects/expectations/Expectation';
+import InjectExpectationContext from '../context/InjectExpectationContext';
 import InjectExpectationResultList, { type AgentResultBreakdownEntry } from './InjectExpectationResultList';
 
 interface Props {
@@ -23,15 +29,32 @@ interface Props {
 
 const InjectExpectationAggregatedAgentsView = ({ inject, injectExpectation, expectationType, target }: Props) => {
   const dispatch = useAppDispatch();
-  const [loading, setLoading] = useState(false);
+  const [stateLoading, setStateLoading] = useState(false);
+  const { atomicTestingQueryKey } = useContext(InjectExpectationContext);
+  const liveUpdates = atomicTestingQueryKey !== undefined;
 
+  // Live updates off: the agents' expectations go through the Redux store.
   useDataLoader(() => {
-    setLoading(true);
-    dispatch(fetchTargetResultAssetWithAgents(inject.inject_id, target.target_id, expectationType)).finally(() => setLoading(false));
+    if (liveUpdates) {
+      return;
+    }
+    setStateLoading(true);
+    dispatch(fetchTargetResultAssetWithAgents(inject.inject_id, target.target_id, expectationType)).finally(() => setStateLoading(false));
   });
 
-  const { injectExpectationsWithAgents } = useHelper((helper: InjectHelper) =>
+  const { injectExpectationsWithAgents: storeExpectationsWithAgents } = useHelper((helper: InjectHelper) =>
     ({ injectExpectationsWithAgents: helper.getInjectExpectationsByAssetAndInject(target.target_id, inject.inject_id, expectationType) }));
+
+  // Live updates on: a query under the atomic testing key, refetched when it is invalidated.
+  const agentsQuery = useNotifiedQuery({
+    queryKey: [...atomicTestingKey(inject.inject_id), 'asset-with-agents', target.target_id, expectationType],
+    queryFn: () => fetchTargetResultAssetWithAgentsQuery(inject.inject_id, target.target_id, expectationType, false)
+      .then((result: { data: InjectExpectationAgentOutput[] }) => result.data ?? []),
+    enabled: liveUpdates,
+  });
+
+  const injectExpectationsWithAgents = liveUpdates ? agentsQuery.data : storeExpectationsWithAgents;
+  const loading = liveUpdates ? agentsQuery.isPending : stateLoading;
 
   // Roll the per-agent results up per security-platform source so the aggregated
   // endpoint row can surface the per-agent breakdown in an "i" tooltip instead of

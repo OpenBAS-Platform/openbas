@@ -2,19 +2,16 @@ import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { type FunctionComponent } from 'react';
 
-import { fetchExerciseCommunications } from '../../../../../actions/Communication';
 import { type CommunicationHelper } from '../../../../../actions/communications/communication-helper';
 import { type UserHelper } from '../../../../../actions/helper';
-import { fetchPlayers } from '../../../../../actions/users/User';
 import Chart from '../../../../../components/Chart';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import { type Communication, type Exercise, type User } from '../../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { resolveUserName } from '../../../../../utils/String';
 import SamplePreview from '../../../workspaces/custom_dashboards/widgets/viz/sample/SamplePreview';
+import useSimulationStoreData from '../simulationStoreQueries';
 import { sampleMailsByPlayer } from './mailsSampleData';
 
 interface Props { exerciseId: Exercise['exercise_id'] }
@@ -22,7 +19,6 @@ interface Props { exerciseId: Exercise['exercise_id'] }
 const MailDistributionByPlayer: FunctionComponent<Props> = ({ exerciseId }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   const theme = useTheme();
 
   // Fetching data
@@ -30,10 +26,7 @@ const MailDistributionByPlayer: FunctionComponent<Props> = ({ exerciseId }) => {
     communications: helper.getExerciseCommunications(exerciseId),
     usersMap: helper.getUsersMap(),
   }));
-  useDataLoader(() => {
-    dispatch(fetchExerciseCommunications(exerciseId));
-    dispatch(fetchPlayers());
-  });
+  useSimulationStoreData(exerciseId, ['communications', 'all-players']);
 
   const communicationsUsers = R.uniq(
     R.flatten(

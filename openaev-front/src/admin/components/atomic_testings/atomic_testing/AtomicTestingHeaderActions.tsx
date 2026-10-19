@@ -2,6 +2,7 @@ import { Button, Checkbox, IconButton, Tooltip, TooltipContent, TooltipTrigger }
 import { PlayArrowOutlined, SettingsOutlined, Stop, TrackChangesOutlined, UpdateOutlined } from '@mui/icons-material';
 import { Alert, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -22,10 +23,13 @@ import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 import { type Cron } from '../../../../utils/period/Cron';
 import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import queryClient from '../../../../utils/query/queryClient';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import ExpectationsDriftIndicator from '../../common/injects/expectations/ExpectationsDriftIndicator';
 import SchedulingDialog from '../../common/scheduling/SchedulingDialog';
 import EntityReportsPanel from '../../reporting/EntityReportsPanel';
 import AtomicTestingPopover from './AtomicTestingPopover';
+import { atomicTestingDriftKey, invalidateAtomicTesting } from './atomicTestingQueries';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
 
 interface Props {
@@ -47,7 +51,8 @@ const AtomicTestingHeaderActions = ({ injectResultOverview, setInjectResultOverv
   const [openDialog, setOpenDialog] = useState(false);
   const [openScheduling, setOpenScheduling] = useState(false);
   const [canLaunch, setCanLaunch] = useState(true);
-  const [expectationsDrift, setExpectationsDrift] = useState<ExpectationsDriftOutput | null>(null);
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const [polledExpectationsDrift, setPolledExpectationsDrift] = useState<ExpectationsDriftOutput | null>(null);
   // Relaunching a drifted atomic testing without realigning replays the outdated
   // expectations forever - hence realign is opt-out (checked by default).
   const [realignOnRelaunch, setRealignOnRelaunch] = useState(true);
@@ -55,13 +60,16 @@ const AtomicTestingHeaderActions = ({ injectResultOverview, setInjectResultOverv
   // Expectation drift between the injector contract template and the inject
   // content - recomputed when the atomic testing is updated.
   useEffect(() => {
+    if (liveUpdates) {
+      return undefined;
+    }
     // A stale response from a previous atomic testing must not overwrite the
     // current one. simpleCall has already notified the user on failure, hence
     // the deliberately empty catch.
     let stale = false;
     fetchAtomicTestingExpectationsDrift(injectResultOverview.inject_id)
       .then((result: { data: ExpectationsDriftOutput }) => {
-        if (!stale) setExpectationsDrift(result.data);
+        if (!stale) setPolledExpectationsDrift(result.data);
       })
       .catch(() => {});
     return () => {
@@ -69,8 +77,31 @@ const AtomicTestingHeaderActions = ({ injectResultOverview, setInjectResultOverv
     };
   }, [injectResultOverview.inject_id, injectResultOverview.inject_updated_at]);
 
+  // Live updates: the drift is a query of the atomic testing screen, so its topic refetches it too.
+  // The update date in the key keeps the refresh on every change of the atomic testing.
+  const driftKey = [...atomicTestingDriftKey(injectResultOverview.inject_id), injectResultOverview.inject_updated_at];
+  const { data: queriedExpectationsDrift } = useQuery({
+    queryKey: driftKey,
+    // simpleCall notifies the user on failure; one attempt keeps it to one toast.
+    queryFn: () => fetchAtomicTestingExpectationsDrift(injectResultOverview.inject_id).then((result: { data: ExpectationsDriftOutput }) => result.data),
+    enabled: liveUpdates,
+    retry: false,
+  });
+  const expectationsDrift = liveUpdates ? queriedExpectationsDrift ?? null : polledExpectationsDrift;
+  const setExpectationsDrift = (drift: ExpectationsDriftOutput) => {
+    if (liveUpdates) {
+      queryClient.setQueryData(driftKey, drift);
+    } else {
+      setPolledExpectationsDrift(drift);
+    }
+  };
+
   const onRealignExpectations = async () => {
     await realignAtomicTestingExpectations(injectResultOverview.inject_id);
+    if (liveUpdates) {
+      await invalidateAtomicTesting(injectResultOverview.inject_id);
+      return;
+    }
     const result = await fetchAtomicTestingExpectationsDrift(injectResultOverview.inject_id);
     setExpectationsDrift(result.data);
     await fetchInjectResultOverviewOutput(injectResultOverview.inject_id).then((overview: { data: InjectResultOverviewOutput }) => {

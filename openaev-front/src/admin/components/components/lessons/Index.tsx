@@ -11,8 +11,10 @@ import { LESSONS_TEMPLATES_BASE_URL } from '../../../../constants/BaseUrls';
 import { useHelper } from '../../../../store';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import { SETTINGS_LABEL } from '../../nav/config/settings.config';
 import CustomizationMenu from '../../settings/CustomizationMenu';
+import { lessonsTemplateEntityKey, loadEvictingDeleted, useComponentsStoreQuery } from '../componentsQueries';
 import LessonsTemplate from './LessonsTemplate';
 import LessonsTemplateHeader from './LessonsTemplateHeader';
 
@@ -23,10 +25,25 @@ const Index = () => {
 
   const { lessonsTemplateId } = useParams() as { lessonsTemplateId: string };
   const { lessonsTemplate } = useHelper((helper: LessonsTemplatesHelper) => ({ lessonsTemplate: helper.getLessonsTemplate(lessonsTemplateId) }));
+  // With live updates on, the templates stay in the store but load through a query under the
+  // components key: the topic 'list:components' refreshes them, and evicts the deleted ones.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const templateQuery = useComponentsStoreQuery(
+    lessonsTemplateEntityKey(lessonsTemplateId),
+    () => loadEvictingDeleted(() => dispatch(fetchLessonsTemplates()), 'lessonstemplates'),
+    liveUpdates,
+  );
+  // The data loader also keeps the legacy stream open; with live updates on, it loads nothing itself.
   useDataLoader(() => {
-    dispatch(fetchLessonsTemplates());
+    if (!liveUpdates) {
+      dispatch(fetchLessonsTemplates());
+    }
   });
 
+  // Deleted or no longer visible while on screen.
+  if (liveUpdates && !templateQuery.isPending && !lessonsTemplate) {
+    return <NotFound />;
+  }
   if (lessonsTemplate) {
     return (
       <div style={{ display: 'flex' }}>

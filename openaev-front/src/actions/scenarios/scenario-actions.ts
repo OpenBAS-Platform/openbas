@@ -56,10 +56,10 @@ export const fetchScenariosById = (exerciseIds: GetScenariosInput) => (dispatch:
   return postReferential(arrayOfScenarios, SCENARIO_URI + '/search-by-id', exerciseIds, undefined, false)(dispatch);
 };
 
-export const searchScenarios = (paginationInput: SearchPaginationInput) => {
+export const searchScenarios = (paginationInput: SearchPaginationInput, notifyError: boolean = true) => {
   const data = paginationInput;
   const uri = '/api/scenarios/search';
-  return simplePostCall(uri, data);
+  return simplePostCall(uri, data, undefined, notifyError);
 };
 
 export const fetchScenario = (scenarioId: string) => (dispatch: Dispatch) => {
@@ -162,24 +162,24 @@ export const removeScenarioTeamPlayers = (scenarioId: Scenario['scenario_id'], t
 
 // -- EXERCISES --
 
-export const searchScenarioExercises = (scenarioId: Scenario['scenario_id'], paginationInput: SearchPaginationInput) => {
+export const searchScenarioExercises = (scenarioId: Scenario['scenario_id'], paginationInput: SearchPaginationInput, notifyError: boolean = true) => {
   const data = paginationInput;
   const uri = `/api/scenarios/${scenarioId}/exercises/search`;
-  return simplePostCall(uri, data);
+  return simplePostCall(uri, data, undefined, notifyError);
 };
 
 // -- HEALTHCHEKS --
 
-export const searchScenarioHealthcheks = (scenarioId: Scenario['scenario_id']) => {
+export const searchScenarioHealthcheks = (scenarioId: Scenario['scenario_id'], notifyError: boolean = true) => {
   const uri = `${SCENARIO_URI}/${scenarioId}/healthchecks`;
-  return simpleCall(uri);
+  return simpleCall(uri, undefined, notifyError);
 };
 
 // -- EXPECTATIONS DRIFT --
 
-export const fetchScenarioExpectationsDrift = (scenarioId: Scenario['scenario_id']) => {
+export const fetchScenarioExpectationsDrift = (scenarioId: Scenario['scenario_id'], notifyError: boolean = true) => {
   const uri = `${SCENARIO_URI}/${scenarioId}/expectations-drift`;
-  return simpleCall(uri);
+  return simpleCall(uri, undefined, notifyError);
 };
 
 export const realignScenarioExpectations = (scenarioId: Scenario['scenario_id']) => {
@@ -207,9 +207,9 @@ export const updateScenarioRecurrence = (
 
 // -- STATISTIC --
 
-export const fetchScenarioStatistic = (scenarioId: Scenario['scenario_id']) => {
+export const fetchScenarioStatistic = (scenarioId: Scenario['scenario_id'], notifyError: boolean = true) => {
   const uri = `${SCENARIO_URI}/${scenarioId}/statistics`;
-  return simpleCall(uri);
+  return simpleCall(uri, undefined, notifyError);
 };
 
 // -- IMPORT --

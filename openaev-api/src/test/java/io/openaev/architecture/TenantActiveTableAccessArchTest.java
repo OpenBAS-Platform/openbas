@@ -253,6 +253,7 @@ import io.openaev.service.scenario.ScenarioService;
 import io.openaev.service.stix.SecurityCoverageService;
 import io.openaev.service.targets.search.AgentTargetSearchAdaptor;
 import io.openaev.service.threat_arsenal.ThreatArsenalImportService;
+import io.openaev.stream.StreamInvalidationListener;
 import io.openaev.telemetry.metric_collectors.InventoryMetricCollector;
 import io.openaev.telemetry.metric_collectors.PlatformAdoptionMetricCollector;
 import io.openaev.telemetry.metric_collectors.ProductInventoryMetricCollector;
@@ -1364,7 +1365,11 @@ class TenantActiveTableAccessArchTest {
               // DashboardService resolves the widget and then dereferences its owning dashboard
               // inside TxCtx-scoped endpoints (pinned by DashboardApiTenantScopeTest and
               // TenantScopedEntrypointsTxCtxArchTest):
-              DashboardService.class)
+              DashboardService.class,
+              // Reads only the id of the dashboard proxy of a committed widget, without
+              // initializing it, to name the dashboard's live topic (pinned by
+              // StreamInvalidationListenerTest): no query reaches custom_dashboards.
+              StreamInvalidationListener.class)
           .should()
           .callMethod(Widget.class, "getCustomDashboard")
           .because(

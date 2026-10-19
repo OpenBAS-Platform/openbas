@@ -1,14 +1,19 @@
 package io.openaev.service;
 
+import io.openaev.context.TenantContext;
+import io.openaev.database.audit.AnalyticsIndexedEvent;
 import io.openaev.database.model.IndexingStatus;
 import io.openaev.database.repository.IndexingStatusRepository;
 import io.openaev.engine.model.EsBase;
+import io.openaev.engine.model.tenant.EsTenantBase;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * Shared helpers for the incremental indexing loop of both engine implementations (Elasticsearch
@@ -339,5 +344,52 @@ public final class EsIndexingUtils {
       IndexingCursor cursor, Instant now, long graceWindowSeconds) {
     Instant capped = capCursorToGraceWindow(cursor.timestamp(), now, graceWindowSeconds);
     return capped.equals(cursor.timestamp()) ? cursor : new IndexingCursor(capped, null);
+  }
+
+  /**
+   * The event announcing that these documents were just indexed: their tenants, or every tenant
+   * when one of them carries no tenant (a document without {@code base_tenant_side} is shown in
+   * every tenant's analytics). Read from the documents in memory, so it costs no query.
+   */
+  public static AnalyticsIndexedEvent indexedEvent(List<? extends EsBase> documents) {
+    Set<String> tenantIds = new HashSet<>();
+    for (EsBase document : documents) {
+      String tenantId =
+          document instanceof EsTenantBase tenantDocument
+              ? tenantDocument.getBase_tenant_side()
+              : null;
+      if (tenantId == null) {
+        return AnalyticsIndexedEvent.everyTenant();
+      }
+      tenantIds.add(tenantId);
+    }
+    return new AnalyticsIndexedEvent(tenantIds);
+  }
+
+  /**
+   * The event announcing that documents were removed from the index: a delete names entity ids
+   * only, so its tenant is the deleting thread's (the request that deleted the rows), or every
+   * tenant when the thread has none (a background job, the deletion replay).
+   */
+  public static AnalyticsIndexedEvent deletedEvent() {
+    return TenantContext.hasCurrentTenant()
+        ? new AnalyticsIndexedEvent(Set.of(TenantContext.getCurrentTenant()))
+        : AnalyticsIndexedEvent.everyTenant();
+  }
+
+  /**
+   * Publishes an {@link AnalyticsIndexedEvent}, best effort: indexing must never fail because a
+   * listener did, and an engine service built outside Spring has no publisher.
+   */
+  public static void publishIndexed(
+      ApplicationEventPublisher publisher, AnalyticsIndexedEvent event, Logger log) {
+    if (publisher == null) {
+      return;
+    }
+    try {
+      publisher.publishEvent(event);
+    } catch (RuntimeException e) {
+      log.warn("Publishing the analytics indexed event failed: {}", e.getMessage(), e);
+    }
   }
 }

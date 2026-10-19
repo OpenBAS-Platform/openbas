@@ -31,8 +31,12 @@ import {
 } from '../../../../../utils/api-types';
 import { useAbility } from '../../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../../utils/permissions/types';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../../utils/query/useNotifiedQuery';
 import { capitalize } from '../../../../../utils/String';
+import { isFeatureEnabled } from '../../../../../utils/utils';
+import { useQueryVersion } from '../../../assets/assetQueries';
 import { MITRE_FILTER_KEY } from '../../../common/filters/MitreFilter';
+import { RESULTS_VERSION_KEY } from '../dashboardQueries';
 import getAuthorizedPerspectives from '../widgets/configuration/AuthorizedPerspectives';
 import buildStyles from '../widgets/viz/list/elements/ColumnStyles';
 import listConfigRenderer from '../widgets/viz/list/elements/ListColumnConfig';
@@ -160,15 +164,25 @@ const ResultsExplorer: FunctionComponent<ExplorerProps> = ({ listConfig, initial
     queryableHelpers.paginationHelpers.handleChangeTotalElements(initialEntities?.total ?? 0);
   }, []);
 
+  // With live updates on, new analytics data (topic 'list:analytics') or the fallback interval
+  // bumps this version, which reloads the current page in the background, rows staying on screen.
+  const resultsVersion = useQueryVersion(RESULTS_VERSION_KEY, isFeatureEnabled('STREAM_INVALIDATION'), FALLBACK_REFETCH_INTERVAL_MS);
+  const lastVersionRef = useRef(resultsVersion);
+
   useEffect(() => {
     const fetchKey = JSON.stringify(searchPaginationInput);
-    if (fetchKey === lastFetchKeyRef.current) {
+    const versionChanged = resultsVersion !== lastVersionRef.current;
+    lastVersionRef.current = resultsVersion;
+    if (fetchKey === lastFetchKeyRef.current && !versionChanged) {
       return;
     }
+    const background = fetchKey === lastFetchKeyRef.current;
     lastFetchKeyRef.current = fetchKey;
     requestIdRef.current += 1;
     const requestId = requestIdRef.current;
-    setLoading(true);
+    if (!background) {
+      setLoading(true);
+    }
     // Re-issue the list query with the user-amended filters and sorts. The
     // widget's implicit time scope is materialized as an editable date chip
     // (seedDateFilters), so it is neutralized here: otherwise editing or
@@ -208,10 +222,12 @@ const ResultsExplorer: FunctionComponent<ExplorerProps> = ({ listConfig, initial
       setLoading(false);
     }).catch(() => {
       if (requestId !== requestIdRef.current) return;
-      setElements([]);
+      if (!background) {
+        setElements([]);
+      }
       setLoading(false);
     });
-  }, [searchPaginationInput]);
+  }, [searchPaginationInput, resultsVersion]);
 
   const loaderIcon = entityConfig?.loaderIcon ?? HelpOutlineOutlined;
 

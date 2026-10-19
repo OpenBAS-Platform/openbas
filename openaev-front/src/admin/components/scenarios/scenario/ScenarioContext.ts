@@ -8,18 +8,33 @@ import { bulkDeleteInjectsForScenario, bulkUpdateInjectForScenario, createInject
 import { type Page } from '../../../../components/common/queryable/Page';
 import { type ImportTestSummary, type Inject, type InjectBulkProcessingInput, type InjectBulkUpdateInputs, type InjectInput, type InjectsImportInput, type InjectTestStatusOutput, type Scenario, type SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { isFeatureEnabled } from '../../../../utils/utils';
+import { invalidateScenario } from './scenarioQueries';
 
 const injectContextForScenario = (scenario: Scenario) => {
   const dispatch = useAppDispatch();
   const [injects, setInjects] = useState<InjectOutputType[]>([]);
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+
+  // An import adds injects and may add teams: reload them and the scenario. With live updates on,
+  // invalidating the scenario refetches the scenario and the header loaders at once.
+  const refreshAfterImport = () => {
+    dispatch(fetchScenarioInjects(scenario.scenario_id));
+    if (liveUpdates) {
+      invalidateScenario(scenario.scenario_id);
+    } else {
+      dispatch(fetchScenario(scenario.scenario_id));
+      dispatch(fetchScenarioTeams(scenario.scenario_id));
+    }
+  };
 
   // This object is the value of InjectContext.Provider wrapping the whole scenario
   // area: keep its identity stable so consumers don't re-render on unrelated updates.
   return useMemo(() => ({
     injects,
     setInjects,
-    searchInjects(input: SearchPaginationInput): Promise<{ data: Page<InjectOutputType> }> {
-      return searchScenarioInjectsSimple(scenario.scenario_id, input);
+    searchInjects(input: SearchPaginationInput, notifyError?: boolean): Promise<{ data: Page<InjectOutputType> }> {
+      return searchScenarioInjectsSimple(scenario.scenario_id, input, notifyError);
     },
     onAddInject(inject: Inject): Promise<{
       result: string;
@@ -54,17 +69,13 @@ const injectContextForScenario = (scenario: Scenario) => {
     },
     onImportInjectFromJson(file: File): Promise<void> {
       return importInjectsForScenario(scenario.scenario_id, file).then(response => new Promise((resolve, _reject) => {
-        dispatch(fetchScenarioInjects(scenario.scenario_id));
-        dispatch(fetchScenario(scenario.scenario_id));
-        dispatch(fetchScenarioTeams(scenario.scenario_id));
+        refreshAfterImport();
         resolve(response.data);
       }));
     },
     onImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
       return importXlsForScenario(scenario.scenario_id, importId, input).then(response => new Promise((resolve, _reject) => {
-        dispatch(fetchScenarioInjects(scenario.scenario_id));
-        dispatch(fetchScenario(scenario.scenario_id));
-        dispatch(fetchScenarioTeams(scenario.scenario_id));
+        refreshAfterImport();
         resolve(response.data);
       }));
     },
@@ -83,7 +94,7 @@ const injectContextForScenario = (scenario: Scenario) => {
         data: result.data,
       }));
     },
-  }), [dispatch, injects, scenario?.scenario_id]);
+  }), [dispatch, injects, scenario?.scenario_id, liveUpdates]);
 };
 
 export default injectContextForScenario;

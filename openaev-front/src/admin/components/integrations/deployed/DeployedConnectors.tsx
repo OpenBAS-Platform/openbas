@@ -20,6 +20,8 @@ import type {
 } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../utils/query/useNotifiedQuery';
+import useStoreQuery from '../../../../utils/query/useStoreQuery';
 import { isFeatureEnabled } from '../../../../utils/utils';
 import { type ConnectorItem, type ConnectorItemType } from '../catalog_connectors/catalog-facets';
 import ConnectorMarketplace from '../catalog_connectors/ConnectorMarketplace';
@@ -35,6 +37,13 @@ import {
   secretsProviderConfig,
 } from '../common/ConnectorContext';
 import ConnectorStatus from '../common/ConnectorStatus';
+import {
+  collectorsKey,
+  executorsKey,
+  injectorsKey,
+  loadConnectorsEvictingDeleted,
+  secretsProvidersKey,
+} from '../common/integrationsQueries';
 import MigrateButton from '../common/MigrateButton';
 import CreateConnectorInstanceDrawer from '../connector_instance/CreateConnectorInstanceDrawer';
 
@@ -63,7 +72,27 @@ const DeployedConnectors = ({ catalogConnectors, isXtmComposerUp }: Props) => {
   const { t, nsdt, locale } = useFormatter();
   const isCredentialAssetEnabled = isFeatureEnabled('CREDENTIAL_ASSET');
 
+  // With live updates on, the connectors stay in the store but load through queries under the
+  // integrations key: the topic 'list:integrations' refreshes them. Heartbeats may not be
+  // announced, so the fallback interval keeps the last-seen dates and health disks fresh.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const storeQueryOptions = {
+    enabled: liveUpdates,
+    refetchInterval: FALLBACK_REFETCH_INTERVAL_MS,
+  };
+  // A connector deleted elsewhere leaves the store on the next refetch.
+  useStoreQuery(injectorsKey, () => loadConnectorsEvictingDeleted(() => dispatch(injectorConfig.apiRequest.fetchAll()), 'injectors'), storeQueryOptions);
+  useStoreQuery(collectorsKey, () => loadConnectorsEvictingDeleted(() => dispatch(collectorConfig.apiRequest.fetchAll()), 'collectors'), storeQueryOptions);
+  useStoreQuery(executorsKey, () => loadConnectorsEvictingDeleted(() => dispatch(executorConfig.apiRequest.fetchAll()), 'executors'), storeQueryOptions);
+  useStoreQuery(secretsProvidersKey, () => loadConnectorsEvictingDeleted(() => dispatch(secretsProviderConfig.apiRequest.fetchAll()), 'secretsproviders'), {
+    ...storeQueryOptions,
+    enabled: liveUpdates && isCredentialAssetEnabled,
+  });
+  // The data loader also keeps the legacy stream open; with live updates on, it loads nothing itself.
   useDataLoader(() => {
+    if (liveUpdates) {
+      return;
+    }
     dispatch(injectorConfig.apiRequest.fetchAll());
     dispatch(collectorConfig.apiRequest.fetchAll());
     dispatch(executorConfig.apiRequest.fetchAll());

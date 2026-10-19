@@ -1,7 +1,7 @@
 import { Chip, Tooltip, TooltipContent, TooltipTrigger } from '@filigran/design-system';
 import { DescriptionOutlined, HelpOutlineOutlined, RowingOutlined } from '@mui/icons-material';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { type CSSProperties, useEffect, useState } from 'react';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -28,6 +28,8 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { Can } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import { buildTenantApiPath } from '../../../../utils/url-helper';
+import { isFeatureEnabled } from '../../../../utils/utils';
+import { documentsKey, invalidateComponents } from '../componentsQueries';
 import CreateDocument from './CreateDocument';
 import DocumentPopover from './DocumentPopover';
 import DocumentType from './DocumentType';
@@ -80,6 +82,9 @@ const Documents = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { t } = useFormatter();
+  // With live updates on, the list is a query under the components key that stream invalidations
+  // refetch; local changes invalidate it too instead of patching the rows.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
   const { exercisesMap, scenariosMap } = useHelper((helper: ExercisesHelper & ScenariosHelper) => ({
     exercisesMap: helper.getExercisesMap(),
     scenariosMap: helper.getScenariosMap(),
@@ -136,6 +141,9 @@ const Documents = () => {
   }));
   const [loadingDocuments, setLoadingDocuments] = useState(true);
   const [loadingExercisesAndScenarios, setLoadingExercisesAndScenarios] = useState(false);
+  // A live refetch reloads the simulation and scenario names in the background, without the
+  // list placeholder.
+  const namesLoadedOnce = useRef(false);
 
   useEffect(() => {
     if (documents.length === 0) return;
@@ -157,6 +165,7 @@ const Documents = () => {
 
     Promise.all(promises).finally(() => {
       setLoadingExercisesAndScenarios(false);
+      namesLoadedOnce.current = true;
     });
   }, [documents, dispatch]);
 
@@ -165,6 +174,10 @@ const Documents = () => {
      * @param result the result of the call
      */
   const handleCreateDocuments = (result: RawPaginationDocument) => {
+    if (liveUpdates) {
+      invalidateComponents();
+      return;
+    }
     // If the document was already in the list displayed, we don't add it to the list
     if (documents.find(element => element.document_id === result.document_id) === undefined) {
       setDocuments([result, ...documents]);
@@ -200,7 +213,9 @@ const Documents = () => {
         }]}
       />
       <PaginationComponentV2
-        fetch={searchDocumentsToLoad}
+        fetch={liveUpdates ? searchDocuments : searchDocumentsToLoad}
+        queryKey={liveUpdates ? documentsKey : undefined}
+        setLoading={liveUpdates ? setLoadingDocuments : undefined}
         searchPaginationInput={searchPaginationInput}
         setContent={setDocuments}
         entityPrefix="document"
@@ -259,7 +274,7 @@ const Documents = () => {
             )}
           />
         </ListItem>
-        {(loadingDocuments || loadingExercisesAndScenarios)
+        {(loadingDocuments || (loadingExercisesAndScenarios && !(liveUpdates && namesLoadedOnce.current)))
           ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
           : documents.map((document) => {
               const displayedExercises = document.document_exercises?.slice(0, 3) ?? [];
@@ -271,8 +286,10 @@ const Documents = () => {
                   secondaryAction={(
                     <DocumentPopover
                       document={document}
-                      onUpdate={(result: Document) => setDocuments(documents.map(d => (d.document_id !== result.document_id ? d : result)))}
-                      onDelete={(result: string) => {
+                      onUpdate={liveUpdates
+                        ? invalidateComponents
+                        : (result: Document) => setDocuments(documents.map(d => (d.document_id !== result.document_id ? d : result)))}
+                      onDelete={liveUpdates ? invalidateComponents : (result: string) => {
                         setDocuments(documents.filter(d => (d.document_id !== result)));
                         queryableHelpers.paginationHelpers.incrementTotalElements(-1);
                       }}

@@ -1,3 +1,4 @@
+import { type QueryKey } from '@tanstack/react-query';
 import { type AxiosResponse } from 'axios';
 import { createContext } from 'react';
 
@@ -46,6 +47,11 @@ export interface CustomDashboardContextType {
 
   // Grid ready state for loader coordination
   setGridReady: (ready: boolean) => void;
+
+  // Given a scope (a key under ANALYTICS_KEY, see dashboardQueries), every widget fetches its data
+  // through the query cache under it, so stream invalidations refetch it. Absent, widgets fetch
+  // on their own as before.
+  widgetQueryScope?: QueryKey;
 }
 
 export const CustomDashboardContext = createContext<CustomDashboardContextType>({

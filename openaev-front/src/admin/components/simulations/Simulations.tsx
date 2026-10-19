@@ -13,6 +13,9 @@ import { type ExerciseSimple, type SearchPaginationInput } from '../../../utils/
 import useEntityToggle from '../../../utils/hooks/useEntityToggle';
 import { Can, useAbility } from '../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
+import { SIMULATIONS_LIST_KEY } from '../../../utils/query/keys';
+import queryClient from '../../../utils/query/queryClient';
+import { isFeatureEnabled } from '../../../utils/utils';
 import useAutonomousRunsIndex from '../autonomous/useAutonomousRunsIndex';
 import ToolBar from '../common/ToolBar';
 import ImportUploaderExercise from './ImportUploaderExercise';
@@ -31,6 +34,15 @@ const Simulations = () => {
   // an AI-driven simulation is observe-only, so its overflow exposes only a read-only Export
   // (deletion tears the run down and is a parent-scenario control).
   const autonomousRuns = useAutonomousRunsIndex();
+  // With live updates on, the list is a query that stream invalidations refetch.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const refresh = () => {
+    if (liveUpdates) {
+      queryClient.invalidateQueries({ queryKey: SIMULATIONS_LIST_KEY });
+    } else {
+      setReloadCount(count => count + 1);
+    }
+  };
 
   // Filters
   const availableFilterNames = [
@@ -76,7 +88,7 @@ const Simulations = () => {
         // @ts-expect-error: should pass Exercise model IF we have update as action
         exercise={exercise}
         actions={exerciseActions}
-        onDelete={result => setExercises(exercises.filter(e => (e.exercise_id !== result)))}
+        onDelete={liveUpdates ? refresh : result => setExercises(exercises.filter(e => (e.exercise_id !== result)))}
         inList
       />
     );
@@ -119,6 +131,11 @@ const Simulations = () => {
       exercise_ids_to_process: selectAll ? undefined : Object.keys(selectedElements),
       exercise_ids_to_ignore: Object.keys(deSelectedElements),
     }).then((result) => {
+      if (liveUpdates) {
+        handleClearSelectedElements();
+        refresh();
+        return;
+      }
       const deletedIds: string[] = result.data ?? [];
       const newTotal = Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - deletedIds.length);
       setExercises(exercises.filter(e => !deletedIds.includes(e.exercise_id)));
@@ -137,7 +154,9 @@ const Simulations = () => {
         }]}
       />
       <PaginationComponentV2
-        fetch={search}
+        fetch={liveUpdates ? searchExercises : search}
+        queryKey={liveUpdates ? SIMULATIONS_LIST_KEY : undefined}
+        setLoading={liveUpdates ? setLoading : undefined}
         reloadContentCount={reloadCount}
         searchPaginationInput={searchPaginationInput}
         setContent={setExercises}
@@ -164,7 +183,7 @@ const Simulations = () => {
                 exportProps={exportProps}
               />
               <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSESSMENT}>
-                <ImportUploaderExercise refresh={() => setReloadCount(count => count + 1)} />
+                <ImportUploaderExercise refresh={refresh} />
               </Can>
             </Box>
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSESSMENT}>
@@ -178,6 +197,8 @@ const Simulations = () => {
         queryableHelpers={queryableHelpers}
         secondaryAction={secondaryAction}
         loading={loading}
+        // The search already carries the scores of the page; the key only skips the extra fetch.
+        globalScoresQueryKey={liveUpdates ? SIMULATIONS_LIST_KEY : undefined}
         entityToggle={canManage ? entityToggle : undefined}
         toolBar={(
           <ToolBar

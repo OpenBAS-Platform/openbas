@@ -2,17 +2,15 @@ import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { type FunctionComponent } from 'react';
 
-import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { type TeamsHelper } from '../../../../../actions/teams/team-helper';
 import Chart from '../../../../../components/Chart';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import { type Exercise, type Team } from '../../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import SamplePreview from '../../../workspaces/custom_dashboards/widgets/viz/sample/SamplePreview';
 import { computeTeamsColors } from '../overview/DistributionUtils';
+import useSimulationStoreData from '../simulationStoreQueries';
 import { sampleMailsByTeam } from './mailsSampleData';
 
 interface Props { exerciseId: Exercise['exercise_id'] }
@@ -20,14 +18,11 @@ interface Props { exerciseId: Exercise['exercise_id'] }
 const MailDistributionByTeam: FunctionComponent<Props> = ({ exerciseId }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   const theme = useTheme();
 
   // Fetching data
   const { teams } = useHelper((helper: TeamsHelper) => ({ teams: helper.getTeams() }));
-  useDataLoader(() => {
-    dispatch(fetchExerciseTeams(exerciseId));
-  });
+  useSimulationStoreData(exerciseId, ['teams']);
 
   const teamsColors = computeTeamsColors(teams, theme);
   const sortedTeamsByCommunicationNumber = R.pipe(

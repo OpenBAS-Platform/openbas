@@ -1,5 +1,5 @@
 import { type Theme } from '@mui/material/styles';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { adHocSeries } from '../../../actions/dashboards/dashboard-action';
 import { generateFilterId } from '../../../components/common/queryable/filter/FilterUtils';
@@ -55,10 +55,13 @@ const bucketTotals = (series: EsSeries[] | null, name: string): Record<string, n
  * @param scopeField ES side field carrying the scope (e.g. `base_asset_side`,
  *                   `base_asset_group_side`).
  * @param entityIds  The ids of the currently displayed page.
+ * @param version    Optional: a change refetches the scores and keeps the
+ *                   current ones on screen until it answers.
  */
 const usePostureScores = (
   scopeField: string,
   entityIds: string[],
+  version?: number,
 ): {
   loading: boolean;
   scores: Record<string, PostureScoreEntry>;
@@ -67,14 +70,20 @@ const usePostureScores = (
 
   // Stable dependency: the ids array is rebuilt on every render by callers.
   const idsKey = entityIds.join(',');
+  const scopeRef = useRef<string | null>(null);
 
   useEffect(() => {
     const ids = idsKey ? idsKey.split(',') : [];
+    const scope = `${scopeField}|${idsKey}`;
+    const scopeChanged = scopeRef.current !== scope;
+    scopeRef.current = scope;
     if (ids.length === 0) {
       setSeries([]);
       return undefined;
     }
-    setSeries(null);
+    if (scopeChanged) {
+      setSeries(null);
+    }
     const expectation = (status: string) => group(
       filter('base_entity', ['expectation-inject']),
       filter(scopeField, ids),
@@ -107,7 +116,7 @@ const usePostureScores = (
     return () => {
       cancelled = true;
     };
-  }, [scopeField, idsKey]);
+  }, [scopeField, idsKey, version]);
 
   const scores = useMemo(() => {
     const successMap = bucketTotals(series, 'SUCCESS');

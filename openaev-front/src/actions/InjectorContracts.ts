@@ -31,10 +31,10 @@ export const fetchInjectorsContracts = () => (dispatch: Dispatch) => {
   return getReferential(schema.arrayOfInjectorContracts, `${INJECTOR_CONTRACT_URI}`)(dispatch);
 };
 
-export const searchInjectorContracts = (paginationInput: InjectorContractSearchPaginationInput) => {
+export const searchInjectorContracts = (paginationInput: InjectorContractSearchPaginationInput, notifyError = true) => {
   const data = paginationInput;
   const uri = `${INJECTOR_CONTRACT_URI}/search`;
-  return simplePostCall(uri, data);
+  return simplePostCall(uri, data, undefined, notifyError);
 };
 
 // Platform + kill-chain-phase + status counts for the current filters, so the

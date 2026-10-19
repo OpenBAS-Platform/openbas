@@ -28,6 +28,8 @@ public interface AssetGroupRepository
   // inspector scopes the statement on top of it; the two agree.
   Optional<AssetGroup> findByIdAndTenantId(@NotNull String id, @NotNull String tenantId);
 
+  boolean existsByIdAndTenantId(@NotNull String id, @NotNull String tenantId);
+
   Optional<AssetGroup> findByExternalReferenceAndTenantId(
       String externalReference, String tenantId);
 

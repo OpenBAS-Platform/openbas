@@ -1,4 +1,5 @@
 import { Alert, AlertTitle } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
 import { type FunctionComponent, lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useParams } from 'react-router';
 
@@ -17,6 +18,8 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { INHERITED_CONTEXT } from '../../../../utils/permissions/types';
 import useSimulationPermissions from '../../../../utils/permissions/useSimulationPermissions';
+import { isClientError } from '../../../../utils/query/queryErrors';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import { AutonomousContext } from '../../autonomous/AutonomousContext';
 import AutonomousOverview from '../../autonomous/AutonomousOverview';
 import AutonomousReasoningPanel from '../../autonomous/AutonomousReasoningPanel';
@@ -25,6 +28,7 @@ import useAutonomousPanelWidth from '../../autonomous/useAutonomousPanelWidth';
 import useAutonomousRunForSimulation from '../../autonomous/useAutonomousRunForSimulation';
 import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../common/Context';
 import injectContextForExercise from './ExerciseContext';
+import { simulationEntityKey, simulationParentScenarioKey } from './simulationQueries';
 import SimulationShell from './SimulationShell';
 
 const Simulation = lazy(() => import('./overview/SimulationComponent'));
@@ -205,19 +209,41 @@ const Index = () => {
     exerciseId,
     exercise?.exercise_autonomous === true ? true : undefined,
   );
+  // With live updates on, the simulation is a query that the topic 'simulation:<id>' refetches.
+  // Tabs keep reading it from the store, which the query fills.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const exerciseQuery = useQuery({
+    queryKey: simulationEntityKey(exerciseId),
+    queryFn: () => dispatch(fetchExercise(exerciseId)).then(() => null),
+    enabled: liveUpdates,
+    // fetchExercise shows its own error toast: no retry, so one toast per failed load.
+    retry: false,
+  });
+  const parentScenarioId = exercise?.exercise_scenario as string | undefined;
+  const parentScenarioQuery = useQuery({
+    queryKey: simulationParentScenarioKey(exerciseId),
+    queryFn: () => dispatch(fetchScenarioFromSimulation(exerciseId)).then(() => null),
+    enabled: liveUpdates && !!parentScenarioId,
+    retry: false,
+  });
+  // The data loader also keeps the legacy stream open, which still pushes entity changes into
+  // the store; with live updates on, it loads nothing itself.
   useDataLoader(() => {
+    if (liveUpdates) {
+      return;
+    }
     setLoading(true);
     dispatch(fetchExercise(exerciseId)).finally(() => {
       setLoading(false);
     });
-  }, [exerciseId]);
+  }, [exerciseId, liveUpdates]);
 
   // Fetch the scenario only once per simulation id: the exercise object gets a
   // new identity on every Redux update (e.g. SSE), which used to re-trigger
   // this effect and re-fetch the scenario redundantly.
   const scenarioRequestedForRef = useRef<ExerciseType['exercise_id'] | undefined>(undefined);
   useEffect(() => {
-    if (!exercise) return;
+    if (liveUpdates || !exercise) return;
     if (scenarioRequestedForRef.current === exercise.exercise_id) return;
     scenarioRequestedForRef.current = exercise.exercise_id;
     setLoading(true);
@@ -231,15 +257,24 @@ const Index = () => {
           setLoading(false);
         });
     }
-  }, [exercise, dispatch]);
+  }, [exercise, dispatch, liveUpdates]);
 
   const exerciseInjectContext = injectContextForExercise(exercise);
 
-  // avoid to show loader if something trigger useDataLoader
-  if ((pristine && loading) || !autonomousResolved) {
+  // Loader until the CURRENT simulation (and its parent scenario) has loaded; later refetches keep
+  // the screen. The legacy path avoids showing the loader if something triggers useDataLoader.
+  const exerciseLoading = liveUpdates
+    ? exerciseQuery.isPending || (!!parentScenarioId && parentScenarioQuery.isPending)
+    : pristine && loading;
+  if (exerciseLoading || !autonomousResolved) {
     return <Loader />;
   }
-  if (!loading && !exercise) {
+  // Deleted or no longer visible while on screen: the store still holds the simulation, so the
+  // query's 4xx shows the same warning as a first load.
+  const unavailable = liveUpdates
+    ? isClientError(exerciseQuery.error) || !exercise
+    : !loading && !exercise;
+  if (unavailable) {
     return (
       <Alert severity="warning">
         <AlertTitle>{t('Warning')}</AlertTitle>

@@ -13,4 +13,6 @@ public interface CredentialSecretReferenceRepository
 
   @Query("select count(sr) from CredentialSecretReference sr")
   long globalCount();
+
+  boolean existsByIdAndTenantId(String id, String tenantId);
 }

@@ -1,17 +1,17 @@
 import { useContext } from 'react';
 import { useParams } from 'react-router';
 
-import { addVariableForScenario, deleteVariableForScenario, fetchVariablesForScenario, updateVariableForScenario } from '../../../../../actions/variables/variable-actions';
+import { addVariableForScenario, deleteVariableForScenario, updateVariableForScenario } from '../../../../../actions/variables/variable-actions';
 import { type VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import { type Scenario, type Variable, type VariableInput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import ConfigurationSection from '../../../common/ConfigurationSection';
 import { PermissionsContext, VariableContext, type VariableContextType } from '../../../common/Context';
 import CreateVariable from '../../../components/variables/CreateVariable';
 import Variables from '../../../components/variables/Variables';
+import useScenarioStoreData from '../scenarioStoreQueries';
 
 const ScenarioVariables = () => {
   // Standard hooks
@@ -22,9 +22,7 @@ const ScenarioVariables = () => {
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
   const { permissions } = useContext(PermissionsContext);
   const { variables } = useHelper((helper: VariablesHelper) => ({ variables: helper.getScenarioVariables(scenarioId) }));
-  useDataLoader(() => {
-    dispatch(fetchVariablesForScenario(scenarioId));
-  });
+  useScenarioStoreData(scenarioId, ['variables']);
 
   const context: VariableContextType = {
     onCreateVariable: (data: VariableInput) => dispatch(addVariableForScenario(scenarioId, data)),

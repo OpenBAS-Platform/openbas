@@ -11,3 +11,7 @@ export const TIMEOUT = 20_000;
  * Linux image (#8507).
  */
 export const WEBKIT_PAGE_LOAD_TIMEOUT = 60_000;
+
+// The built-in manual injector contract (ManualContract.MANUAL_DEFAULT on the backend): present on
+// every platform, it needs no injector, target or content.
+export const MANUAL_INJECTOR_CONTRACT_ID = 'd02e9132-b9d0-4daa-b3b1-4b9871f8472c';

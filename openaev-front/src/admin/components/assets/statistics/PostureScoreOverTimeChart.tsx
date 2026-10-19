@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { type FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 
 import { adHocSeries } from '../../../../actions/dashboards/dashboard-action';
 import Chart from '../../../../components/Chart';
@@ -32,6 +32,8 @@ interface Props {
   /** `eq` for single-value side fields (default), `contains` for set fields. */
   scopeOperator?: Filter['operator'];
   height?: number;
+  /** Optional: a change refetches the trend and keeps the current chart until it answers. */
+  version?: number;
 }
 
 /**
@@ -41,14 +43,19 @@ interface Props {
  * the security platform, asset and asset group detail pages. Shows greyed-out
  * sample data (platform-wide convention) until real validations exist.
  */
-const PostureScoreOverTimeChart: FunctionComponent<Props> = ({ scopeField, entityId, scopeOperator = 'eq', height = 280 }) => {
+const PostureScoreOverTimeChart: FunctionComponent<Props> = ({ scopeField, entityId, scopeOperator = 'eq', height = 280, version }) => {
   const { t, nsdt } = useFormatter();
   const theme = useTheme();
 
   const [trend, setTrend] = useState<EsSeries[] | null>(null);
+  const scopeRef = useRef<string | null>(null);
 
   useEffect(() => {
-    setTrend(null);
+    const scope = `${scopeField}|${entityId}|${scopeOperator}`;
+    if (scopeRef.current !== scope) {
+      scopeRef.current = scope;
+      setTrend(null);
+    }
     const expectation = (extra: Filter[]) => group(
       filter('base_entity', ['expectation-inject']),
       filter(scopeField, [entityId], scopeOperator),
@@ -86,7 +93,7 @@ const PostureScoreOverTimeChart: FunctionComponent<Props> = ({ scopeField, entit
     return () => {
       cancelled = true;
     };
-  }, [scopeField, entityId, scopeOperator]);
+  }, [scopeField, entityId, scopeOperator, version]);
 
   const trendSeries = useMemo(() => {
     if (!trend) return [];

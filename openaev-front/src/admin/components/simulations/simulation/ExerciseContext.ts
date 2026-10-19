@@ -26,18 +26,33 @@ import {
   type SearchPaginationInput,
 } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { isFeatureEnabled } from '../../../../utils/utils';
+import { invalidateSimulation } from './simulationQueries';
 
 const injectContextForExercise = (exercise: Exercise) => {
   const dispatch = useAppDispatch();
   const [injects, setInjects] = useState<InjectOutputType[]>([]);
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+
+  // An import adds injects and may add teams: reload them and the simulation. With live updates
+  // on, invalidating the simulation refetches the simulation and the header loaders at once.
+  const refreshAfterImport = () => {
+    dispatch(fetchExerciseInjects(exercise.exercise_id));
+    if (liveUpdates) {
+      invalidateSimulation(exercise.exercise_id);
+    } else {
+      dispatch(fetchExercise(exercise.exercise_id));
+      dispatch(fetchExerciseTeams(exercise.exercise_id));
+    }
+  };
 
   // This object is the value of InjectContext.Provider wrapping the whole simulation
   // area: keep its identity stable so consumers don't re-render on unrelated updates.
   return useMemo(() => ({
     injects,
     setInjects,
-    searchInjects(input: SearchPaginationInput): Promise<{ data: Page<InjectOutputType> }> {
-      return searchExerciseInjectsSimple(exercise.exercise_id, input);
+    searchInjects(input: SearchPaginationInput, notifyError?: boolean): Promise<{ data: Page<InjectOutputType> }> {
+      return searchExerciseInjectsSimple(exercise.exercise_id, input, notifyError);
     },
     onAddInject(inject: Inject): Promise<{
       result: string;
@@ -83,17 +98,13 @@ const injectContextForExercise = (exercise: Exercise) => {
     },
     onImportInjectFromJson(file: File): Promise<void> {
       return importInjectsForSimulation(exercise.exercise_id, file).then(response => new Promise((resolve, _reject) => {
-        dispatch(fetchExerciseInjects(exercise.exercise_id));
-        dispatch(fetchExercise(exercise.exercise_id));
-        dispatch(fetchExerciseTeams(exercise.exercise_id));
+        refreshAfterImport();
         resolve(response.data);
       }));
     },
     onImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
       return importXlsForExercise(exercise.exercise_id, importId, input).then(response => new Promise((resolve, _reject) => {
-        dispatch(fetchExerciseInjects(exercise.exercise_id));
-        dispatch(fetchExercise(exercise.exercise_id));
-        dispatch(fetchExerciseTeams(exercise.exercise_id));
+        refreshAfterImport();
         resolve(response.data);
       }));
     },
@@ -112,7 +123,7 @@ const injectContextForExercise = (exercise: Exercise) => {
         data: result.data,
       }));
     },
-  }), [dispatch, injects, exercise?.exercise_id]);
+  }), [dispatch, injects, exercise?.exercise_id, liveUpdates]);
 };
 
 export default injectContextForExercise;

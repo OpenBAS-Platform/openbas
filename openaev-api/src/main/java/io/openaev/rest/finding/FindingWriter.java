@@ -1,8 +1,10 @@
 package io.openaev.rest.finding;
 
 import io.openaev.context.TxCtx;
+import io.openaev.database.audit.FindingWrittenEvent;
 import io.openaev.database.repository.FindingRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FindingWriter {
 
   private final FindingRepository findingRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void saveCompleteFinding(
@@ -76,5 +79,7 @@ public class FindingWriter {
     }
     findingRepository.insertFindingAsset(findingId, assetId);
     findingRepository.insertFindingTags(findingId, tagIds);
+    // The native writes above fire no entity event: announce the finding for live screens.
+    eventPublisher.publishEvent(new FindingWrittenEvent(tenantId, findingId, injectId, assetId));
   }
 }

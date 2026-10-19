@@ -11,6 +11,7 @@ import { type Widget } from '../../../../../utils/api-types';
 import { type WidgetInputWithoutLayout } from '../../../../../utils/api-types-custom';
 import { useAbility } from '../../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../../utils/permissions/types';
+import { invalidateDashboard } from '../dashboardQueries';
 import WidgetForm from './configuration/WidgetForm';
 
 interface Props {
@@ -55,7 +56,9 @@ const WidgetPopover: FunctionComponent<Props> = ({
   const handleOpenDelete = () => setOpenDelete(true);
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    deleteCustomDashboardWidget(customDashboardId, widget.widget_id);
+    deleteCustomDashboardWidget(customDashboardId, widget.widget_id).then(() => invalidateDashboard(customDashboardId)).catch(() => {
+      // The API layer already notified the user.
+    });
     if (onDelete) {
       onDelete(widget.widget_id);
     }

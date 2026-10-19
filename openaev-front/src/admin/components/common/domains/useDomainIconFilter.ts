@@ -22,6 +22,8 @@ interface UseDomainIconFilterParams {
   queryableHelpers?: QueryableHelpers;
   domainFilterKey?: string;
   apiPrefix?: string;
+  // Reloads the counts when it changes (live updates), with the same input.
+  reloadVersion?: number;
 }
 
 interface UseDomainIconFilterResult {
@@ -37,6 +39,7 @@ const useDomainIconFilter = ({
   queryableHelpers,
   domainFilterKey = DEFAULT_DOMAIN_FILTER_KEY,
   apiPrefix = 'injector_contracts',
+  reloadVersion,
 }: UseDomainIconFilterParams): UseDomainIconFilterResult => {
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
   const [domainCounts, setDomainCounts] = useState<Record<string, number>>({});
@@ -97,7 +100,7 @@ const useDomainIconFilter = ({
           notifyErrorHandler(error as APIError);
         });
     }
-  }, [searchPaginationInput]);
+  }, [searchPaginationInput, reloadVersion]);
 
   useEffect(() => {
     const domainFilter = searchPaginationInput?.filterGroup?.filters?.find(

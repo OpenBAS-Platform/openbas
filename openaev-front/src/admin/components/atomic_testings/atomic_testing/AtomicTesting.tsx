@@ -11,7 +11,10 @@ import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { type InjectTarget, type SearchPaginationInput } from '../../../../utils/api-types';
+import { atomicTestingKey } from '../../../../utils/query/keys';
+import useNotifiedQuery, { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../utils/query/useNotifiedQuery';
 import { isAgentless } from '../../../../utils/target/TargetUtils';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import PaginatedTargetTab from './PaginatedTargetTab';
 import TargetResultsDetail from './target_result/TargetResultsDetail';
@@ -69,6 +72,26 @@ const storeTargetTab = (injectId: string, targetType: string) => {
   window.localStorage.setItem(targetTabStorageKey(injectId), targetType);
 };
 
+const TARGET_TYPES = ['ASSETS_GROUPS', 'ASSETS', 'TEAMS', 'PLAYERS', 'AGENT', 'AI_TARGETS'] as const;
+type TargetTypePresence = Record<typeof TARGET_TYPES[number], boolean>;
+
+// Which target types the inject has, one single-row search per type. A failed probe counts as
+// absent (its error toast is shown by the call), as in the state-based path below.
+const fetchTargetTypePresence = async (injectId: string): Promise<TargetTypePresence> => {
+  const probeInput: SearchPaginationInput = {
+    filterGroup: {
+      mode: 'and',
+      filters: [],
+    },
+    size: 1,
+    page: 0,
+  };
+  const presences = await Promise.all(TARGET_TYPES.map(targetType => searchTargets(injectId, targetType, probeInput)
+    .then(response => response.data.content.length > 0)
+    .catch(() => false)));
+  return Object.fromEntries(TARGET_TYPES.map((targetType, index) => [targetType, presences[index]])) as TargetTypePresence;
+};
+
 const AtomicTesting = () => {
   // Standard hooks
   const { classes } = useStyles();
@@ -99,6 +122,9 @@ const AtomicTesting = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const targetType = searchParams.get('target');
   const injectId = injectResultOverviewOutput?.inject_id || '';
+  // With live updates on, the target-type probes are a query under the atomic testing key: the
+  // stream invalidation refetches them, instead of each refresh of the overview.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   const navigateToTab = (tab: TabConfig | undefined) => {
     setActiveTab(tab);
@@ -208,8 +234,41 @@ const AtomicTesting = () => {
     return activeTab?.key || 0;
   }, [activeTab]);
 
+  const { data: targetTypePresence } = useNotifiedQuery({
+    queryKey: [...atomicTestingKey(injectId), 'target-types'],
+    queryFn: () => fetchTargetTypePresence(injectId),
+    enabled: liveUpdates && !!injectId,
+    refetchInterval: FALLBACK_REFETCH_INTERVAL_MS,
+  });
+
   useEffect(() => {
-    if (!injectResultOverviewOutput) return;
+    if (!targetTypePresence) return;
+    setHasAssetsGroup(targetTypePresence.ASSETS_GROUPS);
+    setHasEndpoints(targetTypePresence.ASSETS);
+    setHasTeams(targetTypePresence.TEAMS);
+    setHasPlayers(targetTypePresence.PLAYERS);
+    setHasAgents(targetTypePresence.AGENT);
+    setHasAiTargets(targetTypePresence.AI_TARGETS);
+    setHasAssetsGroupChecked(true);
+    setHasEndpointsChecked(true);
+    setHasTeamsChecked(true);
+    setHasPlayersChecked(true);
+    setHasAgentsChecked(true);
+    setHasAiTargetsChecked(true);
+  }, [targetTypePresence]);
+
+  // A refetched page carries new copies of the targets: keep the selection on the fresh copy so
+  // its header (statuses, results) follows the live data.
+  useEffect(() => {
+    if (!liveUpdates || !selectedTarget) return;
+    const freshTarget = pageTargets.find(target => target.target_id === selectedTarget.target_id);
+    if (freshTarget && freshTarget !== selectedTarget) {
+      setSelectedTarget(freshTarget);
+    }
+  }, [pageTargets]);
+
+  useEffect(() => {
+    if (!injectResultOverviewOutput || liveUpdates) return;
 
     const searchPaginationInput1Result: SearchPaginationInput = {
       filterGroup: {

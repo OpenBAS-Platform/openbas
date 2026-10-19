@@ -5,6 +5,7 @@ import ReactGridLayout, { type Layout, type LayoutItem } from 'react-grid-layout
 import { updateCustomDashboardWidgetLayout } from '../../../../actions/custom_dashboards/customdashboardwidget-action';
 import { type Widget, type WidgetLayout } from '../../../../utils/api-types';
 import { CustomDashboardContext } from './CustomDashboardContext';
+import { invalidateDashboard } from './dashboardQueries';
 import WidgetWrapper from './widgets/WidgetWrapper';
 
 interface LazyWidgetProps { children: ReactNode }
@@ -183,11 +184,14 @@ const CustomDashboardReactLayout: FunctionComponent<{
 
     // Only make API calls for changed layouts (don't update React state to avoid re-renders)
     if (changedLayouts.length > 0) {
+      const dashboardId = customDashboard.custom_dashboard_id;
       Promise.all(
         changedLayouts.map(layout =>
-          updateCustomDashboardWidgetLayout(customDashboard.custom_dashboard_id, layout.i, layoutMap.get(layout.i)!),
+          updateCustomDashboardWidgetLayout(dashboardId, layout.i, layoutMap.get(layout.i)!),
         ),
-      );
+      ).then(() => invalidateDashboard(dashboardId)).catch(() => {
+        // The API layer already notified the user.
+      });
     }
   };
 

@@ -37,8 +37,8 @@ const LANDING_PAGES_URI = '/api/phishing/landing-pages';
 export const fetchPhishingLandingPages = () => (dispatch: Dispatch) => {
   return getReferential(arrayOfPhishingLandingPages, LANDING_PAGES_URI)(dispatch);
 };
-export const searchPhishingLandingPages = (input: SearchPaginationInput) => {
-  return simplePostCall(`${LANDING_PAGES_URI}/search`, input);
+export const searchPhishingLandingPages = (input: SearchPaginationInput, notifyError: boolean = true) => {
+  return simplePostCall(`${LANDING_PAGES_URI}/search`, input, undefined, notifyError);
 };
 export const bulkDeletePhishingLandingPages = (input: PhishingLandingPageBulkProcessingInput) => {
   return simpleDelCall(LANDING_PAGES_URI, { data: input });
@@ -69,8 +69,8 @@ const EMAIL_TEMPLATES_URI = '/api/phishing/email-templates';
 export const fetchPhishingEmailTemplates = () => (dispatch: Dispatch) => {
   return getReferential(arrayOfPhishingEmailTemplates, EMAIL_TEMPLATES_URI)(dispatch);
 };
-export const searchPhishingEmailTemplates = (input: SearchPaginationInput) => {
-  return simplePostCall(`${EMAIL_TEMPLATES_URI}/search`, input);
+export const searchPhishingEmailTemplates = (input: SearchPaginationInput, notifyError: boolean = true) => {
+  return simplePostCall(`${EMAIL_TEMPLATES_URI}/search`, input, undefined, notifyError);
 };
 export const bulkDeletePhishingEmailTemplates = (input: PhishingEmailTemplateBulkProcessingInput) => {
   return simpleDelCall(EMAIL_TEMPLATES_URI, { data: input });

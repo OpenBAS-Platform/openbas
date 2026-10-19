@@ -9,6 +9,7 @@ import { type Reporting, type ReportingInput, type ReportingScheduleInput } from
 import { useAbility } from '../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
 import ReportingForm from './form/ReportingForm';
+import { invalidateReportsList } from './reportingQueries';
 
 /**
  * "Create report" button + wizard drawer of the reports list page. On success
@@ -31,6 +32,8 @@ const ReportingCreation: FunctionComponent = () => {
           if (schedule) {
             await createReportingSchedule(created.reporting_id, schedule);
           }
+          // Live lists (query mode) refetch; without live updates no query has this key.
+          invalidateReportsList();
           navigate(`/admin/reporting/${created.reporting_id}`);
         }
       } finally {

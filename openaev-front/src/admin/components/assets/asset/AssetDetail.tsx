@@ -37,6 +37,8 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useMarkingDefinitions from '../../../../utils/hooks/useMarkingDefinitions';
 import useSearchTotal from '../../../../utils/hooks/useSearchTotal';
+import { isClientError, retryUnlessClientError } from '../../../../utils/query/queryErrors';
+import useNotifiedQuery, { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../utils/query/useNotifiedQuery';
 import { emptyFilled, formatIp, formatMacAddress } from '../../../../utils/String';
 import { isFeatureEnabled } from '../../../../utils/utils';
 import InjectResultList from '../../atomic_testings/InjectResultList';
@@ -45,6 +47,15 @@ import FindingList from '../../findings/FindingList';
 import EntityReportsPanel from '../../reporting/EntityReportsPanel';
 import { humanizeEnum } from '../asset-categories';
 import AssetCategoryIcon from '../AssetCategoryIcon';
+import {
+  assetExpectationsKey,
+  assetFindingsKey,
+  assetInjectsKey,
+  assetOverviewKey,
+  assetVersionKey,
+  invalidateAsset,
+  useQueryVersion,
+} from '../assetQueries';
 import AssetPopover, { type AssetPopoverProps } from '../endpoints/AssetPopover';
 import AgentList from '../endpoints/endpoint/AgentList';
 import ExpectationList from '../ExpectationList';
@@ -79,20 +90,45 @@ const AssetDetail = () => {
   };
   const id = assetId ?? endpointId ?? '';
 
-  const [asset, setAsset] = useState<AssetOverview | null>(null);
-  const [loading, setLoading] = useState(true);
+  // With live updates on, every query of the screen starts with assetKey(id): the topic
+  // 'asset:<id>' refetches the overview, the findings, the injects played, the expectations and
+  // the dashboard-engine figures together.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+
+  const [legacyAsset, setLegacyAsset] = useState<AssetOverview | null>(null);
+  const [legacyLoading, setLegacyLoading] = useState(true);
 
   const loadAsset = useCallback(() => {
-    setLoading(true);
+    setLegacyLoading(true);
     fetchAssetOverview(id)
-      .then((result: { data: AssetOverview }) => setAsset(result.data))
-      .catch(() => setAsset(null))
-      .finally(() => setLoading(false));
+      .then((result: { data: AssetOverview }) => setLegacyAsset(result.data))
+      .catch(() => setLegacyAsset(null))
+      .finally(() => setLegacyLoading(false));
   }, [id]);
 
   useEffect(() => {
-    loadAsset();
-  }, [loadAsset]);
+    if (!liveUpdates) {
+      loadAsset();
+    }
+  }, [loadAsset, liveUpdates]);
+
+  // The overview carries the agents and their status. Agent heartbeats may not be announced, so
+  // the fallback interval keeps that status fresh; a failing asset (deleted, rights lost) stops it.
+  const overviewQuery = useNotifiedQuery({
+    queryKey: assetOverviewKey(id),
+    queryFn: () => fetchAssetOverview(id, false).then((result: { data: AssetOverview }) => result.data),
+    retry: retryUnlessClientError,
+    refetchInterval: query => (query.state.status === 'error' ? false : FALLBACK_REFETCH_INTERVAL_MS),
+    enabled: liveUpdates,
+  });
+  // Dashboard-engine figures and hero totals refetch when this version changes.
+  const version = useQueryVersion(assetVersionKey(id), liveUpdates);
+
+  // Deleted or no longer visible while on screen: same warning as on a first load.
+  const liveAsset = isClientError(overviewQuery.error) ? null : overviewQuery.data ?? null;
+  const asset: AssetOverview | null = liveUpdates ? liveAsset : legacyAsset;
+  const loading = liveUpdates ? overviewQuery.isPending : legacyLoading;
+  const refreshAsset = () => (liveUpdates ? invalidateAsset(id) : loadAsset());
 
   // Gates the Markings field (and its data fetch below) so the flag-off platform looks exactly as
   // it does today - mirrors the Endpoints list convention.
@@ -122,8 +158,8 @@ const AssetDetail = () => {
     'asset-injects',
     buildSearchPagination({ sorts: initSorting('inject_updated_at', 'DESC') }),
   );
-  const fetchInjectsPlayed = useCallback((input: SearchPaginationInput): Promise<{ data: Page<InjectResultOutput> }> => {
-    return searchInjectsForAsset(id, input) as Promise<{ data: Page<InjectResultOutput> }>;
+  const fetchInjectsPlayed = useCallback((input: SearchPaginationInput, notifyError?: boolean): Promise<{ data: Page<InjectResultOutput> }> => {
+    return searchInjectsForAsset(id, input, notifyError) as Promise<{ data: Page<InjectResultOutput> }>;
   }, [id]);
 
   // Headline hero counts: size-1 probes of the same searches feeding the lists
@@ -131,9 +167,9 @@ const AssetDetail = () => {
   const findingsTotal = useSearchTotal(useCallback(
     (input: SearchPaginationInput) => searchDistinctFindingsOnEndpoint(id, input),
     [id],
-  ));
-  const injectsTotal = useSearchTotal(fetchInjectsPlayed);
-  const posture = useExpectationPosture('base_asset_side', id);
+  ), version);
+  const injectsTotal = useSearchTotal(fetchInjectsPlayed, version);
+  const posture = useExpectationPosture('base_asset_side', id, 'eq', version);
 
   // Overview keeps the current detail sections; Statistics adds the over-time
   // charts without eating vertical space on the main tab. Tabs are routed
@@ -212,7 +248,7 @@ const AssetDetail = () => {
             <AssetPopover
               endpoint={asset as AssetPopoverProps['endpoint']}
               agentless={!hasAgents}
-              onUpdate={() => loadAsset()}
+              onUpdate={refreshAsset}
               onDelete={() => navigate('/admin/assets')}
             />
           </>
@@ -256,10 +292,10 @@ const AssetDetail = () => {
         // formula as the hero gauge) and the injects-played activity.
         <DetailSections>
           <SectionBlock title={t('Posture score over time')}>
-            <PostureScoreOverTimeChart scopeField="base_asset_side" entityId={id} height={280} />
+            <PostureScoreOverTimeChart scopeField="base_asset_side" entityId={id} height={280} version={version} />
           </SectionBlock>
           <SectionBlock title={t('Injects played over time')}>
-            <InjectsPlayedOverTimeChart scopeField="base_assets_side" entityId={id} height={280} />
+            <InjectsPlayedOverTimeChart scopeField="base_assets_side" entityId={id} height={280} version={version} />
           </SectionBlock>
         </DetailSections>
       )}
@@ -431,6 +467,7 @@ const AssetDetail = () => {
               filterLocalStorageKey="endpoint-findings"
               searchDistinctFindings={(input: SearchPaginationInput) => searchDistinctFindingsOnEndpoint(id, input)}
               contextId={id}
+              queryKey={liveUpdates ? assetFindingsKey(id) : undefined}
             />
           </SectionBlock>
 
@@ -442,6 +479,7 @@ const AssetDetail = () => {
               filterLocalStorageKey="asset-expectations"
               scopeField="base_asset_side"
               entityId={id}
+              queryKey={liveUpdates ? assetExpectationsKey(id) : undefined}
             />
           </SectionBlock>
 
@@ -452,6 +490,7 @@ const AssetDetail = () => {
               queryableHelpers={injectsHelpers}
               searchPaginationInput={injectsInput}
               contextId={id}
+              queryKey={liveUpdates ? assetInjectsKey(id) : undefined}
             />
           </SectionBlock>
         </>

@@ -10110,6 +10110,7 @@ export interface PlatformSettings {
     | "MARKING"
     | "RATE_LIMITING"
     | "BULK_SNAPSHOT_EXPORT"
+    | "STREAM_INVALIDATION"
   )[];
   /** True if the Tanium Executor is enabled */
   executor_tanium_enable?: boolean;
@@ -10497,6 +10498,7 @@ export interface PublicPlatformSettings {
     | "MARKING"
     | "RATE_LIMITING"
     | "BULK_SNAPSHOT_EXPORT"
+    | "STREAM_INVALIDATION"
   )[];
   /** Map of the messages to display on the screen by their level (the level available are DEBUG, INFO, WARN, ERROR, FATAL) */
   platform_banner_by_level?: Record<string, string[]>;

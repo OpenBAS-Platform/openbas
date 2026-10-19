@@ -12,6 +12,9 @@ import { type Scenario as ScenarioType, type ScenarioChallengesReader } from '..
 import { useQueryParameter } from '../../../../../utils/Environment';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useScenarioPermissions from '../../../../../utils/permissions/useScenarioPermissions';
+import { scenarioKey } from '../../../../../utils/query/keys';
+import useStoreQuery from '../../../../../utils/query/useStoreQuery';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import ChallengesPreview from '../../../common/challenges/ChallengesPreview';
 import { PreviewChallengeContext } from '../../../common/Context';
 
@@ -29,9 +32,21 @@ const ScenarioChallengesPreview = () => {
   const permissions = useScenarioPermissions(scenarioId);
   const [userId] = useQueryParameter(['user']);
 
+  // With live updates on, the scenario data of the preview is a store query under the scenario key.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  useStoreQuery(
+    [...scenarioKey(scenarioId), 'challenges-preview', userId],
+    () => Promise.all([
+      dispatch(fetchScenario(scenarioId)),
+      dispatch(fetchScenarioObserverChallenges(scenarioId, userId)),
+      dispatch(fetchScenarioPlayerDocuments(scenarioId, userId)),
+    ]),
+    { enabled: liveUpdates && !!scenarioId },
+  );
+
   useEffect(() => {
     dispatch(fetchMe());
-    if (scenarioId) {
+    if (scenarioId && !liveUpdates) {
       dispatch(fetchScenario(scenarioId));
       dispatch(fetchScenarioObserverChallenges(scenarioId, userId));
       dispatch(fetchScenarioPlayerDocuments(scenarioId, userId));

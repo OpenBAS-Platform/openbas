@@ -164,6 +164,16 @@ public class AssetGroupService {
         .orElseThrow(() -> new ElementNotFoundException("Asset group not found: " + assetGroupId));
   }
 
+  /**
+   * Whether the asset group exists in the given tenant. The tenant is compared in the query, so the
+   * answer does not depend on the tenant scope of the transaction.
+   */
+  @Transactional(readOnly = true)
+  public boolean existsInTenant(@NotBlank final String assetGroupId, final String tenantId) {
+    return tenantId != null
+        && this.assetGroupRepository.existsByIdAndTenantId(assetGroupId, tenantId);
+  }
+
   public Optional<AssetGroup> findByExternalReference(String externalReference, String tenantId) {
     return this.assetGroupRepository.findByExternalReferenceAndTenantId(
         externalReference, tenantId);

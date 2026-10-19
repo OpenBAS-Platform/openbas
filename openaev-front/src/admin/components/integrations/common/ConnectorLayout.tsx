@@ -1,4 +1,5 @@
-import { capitalize } from '@mui/material';
+import { Alert, capitalize } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
 import { useCallback, useContext, useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router';
 
@@ -22,7 +23,11 @@ import type {
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { isClientError } from '../../../../utils/query/queryErrors';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../utils/query/useNotifiedQuery';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import { ConnectorContext, type ConnectorOutput } from './ConnectorContext';
+import { connectorDetailKey, invalidateIntegrations, useXtmComposerReachable } from './integrationsQueries';
 
 export type ConnectorContextLayoutType = {
   connector: ConnectorOutput;
@@ -40,9 +45,50 @@ const ConnectorLayout = () => {
 
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [relatedIds, setRelatedIds] = useState<ConnectorIds>();
-  const [isXtmComposerUp, setIsXtmComposerUp] = useState<boolean>(false);
+  const [legacyLoading, setLoading] = useState<boolean>(true);
+  const [legacyRelatedIds, setRelatedIds] = useState<ConnectorIds>();
+  const [legacyXtmComposerUp, setIsXtmComposerUp] = useState<boolean>(false);
+  // With live updates on, the connector, its catalog entry and its instance stay in the store but
+  // load through one query under the integrations key: the topic 'list:integrations' refreshes
+  // them. Constant for a session.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+
+  // The instance status and the heartbeat may not be announced: the fallback interval keeps them
+  // fresh, and a failing connector (deleted, rights lost) stops it. The actions show their own
+  // error toast, so one attempt only.
+  const detailQuery = useQuery({
+    queryKey: connectorDetailKey(connectorType, connectorId ?? ''),
+    queryFn: async () => {
+      const { data } = await apiRequest.getRelatedIds(connectorId ?? '');
+      if (!data) {
+        return null;
+      }
+      const loads: Promise<unknown>[] = [];
+      if (data.connector_registered) {
+        loads.push(dispatch(apiRequest.fetchSingle(connectorId ?? '')));
+      }
+      if (data.catalog_connector_id) {
+        loads.push(dispatch(fetchConnector(data.catalog_connector_id)));
+      }
+      if (data.connector_instance_id) {
+        loads.push(dispatch(fetchConnectorInstance(data.connector_instance_id)));
+      }
+      await Promise.allSettled(loads);
+      return data;
+    },
+    enabled: liveUpdates && !!connectorId,
+    retry: false,
+    refetchInterval: query => (query.state.status === 'error' ? false : FALLBACK_REFETCH_INTERVAL_MS),
+  });
+  const liveXtmComposerUp = useXtmComposerReachable(liveUpdates);
+
+  const relatedIds = liveUpdates ? detailQuery.data ?? undefined : legacyRelatedIds;
+  // Query mode: only the first load shows the loader, a refetch keeps the page on screen.
+  const loading = liveUpdates ? !!connectorId && detailQuery.isPending : legacyLoading;
+  const isXtmComposerUp = liveUpdates ? liveXtmComposerUp === true : legacyXtmComposerUp;
+  // Deleted or no longer visible while on screen (or on a first load): a warning, as on the other
+  // live detail pages.
+  const unavailable = liveUpdates && isClientError(detailQuery.error);
 
   const getConnectorHelper = () => {
     switch (connectorType) {
@@ -105,9 +151,13 @@ const ConnectorLayout = () => {
     // refetch on every render; both behave correctly when captured once for this layout's lifetime.
   }, [connectorId, apiRequest, dispatch]);
 
+  // The data loader also keeps the legacy stream open; with live updates on, it loads nothing itself.
   useDataLoader(() => {
-    loadConnectorData();
+    if (!liveUpdates) {
+      loadConnectorData();
+    }
   }, [loadConnectorData]);
+  const refreshConnector = liveUpdates ? invalidateIntegrations : loadConnectorData;
 
   // Keep the trail short: "Integrations / <connector>" - the connector-type
   // segment (Injectors / Collectors / Executors) is not a navigable page of
@@ -138,13 +188,16 @@ const ConnectorLayout = () => {
     <>
       <Breadcrumbs variant="list" elements={breadcrumbElements} />
       {loading && <Loader />}
-      {!loading && (
+      {!loading && unavailable && (
+        <Alert severity="warning">{t('This item does not exist or you are not allowed to view it.')}</Alert>
+      )}
+      {!loading && !unavailable && (
         <Outlet context={{
           connector: normalizeSingle(connector),
           catalogConnector,
           instance,
           isXtmComposerUp,
-          refreshConnector: loadConnectorData,
+          refreshConnector,
         }}
         />
       )}

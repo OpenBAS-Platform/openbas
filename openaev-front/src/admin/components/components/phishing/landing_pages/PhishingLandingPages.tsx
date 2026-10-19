@@ -20,7 +20,9 @@ import { type PhishingLandingPage, type SearchPaginationInput } from '../../../.
 import useEntityToggle from '../../../../../utils/hooks/useEntityToggle';
 import { Can, useAbility } from '../../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../../utils/permissions/types';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import ToolBar from '../../../common/ToolBar';
+import { invalidateComponents, phishingLandingPagesKey } from '../../componentsQueries';
 import PhishingLandingPagePopover from './PhishingLandingPagePopover';
 
 const useStyles = makeStyles()(() => ({
@@ -40,6 +42,9 @@ const PhishingLandingPages = () => {
   const { t, nsdt } = useFormatter();
   const navigate = useNavigate();
   const ability = useAbility();
+  // With live updates on, the list is a query under the components key that stream invalidations
+  // refetch; local changes invalidate it too instead of patching the rows.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   // Query param
   const [searchParams] = useSearchParams();
@@ -109,6 +114,11 @@ const PhishingLandingPages = () => {
       landing_page_ids_to_process: selectAll ? undefined : Object.keys(selectedElements),
       landing_page_ids_to_ignore: Object.keys(deSelectedElements),
     }).then((result) => {
+      if (liveUpdates) {
+        handleClearSelectedElements();
+        invalidateComponents();
+        return;
+      }
       const deletedIds: string[] = result.data ?? [];
       const newTotal = Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - deletedIds.length);
       setLandingPages(landingPages.filter(landingPage => !deletedIds.includes(landingPage.phishing_landing_page_id)));
@@ -120,7 +130,9 @@ const PhishingLandingPages = () => {
   return (
     <>
       <PaginationComponentV2
-        fetch={searchLandingPagesToLoad}
+        fetch={liveUpdates ? searchPhishingLandingPages : searchLandingPagesToLoad}
+        queryKey={liveUpdates ? phishingLandingPagesKey : undefined}
+        setLoading={liveUpdates ? setLoading : undefined}
         searchPaginationInput={searchPaginationInput}
         setContent={setLandingPages}
         entityPrefix="phishing_landing_page"
@@ -201,7 +213,7 @@ const PhishingLandingPages = () => {
                     landingPage={landingPage}
                     inList
                     openEditOnInit={landingPage.phishing_landing_page_id === searchId}
-                    onDelete={(result) => {
+                    onDelete={liveUpdates ? invalidateComponents : (result) => {
                       setLandingPages(landingPages.filter(v => v.phishing_landing_page_id !== result));
                       queryableHelpers.paginationHelpers.incrementTotalElements(-1);
                     }}

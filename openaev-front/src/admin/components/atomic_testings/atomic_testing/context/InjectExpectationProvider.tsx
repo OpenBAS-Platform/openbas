@@ -1,4 +1,5 @@
 import { Alert, DialogContentText } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
 import { type ReactNode, useContext, useMemo, useState } from 'react';
 
 import { fetchInjectResultOverviewOutput } from '../../../../../actions/atomic_testings/atomic-testing-actions';
@@ -7,6 +8,8 @@ import DialogDelete from '../../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../../components/i18n';
 import { type InjectExpectationResult, type InjectResultOverviewOutput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
+import { atomicTestingKey } from '../../../../../utils/query/keys';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import type { InjectExpectationsStore } from '../../../common/injects/expectations/Expectation';
 import {
   InjectResultOverviewOutputContext,
@@ -22,6 +25,10 @@ const InjectExpectationProvider = ({ children, inject }: {
 }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
+  // With live updates on, the screen's data lives in the query cache under the atomic testing key.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const atomicTestingQueryKey = liveUpdates ? atomicTestingKey(inject.inject_id) : undefined;
 
   const [openEditResult, setOpenEditResult] = useState<boolean>(false);
   const [selectedResult, setSelectedResult] = useState<InjectExpectationResult | null>(null);
@@ -30,6 +37,21 @@ const InjectExpectationProvider = ({ children, inject }: {
   const [openAlertsDialog, setOpenAlertsDialog] = useState<boolean>(false);
 
   const { updateInjectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
+
+  // After a result is changed: refetch the overview passed down by the screen, and with live updates
+  // on, every query of the screen. The atomic testing screen holds its overview in the query cache,
+  // so invalidating the key covers it; the simulation inject screen keeps it in a state, refreshed
+  // through the context as before.
+  const refreshAfterChange = (): Promise<unknown> => {
+    const refreshOverview = () => fetchInjectResultOverviewOutput(inject.inject_id)
+      .then((result: { data: InjectResultOverviewOutput }) => updateInjectResultOverviewOutput(result.data));
+    if (!atomicTestingQueryKey) {
+      return refreshOverview();
+    }
+    const overviewInCache = queryClient.getQueryData([...atomicTestingQueryKey, 'overview']) !== undefined;
+    const invalidation = queryClient.invalidateQueries({ queryKey: atomicTestingQueryKey });
+    return overviewInCache ? invalidation : Promise.all([invalidation, refreshOverview()]);
+  };
 
   // -- Delete Inject Expectation Result
   const onOpenDeleteInjectExpectationResult = (injectExpectationResult: InjectExpectationResult | null = null, injectExpectationStore: InjectExpectationsStore | null = null) => {
@@ -44,10 +66,7 @@ const InjectExpectationProvider = ({ children, inject }: {
   };
   const onDelete = () => {
     dispatch(deleteInjectExpectationResult(selectedInjectExpectation?.inject_expectation_id ?? '', selectedResult?.sourceId ?? '')).then(() => {
-      fetchInjectResultOverviewOutput(inject.inject_id).then((result: { data: InjectResultOverviewOutput }) => {
-        updateInjectResultOverviewOutput(result.data);
-        onCloseDeleteInjectExpectationResult();
-      });
+      refreshAfterChange().then(() => onCloseDeleteInjectExpectationResult());
     });
   };
 
@@ -63,10 +82,7 @@ const InjectExpectationProvider = ({ children, inject }: {
     setOpenEditResult(false);
   };
   const onUpdateValidation = () => {
-    fetchInjectResultOverviewOutput(inject.inject_id).then((result: { data: InjectResultOverviewOutput }) => {
-      updateInjectResultOverviewOutput(result.data);
-      onCloseEditInjectExpectationResultResult();
-    });
+    refreshAfterChange().then(() => onCloseEditInjectExpectationResultResult());
   };
 
   const onOpenAlertsDialog = (result: InjectExpectationResult | null = null, injectExpectationStore: InjectExpectationsStore | null = null) => {
@@ -100,10 +116,12 @@ const InjectExpectationProvider = ({ children, inject }: {
     onOpenDeleteInjectExpectationResult,
     onOpenEditInjectExpectationResultResult,
     onOpenAlertsDialog,
+    atomicTestingQueryKey,
   }),
   [onOpenDeleteInjectExpectationResult,
     onOpenEditInjectExpectationResultResult,
-    onOpenAlertsDialog]);
+    onOpenAlertsDialog,
+    atomicTestingQueryKey]);
 
   return (
     <InjectExpectationContext.Provider value={contextValue}>
@@ -145,6 +163,7 @@ const InjectExpectationProvider = ({ children, inject }: {
           expectationResult={selectedResult}
           open={openAlertsDialog}
           handleClose={onCloseAlertsDialog}
+          atomicTestingQueryKey={atomicTestingQueryKey}
         />
       )}
     </InjectExpectationContext.Provider>

@@ -19,6 +19,8 @@ public interface CustomDashboardRepository
 
   Optional<CustomDashboard> findByName(@NotBlank final String name);
 
+  boolean existsByIdAndTenantId(@NotBlank String id, @NotBlank String tenantId);
+
   /**
    * Loads the {@code custom_dashboard_widgets} of the given dashboards inside the scoped
    * transaction, for the search endpoint that returns the raw entity: a lazy {@code widgets}

@@ -22,8 +22,11 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { Can, useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import useStoreQuery from '../../../../utils/query/useStoreQuery';
 import useSearchAndFilter from '../../../../utils/SortingFiltering';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import TagsFilter from '../../common/filters/TagsFilter';
+import { challengesKey, loadEvictingDeleted } from '../componentsQueries';
 import ChallengePopover from './ChallengePopover';
 import CreateChallenge from './CreateChallenge';
 
@@ -124,11 +127,24 @@ const Challenges = () => {
     exercisesMap: helper.getExercisesMap(),
     challenges: helper.getChallenges(),
   }));
+  const canAccessDocuments = ability.can(ACTIONS.ACCESS, SUBJECTS.DOCUMENTS);
+  // With live updates on, the challenges and their documents stay in the store but load through a
+  // query under the components key: the topic 'list:components' refreshes them, deleted
+  // challenges included.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  useStoreQuery(challengesKey, () => Promise.all([
+    loadEvictingDeleted(() => dispatch(fetchChallenges()), 'challenges'),
+    canAccessDocuments ? dispatch(fetchDocuments()) : Promise.resolve(),
+  ]), { enabled: liveUpdates });
+  // The data loader also keeps the legacy stream open; with live updates on, it only loads the
+  // simulations referential.
   useDataLoader(() => {
     dispatch(fetchExercises());
-    dispatch(fetchChallenges());
-    if (ability.can(ACTIONS.ACCESS, SUBJECTS.DOCUMENTS)) {
-      dispatch(fetchDocuments());
+    if (!liveUpdates) {
+      dispatch(fetchChallenges());
+      if (canAccessDocuments) {
+        dispatch(fetchDocuments());
+      }
     }
   });
   const sortedChallenges: Challenge[] = filtering.filterAndSort(challenges);

@@ -10,8 +10,11 @@ import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { INHERITED_CONTEXT } from '../../../../../utils/permissions/types';
 import useSimulationPermissions from '../../../../../utils/permissions/useSimulationPermissions';
+import useStoreQuery from '../../../../../utils/query/useStoreQuery';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../../common/Context';
 import injectContextForExercise from '../ExerciseContext';
+import { simulationEntityKey } from '../simulationQueries';
 import SimulationShell from '../SimulationShell';
 import SimulationInjectCreation from './SimulationInjectCreation';
 
@@ -28,8 +31,14 @@ const SimulationInjectCreationRoute: FunctionComponent = () => {
   const dispatch = useAppDispatch();
   const { exerciseId } = useParams() as { exerciseId: ExerciseType['exercise_id'] };
   const { exercise } = useHelper((helper: ExercisesHelper) => ({ exercise: helper.getExercise(exerciseId) as SimulationDetails }));
+  // With live updates on, the simulation is a store query that the topic 'simulation:<id>'
+  // refetches. The data loader also keeps the legacy stream open; it loads nothing itself then.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  useStoreQuery(simulationEntityKey(exerciseId), () => dispatch(fetchExercise(exerciseId)), { enabled: liveUpdates });
   useDataLoader(() => {
-    dispatch(fetchExercise(exerciseId));
+    if (!liveUpdates) {
+      dispatch(fetchExercise(exerciseId));
+    }
   });
 
   const injectContext = injectContextForExercise(exercise);

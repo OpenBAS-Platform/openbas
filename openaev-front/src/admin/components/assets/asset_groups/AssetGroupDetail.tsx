@@ -1,6 +1,7 @@
 import { DevicesOtherOutlined, TrackChangesOutlined } from '@mui/icons-material';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Alert, AlertTitle, Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { useQuery } from '@tanstack/react-query';
 import { Binoculars, SelectGroup } from 'mdi-material-ui';
 import { type CSSProperties, useCallback, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
@@ -33,11 +34,23 @@ import { type AssetOutput, type Filter, type InjectResultOutput, type SearchPagi
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useSearchTotal from '../../../../utils/hooks/useSearchTotal';
+import { isClientError } from '../../../../utils/query/queryErrors';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import InjectResultList from '../../atomic_testings/InjectResultList';
 import injectResultDetailPath from '../../atomic_testings/injectResultUtils';
 import FindingList from '../../findings/FindingList';
 import EntityReportsPanel from '../../reporting/EntityReportsPanel';
 import AssetCategoryIcon from '../AssetCategoryIcon';
+import {
+  assetGroupEntityKey,
+  assetGroupExpectationsKey,
+  assetGroupFindingsKey,
+  assetGroupInjectsKey,
+  assetGroupMembersKey,
+  assetGroupVersionKey,
+  invalidateAssetGroup,
+  useQueryVersion,
+} from '../assetQueries';
 import ExpectationList from '../ExpectationList';
 import PostureScore from '../PostureScore';
 import InjectsPlayedOverTimeChart from '../statistics/InjectsPlayedOverTimeChart';
@@ -78,6 +91,12 @@ const AssetGroupDetail = () => {
   const dispatch = useAppDispatch();
   const bodyItemsStyles = useBodyItemsStyles();
   const { assetGroupId } = useParams() as { assetGroupId: string };
+  // With live updates on, every query of the screen starts with assetGroupKey(id): the topic
+  // 'asset-group:<id>' refetches the group, its members, findings, injects played, expectations
+  // and the dashboard-engine figures together.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  // Dashboard-engine figures and hero totals refetch when this version changes.
+  const version = useQueryVersion(assetGroupVersionKey(assetGroupId), liveUpdates);
 
   // Headline hero counts: size-1 probes of the group-scoped searches feeding the
   // lists below, plus the expectation posture from the dashboard engine. The
@@ -86,12 +105,12 @@ const AssetGroupDetail = () => {
   const injectsTotal = useSearchTotal(useCallback(
     (input: SearchPaginationInput) => searchInjectsForAssetGroup(assetGroupId, input),
     [assetGroupId],
-  ));
+  ), version);
   const findingsTotal = useSearchTotal(useCallback(
     (input: SearchPaginationInput) => searchDistinctFindings(withFilter(input, 'finding_asset_groups', [assetGroupId])),
     [assetGroupId],
-  ));
-  const posture = useExpectationPosture('base_asset_group_side', assetGroupId);
+  ), version);
+  const posture = useExpectationPosture('base_asset_group_side', assetGroupId, 'eq', version);
 
   // Overview keeps the current detail sections; Statistics adds the over-time
   // charts without eating vertical space on the main tab. Tabs are routed
@@ -106,16 +125,30 @@ const AssetGroupDetail = () => {
     buildSearchPagination({ sorts: initSorting('inject_updated_at', 'DESC') }),
   );
   const fetchInjectsPlayed = useCallback(
-    (input: SearchPaginationInput): Promise<{ data: Page<InjectResultOutput> }> =>
-      searchInjectsForAssetGroup(assetGroupId, input) as Promise<{ data: Page<InjectResultOutput> }>,
+    (input: SearchPaginationInput, notifyError?: boolean): Promise<{ data: Page<InjectResultOutput> }> =>
+      searchInjectsForAssetGroup(assetGroupId, input, notifyError) as Promise<{ data: Page<InjectResultOutput> }>,
     [assetGroupId],
   );
 
   // Fetching data
   const { assetGroup } = useHelper((helper: AssetGroupsHelper) => ({ assetGroup: helper.getAssetGroup(assetGroupId) }));
+  // With live updates on, the group is a query that fills the store, read by the popover and the
+  // sections below.
+  const assetGroupQuery = useQuery({
+    queryKey: assetGroupEntityKey(assetGroupId),
+    queryFn: () => dispatch(fetchAssetGroup(assetGroupId)).then(() => null),
+    enabled: liveUpdates,
+    // fetchAssetGroup shows its own error toast: no retry, so one toast per failed load.
+    retry: false,
+  });
+  // The data loader also keeps the legacy stream open, which still pushes entity changes into
+  // the store; with live updates on, it loads nothing itself.
   useDataLoader(() => {
+    if (liveUpdates) {
+      return;
+    }
     dispatch(fetchAssetGroup(assetGroupId));
-  }, [assetGroupId]);
+  }, [assetGroupId, liveUpdates]);
 
   // Member assets pagination
   const [endpoints, setEndpoints] = useState<AssetOutput[]>([]);
@@ -157,6 +190,17 @@ const AssetGroupDetail = () => {
     },
   ];
 
+  // Deleted or no longer visible while on screen: the store may still hold the group, so the
+  // query's 4xx shows the warning too.
+  if (liveUpdates && !assetGroupQuery.isPending && (isClientError(assetGroupQuery.error) || !assetGroup)) {
+    return (
+      <Alert severity="warning">
+        <AlertTitle>{t('Warning')}</AlertTitle>
+        {/* No dedicated translation yet: the asset message covers groups too. */}
+        {t('Asset is currently unavailable or you do not have sufficient permissions to access it.')}
+      </Alert>
+    );
+  }
   if (!assetGroup) {
     return <Loader />;
   }
@@ -206,6 +250,10 @@ const AssetGroupDetail = () => {
               variant="toggle"
               assetGroup={assetGroup}
               onUpdate={() => {
+                if (liveUpdates) {
+                  invalidateAssetGroup(assetGroupId);
+                  return;
+                }
                 dispatch(fetchAssetGroup(assetGroupId));
                 setReloadContentCount(count => count + 1);
               }}
@@ -250,10 +298,10 @@ const AssetGroupDetail = () => {
         // formula as the hero gauge) and the injects-played activity.
         <DetailSections>
           <SectionBlock title={t('Posture score over time')}>
-            <PostureScoreOverTimeChart scopeField="base_asset_group_side" entityId={assetGroupId} height={280} />
+            <PostureScoreOverTimeChart scopeField="base_asset_group_side" entityId={assetGroupId} height={280} version={version} />
           </SectionBlock>
           <SectionBlock title={t('Injects played over time')}>
-            <InjectsPlayedOverTimeChart scopeField="base_asset_groups_side" entityId={assetGroupId} height={280} />
+            <InjectsPlayedOverTimeChart scopeField="base_asset_groups_side" entityId={assetGroupId} height={280} version={version} />
           </SectionBlock>
         </DetailSections>
       )}
@@ -280,7 +328,8 @@ const AssetGroupDetail = () => {
 
           <SectionBlock title={t('Assets')}>
             <PaginationComponentV2
-              fetch={(input: SearchPaginationInput) => searchEndpointsFromAssetGroup(input, assetGroupId)}
+              fetch={(input: SearchPaginationInput, notifyError?: boolean) => searchEndpointsFromAssetGroup(input, assetGroupId, notifyError)}
+              queryKey={liveUpdates ? assetGroupMembersKey(assetGroupId) : undefined}
               searchPaginationInput={searchPaginationInput}
               setContent={setEndpoints}
               entityPrefix="endpoint"
@@ -344,8 +393,9 @@ const AssetGroupDetail = () => {
           <SectionBlock title={t('Findings')}>
             <FindingList
               filterLocalStorageKey="asset-group-findings"
-              searchDistinctFindings={(input: SearchPaginationInput) => searchDistinctFindings(withFilter(input, 'finding_asset_groups', [assetGroupId]))}
+              searchDistinctFindings={(input: SearchPaginationInput, notifyError?: boolean) => searchDistinctFindings(withFilter(input, 'finding_asset_groups', [assetGroupId]), notifyError)}
               contextId={assetGroupId}
+              queryKey={liveUpdates ? assetGroupFindingsKey(assetGroupId) : undefined}
             />
           </SectionBlock>
 
@@ -357,6 +407,7 @@ const AssetGroupDetail = () => {
               filterLocalStorageKey="asset-group-expectations"
               scopeField="base_asset_group_side"
               entityId={assetGroupId}
+              queryKey={liveUpdates ? assetGroupExpectationsKey(assetGroupId) : undefined}
             />
           </SectionBlock>
 
@@ -367,6 +418,7 @@ const AssetGroupDetail = () => {
               queryableHelpers={injectsHelpers}
               searchPaginationInput={injectsInput}
               contextId={assetGroupId}
+              queryKey={liveUpdates ? assetGroupInjectsKey(assetGroupId) : undefined}
             />
           </SectionBlock>
         </>

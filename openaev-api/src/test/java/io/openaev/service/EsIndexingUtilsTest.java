@@ -1,19 +1,25 @@
 package io.openaev.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.openaev.context.TenantContext;
+import io.openaev.database.audit.AnalyticsIndexedEvent;
 import io.openaev.database.model.IndexingStatus;
 import io.openaev.database.repository.IndexingStatusRepository;
 import io.openaev.engine.model.EsBase;
+import io.openaev.engine.model.tenant.EsTenantBase;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +27,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * Unit tests for the shared incremental-indexing helpers used by both engine implementations
@@ -523,6 +530,73 @@ class EsIndexingUtilsTest {
       IndexingCursor capped = EsIndexingUtils.capToGraceWindow(cursor, now, -30);
 
       assertThat(capped).isEqualTo(new IndexingCursor(now, null));
+    }
+  }
+
+  @Nested
+  @DisplayName("analytics indexed event")
+  class AnalyticsIndexed {
+
+    private EsTenantBase document(String tenantId) {
+      EsTenantBase document = new EsTenantBase();
+      document.setBase_id(UUID.randomUUID().toString());
+      document.setBase_tenant_side(tenantId);
+      return document;
+    }
+
+    @AfterEach
+    void tearDown() {
+      TenantContext.clearCurrentTenant();
+    }
+
+    @Test
+    @DisplayName("Indexed documents name their tenants, read from memory")
+    void given_tenantDocuments_should_nameTheirTenants() {
+      AnalyticsIndexedEvent event =
+          EsIndexingUtils.indexedEvent(
+              List.of(document("tenant-a"), document("tenant-b"), document("tenant-a")));
+
+      assertThat(event.isEveryTenant()).isFalse();
+      assertThat(event.tenantIds()).containsExactlyInAnyOrder("tenant-a", "tenant-b");
+    }
+
+    @Test
+    @DisplayName("A document without a tenant is shown everywhere, so every tenant is named")
+    void given_documentWithoutTenant_should_nameEveryTenant() {
+      assertThat(
+              EsIndexingUtils.indexedEvent(List.of(document("tenant-a"), document(null)))
+                  .isEveryTenant())
+          .isTrue();
+      assertThat(EsIndexingUtils.indexedEvent(List.of(row(T0))).isEveryTenant()).isTrue();
+    }
+
+    @Test
+    @DisplayName("A delete names the deleting thread's tenant, or every tenant without one")
+    void given_delete_should_nameThreadTenantOrEveryTenant() {
+      // Arrange: another test of the same thread may have left a tenant behind
+      TenantContext.clearCurrentTenant();
+
+      assertThat(EsIndexingUtils.deletedEvent().isEveryTenant()).isTrue();
+
+      TenantContext.setCurrentTenant("tenant-a");
+
+      assertThat(EsIndexingUtils.deletedEvent().tenantIds()).containsExactly("tenant-a");
+    }
+
+    @Test
+    @DisplayName("Publishing is best effort: a failing listener or no publisher never throws")
+    void given_failingOrMissingPublisher_should_neverThrow() {
+      // Arrange
+      ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+      AnalyticsIndexedEvent event = new AnalyticsIndexedEvent(Set.of("tenant-a"));
+      doThrow(new IllegalStateException("boom")).when(publisher).publishEvent(event);
+
+      // Act & Assert
+      assertThatCode(() -> EsIndexingUtils.publishIndexed(publisher, event, LOG))
+          .doesNotThrowAnyException();
+      assertThatCode(() -> EsIndexingUtils.publishIndexed(null, event, LOG))
+          .doesNotThrowAnyException();
+      verify(publisher).publishEvent(event);
     }
   }
 }

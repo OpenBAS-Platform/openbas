@@ -8,7 +8,9 @@ import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { type Exercise, type SimulationDetails } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import ExerciseDateForm from './ExerciseDateForm';
+import { invalidateSimulation } from './simulationQueries';
 
 interface BaseProps {
   exercise: SimulationDetails;
@@ -43,6 +45,10 @@ const ExerciseDatePopover: FunctionComponent<Props> = ({ exercise, open, onOpenC
   const dispatch = useAppDispatch();
   const onSubmitEdit = async (data: Pick<Exercise, 'exercise_start_date'>) => {
     await dispatch(updateExerciseStartDate(exercise.exercise_id, data));
+    // Healthchecks and the header follow the new date at once with live updates on.
+    if (isFeatureEnabled('STREAM_INVALIDATION')) {
+      invalidateSimulation(exercise.exercise_id);
+    }
     setOpenEdit(false);
   };
   const initialValues = { exercise_start_date: exercise.exercise_start_date };

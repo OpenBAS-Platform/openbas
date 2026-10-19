@@ -582,6 +582,18 @@ public class InjectorContractService implements DependenciesManager {
   }
 
   /**
+   * Whether the injector contract exists in the given tenant. Contract ids repeat across tenants
+   * (built-in contracts), so the tenant is compared in the query rather than left to the tenant
+   * filter, which a lookup by id does not apply.
+   */
+  @Transactional(readOnly = true)
+  public boolean existsInTenant(@NotBlank final String injectorContractId, final String tenantId) {
+    return tenantId != null
+        && this.injectorContractRepository.existsByContractIdAndTenant(
+            injectorContractId, tenantId);
+  }
+
+  /**
    * Checks whether the given injector contract is payload-based without loading the full entity.
    *
    * @param injectorContractId the contract ID to check

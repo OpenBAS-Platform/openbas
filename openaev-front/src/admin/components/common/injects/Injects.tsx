@@ -1,6 +1,7 @@
 import { Checkbox, Chip } from '@filigran/design-system';
 import { HelpOutlineOutlined } from '@mui/icons-material';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { type QueryKey } from '@tanstack/react-query';
 import * as R from 'ramda';
 import { type CSSProperties, type FunctionComponent, lazy, Suspense, type SyntheticEvent, useContext, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
@@ -35,6 +36,7 @@ import {
 import { type InjectorContractConverted } from '../../../../utils/api-types-custom';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
+import queryClient from '../../../../utils/query/queryClient';
 import { splitDuration } from '../../../../utils/Time';
 import { download, isNotEmptyField } from '../../../../utils/utils';
 import PayloadDeprecatedChip from '../../payloads/PayloadDeprecatedChip';
@@ -96,6 +98,8 @@ interface Props {
   variables: Variable[];
   uriVariable: string;
   variablesConfigurationUri?: string;
+  // Given a key, the list is a query under it (see PaginationComponentV2), refetched when it is invalidated.
+  queryKey?: QueryKey;
 }
 
 const Injects: FunctionComponent<Props> = ({
@@ -106,6 +110,7 @@ const Injects: FunctionComponent<Props> = ({
   variables,
   uriVariable,
   variablesConfigurationUri = uriVariable,
+  queryKey,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -264,7 +269,13 @@ const Injects: FunctionComponent<Props> = ({
   } = useQueryableWithLocalStorage(`${contextId}-injects`, buildSearchPagination({ sorts: initSorting('inject_depends_duration', 'ASC') }));
 
   const [loading, setLoading] = useState<boolean>(true);
-  const searchInjectsToLoad = (input: SearchPaginationInput) => {
+  // In query mode the loading state follows the first load only (PaginationComponentV2 sets it),
+  // so a refetch keeps the rows on screen instead of flashing the loader.
+  const queryMode = queryKey !== undefined;
+  const searchInjectsToLoad = (input: SearchPaginationInput, notifyError?: boolean) => {
+    if (queryMode) {
+      return injectContext.searchInjects(input, notifyError);
+    }
     setLoading(true);
     return injectContext.searchInjects(input).finally(() => setLoading(false));
   };
@@ -275,6 +286,13 @@ const Injects: FunctionComponent<Props> = ({
   const [isBulkLoading, setIsBulkLoading] = useState<boolean>(false);
   const [selectedInjectId, setSelectedInjectId] = useState<string | null>(null);
   const [reloadInjectCount, setReloadInjectCount] = useState(0);
+  const reloadInjects = () => {
+    if (queryMode) {
+      queryClient.invalidateQueries({ queryKey });
+    } else {
+      setReloadInjectCount(prev => prev + 1);
+    }
+  };
 
   // Optimistic update
   const onCreate = (result: {
@@ -429,7 +447,7 @@ const Injects: FunctionComponent<Props> = ({
       simulation_or_scenario_id: contextId,
       update_operations: operationsToPerform,
     });
-    setReloadInjectCount(prev => prev + 1);
+    reloadInjects();
   };
 
   const bulkDeleteInjects = () => {
@@ -522,6 +540,8 @@ const Injects: FunctionComponent<Props> = ({
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
         reloadContentCount={reloadInjectCount}
+        queryKey={queryKey}
+        setLoading={queryMode ? setLoading : undefined}
         topBarButtons={(
           <Box
             sx={{
@@ -533,7 +553,7 @@ const Injects: FunctionComponent<Props> = ({
             <InjectsListButtons
               availableButtons={availableButtons}
               setViewMode={setViewMode}
-              onImportedInjects={() => setReloadInjectCount(prev => prev + 1)}
+              onImportedInjects={reloadInjects}
             />
             {permissions.canManage && (
               <ButtonCreate onClick={() => openCreateInjectPage()} />

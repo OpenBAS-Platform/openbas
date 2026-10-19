@@ -1,7 +1,8 @@
 import { Checkbox } from '@filigran/design-system';
 import { GroupsOutlined, HelpOutlineOutlined } from '@mui/icons-material';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { type CSSProperties, useMemo, useState } from 'react';
+import { type QueryKey } from '@tanstack/react-query';
+import { type CSSProperties, type FunctionComponent, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -26,6 +27,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
 import { Can, useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import queryClient from '../../../../utils/query/queryClient';
 import ToolBar from '../../common/ToolBar';
 import CreateTeam from './CreateTeam';
 import TeamPlayers from './TeamPlayers';
@@ -50,7 +52,13 @@ const inlineStyles: Record<string, CSSProperties> = {
   team_updated_at: { width: '20%' },
 };
 
-const Teams = () => {
+interface Props {
+  // Given a key, the list is a query under this key (see PaginationComponentV2): stream
+  // invalidations refetch it, and local changes invalidate it instead of patching the rows.
+  queryKey?: QueryKey;
+}
+
+const Teams: FunctionComponent<Props> = ({ queryKey }) => {
   // Standard hooks
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
@@ -112,12 +120,22 @@ const Teams = () => {
 
   const { refetched } = useHelper((helper: TeamsHelper) => ({ refetched: helper.getTeam(selectedTeam ?? '') }));
 
+  const queryMode = queryKey !== undefined;
+  const refresh = () => queryClient.invalidateQueries({ queryKey });
+
   const onTeamUpdated = (team: Team) => {
+    if (queryMode) {
+      refresh();
+      return;
+    }
     setTeams(teams.map(v => (v.team_id !== team.team_id ? v : team)));
   };
 
   const onPlayersChanged = (team_id: string | null) => {
-    if (team_id) {
+    if (team_id && queryMode) {
+      refresh();
+      setSelectedTeam(null);
+    } else if (team_id) {
       onTeamUpdated(refetched);
       setSelectedTeam(null);
     }
@@ -161,6 +179,11 @@ const Teams = () => {
       team_ids_to_process: selectAll ? undefined : Object.keys(selectedElements),
       team_ids_to_ignore: Object.keys(deSelectedElements),
     })).then((result: { data: string[] }) => {
+      if (queryMode) {
+        handleClearSelectedElements();
+        refresh();
+        return;
+      }
       const deletedIds: string[] = result.data ?? [];
       const newTotal = Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - deletedIds.length);
       setTeams(teams.filter(team => !deletedIds.includes(team.team_id)));
@@ -179,7 +202,9 @@ const Teams = () => {
         }]}
       />
       <PaginationComponentV2
-        fetch={searchTeamsToLoad}
+        fetch={queryMode ? searchTeams : searchTeamsToLoad}
+        queryKey={queryKey}
+        setLoading={queryMode ? setLoading : undefined}
         searchPaginationInput={searchPaginationInput}
         setContent={setTeams}
         entityPrefix="team"
@@ -196,6 +221,10 @@ const Teams = () => {
             <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.TEAMS_AND_PLAYERS}>
               <CreateTeam onCreate={(result) => {
+                if (queryMode) {
+                  refresh();
+                  return;
+                }
                 setTeams([result, ...teams]);
                 queryableHelpers.paginationHelpers.incrementTotalElements(1);
               }}
@@ -268,6 +297,10 @@ const Teams = () => {
                     managePlayers={() => setSelectedTeam(team.team_id)}
                     onUpdate={result => onTeamUpdated(result)}
                     onDelete={(result) => {
+                      if (queryMode) {
+                        refresh();
+                        return;
+                      }
                       setTeams(teams.filter(v => (v.team_id !== result)));
                       queryableHelpers.paginationHelpers.incrementTotalElements(-1);
                     }}

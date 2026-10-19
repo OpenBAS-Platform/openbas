@@ -2,6 +2,7 @@ import { IconButton, Select, SelectContent, SelectItem, SelectTrigger, SelectVal
 import { RefreshOutlined } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useLocalStorage } from 'usehooks-ts';
@@ -15,8 +16,11 @@ import { useBulkOperationsFinishedCount } from '../../../utils/bulkOperations';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import limitConcurrency from '../../../utils/limitConcurrency';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../utils/query/useNotifiedQuery';
+import { isFeatureEnabled } from '../../../utils/utils';
 import { CustomDashboardContext, type CustomDashboardContextType, type WidgetResultsConf } from '../workspaces/custom_dashboards/CustomDashboardContext';
 import CustomDashboardReactLayout from '../workspaces/custom_dashboards/CustomDashboardReactLayout';
+import { DEFAULT_HOME_KEY, widgetScopeKey } from '../workspaces/custom_dashboards/dashboardQueries';
 import { getTimeRangeItems } from '../workspaces/custom_dashboards/widgets/configuration/common/TimeRangeUtils';
 import {
   buildDefaultHomeWidgets,
@@ -33,6 +37,12 @@ const NOW = new Date().toISOString();
 // origin - lazy route chunks then queue behind them and the left menu appears
 // frozen. Capping the widget queries keeps connections free for navigation.
 const limitWidgetQueries = limitConcurrency(4);
+
+// With live updates on, the widgets fetch through queries under this scope (see WidgetWrapper),
+// which the topic 'list:analytics' refetches.
+const DEFAULT_HOME_WIDGET_SCOPE = widgetScopeKey('default');
+
+const hasHumanResponseData = (response: { data?: EsSeries[] }) => (response?.data ?? []).some(serie => (serie.data ?? []).some(bucket => (bucket.value ?? 0) > 0));
 
 /**
  * The hardcoded "Platform default" home dashboard. Reuses the full custom
@@ -64,14 +74,30 @@ const DefaultHomeDashboard = () => {
   // count: mounting it eagerly with 3 gauges and key-remounting when the probe
   // resolved re-rendered (blank flash) and refetched the entire dashboard on
   // every first load of a platform with human response data (#7599).
-  const [humanResponsePresent, setHumanResponsePresent] = useState<boolean | null>(null);
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const [probedHumanResponse, setHumanResponsePresent] = useState<boolean | null>(null);
+  // With live updates on, the probe is a query of the analytics topic too: it keeps its previous
+  // answer while refetching, so the grid stays mounted until the answer actually changes.
+  const probeQuery = useQuery({
+    queryKey: [...DEFAULT_HOME_KEY, 'human-response-probe', timeRange, refreshCount],
+    queryFn: () => limitWidgetQueries(() => adHocSeries(buildHumanResponseProbeConfig(timeRange))).then(hasHumanResponseData),
+    enabled: liveUpdates,
+    placeholderData: keepPreviousData,
+    refetchInterval: FALLBACK_REFETCH_INTERVAL_MS,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+  const liveHumanResponse = probeQuery.data ?? (probeQuery.isError ? false : null);
+  const humanResponsePresent = liveUpdates ? liveHumanResponse : probedHumanResponse;
   useEffect(() => {
+    if (liveUpdates) {
+      return undefined;
+    }
     let cancelled = false;
     limitWidgetQueries(() => adHocSeries(buildHumanResponseProbeConfig(timeRange)))
       .then((response: { data?: EsSeries[] }) => {
         if (cancelled) return;
-        const hasData = (response?.data ?? []).some(serie => (serie.data ?? []).some(bucket => (bucket.value ?? 0) > 0));
-        setHumanResponsePresent(hasData);
+        setHumanResponsePresent(hasHumanResponseData(response));
       })
       .catch(() => {
         if (!cancelled) setHumanResponsePresent(false);
@@ -79,7 +105,7 @@ const DefaultHomeDashboard = () => {
     return () => {
       cancelled = true;
     };
-  }, [timeRange, refreshCount]);
+  }, [timeRange, refreshCount, liveUpdates]);
 
   // Massive operations no longer stream one event per deleted entity (which used to force a
   // widget refresh per delete): refresh the engine-backed widgets once per finished operation,
@@ -176,7 +202,8 @@ const DefaultHomeDashboard = () => {
     },
     openWidgetResults,
     setGridReady: () => {},
-  }), [customDashboard, widgetOf, refreshCount, openWidgetResults]);
+    widgetQueryScope: liveUpdates ? DEFAULT_HOME_WIDGET_SCOPE : undefined,
+  }), [customDashboard, widgetOf, refreshCount, openWidgetResults, liveUpdates]);
 
   return (
     <CustomDashboardContext.Provider value={contextValue}>

@@ -13,6 +13,8 @@ import type {
 } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { notifyErrorHandler } from '../../../../utils/error/errorHandlerUtil';
+import { isFeatureEnabled } from '../../../../utils/utils';
+import { invalidateIntegrations } from '../common/integrationsQueries';
 import ConnectorInstanceForm from './ConnectorInstanceForm';
 import useConnectorInstanceForm from './useConnectorInstance';
 
@@ -56,6 +58,9 @@ const UpdateConnectorInstanceDrawer = ({
       catalog_connector_id: catalogConnectorId,
       connector_instance_configurations: filteredConfigs,
     }).then(() => {
+      if (isFeatureEnabled('STREAM_INVALIDATION')) {
+        invalidateIntegrations();
+      }
       onClose();
     }).catch((error) => {
       if (error?.status === 500) {

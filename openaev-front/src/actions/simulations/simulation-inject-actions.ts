@@ -15,9 +15,9 @@ export const fetchExerciseInjectsSimple = (exerciseId: Exercise['exercise_id']) 
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
 };
 
-export const searchExerciseInjectsSimple = (exerciseId: Exercise['exercise_id'], input: SearchPaginationInput) => {
+export const searchExerciseInjectsSimple = (exerciseId: Exercise['exercise_id'], input: SearchPaginationInput, notifyError: boolean = true) => {
   const uri = `/api/exercises/${exerciseId}/injects/simple`;
-  return simplePostCall(uri, input);
+  return simplePostCall(uri, input, undefined, notifyError);
 };
 
 export const bulkDeleteInjectsForSimulation = (exerciseId: Exercise['exercise_id'], data: InjectBulkProcessingInput) => {

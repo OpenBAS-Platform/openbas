@@ -21,7 +21,10 @@ import { SECURITY_PLATFORM_BASE_URL } from '../../../../constants/BaseUrls';
 import { type SearchPaginationInput, type SecurityPlatform } from '../../../../utils/api-types';
 import { Can } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import { ASSETS_LIST_KEY } from '../../../../utils/query/keys';
 import { buildTenantApiPath } from '../../../../utils/url-helper';
+import { isFeatureEnabled } from '../../../../utils/utils';
+import { invalidateAssetsList } from '../assetQueries';
 import SecurityPlatformCard from './SecurityPlatformCard';
 import SecurityPlatformCreation from './SecurityPlatformCreation';
 import SecurityPlatformPopover from './SecurityPlatformPopover';
@@ -61,6 +64,10 @@ const SecurityPlatforms = () => {
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
   const [searchId] = searchParams.getAll('id');
+  // With live updates on, the list is a query under the assets list key (security platforms are
+  // assets): stream invalidations refetch it, and local changes invalidate it instead of patching
+  // the rows.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   // Headers
   const headers = [
@@ -110,6 +117,16 @@ const SecurityPlatforms = () => {
     setLoading(true);
     return searchSecurityPlatforms(input).finally(() => setLoading(false));
   };
+  // Query mode: only the first load shows the loader, a refetch keeps the rows on screen.
+  const searchSecurityPlatformsQuery = (input: SearchPaginationInput, notifyError?: boolean) => {
+    return searchSecurityPlatforms(input, notifyError).finally(() => setLoading(false));
+  };
+  const onUpdateRow = (result: SecurityPlatform) => (liveUpdates
+    ? invalidateAssetsList()
+    : setSecurityPlatforms(securityPlatforms.map(e => (e.asset_id !== result.asset_id ? e : result))));
+  const onDeleteRow = (result: string) => (liveUpdates
+    ? invalidateAssetsList()
+    : setSecurityPlatforms(securityPlatforms.filter(e => (e.asset_id !== result))));
 
   const [viewMode, setViewMode] = useState<ViewMode>(readViewMode);
   const handleViewModeChange = (next: string) => {
@@ -171,8 +188,8 @@ const SecurityPlatforms = () => {
           <SecurityPlatformCard
             key={securityPlatform.asset_id}
             securityPlatform={securityPlatform}
-            onUpdate={result => setSecurityPlatforms(securityPlatforms.map(e => (e.asset_id !== result.asset_id ? e : result)))}
-            onDelete={result => setSecurityPlatforms(securityPlatforms.filter(e => (e.asset_id !== result)))}
+            onUpdate={onUpdateRow}
+            onDelete={onDeleteRow}
             openEditOnInit={securityPlatform.asset_id === searchId}
           />
         ))}
@@ -190,14 +207,15 @@ const SecurityPlatforms = () => {
         }]}
       />
       <PaginationComponent
-        fetch={searchSecurityPlatformsToLoad}
+        fetch={liveUpdates ? searchSecurityPlatformsQuery : searchSecurityPlatformsToLoad}
+        queryKey={liveUpdates ? [...ASSETS_LIST_KEY, 'security-platforms'] : undefined}
         searchPaginationInput={searchPaginationInput}
         setContent={setSecurityPlatforms}
         exportProps={exportProps}
         topRightSlot={viewSwitcher}
         createButton={(
           <Can I={ACTIONS.MANAGE} a={SUBJECTS.SECURITY_PLATFORMS}>
-            <SecurityPlatformCreation onCreate={result => setSecurityPlatforms([result, ...securityPlatforms])} />
+            <SecurityPlatformCreation onCreate={liveUpdates ? invalidateAssetsList : result => setSecurityPlatforms([result, ...securityPlatforms])} />
           </Can>
         )}
       />
@@ -246,8 +264,8 @@ const SecurityPlatforms = () => {
                           ...securityPlatform,
                           type: 'static',
                         }}
-                        onUpdate={result => setSecurityPlatforms(securityPlatforms.map(e => (e.asset_id !== result.asset_id ? e : result)))}
-                        onDelete={result => setSecurityPlatforms(securityPlatforms.filter(e => (e.asset_id !== result)))}
+                        onUpdate={onUpdateRow}
+                        onDelete={onDeleteRow}
                         openEditOnInit={securityPlatform.asset_id === searchId}
                         disabled={isConnectorManaged(securityPlatform)}
                       />

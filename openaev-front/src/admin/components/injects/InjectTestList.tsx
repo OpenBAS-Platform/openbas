@@ -1,5 +1,6 @@
 import { ForwardToInbox, HelpOutlineOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, useTheme } from '@mui/material';
+import { type QueryKey } from '@tanstack/react-query';
 import { type CSSProperties, type FunctionComponent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -52,9 +53,13 @@ const inlineStyles: Record<string, CSSProperties> = {
   status_name: { width: '20%' },
 };
 
-interface Props { statusId: string | undefined }
+interface Props {
+  statusId: string | undefined;
+  // Given a key, the list is a query under it (see PaginationComponent), refetched when it is invalidated.
+  queryKey?: QueryKey;
+}
 
-const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
+const InjectTestList: FunctionComponent<Props> = ({ statusId, queryKey }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t, fldt } = useFormatter();
@@ -118,11 +123,11 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
   const [hasTests, setHasTests] = useState<boolean | null>(null);
 
   const [loading, setLoading] = useState<boolean>(true);
-  const searchInjectTestsToLoad = (input: SearchPaginationInput) => {
+  const searchInjectTestsToLoad = (input: SearchPaginationInput, notifyError?: boolean) => {
     setLoading(true);
     try {
       if (searchInjectTests) {
-        return searchInjectTests(contextId, input).then((result) => {
+        return searchInjectTests(contextId, input, notifyError).then((result) => {
           // A search without match keeps the search bar, so it can still be cleared
           if (!input.textSearch) {
             setHasTests(result.data.totalElements > 0);
@@ -144,6 +149,7 @@ const InjectTestList: FunctionComponent<Props> = ({ statusId }) => {
       <div hidden={!hasTests}>
         <PaginationComponent
           fetch={searchInjectTestsToLoad}
+          queryKey={queryKey}
           searchPaginationInput={searchPaginationInput}
           setContent={setTests}
         >

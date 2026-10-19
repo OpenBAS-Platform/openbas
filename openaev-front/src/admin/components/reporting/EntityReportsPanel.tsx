@@ -18,8 +18,19 @@ import { type Reporting, type ReportingGeneration, type ReportingInput } from '.
 import { MESSAGING$ } from '../../../utils/Environment';
 import { useAbility } from '../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
+import { isClientError, retryUnlessClientError } from '../../../utils/query/queryErrors';
+import useNotifiedQuery, { FALLBACK_REFETCH_INTERVAL_MS } from '../../../utils/query/useNotifiedQuery';
+import { isFeatureEnabled } from '../../../utils/utils';
 import { latestGeneration, REPORTING_CONTEXT_LABELS } from './ReportingContexts';
 import { ReportingFormatFragment, ReportingStatusChip } from './ReportingFragments';
+import {
+  ACTIVE_GENERATIONS_POLL_INTERVAL_MS,
+  entityReportingsKey,
+  invalidateReport,
+  invalidateReportsList,
+  isGenerationActive,
+  useGenerationProgress,
+} from './reportingQueries';
 
 const POLL_INTERVAL_MS = 2500;
 // ~3 minutes: past this we stop polling and point to the report page instead.
@@ -59,9 +70,13 @@ const EntityReportsPanel: FunctionComponent<Props> = ({ contextType, contextId, 
   const navigate = useNavigate();
   const ability = useAbility();
 
+  // With live updates on, the entity's reports are a query under the reports list key, fetched
+  // while the popover is open: the topic 'list:reports' refetches them.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   // null = not fetched yet (skeleton state while the popover is open).
-  const [reportings, setReportings] = useState<Reporting[] | null>(null);
+  const [legacyReportings, setLegacyReportings] = useState<Reporting[] | null>(null);
   const [generating, setGenerating] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [pollTimedOut, setPollTimedOut] = useState(false);
@@ -79,17 +94,60 @@ const EntityReportsPanel: FunctionComponent<Props> = ({ contextType, contextId, 
 
   const loadReportings = useCallback(() => {
     fetchReportingsByContext(contextType, contextId)
-      .then((result: { data: Reporting[] }) => setReportings(result.data ?? []))
-      .catch(() => setReportings([]));
+      .then((result: { data: Reporting[] }) => setLegacyReportings(result.data ?? []))
+      .catch(() => setLegacyReportings([]));
   }, [contextType, contextId]);
 
   // Fetch on each open so the list reflects generations triggered elsewhere.
   useEffect(() => {
-    if (anchorEl) {
-      setReportings(null);
+    if (anchorEl && !liveUpdates) {
+      setLegacyReportings(null);
       loadReportings();
     }
   }, [anchorEl, loadReportings]);
+
+  // Live updates: refetched on each open (stale data) and by the topic; polled while a listed
+  // report has a pending or running generation, which a job may write without an invalidation.
+  const reportingsQuery = useNotifiedQuery({
+    queryKey: entityReportingsKey(contextType, contextId),
+    queryFn: () => fetchReportingsByContext(contextType, contextId, false).then((result: { data: Reporting[] }) => result.data ?? []),
+    retry: retryUnlessClientError,
+    refetchInterval: (query) => {
+      if (query.state.status === 'error') return false;
+      const active = (query.state.data ?? []).some(reporting => isGenerationActive(latestGeneration(reporting)));
+      return active ? ACTIVE_GENERATIONS_POLL_INTERVAL_MS : FALLBACK_REFETCH_INTERVAL_MS;
+    },
+    enabled: liveUpdates && !!anchorEl,
+  });
+  const liveReportings = isClientError(reportingsQuery.error) ? [] : reportingsQuery.data ?? (reportingsQuery.error ? [] : null);
+  const reportings = liveUpdates ? liveReportings : legacyReportings;
+
+  // Live updates: the generation started here is a query under its report's key, polled until it
+  // ends (see useGenerationProgress), instead of the interval below.
+  const [pendingGeneration, setPendingGeneration] = useState<{
+    reportingId: string;
+    generationId: string;
+  } | null>(null);
+  const finishLiveGeneration = () => {
+    if (pendingGeneration) invalidateReport(pendingGeneration.reportingId);
+    setPendingGeneration(null);
+    setGenerating(false);
+    invalidateReportsList();
+  };
+  useGenerationProgress(pendingGeneration?.reportingId, liveUpdates ? pendingGeneration?.generationId ?? null : null, {
+    onSuccess: () => {
+      finishLiveGeneration();
+      MESSAGING$.notifySuccess(t('Report successfully generated'));
+    },
+    onFailure: (error) => {
+      finishLiveGeneration();
+      setGenerationError(error || t('The report generation failed.'));
+    },
+    onTimeout: () => {
+      finishLiveGeneration();
+      setPollTimedOut(true);
+    },
+  });
 
   if (!ability.can(ACTIONS.ACCESS, SUBJECTS.REPORTINGS)) {
     return null;
@@ -103,6 +161,7 @@ const EntityReportsPanel: FunctionComponent<Props> = ({ contextType, contextId, 
     // A closed panel no longer reports progress: stop polling and reset the
     // transient generation state (the report page shows the full history).
     stopPolling();
+    setPendingGeneration(null);
     setGenerating(false);
     setGenerationError(null);
     setPollTimedOut(false);
@@ -166,6 +225,15 @@ const EntityReportsPanel: FunctionComponent<Props> = ({ contextType, contextId, 
         target = (await createReporting(input)).data as Reporting;
       }
       const generation: ReportingGeneration = (await generateReporting(target.reporting_id, { reporting_generation_format: target.reporting_default_format ?? 'PDF' })).data;
+      if (liveUpdates) {
+        invalidateReportsList();
+        invalidateReport(target.reporting_id);
+        setPendingGeneration({
+          reportingId: target.reporting_id,
+          generationId: generation.reporting_generation_id,
+        });
+        return;
+      }
       loadReportings();
       pollGeneration(generation.reporting_generation_id);
     } catch {

@@ -5,6 +5,8 @@ import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import type { Exercise } from '../../../../../utils/api-types';
 import useSimulationPermissions from '../../../../../utils/permissions/useSimulationPermissions';
+import { simulationKey } from '../../../../../utils/query/keys';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import Logic from '../../../chaining/logic/Logic';
 
 const SimulationLogic = ({ isAutonomous = false }: { isAutonomous?: boolean }) => {
@@ -12,6 +14,8 @@ const SimulationLogic = ({ isAutonomous = false }: { isAutonomous?: boolean }) =
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const { exercise } = useHelper((helper: ExercisesHelper) => ({ exercise: helper.getExercise(exerciseId) }));
   const permissions = useSimulationPermissions(exerciseId, exercise);
+  // With live updates on, the logic map is read by a query under the simulation key.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
   // Two independent reasons the logic map is read-only: an autonomous run (the AI owns the map,
   // passed in by the router) OR a launched simulation - the map is editable only while SCHEDULED
   // (UI "Draft" / "Scheduled"), see ADR-005. While the exercise is still loading, only the incoming
@@ -40,6 +44,7 @@ const SimulationLogic = ({ isAutonomous = false }: { isAutonomous?: boolean }) =
       exerciseId={exerciseId}
       readOnly={effectiveReadOnly}
       readOnlyMessage={effectiveReadOnly ? readOnlyMessage : undefined}
+      queryKey={liveUpdates ? simulationKey(exerciseId) : undefined}
     />
   );
 };

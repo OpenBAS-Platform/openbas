@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { adHocSeries } from '../../../actions/dashboards/dashboard-action';
 import { generateFilterId } from '../../../components/common/queryable/filter/FilterUtils';
@@ -56,16 +56,24 @@ const namedTotal = (series: EsSeries[] | null, name: string) =>
  * @param entityId      The scoped entity id.
  * @param scopeOperator `eq` for single-value side fields (default), `contains`
  *                      for set fields (e.g. `base_security_platforms_side`).
+ * @param version       Optional: a change refetches the series and keeps the
+ *                      current values on screen until it answers.
  */
 const useExpectationPosture = (
   scopeField: string,
   entityId: string,
   scopeOperator: Filter['operator'] = 'eq',
+  version?: number,
 ): ExpectationPosture => {
   const [series, setSeries] = useState<EsSeries[] | null>(null);
+  const scopeRef = useRef<string | null>(null);
 
   useEffect(() => {
-    setSeries(null);
+    const scope = `${scopeField}|${entityId}|${scopeOperator}`;
+    if (scopeRef.current !== scope) {
+      scopeRef.current = scope;
+      setSeries(null);
+    }
     const expectation = (extra: Filter[]) => group(
       filter('base_entity', ['expectation-inject']),
       filter(scopeField, [entityId], scopeOperator),
@@ -101,7 +109,7 @@ const useExpectationPosture = (
     return () => {
       cancelled = true;
     };
-  }, [scopeField, entityId, scopeOperator]);
+  }, [scopeField, entityId, scopeOperator, version]);
 
   const breakdown = EXPECTATION_TYPES
     .map(type => ({

@@ -21,7 +21,9 @@ import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import useSimulationPermissions from '../../../../utils/permissions/useSimulationPermissions';
 import { buildTenantApiPath } from '../../../../utils/url-helper';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import ExerciseForm from './ExerciseForm';
+import { invalidateSimulation } from './simulationQueries';
 
 type ExerciseUpdateFormInput = UpdateExerciseInput & { exercise_lessons_enabled?: boolean };
 
@@ -185,7 +187,14 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
           ? dispatch(updateExerciseLessons(exercise.exercise_id, { lessons_enabled: lessonsEnabled }))
           : Promise.resolve();
       })
-      .then(() => handleCloseEdit());
+      .then(() => {
+        // The store already holds the updated simulation; with live updates on, the screen's
+        // other queries (tabs shown with lessons, dashboard) follow it at once.
+        if (isFeatureEnabled('STREAM_INVALIDATION')) {
+          invalidateSimulation(exercise.exercise_id);
+        }
+        handleCloseEdit();
+      });
   };
 
   const handleTagRuleChoice = (shouldApply: boolean) => {

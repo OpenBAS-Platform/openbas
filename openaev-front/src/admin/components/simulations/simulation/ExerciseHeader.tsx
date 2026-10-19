@@ -24,13 +24,10 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router';
 
 import { type AutonomousRun } from '../../../../actions/autonomous/autonomous-types';
 import type { WorkflowConfigurationHelper } from '../../../../actions/chaining/workflow-helper';
-import { fetchExerciseChallenges } from '../../../../actions/challenge-action';
-import { fetchExerciseArticles } from '../../../../actions/channels/article-action';
 import { type ArticlesHelper } from '../../../../actions/channels/article-helper';
 import {
   dismissExerciseExpectationsDrift,
   fetchExerciseExpectationsDrift,
-  fetchExerciseTeams,
   realignExerciseExpectations,
   searchExerciseHealthchecks,
   updateExerciseStatus,
@@ -66,7 +63,12 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
 import useSimulationPermissions from '../../../../utils/permissions/useSimulationPermissions';
+import queryClient from '../../../../utils/query/queryClient';
+import { retryUnlessClientError } from '../../../../utils/query/queryErrors';
+import useNotifiedQuery from '../../../../utils/query/useNotifiedQuery';
+import useStoreQuery from '../../../../utils/query/useStoreQuery';
 import { truncate } from '../../../../utils/String';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import HealthcheckIndicator from '../../common/healthchecks/HealthcheckIndicator';
 import isScopeLaunchBlocked from '../../common/healthchecks/scopeHealthcheck';
 import ExpectationsDriftIndicator from '../../common/injects/expectations/ExpectationsDriftIndicator';
@@ -82,6 +84,16 @@ import ExercisePopover, { type ExerciseActionPopover } from './ExercisePopover';
 import ExerciseStatus from './ExerciseStatus';
 import SecurityPlatformIndicator from './SecurityPlatformIndicator';
 import SimulationConfiguration from './SimulationConfiguration';
+import {
+  invalidateSimulation,
+  liveRefetchInterval,
+  simulationExpectationsDriftKey,
+  simulationParentScenarioKey,
+  useSimulationHealthchecks,
+} from './simulationQueries';
+import useSimulationStoreData, { type SimulationStoreDataset } from './simulationStoreQueries';
+
+const HEADER_STORE_DATASETS: SimulationStoreDataset[] = ['challenges', 'injects-simple', 'teams', 'articles'];
 
 // Exported for testing: props-driven UI, covered without the store-bound header.
 export const Buttons = ({ exerciseId, exerciseStatus, exerciseName, onLoading, isLoading, isScopeMissing }: {
@@ -107,6 +119,11 @@ export const Buttons = ({ exerciseId, exerciseStatus, exerciseName, onLoading, i
       // evicts on refetch — reconcile it or Execution keeps showing them.
       if (status.exercise_status === 'CANCELED' || status.exercise_status === 'SCHEDULED') {
         await dispatch(reconcileExerciseInjects(exerciseId));
+      }
+      // With live updates on, every query of the screen (header counts, overview, tabs) follows
+      // the new status at once instead of waiting for the stream.
+      if (isFeatureEnabled('STREAM_INVALIDATION')) {
+        await invalidateSimulation(exerciseId);
       }
     } finally {
       onLoading(false);
@@ -280,17 +297,24 @@ const ExerciseHeader = ({ onLoading, isLoading, autonomousRun = null }: {
   // at least one inject uses a challenge, expose the player-facing preview
   // right in the hero. Injects (lightweight view) feed the usage-aware hero
   // stats: which assets and asset groups the simulation actually targets.
+  // With live updates on, the header data are queries under simulationKey(id), refetched by the
+  // topic 'simulation:<id>'; the state below only serves the legacy path.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  // Store queries shared with the tabs, which read the same store entries: one invalidation
+  // refreshes the header counts and the tabs together, and they share one request. The injects
+  // are reconciled (not just fetched): injects can be deleted server-side out of band - deleting
+  // a phishing landing page cascade-deletes the injects built on its contract - and the
+  // merge-only store would otherwise keep counting the ghosts in the hero until a full reload.
+  useSimulationStoreData(exerciseId, HEADER_STORE_DATASETS, { refetchInterval: liveRefetchInterval(exercise.exercise_status) });
+  // Resolve the parent scenario name for the hero pivot button (it is not embedded in the
+  // SimulationDetails DTO), on every tab where the header lives.
+  useStoreQuery(
+    [...simulationParentScenarioKey(exerciseId), parentScenarioId],
+    () => dispatch(fetchScenario(parentScenarioId ?? '')),
+    { enabled: liveUpdates && !!parentScenarioId },
+  );
   useDataLoader(() => {
-    dispatch(fetchExerciseChallenges(exerciseId));
-    // Reconcile (not just fetch): injects can be deleted server-side out of band - deleting a
-    // phishing landing page cascade-deletes the injects built on its contract - and the
-    // merge-only store would otherwise keep counting the ghosts in the hero until a full reload.
-    dispatch(reconcileExerciseInjects(exerciseId, fetchExerciseInjectsSimple));
-    dispatch(fetchExerciseTeams(exerciseId));
-    dispatch(fetchExerciseArticles(exerciseId));
-    // Resolve the parent scenario name for the hero pivot button (it is not embedded in the
-    // SimulationDetails DTO), on every tab where the header lives.
-    if (parentScenarioId) {
+    if (!liveUpdates && parentScenarioId) {
       dispatch(fetchScenario(parentScenarioId));
     }
   });
@@ -307,8 +331,19 @@ const ExerciseHeader = ({ onLoading, isLoading, autonomousRun = null }: {
     }),
   );
 
-  const [healthchecks, setHealthchecks] = useState<HealthCheck[]>([]);
-  const [expectationsDrift, setExpectationsDrift] = useState<ExpectationsDriftOutput | null>(null);
+  const [legacyHealthchecks, setHealthchecks] = useState<HealthCheck[]>([]);
+  const [legacyExpectationsDrift, setExpectationsDrift] = useState<ExpectationsDriftOutput | null>(null);
+  const healthchecksQuery = useSimulationHealthchecks(exerciseId, liveUpdates);
+  const healthchecks = liveUpdates ? healthchecksQuery.data ?? [] : legacyHealthchecks;
+  // Expectation drift between the injector contract templates and the inject content: the
+  // simulation topic covers its injects, and the store loaders above follow it.
+  const driftQuery = useNotifiedQuery({
+    queryKey: simulationExpectationsDriftKey(exerciseId),
+    queryFn: () => fetchExerciseExpectationsDrift(exerciseId, false).then((result: { data: ExpectationsDriftOutput }) => result.data),
+    retry: retryUnlessClientError,
+    enabled: liveUpdates,
+  });
+  const expectationsDrift = liveUpdates ? driftQuery.data ?? null : legacyExpectationsDrift;
   const [openConfiguration, setOpenConfiguration] = useState(false);
   const [configurationInitialTab, setConfigurationInitialTab] = useState<SimulationConfigurationTab>(SimulationConfigurationTab.TEAMS);
   const [openDateDialog, setOpenDateDialog] = useState(false);
@@ -349,8 +384,11 @@ const ExerciseHeader = ({ onLoading, isLoading, autonomousRun = null }: {
   }, [canOpenConfiguration, clearConfigurationQueryParam, location.search]);
 
   useEffect(() => {
+    if (liveUpdates) {
+      return;
+    }
     searchExerciseHealthchecks(exerciseId).then((result: { data: HealthCheck[] }) => setHealthchecks(result.data));
-  }, [exerciseId, exercise, workflowConfiguration]);
+  }, [exerciseId, exercise, workflowConfiguration, liveUpdates]);
 
   // Expectation drift between the injector contract templates and the inject
   // content - recomputed when the simulation or its inject set changes.
@@ -358,6 +396,9 @@ const ExerciseHeader = ({ onLoading, isLoading, autonomousRun = null }: {
     // The header survives simulation switches (no remount): a stale response from
     // the previous simulation must not overwrite the current one. simpleCall has
     // already notified the user on failure, hence the deliberately empty catch.
+    if (liveUpdates) {
+      return () => {};
+    }
     let stale = false;
     fetchExerciseExpectationsDrift(exerciseId)
       .then((result: { data: ExpectationsDriftOutput }) => {
@@ -368,10 +409,15 @@ const ExerciseHeader = ({ onLoading, isLoading, autonomousRun = null }: {
     return () => {
       stale = true;
     };
-  }, [exerciseId, exercise, injects?.length]);
+  }, [exerciseId, exercise, injects?.length, liveUpdates]);
 
   const onRealignExpectations = async () => {
     await realignExerciseExpectations(exerciseId);
+    if (liveUpdates) {
+      // Refetches the drift and the injects at once.
+      await invalidateSimulation(exerciseId);
+      return;
+    }
     const result = await fetchExerciseExpectationsDrift(exerciseId);
     setExpectationsDrift(result.data);
     dispatch(fetchExerciseInjectsSimple(exerciseId));
@@ -381,6 +427,10 @@ const ExerciseHeader = ({ onLoading, isLoading, autonomousRun = null }: {
   // returns the refreshed drift report.
   const onDismissExpectations = async (dismissed: boolean) => {
     const result = await dismissExerciseExpectationsDrift(exerciseId, dismissed);
+    if (liveUpdates) {
+      queryClient.setQueryData(simulationExpectationsDriftKey(exerciseId), result.data);
+      return;
+    }
     setExpectationsDrift(result.data);
   };
 
@@ -484,6 +534,7 @@ const ExerciseHeader = ({ onLoading, isLoading, autonomousRun = null }: {
               <SecurityPlatformIndicator
                 workflowId={exerciseWorkflowId}
                 launched={exercise.exercise_status !== 'SCHEDULED'}
+                simulationId={exerciseId}
               />
               {/* Dismissed drift downgraded to a discreet icon - the drift is
                   acknowledged but still reviewable. */}

@@ -448,18 +448,58 @@ public class ReportingService {
    */
   private void checkSubjectAccess(
       final ReportingContextType contextType, final String contextId, @NotNull final User user) {
-    ResourceType subjectType = contextType == null ? null : SUBJECT_RESOURCE_TYPES.get(contextType);
-    if (subjectType == null || !StringUtils.hasText(contextId)) {
-      // PLATFORM reporting (or subject-less legacy row): capability gate only.
-      return;
-    }
-    boolean allowed =
-        this.permissionService.hasPermission(
-            user, Optional.empty(), contextId, subjectType, Action.READ);
-    if (!allowed) {
+    if (!canReadSubject(contextType, contextId, user)) {
       throw new AccessDeniedException(
           "Access denied to the subject of this reporting: " + contextType + " " + contextId);
     }
+  }
+
+  /** Whether the user can read the subject a reporting is built around (see above). */
+  private boolean canReadSubject(
+      final ReportingContextType contextType, final String contextId, @NotNull final User user) {
+    ResourceType subjectType = contextType == null ? null : SUBJECT_RESOURCE_TYPES.get(contextType);
+    if (subjectType == null || !StringUtils.hasText(contextId)) {
+      // PLATFORM reporting (or subject-less legacy row): capability gate only.
+      return true;
+    }
+    return this.permissionService.hasPermission(
+        user, Optional.empty(), contextId, subjectType, Action.READ);
+  }
+
+  /**
+   * Whether the reporting exists in the given tenant and the user can read its subject: the check
+   * of {@code GET /api/reportings/{id}} beyond the REPORT capability, which the caller verifies.
+   * The tenant is compared in the query, so a reporting of another tenant reads as missing.
+   */
+  @Transactional(readOnly = true)
+  public boolean isReadableInTenant(
+      @NotBlank final String reportingId, final String tenantId, @NotNull final User user) {
+    if (tenantId == null) {
+      return false;
+    }
+    return this.reportingRepository
+        .findByIdAndTenantId(reportingId, tenantId)
+        .map(
+            reporting -> canReadSubject(reporting.getContextType(), reporting.getContextId(), user))
+        .orElse(false);
+  }
+
+  /**
+   * Whether the reportings search returns every reporting of the tenant to the user, i.e. whether
+   * {@link #subjectAccessSpecification} filters nothing out: an administrator or a bypass, or a
+   * user who can read every subject type (open, or through a capability). A user who reads some
+   * subjects only through grants sees part of the list.
+   */
+  public boolean seesEveryReporting(@NotNull final User user) {
+    if (user.isAdminOrBypass()) {
+      return true;
+    }
+    return SUBJECT_RESOURCE_TYPES.values().stream()
+        .allMatch(
+            subjectType ->
+                PermissionService.isOpenResource(subjectType, Action.READ)
+                    || this.permissionService.hasCapabilityPermission(
+                        user, subjectType, Action.READ));
   }
 
   /**

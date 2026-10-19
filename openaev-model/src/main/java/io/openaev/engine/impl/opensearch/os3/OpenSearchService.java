@@ -43,6 +43,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import os3.org.opensearch.client.json.JsonData;
 import os3.org.opensearch.client.opensearch.OpenSearchClient;
 import os3.org.opensearch.client.opensearch._types.*;
@@ -54,7 +56,7 @@ import os3.org.opensearch.client.opensearch.core.search.*;
 import os3.org.opensearch.client.opensearch.generic.*;
 
 @Slf4j
-public class OpenSearchService implements EngineService {
+public class OpenSearchService implements EngineService, ApplicationEventPublisherAware {
 
   private final OpenSearchDriver driver;
   private final EngineContext searchEngine;
@@ -62,6 +64,9 @@ public class OpenSearchService implements EngineService {
   private final IndexingStatusRepository indexingStatusRepository;
   private final EngineConfig engineConfig;
   private final CommonSearchService commonSearchService;
+
+  /** Announces indexed or deleted documents (live analytics invalidation); set by Spring. */
+  private ApplicationEventPublisher eventPublisher;
 
   @Resource private ObjectMapper mapper;
 
@@ -492,6 +497,11 @@ public class OpenSearchService implements EngineService {
 
   // endregion
 
+  @Override
+  public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+    this.eventPublisher = eventPublisher;
+  }
+
   // region indexing
 
   public <T extends EsBase> void bulkProcessing(Stream<EsModel<T>> models) {
@@ -539,6 +549,12 @@ public class OpenSearchService implements EngineService {
                       log.info("Indexing ({}) in progress for {}", results.size(), model.getName());
                       BulkRequest bulkRequest = br.build();
                       BulkResponse result = openSearchClient.bulk(bulkRequest);
+                      // Widget data read from these documents may have changed, even when a
+                      // transient error elsewhere in the batch keeps the cursor for a retry.
+                      if (result.items().stream().anyMatch(item -> item.error() == null)) {
+                        EsIndexingUtils.publishIndexed(
+                            eventPublisher, EsIndexingUtils.indexedEvent(results), log);
+                      }
                       // Log errors, if any
                       if (result.errors()) {
                         long errorCount =
@@ -663,13 +679,21 @@ public class OpenSearchService implements EngineService {
     }
     // Batch internally: a bulk deletion cascade can journal thousands of ids in one flush, and
     // both the terms clauses and the painless "valuesToRemove" params must stay bounded.
+    boolean deletedAny = false;
     for (int start = 0; start < ids.size(); start += EngineService.BULK_DELETE_BATCH_SIZE) {
-      bulkDeleteBatch(
-          ids.subList(start, Math.min(start + EngineService.BULK_DELETE_BATCH_SIZE, ids.size())));
+      deletedAny |=
+          bulkDeleteBatch(
+                  ids.subList(
+                      start, Math.min(start + EngineService.BULK_DELETE_BATCH_SIZE, ids.size())))
+              > 0;
+    }
+    if (deletedAny) {
+      EsIndexingUtils.publishIndexed(eventPublisher, EsIndexingUtils.deletedEvent(), log);
     }
   }
 
-  private void bulkDeleteBatch(List<String> ids) {
+  /** Deletes one batch and returns the number of documents deleted (dependencies included). */
+  private long bulkDeleteBatch(List<String> ids) {
     try {
       List<FieldValue> values = ids.stream().map(FieldValue::of).toList();
       // Delete the direct document corresponding to the id
@@ -686,13 +710,17 @@ public class OpenSearchService implements EngineService {
               .toQuery();
       Query query =
           BoolQuery.of(b -> b.should(directId, dependenciesId).minimumShouldMatch("1")).toQuery();
-      openSearchClient.deleteByQuery(
-          new DeleteByQueryRequest.Builder()
-              .index(engineConfig.getIndexPattern())
-              .query(query)
-              .refresh(Refresh.True)
-              .conflicts(Conflicts.Proceed)
-              .build());
+      Long deleted =
+          openSearchClient
+              .deleteByQuery(
+                  new DeleteByQueryRequest.Builder()
+                      .index(engineConfig.getIndexPattern())
+                      .query(query)
+                      .refresh(Refresh.True)
+                      .conflicts(Conflicts.Proceed)
+                      .build())
+              .deleted();
+      long deletedCount = deleted == null ? 0 : deleted;
       // Remove the deleted ids from the denormalized "base_XXX_side" attributes of the documents
       // that reference them. The update-by-query MUST be scoped to those documents only: this
       // runs synchronously after every entity delete (the HTTP response waits for it), and an
@@ -700,7 +728,7 @@ public class OpenSearchService implements EngineService {
       // dataset (relaunching an atomic testing was observed blocking for over a minute).
       Query sideReferences = sideReferencesQuery(values);
       if (sideReferences == null) {
-        return;
+        return deletedCount;
       }
       openSearchClient.updateByQuery(
           new UpdateByQueryRequest.Builder()
@@ -717,6 +745,7 @@ public class OpenSearchService implements EngineService {
               .refresh(Refresh.True)
               .conflicts(Conflicts.Proceed)
               .build());
+      return deletedCount;
     } catch (IOException e) {
       // Propagate: callers decide resilience (the after-commit flush swallows and relies on the
       // deletion journal + replay job; the replay job retries on its next pass).

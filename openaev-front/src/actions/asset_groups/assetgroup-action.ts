@@ -48,10 +48,10 @@ export const bulkDeleteAssetGroups = (input: AssetGroupBulkProcessingInput) => {
 export const fetchAssetGroups = () => (dispatch: Dispatch) => {
   return getReferential(arrayOfAssetGroups, ASSET_GROUP_URI)(dispatch);
 };
-export const searchAssetGroups = (searchPaginationInput: SearchPaginationInput) => {
+export const searchAssetGroups = (searchPaginationInput: SearchPaginationInput, notifyError: boolean = true) => {
   const data = searchPaginationInput;
   const uri = `${ASSET_GROUP_URI}/search`;
-  return simplePostCall(uri, data);
+  return simplePostCall(uri, data, undefined, notifyError);
 };
 
 export const findAssetGroups = (assetGroupIds: string[]) => {
@@ -65,17 +65,17 @@ export const fetchAssetGroup = (assetGroupId: AssetGroup['asset_group_id']) => (
   return getReferential(assetGroup, uri)(dispatch);
 };
 
-export const searchEndpointsFromAssetGroup = (searchPaginationInput: SearchPaginationInput, assetGroupId: string) => {
+export const searchEndpointsFromAssetGroup = (searchPaginationInput: SearchPaginationInput, assetGroupId: string, notifyError: boolean = true) => {
   const data = searchPaginationInput;
   const uri = `${ASSET_GROUP_URI}/${assetGroupId}/assets/search`;
-  return simplePostCall(uri, data);
+  return simplePostCall(uri, data, undefined, notifyError);
 };
 
 // "Injects played" for the asset group detail page: every inject (atomic testing or simulation
 // inject) that concerns the group - targeted directly or evidenced by the technical expectations
 // persisted at execution time. Same scope as the asset group posture score.
-export const searchInjectsForAssetGroup = (assetGroupId: string, searchPaginationInput: SearchPaginationInput) => {
-  return simplePostCall(`${ASSET_GROUP_URI}/${assetGroupId}/injects/search`, searchPaginationInput);
+export const searchInjectsForAssetGroup = (assetGroupId: string, searchPaginationInput: SearchPaginationInput, notifyError: boolean = true) => {
+  return simplePostCall(`${ASSET_GROUP_URI}/${assetGroupId}/injects/search`, searchPaginationInput, undefined, notifyError);
 };
 
 export const searchAssetGroupAsOption = (searchText: string = '', sourceId: string = '', inputFilterOption: string = '') => {

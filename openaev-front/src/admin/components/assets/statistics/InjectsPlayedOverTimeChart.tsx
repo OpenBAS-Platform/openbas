@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { type FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 
 import { adHocSeries } from '../../../../actions/dashboards/dashboard-action';
 import Chart from '../../../../components/Chart';
@@ -30,6 +30,8 @@ interface Props {
   /** The scoped entity id. */
   entityId: string;
   height?: number;
+  /** Optional: a change refetches the trend and keeps the current chart until it answers. */
+  version?: number;
 }
 
 /**
@@ -38,14 +40,19 @@ interface Props {
  * Statistics tab of asset-side detail pages. Shows greyed-out sample data
  * (platform-wide convention) until real injects exist.
  */
-const InjectsPlayedOverTimeChart: FunctionComponent<Props> = ({ scopeField, entityId, height = 280 }) => {
+const InjectsPlayedOverTimeChart: FunctionComponent<Props> = ({ scopeField, entityId, height = 280, version }) => {
   const { t, nsdt } = useFormatter();
   const theme = useTheme();
 
   const [trend, setTrend] = useState<EsSeries[] | null>(null);
+  const scopeRef = useRef<string | null>(null);
 
   useEffect(() => {
-    setTrend(null);
+    const scope = `${scopeField}|${entityId}`;
+    if (scopeRef.current !== scope) {
+      scopeRef.current = scope;
+      setTrend(null);
+    }
     const trendConfig = {
       title: '',
       series: [
@@ -77,7 +84,7 @@ const InjectsPlayedOverTimeChart: FunctionComponent<Props> = ({ scopeField, enti
     return () => {
       cancelled = true;
     };
-  }, [scopeField, entityId]);
+  }, [scopeField, entityId, version]);
 
   const trendSeries = useMemo(() => {
     if (!trend) return [];

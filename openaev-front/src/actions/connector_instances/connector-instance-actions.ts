@@ -45,7 +45,7 @@ export const deleteConnectorInstance = (instanceId: string) => (dispatch: Dispat
   return delReferential(uri, connectorInstance.key, instanceId)(dispatch);
 };
 
-export const searchConnectorInstanceLogs = (instanceId: string, searchPaginationInput: SearchPaginationInput) => {
+export const searchConnectorInstanceLogs = (instanceId: string, searchPaginationInput: SearchPaginationInput, notifyError = true) => {
   const uri = `${CONNECTOR_INSTANCE_URI}/${instanceId}/logs/search`;
-  return simplePostCall(uri, searchPaginationInput);
+  return simplePostCall(uri, searchPaginationInput, undefined, notifyError);
 };

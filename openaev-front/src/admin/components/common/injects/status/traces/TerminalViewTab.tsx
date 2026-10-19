@@ -1,19 +1,27 @@
+import { type QueryKey } from '@tanstack/react-query';
 import { type FunctionComponent, useMemo } from 'react';
 
 import useFetchInjectExecutionResult from '../../../../../../actions/inject_status/useFetchInjectExecutionResult';
+import useInjectExecutionResultQuery from '../../../../../../actions/inject_status/useInjectExecutionResultQuery';
 import Empty from '../../../../../../components/Empty';
 import { useFormatter } from '../../../../../../components/i18n';
-import type { InjectTarget } from '../../../../../../utils/api-types';
+import type { InjectResultPayloadExecutionOutput, InjectTarget } from '../../../../../../utils/api-types';
 import TerminalView from './TerminalView';
 
 interface Props {
   injectId: string;
   target: InjectTarget;
+  // Given a key, the execution result is a query under it, refetched when it is invalidated.
+  queryKey?: QueryKey;
 }
 
-const TerminalViewTab: FunctionComponent<Props> = ({ injectId, target }) => {
+interface ContentProps {
+  injectExecutionResult?: InjectResultPayloadExecutionOutput | null;
+  loading: boolean;
+}
+
+const TerminalViewContent: FunctionComponent<ContentProps> = ({ injectExecutionResult, loading }) => {
   const { t } = useFormatter();
-  const { injectExecutionResult, loading } = useFetchInjectExecutionResult(injectId, target);
 
   const nonEmptyTraces = useMemo(() => {
     if (!injectExecutionResult?.execution_traces) {
@@ -42,5 +50,19 @@ const TerminalViewTab: FunctionComponent<Props> = ({ injectId, target }) => {
     </>
   );
 };
+
+const FetchedTerminalViewTab: FunctionComponent<Props> = ({ injectId, target }) => {
+  const { injectExecutionResult, loading } = useFetchInjectExecutionResult(injectId, target);
+  return <TerminalViewContent injectExecutionResult={injectExecutionResult} loading={loading} />;
+};
+
+const QueriedTerminalViewTab: FunctionComponent<Props & { queryKey: QueryKey }> = ({ injectId, target, queryKey }) => {
+  const { injectExecutionResult, loading } = useInjectExecutionResultQuery(queryKey, injectId, target);
+  return <TerminalViewContent injectExecutionResult={injectExecutionResult} loading={loading} />;
+};
+
+const TerminalViewTab: FunctionComponent<Props> = ({ injectId, target, queryKey }) => (queryKey
+  ? <QueriedTerminalViewTab injectId={injectId} target={target} queryKey={queryKey} />
+  : <FetchedTerminalViewTab injectId={injectId} target={target} />);
 
 export default TerminalViewTab;

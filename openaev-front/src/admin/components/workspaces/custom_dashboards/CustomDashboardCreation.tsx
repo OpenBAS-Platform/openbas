@@ -7,6 +7,7 @@ import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { DASHBOARD_BASE_URL } from '../../../../constants/BaseUrls';
 import CustomDashboardForm, { type CustomDashboardFormType } from './CustomDashboardForm';
+import { invalidateDashboardsList } from './dashboardQueries';
 
 const CustomDashboardCreation: FunctionComponent = () => {
   // Standard hooks
@@ -22,6 +23,7 @@ const CustomDashboardCreation: FunctionComponent = () => {
       try {
         const response = await createCustomDashboard(data);
         if (response.data) {
+          invalidateDashboardsList();
           navigate(`${DASHBOARD_BASE_URL}/${response.data.custom_dashboard_id}`);
         }
       } finally {

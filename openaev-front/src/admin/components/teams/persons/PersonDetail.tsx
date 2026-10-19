@@ -1,7 +1,8 @@
 import { Chip } from '@filigran/design-system';
 import { GroupsOutlined, PersonOutlined, TrackChangesOutlined } from '@mui/icons-material';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Alert, AlertTitle, Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { useQuery } from '@tanstack/react-query';
 import { Binoculars } from 'mdi-material-ui';
 import { useCallback, useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
@@ -35,12 +36,16 @@ import {
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useSearchTotal from '../../../../utils/hooks/useSearchTotal';
+import { isClientError } from '../../../../utils/query/queryErrors';
 import { emptyFilled } from '../../../../utils/String';
+import { isFeatureEnabled } from '../../../../utils/utils';
+import { useQueryVersion } from '../../assets/assetQueries';
 import InjectResultList from '../../atomic_testings/InjectResultList';
 import injectResultDetailPath from '../../atomic_testings/injectResultUtils';
 import FindingList from '../../findings/FindingList';
 import EntityReportsPanel from '../../reporting/EntityReportsPanel';
 import PlayerPopover from '../players/PlayerPopover';
+import { invalidatePerson, personEntityKey, personFindingsKey, personInjectsKey, personVersionKey } from '../teamQueries';
 
 // Adds a scoped filter to a search input without mutating the caller's group.
 const withFilter = (input: SearchPaginationInput, key: string, values: string[]): SearchPaginationInput => {
@@ -76,7 +81,29 @@ const PersonDetail = () => {
     organizationsMap: helper.getOrganizationsMap(),
   }));
 
+  // With live updates on, every query of the screen starts with personKey(id): the topic
+  // 'person:<id>' refetches the person (and the teams and organizations it shows), the findings,
+  // the injects played and the hero totals together.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  // The person, teams and organizations stay in the store (read by the popover and the sections
+  // below); the query reloads them and tells whether the person is still listed, since a reload
+  // merges into the store and keeps a deleted person there.
+  const personQuery = useQuery({
+    queryKey: personEntityKey(userId),
+    queryFn: () => Promise.all([dispatch(fetchPlayers()), dispatch(fetchTeams()), dispatch(fetchOrganizations())])
+      .then(([players]: [{ result?: string[] }, ...unknown[]]) => (players.result ?? []).includes(userId)),
+    enabled: liveUpdates,
+    // The fetch actions show their own error toast: no retry, so one toast per failed load.
+    retry: false,
+  });
+  // Hero totals refetch when this version changes.
+  const version = useQueryVersion(personVersionKey(userId), liveUpdates);
+  // The data loader also keeps the legacy stream open, which still pushes entity changes into
+  // the store; with live updates on, it loads nothing itself.
   useDataLoader(() => {
+    if (liveUpdates) {
+      return;
+    }
     dispatch(fetchPlayers());
     dispatch(fetchTeams());
     dispatch(fetchOrganizations());
@@ -103,8 +130,8 @@ const PersonDetail = () => {
   // the player-level expectations persisted at execution time. Resolved
   // server-side, so no need to load every team of the platform to build the scope.
   const fetchInjectsPlayed = useCallback(
-    (input: SearchPaginationInput): Promise<{ data: Page<InjectResultOutput> }> =>
-      searchInjectsForPlayer(userId, input) as Promise<{ data: Page<InjectResultOutput> }>,
+    (input: SearchPaginationInput, notifyError?: boolean): Promise<{ data: Page<InjectResultOutput> }> =>
+      searchInjectsForPlayer(userId, input, notifyError) as Promise<{ data: Page<InjectResultOutput> }>,
     [userId],
   );
 
@@ -112,12 +139,21 @@ const PersonDetail = () => {
   const injectsTotal = useSearchTotal(useCallback(
     (input: SearchPaginationInput) => searchInjectsForPlayer(userId, input),
     [userId],
-  ));
+  ), version);
   const findingsTotal = useSearchTotal(useCallback(
     (input: SearchPaginationInput) => searchDistinctFindings(withFilter(input, 'finding_users', [userId])),
     [userId],
-  ));
+  ), version);
 
+  // Deleted or no longer visible while on screen: the store may still hold the person.
+  if (liveUpdates && !personQuery.isPending && (isClientError(personQuery.error) || personQuery.data === false || !user)) {
+    return (
+      <Alert severity="warning">
+        <AlertTitle>{t('Warning')}</AlertTitle>
+        {t('Person is currently unavailable or you do not have sufficient permissions to access it.')}
+      </Alert>
+    );
+  }
   if (!user) {
     return <Loader />;
   }
@@ -168,6 +204,7 @@ const PersonDetail = () => {
             <PlayerPopover
               variant="toggle"
               user={user}
+              onUpdate={liveUpdates ? () => invalidatePerson(userId) : undefined}
               onDelete={() => navigate(PERSON_BASE_URL)}
             />
           </>
@@ -221,8 +258,9 @@ const PersonDetail = () => {
       <SectionBlock title={t('Findings')}>
         <FindingList
           filterLocalStorageKey="person-findings"
-          searchDistinctFindings={(input: SearchPaginationInput) => searchDistinctFindings(withFilter(input, 'finding_users', [userId]))}
+          searchDistinctFindings={(input: SearchPaginationInput, notifyError?: boolean) => searchDistinctFindings(withFilter(input, 'finding_users', [userId]), notifyError)}
           contextId={userId}
+          queryKey={liveUpdates ? personFindingsKey(userId) : undefined}
         />
       </SectionBlock>
 
@@ -233,6 +271,7 @@ const PersonDetail = () => {
           queryableHelpers={injectsHelpers}
           searchPaginationInput={injectsInput}
           contextId={userId}
+          queryKey={liveUpdates ? personInjectsKey(userId) : undefined}
         />
       </SectionBlock>
     </Box>

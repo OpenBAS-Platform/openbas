@@ -4,13 +4,10 @@ import { useParams } from 'react-router';
 
 import { fetchExerciseChallenges } from '../../../../../actions/challenge-action';
 import { type ArticlesHelper } from '../../../../../actions/channels/article-helper';
-import { fetchExerciseDocuments } from '../../../../../actions/documents/documents-actions';
-import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { type ChallengeHelper } from '../../../../../actions/helper';
 import { testInject } from '../../../../../actions/inject_test/simulation-inject-test-actions';
 import { type TeamsHelper } from '../../../../../actions/teams/team-helper';
-import { fetchVariablesForExercise } from '../../../../../actions/variables/variable-actions';
 import { type VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import ButtonCreate from '../../../../../components/common/ButtonCreate';
 import { SectionBlock } from '../../../../../components/common/detail/EntityDetailCommon';
@@ -20,7 +17,8 @@ import { type Exercise } from '../../../../../utils/api-types';
 import { EndpointContext } from '../../../../../utils/context/endpoint/EndpointContext';
 import endpointContextForExercise from '../../../../../utils/context/endpoint/EndpointContextForExercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { simulationKey } from '../../../../../utils/query/keys';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import {
   ArticleContext,
   ChallengeContext,
@@ -40,6 +38,7 @@ import ExerciseDistributionScoreByTeamInPercentage from '../overview/ExerciseDis
 import ExerciseDistributionScoreOverTimeByInjectorContract from '../overview/ExerciseDistributionScoreOverTimeByInjectorContract';
 import ExerciseDistributionScoreOverTimeByTeam from '../overview/ExerciseDistributionScoreOverTimeByTeam';
 import ExerciseDistributionScoreOverTimeByTeamInPercentage from '../overview/ExerciseDistributionScoreOverTimeByTeamInPercentage';
+import useSimulationStoreData from '../simulationStoreQueries';
 import teamContextForExercise from '../teams/teamContextForExercise';
 
 const ExerciseInjects: FunctionComponent = () => {
@@ -70,18 +69,12 @@ const ExerciseInjects: FunctionComponent = () => {
       };
     },
   );
-  useDataLoader(() => {
-    dispatch(fetchExerciseTeams(exerciseId));
-    dispatch(fetchVariablesForExercise(exerciseId));
-    dispatch(fetchExerciseDocuments(exerciseId));
-  });
   // The score distribution charts read the simulation expectations from the store: load them only
   // when they are displayed
-  useDataLoader(() => {
-    if (viewMode === 'distribution') {
-      dispatch(fetchExerciseInjectExpectations(exerciseId));
-    }
-  }, [viewMode]);
+  useSimulationStoreData(exerciseId, viewMode === 'distribution' ? ['teams', 'variables', 'documents', 'expectations'] : ['teams', 'variables', 'documents']);
+  // With live updates on, the paginated injects list is a query under the simulation key.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const injectsQueryKey = useMemo(() => (liveUpdates ? [...simulationKey(exerciseId), 'injects', 'list'] : undefined), [liveUpdates, exerciseId]);
 
   const articleContext = articleContextForExercise(exerciseId);
   const teamContext = teamContextForExercise(exerciseId);
@@ -111,6 +104,7 @@ const ExerciseInjects: FunctionComponent = () => {
                     variables={variables}
                     uriVariable={`/admin/simulations/${exerciseId}/injects`}
                     variablesConfigurationUri={buildSimulationVariablesConfigurationUrl(exerciseId)}
+                    queryKey={injectsQueryKey}
                   />
                 </InjectTestContext.Provider>
               </ChallengeContext.Provider>

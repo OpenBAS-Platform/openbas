@@ -108,6 +108,15 @@ public class FindingService {
     return this.findingRepository.save(finding);
   }
 
+  /**
+   * Whether the finding exists in the given tenant. The tenant is compared in the query, so the
+   * answer does not depend on the tenant scope of the transaction.
+   */
+  @Transactional(readOnly = true)
+  public boolean existsInTenant(@NotBlank final String findingId, final String tenantId) {
+    return tenantId != null && this.findingRepository.existsByIdAndTenantId(findingId, tenantId);
+  }
+
   public void deleteFinding(@NotNull final String id) {
     if (!this.findingRepository.existsByIdAndTenantId(id, TenantContext.getCurrentTenant())) {
       throw new EntityNotFoundException("Finding not found with id: " + id);

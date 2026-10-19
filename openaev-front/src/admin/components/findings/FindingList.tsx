@@ -1,5 +1,6 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from '@filigran/design-system';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { type QueryKey } from '@tanstack/react-query';
 import { Binoculars } from 'mdi-material-ui';
 import { type CSSProperties, useState } from 'react';
 import { Link } from 'react-router';
@@ -20,7 +21,7 @@ import { type AggregatedFindingOutput, type SearchPaginationInput, type TargetSi
 import ContractOutputElementType from './ContractOutputElementType';
 
 interface Props {
-  searchDistinctFindings: (input: SearchPaginationInput) => Promise<{ data: Page<AggregatedFindingOutput> }>;
+  searchDistinctFindings: (input: SearchPaginationInput, notifyError?: boolean) => Promise<{ data: Page<AggregatedFindingOutput> }>;
   filterLocalStorageKey: string;
   contextId?: string;
   // Column fields to hide (e.g. ['finding_asset_groups']) — defaults to showing all columns.
@@ -28,6 +29,8 @@ interface Props {
   // Compact mode for embedding in a narrow container (e.g. the attack-path drawer): hides the
   // search/filters/pagination top bar. Defaults to false so the full-page usage is unchanged.
   compact?: boolean;
+  // Given a key, the list is a query under it (see PaginationComponentV2), refetched when it is invalidated.
+  queryKey?: QueryKey;
 }
 
 const inlineStyles: Record<string, CSSProperties> = ({
@@ -39,7 +42,7 @@ const inlineStyles: Record<string, CSSProperties> = ({
   finding_updated_at: { width: '14%' },
 });
 
-const FindingList = ({ searchDistinctFindings, filterLocalStorageKey, contextId, hiddenFields = [], compact = false }: Props) => {
+const FindingList = ({ searchDistinctFindings, filterLocalStorageKey, contextId, hiddenFields = [], compact = false, queryKey }: Props) => {
   const bodyItemsStyles = useBodyItemsStyles();
   const { t, nsdt } = useFormatter();
   const [loading, setLoading] = useState<boolean>(true);
@@ -69,15 +72,22 @@ const FindingList = ({ searchDistinctFindings, filterLocalStorageKey, contextId,
       ...(compact ? { size: compactPageSize } : {}),
     }),
   );
-  const searchFindingsToload = (input: SearchPaginationInput) => {
-    setLoading(true);
-    return searchDistinctFindings(input)
+  // In query mode the loading state follows the first load only (PaginationComponentV2 sets it),
+  // so a refetch keeps the rows on screen instead of flashing the loader.
+  const queryMode = queryKey !== undefined;
+  const searchFindingsToload = (input: SearchPaginationInput, notifyError?: boolean) => {
+    if (!queryMode) {
+      setLoading(true);
+    }
+    return searchDistinctFindings(input, notifyError)
       .then((res) => {
         setTotal(res.data.totalElements);
         return res;
       })
       .finally(() => {
-        setLoading(false);
+        if (!queryMode) {
+          setLoading(false);
+        }
       });
   };
 
@@ -209,6 +219,8 @@ const FindingList = ({ searchDistinctFindings, filterLocalStorageKey, contextId,
         searchEnable={!compact}
         disableFilters={compact}
         disablePagination={compact}
+        queryKey={queryKey}
+        setLoading={queryMode ? setLoading : undefined}
       />
       <List>
         <ListItem

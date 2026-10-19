@@ -2,14 +2,18 @@ import { Paper, Tabs, TabsList, TabsTrigger } from '@filigran/design-system';
 import { PolicyOutlined, ShieldOutlined } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
+import { useQueryClient } from '@tanstack/react-query';
 // eslint-disable-next-line import/no-named-as-default
 import DOMPurify from 'dompurify';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router';
 
 import type { SecurityPlatformHelper } from '../../../../actions/assets/asset-helper';
-import { fetchSecurityPlatforms } from '../../../../actions/assets/securityPlatform-actions';
-import { fetchSecurityPlatformsForAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { fetchSecurityPlatformList, fetchSecurityPlatforms } from '../../../../actions/assets/securityPlatform-actions';
+import {
+  fetchSecurityPlatformsForAtomicTesting,
+  fetchSecurityPlatformsForAtomicTestingQuery,
+} from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { postDetectionRemediationAIRulesByInject } from '../../../../actions/detection-remediation/detectionremediation-action';
 import { fetchPayloadDetectionRemediationsByInject } from '../../../../actions/injects/inject-action';
 import Empty from '../../../../components/Empty';
@@ -26,11 +30,17 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import RestrictionAccess from '../../../../utils/permissions/RestrictionAccess';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import { atomicTestingKey } from '../../../../utils/query/keys';
+import useNotifiedQuery from '../../../../utils/query/useNotifiedQuery';
 import { buildTenantApiPath } from '../../../../utils/url-helper';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import DetectionRemediationInfo from '../../threat_arsenal/form/DetectionRemediationInfo';
 import DetectionRemediationUseAriane from '../../threat_arsenal/form/DetectionRemediationUseAriane';
 import { type SnapshotEditionRemediationType } from '../../threat_arsenal/utils/SnapshotRemediationContext';
 import { useSnapshotRemediation } from '../../threat_arsenal/utils/useSnapshotRemediation';
+
+const NO_SECURITY_PLATFORMS: SecurityPlatform[] = [];
+const NO_DETECTION_REMEDIATIONS: DetectionRemediationOutput[] = [];
 
 // Remediations are keyed by security platform (manual platforms included): the tab
 // list is the security platform inventory, with no dependency on registered collectors.
@@ -42,18 +52,53 @@ const AtomicTestingRemediations = () => {
   const location = useLocation();
   const [tabs, setTabs] = useState<SecurityPlatform[]>([]);
   const [activeTab, setActiveTab] = useState<number>(0);
-  const [detectionRemediations, setDetectionRemediations] = useState<DetectionRemediationOutput[]>([]);
+  const [stateDetectionRemediations, setStateDetectionRemediations] = useState<DetectionRemediationOutput[]>([]);
   const [hasFetchedRemediations, setHasFetchedRemediations] = useState(false);
   const ability = useAbility();
+  const queryClient = useQueryClient();
+  // With live updates on, the platforms and the remediations are queries under the atomic testing
+  // key, outside the Redux store. They do not change while the screen is open: no refetch interval.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   const isRemediationTab = location.pathname.includes('/remediations');
 
   const hasSecurityPlatformsAccess = ability.can(ACTIONS.ACCESS, SUBJECTS.SECURITY_PLATFORMS);
-  const [loading, setLoading] = useState(false);
+  const [stateLoading, setLoading] = useState(false);
 
-  const { securityPlatforms }: { securityPlatforms: SecurityPlatform[] } = useHelper(
+  const { securityPlatforms: storeSecurityPlatforms }: { securityPlatforms: SecurityPlatform[] } = useHelper(
     (helper: SecurityPlatformHelper) => ({ securityPlatforms: helper.getSecurityPlatforms() }),
   );
+
+  // Users without the global security-platform capability read the platforms through the scoped
+  // atomic testing endpoint.
+  const securityPlatformsQuery = useNotifiedQuery({
+    queryKey: [...atomicTestingKey(injectId ?? ''), 'security-platforms', hasSecurityPlatformsAccess],
+    queryFn: () => (hasSecurityPlatformsAccess ? fetchSecurityPlatformList(false) : fetchSecurityPlatformsForAtomicTestingQuery(injectId, false))
+      .then((result: { data?: SecurityPlatform[] }) => result.data ?? []),
+    enabled: liveUpdates && (hasSecurityPlatformsAccess || !!injectId),
+  });
+
+  const remediationsQueryKey = [...atomicTestingKey(injectId ?? ''), 'detection-remediations'];
+  const remediationsQuery = useNotifiedQuery({
+    queryKey: remediationsQueryKey,
+    queryFn: () => fetchPayloadDetectionRemediationsByInject(injectId, false)
+      .then((result: { data?: DetectionRemediationOutput[] }) => result.data ?? []),
+    enabled: liveUpdates && isRemediationTab && !!injectId,
+  });
+
+  const securityPlatforms = liveUpdates ? (securityPlatformsQuery.data ?? NO_SECURITY_PLATFORMS) : storeSecurityPlatforms;
+  const detectionRemediations = liveUpdates ? (remediationsQuery.data ?? NO_DETECTION_REMEDIATIONS) : stateDetectionRemediations;
+  const loading = liveUpdates ? securityPlatformsQuery.isLoading : stateLoading;
+
+  // A generated rule is saved by the server: write it in the cache too, so it shows before the next
+  // refetch.
+  const setDetectionRemediations = (update: (previous: DetectionRemediationOutput[]) => DetectionRemediationOutput[]) => {
+    if (liveUpdates) {
+      queryClient.setQueryData<DetectionRemediationOutput[]>(remediationsQueryKey, previous => update(previous ?? []));
+    } else {
+      setStateDetectionRemediations(update);
+    }
+  };
 
   const { snapshot, setSnapshot } = useSnapshotRemediation();
   const [activeDetectionRemediation, setActiveDetectionRemediation] = useState<DetectionRemediationOutput>();
@@ -62,6 +107,9 @@ const AtomicTestingRemediations = () => {
   const [typing, setTyping] = useState<boolean>(!!snapshot?.get(tabs[activeTab]?.asset_id)?.isLoading);
 
   useDataLoader(() => {
+    if (liveUpdates) {
+      return;
+    }
     if (hasSecurityPlatformsAccess) {
       setLoading(true);
       dispatch(fetchSecurityPlatforms()).finally(() => {
@@ -85,13 +133,13 @@ const AtomicTestingRemediations = () => {
   }, [securityPlatforms]);
 
   useEffect(() => {
-    if (isRemediationTab && injectId && !hasFetchedRemediations) {
+    if (!liveUpdates && isRemediationTab && injectId && !hasFetchedRemediations) {
       fetchPayloadDetectionRemediationsByInject(injectId).then((result) => {
-        setDetectionRemediations(result.data);
+        setStateDetectionRemediations(result.data);
         setHasFetchedRemediations(true);
       });
     }
-  }, [isRemediationTab, injectId, hasFetchedRemediations]);
+  }, [isRemediationTab, injectId, hasFetchedRemediations, liveUpdates]);
 
   useEffect(() => {
     if (activeTab >= tabs.length) {

@@ -383,6 +383,16 @@ public class CredentialService {
   }
 
   /**
+   * Whether the credential exists in the given tenant. The tenant is compared in the query, so the
+   * answer does not depend on the tenant scope of the transaction.
+   */
+  @Transactional(readOnly = true)
+  public boolean existsInTenant(@NotBlank final String credentialId, final String tenantId) {
+    return tenantId != null
+        && credentialSecretReferenceRepository.existsByIdAndTenantId(credentialId, tenantId);
+  }
+
+  /**
    * Retrieve credential by id within the given tenant.
    *
    * @param credentialId credential identifier

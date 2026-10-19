@@ -1,5 +1,5 @@
 import { DomainOutlined, GroupsOutlined, HelpOutlineOutlined, KeyboardArrowRight, PersonOutlined, TrackChangesOutlined } from '@mui/icons-material';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Alert, AlertTitle, Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Binoculars } from 'mdi-material-ui';
 import { type CSSProperties, useCallback, useEffect, useMemo, useState } from 'react';
@@ -35,9 +35,23 @@ import { type AggregatedFindingOutput, type Filter, type InjectResultOutput, typ
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useSearchTotal from '../../../../utils/hooks/useSearchTotal';
+import { isClientError, retryUnlessClientError } from '../../../../utils/query/queryErrors';
+import useNotifiedQuery from '../../../../utils/query/useNotifiedQuery';
+import useStoreQuery from '../../../../utils/query/useStoreQuery';
+import { isFeatureEnabled } from '../../../../utils/utils';
+import { useQueryVersion } from '../../assets/assetQueries';
 import InjectResultList from '../../atomic_testings/InjectResultList';
 import injectResultDetailPath from '../../atomic_testings/injectResultUtils';
 import FindingList from '../../findings/FindingList';
+import {
+  invalidateOrganization,
+  organizationDirectoryKey,
+  organizationEntityKey,
+  organizationFindingsKey,
+  organizationInjectsKey,
+  organizationMembersKey,
+  organizationVersionKey,
+} from '../teamQueries';
 import OrganizationPopover from './OrganizationPopover';
 
 // Scoped `contains` filter for the hero count probes (array-valued keys such
@@ -72,13 +86,33 @@ const OrganizationDetailContent = () => {
   const bodyItemsStyles = useBodyItemsStyles();
   const { organizationId } = useParams() as { organizationId: string };
 
-  const [organization, setOrganization] = useState<Organization | null>(null);
+  // With live updates on, every query of the screen starts with organizationKey(id): the topic
+  // 'organization:<id>' refetches the organization, its members and teams, findings, injects
+  // played and the hero totals together.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+
+  const [legacyOrganization, setLegacyOrganization] = useState<Organization | null>(null);
   useEffect(() => {
+    if (liveUpdates) {
+      return;
+    }
     // simpleCall has already notified the user on failure, hence the empty catch.
     fetchOrganization(organizationId)
-      .then(response => setOrganization(response.data as Organization))
+      .then(response => setLegacyOrganization(response.data as Organization))
       .catch(() => {});
-  }, [organizationId]);
+  }, [organizationId, liveUpdates]);
+
+  const organizationQuery = useNotifiedQuery({
+    queryKey: organizationEntityKey(organizationId),
+    queryFn: () => fetchOrganization(organizationId, false).then(response => response.data as Organization),
+    retry: retryUnlessClientError,
+    enabled: liveUpdates,
+  });
+  // Deleted or no longer visible while on screen: same warning as on a first load.
+  const liveOrganization = isClientError(organizationQuery.error) ? null : organizationQuery.data ?? null;
+  const organization = liveUpdates ? liveOrganization : legacyOrganization;
+  // Hero totals refetch when this version changes.
+  const version = useQueryVersion(organizationVersionKey(organizationId), liveUpdates);
 
   const { usersMap, tagsMap, teamsMap } = useHelper((helper: UserHelper & TagHelper & TeamsHelper) => ({
     usersMap: helper.getUsersMap(),
@@ -89,7 +123,17 @@ const OrganizationDetailContent = () => {
   // members list below, so the hero count and the findings scope can never
   // diverge from what the list shows (and no Users-management permission is
   // needed on this business-side page).
+  // With live updates on, a query reloads them into the store under the organization key; the
+  // data loader keeps the legacy stream open and loads nothing itself.
+  useStoreQuery(
+    organizationDirectoryKey(organizationId),
+    () => Promise.all([dispatch(fetchPlayers()), dispatch(fetchTeams())]),
+    { enabled: liveUpdates },
+  );
   useDataLoader(() => {
+    if (liveUpdates) {
+      return;
+    }
     dispatch(fetchPlayers());
     dispatch(fetchTeams());
   });
@@ -108,14 +152,14 @@ const OrganizationDetailContent = () => {
     buildSearchPagination({ sorts: initSorting('user_email') }),
   );
   const fetchOrganizationMembers = useCallback(
-    (input: SearchPaginationInput): Promise<{ data: Page<PlayerOutput> }> =>
+    (input: SearchPaginationInput, notifyError?: boolean): Promise<{ data: Page<PlayerOutput> }> =>
       searchPlayers({
         ...input,
         filterGroup: {
           mode: input.filterGroup?.mode ?? 'and',
           filters: [...(input.filterGroup?.filters ?? []), equals('user_organization', [organizationId])],
         },
-      }) as Promise<{ data: Page<PlayerOutput> }>,
+      }, notifyError) as Promise<{ data: Page<PlayerOutput> }>,
     [organizationId],
   );
 
@@ -180,13 +224,13 @@ const OrganizationDetailContent = () => {
   const injectsTotal = useSearchTotal(useCallback(
     (input: SearchPaginationInput) => searchInjectsForOrganization(organizationId, input),
     [organizationId],
-  ));
+  ), version);
   const findingsTotal = useSearchTotal(useCallback(
     (input: SearchPaginationInput) => (teamIds.length === 0
       ? Promise.resolve({ data: { totalElements: 0 } })
       : searchDistinctFindings(withTeamsScope(input, 'finding_teams'))),
     [teamIds, withTeamsScope],
-  ));
+  ), version);
 
   // Injects played: server-paginated search scoped to the organization.
   const { queryableHelpers: injectsHelpers, searchPaginationInput: injectsInput } = useQueryableWithLocalStorage(
@@ -194,20 +238,31 @@ const OrganizationDetailContent = () => {
     buildSearchPagination({ sorts: initSorting('inject_updated_at', 'DESC') }),
   );
   const fetchInjectsPlayed = useCallback(
-    (input: SearchPaginationInput): Promise<{ data: Page<InjectResultOutput> }> =>
-      searchInjectsForOrganization(organizationId, input) as Promise<{ data: Page<InjectResultOutput> }>,
+    (input: SearchPaginationInput, notifyError?: boolean): Promise<{ data: Page<InjectResultOutput> }> =>
+      searchInjectsForOrganization(organizationId, input, notifyError) as Promise<{ data: Page<InjectResultOutput> }>,
     [organizationId],
   );
   // An organization with no team cannot have findings, and an empty `contains`
   // scope would match everything - so short-circuit to an empty page while
   // keeping the list (search, filters, pagination) rendered.
   const fetchOrganizationFindings = useCallback(
-    (input: SearchPaginationInput): Promise<{ data: Page<AggregatedFindingOutput> }> => (teamIds.length === 0
+    (input: SearchPaginationInput, notifyError?: boolean): Promise<{ data: Page<AggregatedFindingOutput> }> => (teamIds.length === 0
       ? Promise.resolve(buildEmptyPage<AggregatedFindingOutput>(input))
-      : searchDistinctFindings(withTeamsScope(input, 'finding_teams'))),
+      : searchDistinctFindings(withTeamsScope(input, 'finding_teams'), notifyError)),
     [teamIds, withTeamsScope],
   );
+  // The findings scope depends on the organization's teams, so the key carries them: the page
+  // refetches once the teams are loaded or change.
+  const findingsQueryKey = useMemo(() => [...organizationFindingsKey(organizationId), teamIds], [organizationId, teamIds]);
 
+  if (liveUpdates && !organizationQuery.isPending && !organization) {
+    return (
+      <Alert severity="warning">
+        <AlertTitle>{t('Warning')}</AlertTitle>
+        {t('Organization is currently unavailable or you do not have sufficient permissions to access it.')}
+      </Alert>
+    );
+  }
   if (!organization) {
     return <Loader />;
   }
@@ -241,7 +296,7 @@ const OrganizationDetailContent = () => {
               variant="toggle"
               organization={organization}
               tagsMap={tagsMap}
-              onUpdate={(updated: Organization) => setOrganization(updated)}
+              onUpdate={(updated: Organization) => (liveUpdates ? invalidateOrganization(organizationId) : setLegacyOrganization(updated))}
               onDelete={() => navigate(ORGANIZATION_BASE_URL)}
             />
           )}
@@ -275,6 +330,7 @@ const OrganizationDetailContent = () => {
             entityPrefix="user"
             availableFilterNames={['user_email', 'user_firstname', 'user_lastname', 'user_tags']}
             queryableHelpers={membersHelpers}
+            queryKey={liveUpdates ? organizationMembersKey(organizationId) : undefined}
           />
           <List>
             <ListItem
@@ -342,6 +398,7 @@ const OrganizationDetailContent = () => {
             filterLocalStorageKey="organization-findings"
             searchDistinctFindings={fetchOrganizationFindings}
             contextId={organizationId}
+            queryKey={liveUpdates ? findingsQueryKey : undefined}
           />
         </SectionBlock>
 
@@ -352,6 +409,7 @@ const OrganizationDetailContent = () => {
             queryableHelpers={injectsHelpers}
             searchPaginationInput={injectsInput}
             contextId={organizationId}
+            queryKey={liveUpdates ? organizationInjectsKey(organizationId) : undefined}
           />
         </SectionBlock>
       </Box>

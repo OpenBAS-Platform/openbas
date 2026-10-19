@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router';
 
 import { updateExercise } from '../../../../../actions/Exercise';
@@ -19,11 +20,14 @@ import {
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { Can, useAbility } from '../../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../../utils/permissions/types';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import type { ParameterOption } from '../../../workspaces/custom_dashboards/CustomDashboardContext';
 import CustomDashboardWrapper from '../../../workspaces/custom_dashboards/CustomDashboardWrapper';
+import { invalidateWidgets, widgetScopeKey } from '../../../workspaces/custom_dashboards/dashboardQueries';
 import NoDashboardComponent from '../../../workspaces/custom_dashboards/NoDashboardComponent';
 import SelectDashboardButton from '../../../workspaces/custom_dashboards/SelectDashboardButton';
 import { ALL_TIME_TIME_RANGE } from '../../../workspaces/custom_dashboards/widgets/configuration/common/TimeRangeUtils';
+import { liveRefetchInterval, simulationDashboardVersionKey } from '../simulationQueries';
 
 const SimulationAnalysis = () => {
   const dispatch = useAppDispatch();
@@ -37,6 +41,27 @@ const SimulationAnalysis = () => {
     exercise: helper.getExercise(exerciseId),
     tenantSettings: helper.getTenantSettings(),
   }));
+
+  // With live updates on, the widgets fetch through queries under the simulation's analytics scope,
+  // which the topic 'list:analytics' refetches. A version query under simulationKey(id) also stands
+  // for them: the topic 'simulation:<id>' and, while the simulation runs, the fallback interval bump
+  // it, and the bump refetches the widgets in the background. It never goes stale on its own, so a
+  // window refocus does not reload every widget.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const { data: dashboardVersion } = useQuery({
+    queryKey: simulationDashboardVersionKey(exerciseId),
+    queryFn: () => Date.now(),
+    initialData: 0,
+    staleTime: Infinity,
+    refetchInterval: liveRefetchInterval(exercise?.exercise_status),
+    enabled: liveUpdates,
+  });
+
+  useEffect(() => {
+    if (dashboardVersion) {
+      invalidateWidgets(widgetScopeKey('simulation', exerciseId));
+    }
+  }, [dashboardVersion]);
 
   const exerciseRef = useRef(exercise);
   exerciseRef.current = exercise;
@@ -86,6 +111,9 @@ const SimulationAnalysis = () => {
     || tenantSettings?.platform_simulation_dashboard
     || undefined;
 
+  // Stable on its own: a new one would reload the whole dashboard, not only its widgets.
+  const fetchCustomDashboard = useCallback(() => fetchCustomDashboardFromSimulation(exerciseId), [exerciseId]);
+
   const configuration = useMemo(() => ({
     customDashboardId: effectiveDashboardId,
     paramLocalStorageKey: 'custom-dashboard-simulation-' + exerciseId,
@@ -97,14 +125,14 @@ const SimulationAnalysis = () => {
     parentContextId: exerciseId,
     canChooseDashboard: ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, exerciseId),
     handleSelectNewDashboard,
-    fetchCustomDashboard: () => fetchCustomDashboardFromSimulation(exerciseId),
+    fetchCustomDashboard,
     fetchCount: (widgetId: string, params: Record<string, string | undefined>) => countBySimulation(exerciseId, widgetId, params),
     fetchAverage: (widgetId: string, params: Record<string, string | undefined>) => averageBySimulation(exerciseId, widgetId, params),
     fetchSeries: (widgetId: string, params: Record<string, string | undefined>) => seriesBySimulation(exerciseId, widgetId, params),
     fetchEntitiesRuntime: (widgetId: string, input: WidgetToEntitiesInput) => widgetToEntitiesBySimulation(exerciseId, widgetId, input),
     fetchEntities: (widgetId: string, params: Record<string, string | undefined>, pagination?: Pagination) => entitiesBySimulation(exerciseId, widgetId, params, pagination),
     fetchAttackPaths: (widgetId: string, params: Record<string, string | undefined>) => attackPathsBySimulation(exerciseId, widgetId, params),
-  }), [effectiveDashboardId, exerciseId, paramsBuilder, ability, handleSelectNewDashboard]);
+  }), [effectiveDashboardId, exerciseId, paramsBuilder, ability, handleSelectNewDashboard, fetchCustomDashboard]);
 
   return (
     <CustomDashboardWrapper

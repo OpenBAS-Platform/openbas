@@ -1,3 +1,4 @@
+import { Alert, AlertTitle } from '@mui/material';
 import { type FunctionComponent, useEffect, useState } from 'react';
 
 import { fetchThreatArsenalAction } from '../../../actions/threat_arsenals/threatArsenal-actions';
@@ -8,7 +9,11 @@ import {
   type ThreatArsenalAction,
   type ThreatArsenalActionFullOutput,
 } from '../../../utils/api-types';
+import { isClientError, retryUnlessClientError } from '../../../utils/query/queryErrors';
+import useNotifiedQuery, { FALLBACK_REFETCH_INTERVAL_MS } from '../../../utils/query/useNotifiedQuery';
+import { isFeatureEnabled } from '../../../utils/utils';
 import ThreatArsenalActionOverview from './ThreatArsenalActionOverview';
+import { threatArsenalActionOverviewKey } from './threatArsenalQueries';
 
 const toPayload = (action: ThreatArsenalActionFullOutput): Payload => {
   return {
@@ -53,10 +58,27 @@ const ThreatArsenalInformationDrawer: FunctionComponent<Props> = ({
 }) => {
   const { t } = useFormatter();
 
-  const [loading, setLoading] = useState(false);
-  const [fullOutput, setFullOutput] = useState<ThreatArsenalActionFullOutput | null>(null);
+  // With live updates on, the details are a query under the action's key, which the topic
+  // 'payload:<id>' refetches, with a slow interval as fallback.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const actionId = threatArsenalAction?.injector_contract_id;
+  const queryEnabled = liveUpdates && open && !!actionId;
+  const detailsQuery = useNotifiedQuery({
+    queryKey: threatArsenalActionOverviewKey(actionId ?? ''),
+    queryFn: () => fetchThreatArsenalAction(actionId ?? '', false).then(result => result.data as ThreatArsenalActionFullOutput),
+    enabled: queryEnabled,
+    retry: retryUnlessClientError,
+    // A failing action (deleted, rights lost) stops polling; an invalidation still refetches it.
+    refetchInterval: query => (query.state.status === 'error' ? false : FALLBACK_REFETCH_INTERVAL_MS),
+  });
+
+  const [legacyLoading, setLoading] = useState(false);
+  const [legacyFullOutput, setFullOutput] = useState<ThreatArsenalActionFullOutput | null>(null);
 
   useEffect(() => {
+    if (liveUpdates) {
+      return undefined;
+    }
     // Reset state on every (re)entry so a previous in-flight fetch whose
     // `.finally()` was skipped by the cancellation guard can't leave the drawer
     // stuck on a spinner when the next opened action resolves quickly.
@@ -92,11 +114,41 @@ const ThreatArsenalInformationDrawer: FunctionComponent<Props> = ({
     };
   }, [open, threatArsenalAction]);
 
+  const fullOutput = liveUpdates ? (detailsQuery.data ?? null) : legacyFullOutput;
+  const loading = liveUpdates ? queryEnabled && detailsQuery.isPending : legacyLoading;
+  // Deleted or no longer visible, on a first load or while the drawer is open.
+  const unavailable = liveUpdates && queryEnabled && isClientError(detailsQuery.error);
+
   // Only payload-based contracts produce a payload object (execution/arguments/
   // cleanup sections). Expectations are passed separately so injector-based
   // contracts without a payload still display them.
   const selectedPayload: Payload | null
     = fullOutput && threatArsenalAction?.action_payload ? toPayload(fullOutput) : null;
+
+  const renderContent = () => {
+    if (threatArsenalAction == null) {
+      return <></>;
+    }
+    if (unavailable) {
+      return (
+        <Alert severity="warning">
+          <AlertTitle>{t('Warning')}</AlertTitle>
+          {t('Action is currently unavailable or you do not have sufficient permissions to access it.')}
+        </Alert>
+      );
+    }
+    return (
+      <ThreatArsenalActionOverview
+        action={threatArsenalAction}
+        payload={selectedPayload}
+        expectations={fullOutput?.action_expectations}
+        expectationDetails={fullOutput?.action_expectation_details}
+        expectedSecurityPlatforms={fullOutput?.action_expected_security_platforms}
+        providing={fullOutput?.action_providing}
+        loading={loading}
+      />
+    );
+  };
 
   return (
     <Drawer
@@ -104,17 +156,7 @@ const ThreatArsenalInformationDrawer: FunctionComponent<Props> = ({
       handleClose={onClose}
       title={t('Action information')}
     >
-      {threatArsenalAction == null ? <></> : (
-        <ThreatArsenalActionOverview
-          action={threatArsenalAction}
-          payload={selectedPayload}
-          expectations={fullOutput?.action_expectations}
-          expectationDetails={fullOutput?.action_expectation_details}
-          expectedSecurityPlatforms={fullOutput?.action_expected_security_platforms}
-          providing={fullOutput?.action_providing}
-          loading={loading}
-        />
-      )}
+      {renderContent()}
     </Drawer>
   );
 };

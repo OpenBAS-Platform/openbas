@@ -1,6 +1,7 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from '@filigran/design-system';
 import { Box, Paper, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
+import { type QueryKey } from '@tanstack/react-query';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
@@ -13,6 +14,8 @@ import { ATOMIC_BASE_URL, SIMULATION_BASE_URL } from '../../../constants/BaseUrl
 import type { FindingOutput, RelatedFindingOutput, SearchPaginationInput } from '../../../utils/api-types';
 import { useAbility } from '../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
+import { retryUnlessClientError } from '../../../utils/query/queryErrors';
+import useNotifiedQuery, { FALLBACK_REFETCH_INTERVAL_MS } from '../../../utils/query/useNotifiedQuery';
 import { buildOccurrencesFilter, occurrenceTargets } from './FindingOccurrencesUtils';
 
 // Maximum markers stacked per time bucket before collapsing into a "+N" badge.
@@ -25,47 +28,39 @@ const BUCKET_SIZE = 2.5;
 // say so explicitly when a pathological finding has even more occurrences.
 const TIMELINE_FETCH_SIZE = 500;
 
+type SearchFindings = (input: SearchPaginationInput, notifyError?: boolean) => Promise<{ data: Page<RelatedFindingOutput> }>;
+type TimelineFinding = Pick<FindingOutput, 'finding_type' | 'finding_value'>;
+
 interface Props {
-  searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<RelatedFindingOutput> }>;
-  finding: Pick<FindingOutput, 'finding_type' | 'finding_value'>;
+  searchFindings: SearchFindings;
+  finding: TimelineFinding;
+  // Given the key of the finding screen, the occurrences are a query under it, refetched when it is invalidated.
+  queryKey?: QueryKey;
+}
+
+// DESC so that, when the window overflows, it keeps the MOST RECENT occurrences
+// (the markers are re-sorted ascending client-side for plotting).
+const timelineInput = (finding: TimelineFinding) => buildSearchPagination({
+  page: 0,
+  size: TIMELINE_FETCH_SIZE,
+  sorts: initSorting('finding_updated_at', 'DESC'),
+  filterGroup: buildOccurrencesFilter(finding),
+});
+
+interface ViewProps {
+  loading: boolean;
+  occurrences: RelatedFindingOutput[];
+  total: number;
 }
 
 // Horizontal occurrence timeline: every detection of this finding is plotted on a single time
 // axis at the moment it was last seen in its inject, so re-detections (e.g. a recurring atomic
 // testing) read as a dense progression and one-shot findings as a single milestone. Mirrors the
 // simulation ExecutionFlowStrip geometry so the two strips feel like the same product.
-const FindingOccurrencesTimeline = ({ searchFindings, finding }: Props) => {
+const TimelineView = ({ loading, occurrences, total }: ViewProps) => {
   const theme = useTheme();
   const { t, fndt } = useFormatter();
   const ability = useAbility();
-
-  const [loading, setLoading] = useState<boolean>(true);
-  const [occurrences, setOccurrences] = useState<RelatedFindingOutput[]>([]);
-  const [total, setTotal] = useState<number>(0);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    // DESC so that, when the window overflows, it keeps the MOST RECENT occurrences
-    // (the markers are re-sorted ascending client-side for plotting).
-    searchFindings(buildSearchPagination({
-      page: 0,
-      size: TIMELINE_FETCH_SIZE,
-      sorts: initSorting('finding_updated_at', 'DESC'),
-      filterGroup: buildOccurrencesFilter(finding),
-    }))
-      .then((res) => {
-        if (cancelled) return;
-        setOccurrences(res.data.content ?? []);
-        setTotal(res.data.totalElements ?? 0);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [finding.finding_type, finding.finding_value]);
 
   const seenAt = (occurrence: RelatedFindingOutput) => new Date(occurrence.finding_updated_at).getTime();
 
@@ -333,5 +328,62 @@ const FindingOccurrencesTimeline = ({ searchFindings, finding }: Props) => {
     </Paper>
   );
 };
+
+interface LoaderProps {
+  searchFindings: SearchFindings;
+  finding: TimelineFinding;
+}
+
+// Loads the occurrences once per finding.
+const LoadedTimeline = ({ searchFindings, finding }: LoaderProps) => {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [occurrences, setOccurrences] = useState<RelatedFindingOutput[]>([]);
+  const [total, setTotal] = useState<number>(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    searchFindings(timelineInput(finding))
+      .then((res) => {
+        if (cancelled) return;
+        setOccurrences(res.data.content ?? []);
+        setTotal(res.data.totalElements ?? 0);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [finding.finding_type, finding.finding_value]);
+
+  return <TimelineView loading={loading} occurrences={occurrences} total={total} />;
+};
+
+// Live updates: the occurrences are a query under the finding screen key.
+const QueriedTimeline = ({ searchFindings, finding, queryKey }: LoaderProps & { queryKey: QueryKey }) => {
+  const { finding_type: findingType, finding_value: findingValue } = finding;
+  const { data, isPending } = useNotifiedQuery({
+    queryKey: [...queryKey, 'occurrences-timeline', findingType, findingValue],
+    queryFn: () => searchFindings(timelineInput({
+      finding_type: findingType,
+      finding_value: findingValue,
+    }), false).then(res => res.data),
+    retry: retryUnlessClientError,
+    refetchInterval: FALLBACK_REFETCH_INTERVAL_MS,
+  });
+
+  return (
+    <TimelineView
+      loading={isPending}
+      occurrences={data?.content ?? []}
+      total={data?.totalElements ?? 0}
+    />
+  );
+};
+
+const FindingOccurrencesTimeline = ({ searchFindings, finding, queryKey }: Props) => (queryKey
+  ? <QueriedTimeline searchFindings={searchFindings} finding={finding} queryKey={queryKey} />
+  : <LoadedTimeline searchFindings={searchFindings} finding={finding} />);
 
 export default FindingOccurrencesTimeline;

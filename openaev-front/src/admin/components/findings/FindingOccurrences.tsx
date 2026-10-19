@@ -1,6 +1,7 @@
 import { ButtonGroup, ButtonGroupItem, Tooltip, TooltipContent, TooltipTrigger } from '@filigran/design-system';
 import { TimelineOutlined, ViewListOutlined } from '@mui/icons-material';
 import { Box } from '@mui/material';
+import { type QueryKey } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { SectionLabel } from '../../../components/common/detail/EntityDetailCommon';
@@ -19,15 +20,17 @@ const initialViewMode = (): ViewMode => (
 );
 
 interface Props {
-  searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<RelatedFindingOutput> }>;
+  searchFindings: (input: SearchPaginationInput, notifyError?: boolean) => Promise<{ data: Page<RelatedFindingOutput> }>;
   finding: Pick<FindingOutput, 'finding_type' | 'finding_value'>;
   contextId?: string;
+  // Given the key of the finding screen, both views are queries under it, refetched when it is invalidated.
+  queryKey?: QueryKey;
 }
 
 // "Finding timeline" section: every occurrence of the finding (one per inject), either as a
 // filterable table or as a horizontal time strip - the strip is what makes a recurring detection
 // (e.g. a scheduled atomic testing re-finding the same credential) readable at a glance.
-const FindingOccurrences = ({ searchFindings, finding, contextId }: Props) => {
+const FindingOccurrences = ({ searchFindings, finding, contextId, queryKey }: Props) => {
   const { t } = useFormatter();
   const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode);
 
@@ -78,12 +81,14 @@ const FindingOccurrences = ({ searchFindings, finding, contextId }: Props) => {
               searchFindings={searchFindings}
               finding={finding}
               contextId={contextId}
+              queryKey={queryKey}
             />
           )
         : (
             <FindingOccurrencesTimeline
               searchFindings={searchFindings}
               finding={finding}
+              queryKey={queryKey}
             />
           )}
     </div>

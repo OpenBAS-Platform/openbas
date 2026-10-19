@@ -2,6 +2,7 @@ import { Chip, Tooltip, TooltipContent, TooltipTrigger } from '@filigran/design-
 import { HelpOutlineOutlined, KeyboardArrowRight } from '@mui/icons-material';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { type QueryKey } from '@tanstack/react-query';
 import { type CSSProperties, type FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
@@ -161,6 +162,8 @@ interface Props {
   scopeField: string;
   entityId: string;
   scopeOperator?: Filter['operator'];
+  /** Given a key, the list is a query under it (see PaginationComponentV2), refetched when it is invalidated. */
+  queryKey?: QueryKey;
 }
 
 // Paginated list of every expectation evaluated against an asset or an asset
@@ -172,6 +175,7 @@ const ExpectationList: FunctionComponent<Props> = ({
   scopeField,
   entityId,
   scopeOperator = 'eq',
+  queryKey,
 }) => {
   const { t, nsdt } = useFormatter();
   const bodyItemsStyles = useBodyItemsStyles();
@@ -306,8 +310,13 @@ const ExpectationList: FunctionComponent<Props> = ({
 
   // The runtime search, filters, sort and page are translated into an ad-hoc
   // dashboard list query scoped to this entity's expectations.
+  // In query mode the loading state follows the first load only (PaginationComponentV2 sets it),
+  // so a refetch keeps the rows on screen instead of flashing the loader.
+  const queryMode = queryKey !== undefined;
   const fetchExpectations = (input: SearchPaginationInput): Promise<{ data: Page<EsBase> }> => {
-    setLoading(true);
+    if (!queryMode) {
+      setLoading(true);
+    }
     const runtimeFilters = input.filterGroup?.filters ?? [];
     const searchFilters = input.textSearch
       ? [filter('base_representative', [input.textSearch], 'contains')]
@@ -343,7 +352,11 @@ const ExpectationList: FunctionComponent<Props> = ({
         totalPages: r.data.page_size ? Math.ceil((r.data.total ?? 0) / r.data.page_size) : 0,
         pageable: { pageNumber: r.data.page_number ?? 0 },
       } as Page<EsBase>,
-    })).finally(() => setLoading(false));
+    })).finally(() => {
+      if (!queryMode) {
+        setLoading(false);
+      }
+    });
   };
 
   return (
@@ -358,6 +371,8 @@ const ExpectationList: FunctionComponent<Props> = ({
         availableFilterNames={['inject_expectation_type', 'inject_expectation_status', 'inject_expectation_score', 'base_security_platforms_side']}
         queryableHelpers={queryableHelpers}
         contextId={entityId}
+        queryKey={queryKey}
+        setLoading={queryMode ? setLoading : undefined}
       />
       <List>
         <ListItem

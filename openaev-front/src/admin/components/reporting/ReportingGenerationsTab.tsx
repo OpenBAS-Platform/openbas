@@ -16,8 +16,7 @@ import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
 import { type ReportingGeneration } from '../../../utils/api-types';
 import { ReportingFormatFragment } from './ReportingFragments';
-
-const LIST_POLL_INTERVAL_MS = 5000;
+import { ACTIVE_GENERATIONS_POLL_INTERVAL_MS, isGenerationActive } from './reportingQueries';
 
 // i18n keys - translated through useFormatter's t()
 const TRIGGER_LABELS: Record<NonNullable<ReportingGeneration['reporting_generation_trigger']>, string> = {
@@ -45,6 +44,8 @@ interface Props {
   /** Empty-state CTA: generate the report in its default format. */
   onGenerate?: () => void;
   generating?: boolean;
+  /** Reload the list on an interval while a generation is active (off when the caller polls it). */
+  pollWhileActive?: boolean;
 }
 
 /**
@@ -52,20 +53,19 @@ interface Props {
  * generations download when the row is clicked; deletion stays as a row
  * action. The list polls itself while a generation is still in progress.
  */
-const ReportingGenerationsTab: FunctionComponent<Props> = ({ generations, onReload, canManage, onGenerate, generating = false }) => {
+const ReportingGenerationsTab: FunctionComponent<Props> = ({ generations, onReload, canManage, onGenerate, generating = false, pollWhileActive = true }) => {
   const { t, fldt } = useFormatter();
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
   const [generationToDelete, setGenerationToDelete] = useState<ReportingGeneration | null>(null);
 
-  const hasActiveGeneration = generations.some(generation =>
-    generation.reporting_generation_status === 'PENDING' || generation.reporting_generation_status === 'RUNNING');
+  const hasActiveGeneration = generations.some(isGenerationActive);
 
   useEffect(() => {
-    if (!hasActiveGeneration) return undefined;
-    const timer = setInterval(onReload, LIST_POLL_INTERVAL_MS);
+    if (!pollWhileActive || !hasActiveGeneration) return undefined;
+    const timer = setInterval(onReload, ACTIVE_GENERATIONS_POLL_INTERVAL_MS);
     return () => clearInterval(timer);
-  }, [hasActiveGeneration, onReload]);
+  }, [pollWhileActive, hasActiveGeneration, onReload]);
 
   const submitDelete = async () => {
     if (!generationToDelete) return;

@@ -25,11 +25,14 @@ import {
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
 import { Can, useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import { CREDENTIALS_LIST_KEY } from '../../../../utils/query/keys';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import ToolBar from '../../common/ToolBar';
 import { humanizeEnum } from '../asset-categories';
 import AssetCategoryIcon from '../AssetCategoryIcon';
 import CredentialCreation from './CredentialCreation';
 import CredentialPopover from './CredentialPopover';
+import { invalidateCredentialsList } from './credentialQueries';
 import CredentialStatusChip from './CredentialStatusChip';
 import convertCredentialFullOutputToCredentialInput from './credentialUtils';
 
@@ -48,6 +51,9 @@ const Credentials = () => {
   const { t, fldt } = useFormatter();
   const bodyItemsStyles = useBodyItemsStyles();
   const ability = useAbility();
+  // With live updates on, the list is a query under the credentials key that stream invalidations
+  // refetch; local changes invalidate it too instead of patching the rows.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
   const [loading, setLoading] = useState<boolean>(true);
   const [credentials, setCredentials] = useState<CredentialOutput[]>([]);
 
@@ -103,6 +109,11 @@ const Credentials = () => {
       credential_ids_to_process: selectAll ? undefined : Object.keys(selectedElements),
       credential_ids_to_ignore: Object.keys(deSelectedElements),
     }).then((result) => {
+      if (liveUpdates) {
+        handleClearSelectedElements();
+        invalidateCredentialsList();
+        return;
+      }
       const deletedIds: string[] = result.data ?? [];
       const newTotal = Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - deletedIds.length);
       setCredentials(current => current.filter(credential => !deletedIds.includes(credential.credential_id ?? '')));
@@ -176,7 +187,9 @@ const Credentials = () => {
         ]}
       />
       <PaginationComponentV2
-        fetch={searchCredentialsToLoad}
+        fetch={liveUpdates ? searchCredentials : searchCredentialsToLoad}
+        queryKey={liveUpdates ? CREDENTIALS_LIST_KEY : undefined}
+        setLoading={liveUpdates ? setLoading : undefined}
         searchPaginationInput={searchPaginationInput}
         setContent={setCredentials}
         entityPrefix="credential"
@@ -192,7 +205,7 @@ const Credentials = () => {
           >
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.CREDENTIALS}>
               <CredentialCreation
-                onCreate={(result) => {
+                onCreate={liveUpdates ? invalidateCredentialsList : (result) => {
                   setCredentials(current => [result, ...current]);
                   queryableHelpers.paginationHelpers.incrementTotalElements(1);
                 }}
@@ -263,7 +276,7 @@ const Credentials = () => {
                     credentialId={credential.credential_id ?? ''}
                     credentialName={credential.credential_name ?? ''}
                     resolveInitialValues={() => resolveCredentialInitialValues(credential.credential_id ?? '')}
-                    onUpdate={(updated) => {
+                    onUpdate={liveUpdates ? invalidateCredentialsList : (updated) => {
                       setCredentials(current => current.map(item => (
                         item.credential_id === updated.credential_id
                           ? {
@@ -273,7 +286,7 @@ const Credentials = () => {
                           : item
                       )));
                     }}
-                    onDelete={(deletedId) => {
+                    onDelete={liveUpdates ? invalidateCredentialsList : (deletedId) => {
                       setCredentials(current => current.filter(item => item.credential_id !== deletedId));
                       queryableHelpers.paginationHelpers.incrementTotalElements(-1);
                     }}

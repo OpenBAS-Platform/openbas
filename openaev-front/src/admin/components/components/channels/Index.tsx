@@ -12,6 +12,9 @@ import { useHelper } from '../../../../store';
 import { type Channel as ChannelType } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { isClientError } from '../../../../utils/query/queryErrors';
+import { isFeatureEnabled } from '../../../../utils/utils';
+import { channelEntityKey, useComponentsStoreQuery } from '../componentsQueries';
 import ChannelHeader from './ChannelHeader';
 
 const Channel = lazy(() => import('./Channel'));
@@ -21,9 +24,20 @@ const Index = () => {
   const dispatch = useAppDispatch();
   const { channelId } = useParams() as { channelId: ChannelType['channel_id'] };
   const { channel } = useHelper((helper: ChannelsHelper) => ({ channel: helper.getChannel(channelId) }));
+  // With live updates on, the channel stays in the store but loads through a query under the
+  // components key: the topic 'list:components' refreshes it.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const channelQuery = useComponentsStoreQuery(channelEntityKey(channelId), () => dispatch(fetchChannel(channelId)), liveUpdates);
+  // The data loader also keeps the legacy stream open; with live updates on, it loads nothing itself.
   useDataLoader(() => {
-    dispatch(fetchChannel(channelId));
+    if (!liveUpdates) {
+      dispatch(fetchChannel(channelId));
+    }
   });
+  // Deleted or no longer visible while on screen: the store may still hold the channel.
+  if (liveUpdates && !channelQuery.isPending && (isClientError(channelQuery.error) || !channel)) {
+    return <NotFound />;
+  }
   if (channel) {
     return (
       <div style={{

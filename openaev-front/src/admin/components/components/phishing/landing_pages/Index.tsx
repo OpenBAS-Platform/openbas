@@ -12,6 +12,9 @@ import { useHelper } from '../../../../../store';
 import { type PhishingLandingPage as PhishingLandingPageType } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { isClientError } from '../../../../../utils/query/queryErrors';
+import { isFeatureEnabled } from '../../../../../utils/utils';
+import { phishingLandingPageKey, useComponentsStoreQuery } from '../../componentsQueries';
 import PhishingLandingPageHeader from './PhishingLandingPageHeader';
 
 const PhishingLandingPage = lazy(() => import('./PhishingLandingPage'));
@@ -23,9 +26,20 @@ const Index = () => {
   const { landingPage } = useHelper(
     (helper: PhishingLandingPagesHelper) => ({ landingPage: helper.getPhishingLandingPage(landingPageId) }),
   );
+  // With live updates on, the entity stays in the store but loads through a query under the
+  // components key: the topic 'list:components' refreshes it.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const entityQuery = useComponentsStoreQuery(phishingLandingPageKey(landingPageId), () => dispatch(fetchPhishingLandingPage(landingPageId)), liveUpdates);
+  // The data loader also keeps the legacy stream open; with live updates on, it loads nothing itself.
   useDataLoader(() => {
-    dispatch(fetchPhishingLandingPage(landingPageId));
+    if (!liveUpdates) {
+      dispatch(fetchPhishingLandingPage(landingPageId));
+    }
   });
+  // Deleted or no longer visible while on screen: the store may still hold the entity.
+  if (liveUpdates && !entityQuery.isPending && (isClientError(entityQuery.error) || !landingPage)) {
+    return <NotFound />;
+  }
   if (landingPage) {
     return (
       <div style={{

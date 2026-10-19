@@ -12,6 +12,9 @@ import { type Exercise as ExerciseType, type SimulationChallengesReader } from '
 import { useQueryParameter } from '../../../../../utils/Environment';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useSimulationPermissions from '../../../../../utils/permissions/useSimulationPermissions';
+import { simulationKey } from '../../../../../utils/query/keys';
+import useStoreQuery from '../../../../../utils/query/useStoreQuery';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import ChallengesPreview from '../../../common/challenges/ChallengesPreview';
 import { PreviewChallengeContext } from '../../../common/Context';
 
@@ -29,9 +32,21 @@ const SimulationChallengesPreview = () => {
   const permissions = useSimulationPermissions(exerciseId, fullExercise);
   const [userId, challengeId] = useQueryParameter(['user', 'challenge']);
 
+  // With live updates on, the simulation data of the preview is a store query under the simulation key.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  useStoreQuery(
+    [...simulationKey(exerciseId), 'challenges-preview', userId],
+    () => Promise.all([
+      dispatch(fetchExercise(exerciseId)),
+      dispatch(fetchSimulationObserverChallenges(exerciseId, userId)),
+      dispatch(fetchSimulationPlayerDocuments(exerciseId, userId)),
+    ]),
+    { enabled: liveUpdates && !!exerciseId },
+  );
+
   useEffect(() => {
     dispatch(fetchMe());
-    if (exerciseId) {
+    if (exerciseId && !liveUpdates) {
       dispatch(fetchExercise(exerciseId));
       dispatch(fetchSimulationObserverChallenges(exerciseId, userId));
       dispatch(fetchSimulationPlayerDocuments(exerciseId, userId));

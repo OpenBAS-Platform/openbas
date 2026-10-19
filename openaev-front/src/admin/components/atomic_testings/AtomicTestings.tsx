@@ -9,6 +9,8 @@ import { useQueryableWithLocalStorage } from '../../../components/common/queryab
 import { useFormatter } from '../../../components/i18n';
 import { Can, useAbility } from '../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
+import { ATOMIC_TESTINGS_LIST_KEY } from '../../../utils/query/keys';
+import { isFeatureEnabled } from '../../../utils/utils';
 import InjectResultList from './InjectResultList';
 
 const AtomicTestings = () => {
@@ -17,6 +19,8 @@ const AtomicTestings = () => {
   const navigate = useNavigate();
   const ability = useAbility();
   const canManage = ability.can(ACTIONS.MANAGE, SUBJECTS.ASSESSMENT);
+  // With live updates on, the list is a query that stream invalidations refetch.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('atomic-testing', buildSearchPagination({ sorts: initSorting('inject_updated_at', 'DESC') }));
 
@@ -44,6 +48,7 @@ const AtomicTestings = () => {
       <InjectResultList
         showActions
         fetchInjects={searchAtomicTestings}
+        queryKey={liveUpdates ? ATOMIC_TESTINGS_LIST_KEY : undefined}
         goTo={injectId => `/admin/atomic_testings/${injectId}`}
         queryableHelpers={queryableHelpers}
         searchPaginationInput={searchPaginationInput}

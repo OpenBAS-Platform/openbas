@@ -35,14 +35,14 @@ export const fetchSecurityPlatforms = () => (dispatch: Dispatch) => {
   return getReferential(arrayOfSecurityPlatforms, SECURITY_PLATFORM_URI)(dispatch);
 };
 
-export const fetchSecurityPlatform = (assetId: SecurityPlatform['asset_id']) => {
-  return simpleCall(`${SECURITY_PLATFORM_URI}/${assetId}`);
+export const fetchSecurityPlatform = (assetId: SecurityPlatform['asset_id'], notifyError: boolean = true) => {
+  return simpleCall(`${SECURITY_PLATFORM_URI}/${assetId}`, undefined, notifyError);
 };
 
-export const searchSecurityPlatforms = (searchPaginationInput: SearchPaginationInput) => {
+export const searchSecurityPlatforms = (searchPaginationInput: SearchPaginationInput, notifyError: boolean = true) => {
   const data = searchPaginationInput;
   const uri = `${SECURITY_PLATFORM_URI}/search`;
-  return simplePostCall(uri, data);
+  return simplePostCall(uri, data, undefined, notifyError);
 };
 
 export const searchSecurityPlatformAsOption = (searchText: string = '') => {
@@ -55,3 +55,9 @@ export const searchSecurityPlatformByIdAsOption = (ids: string[]) => {
 };
 
 export const fetchDocumentFromSecurityPlatform = (securityPlatformId: string) => (dispatch: Dispatch) => getReferential(schema.arrayOfDocuments, `${SECURITY_PLATFORM_URI}/${securityPlatformId}/documents`)(dispatch);
+
+// Plain variant of fetchSecurityPlatforms, outside the Redux store, for screens that cache the list
+// in a query.
+export const fetchSecurityPlatformList = (notifyError: boolean = true) => {
+  return simpleCall(SECURITY_PLATFORM_URI, undefined, notifyError);
+};

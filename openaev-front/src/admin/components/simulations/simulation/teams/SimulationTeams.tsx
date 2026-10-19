@@ -1,31 +1,26 @@
 import { type FunctionComponent, useContext } from 'react';
 import { useParams } from 'react-router';
 
-import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import { type Exercise, type Team } from '../../../../../utils/api-types';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import ConfigurationSection from '../../../common/ConfigurationSection';
 import { PermissionsContext, TeamContext } from '../../../common/Context';
 import ContextualTeams from '../../../components/teams/ContextualTeams';
 import UpdateTeams from '../../../components/teams/UpdateTeams';
+import useSimulationStoreData from '../simulationStoreQueries';
 import teamContextForExercise from './teamContextForExercise';
 
 const SimulationTeams: FunctionComponent = () => {
   // Standard hooks
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
 
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const { teamsStore }: { teamsStore: Team[] } = useHelper((helper: ExercisesHelper) => ({ teamsStore: helper.getExerciseTeams(exerciseId) }));
-  useDataLoader(() => {
-    dispatch(fetchExerciseTeams(exerciseId));
-  });
+  useSimulationStoreData(exerciseId, ['teams']);
 
   return (
     <TeamContext.Provider value={teamContextForExercise(exerciseId)}>

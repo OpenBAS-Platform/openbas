@@ -194,6 +194,12 @@ package is never silently untested.
 | Infra tests | 4 cells, `infra-chromium`                        | 7 cells across chrome, chromium, firefox, webkit, edge |
 | **Total cells** | **10**                                           | **25**                                                 |
 
+The `ci` profile turns on every preview feature, but the E2E action overrides that list: by
+default a cell runs with all of them except `STREAM_INVALIDATION`, so the list screens keep their
+usual fetch path and the `remaining` shards check that no invalidation socket opens. Core CI also
+runs a `live-updates` cell whose `enabled_dev_features` entry is `STREAM_INVALIDATION`, which the
+live-update spec reads to expect the socket.
+
 `ubi9` and `webkit` are nightly-only: they exercise the same JAR and were doubling the
 critical path. `artifact_suffix` must stay unique per cell — the report artifact is named
 `playwright-report-<browser><suffix>` and duplicates fail the upload.

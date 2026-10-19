@@ -129,12 +129,18 @@ type DevFeature = NonNullable<
   PlatformSettings['enabled_dev_features']
 >[number];
 
+// Non-hook form, for callers that hold the settings already or may not have them yet.
+export const isFeatureEnabledInSettings = (settings: PlatformSettings | undefined, feature: DevFeature) => {
+  const enabledDevFeatures = settings?.enabled_dev_features ?? [];
+  return enabledDevFeatures.includes('FEATURE_FLAG_ALL') || enabledDevFeatures.includes(feature);
+};
+
 export const isFeatureEnabled = (feature: DevFeature) => {
   const { settings } = useHelper((helper: LoggedHelper) => {
     return { settings: helper.getPlatformSettings() };
   });
 
-  return (settings.enabled_dev_features ?? []).includes('FEATURE_FLAG_ALL') || (settings.enabled_dev_features ?? []).includes(feature);
+  return isFeatureEnabledInSettings(settings, feature);
 };
 
 export const getUrl = (url: string, base: string): string => {

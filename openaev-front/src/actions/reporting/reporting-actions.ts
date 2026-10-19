@@ -15,12 +15,12 @@ export const createReporting = (input: ReportingInput) => {
   return simplePostCall(REPORTING_URI, input);
 };
 
-export const searchReportings = (searchPaginationInput: SearchPaginationInput) => {
-  return simplePostCall(`${REPORTING_URI}/search`, searchPaginationInput);
+export const searchReportings = (searchPaginationInput: SearchPaginationInput, notifyError: boolean = true) => {
+  return simplePostCall(`${REPORTING_URI}/search`, searchPaginationInput, undefined, notifyError);
 };
 
-export const fetchReporting = (id: Reporting['reporting_id']) => {
-  return simpleCall(`${REPORTING_URI}/${id}`);
+export const fetchReporting = (id: Reporting['reporting_id'], notifyError: boolean = true) => {
+  return simpleCall(`${REPORTING_URI}/${id}`, undefined, notifyError);
 };
 
 export const updateReporting = (id: Reporting['reporting_id'], input: ReportingInput) => {
@@ -36,11 +36,14 @@ export const deleteReporting = (id: Reporting['reporting_id']) => {
 export const fetchReportingsByContext = (
   contextType: Reporting['reporting_context_type'],
   contextId?: string,
+  notifyError: boolean = true,
 ) => {
   return simpleCall(
     contextId
       ? `${REPORTING_URI}/context/${contextType}/${contextId}`
       : `${REPORTING_URI}/context/${contextType}`,
+    undefined,
+    notifyError,
   );
 };
 
@@ -50,12 +53,12 @@ export const generateReporting = (id: Reporting['reporting_id'], input: Reportin
   return simplePostCall(`${REPORTING_URI}/${id}/generate`, input);
 };
 
-export const fetchReportingGenerations = (id: Reporting['reporting_id']) => {
-  return simpleCall(`${REPORTING_URI}/${id}/generations`);
+export const fetchReportingGenerations = (id: Reporting['reporting_id'], notifyError: boolean = true) => {
+  return simpleCall(`${REPORTING_URI}/${id}/generations`, undefined, notifyError);
 };
 
-export const fetchReportingGeneration = (generationId: string) => {
-  return simpleCall(`${REPORTING_URI}/generations/${generationId}`);
+export const fetchReportingGeneration = (generationId: string, notifyError: boolean = true) => {
+  return simpleCall(`${REPORTING_URI}/generations/${generationId}`, undefined, notifyError);
 };
 
 export const deleteReportingGeneration = (generationId: string) => {

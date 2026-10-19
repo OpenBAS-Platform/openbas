@@ -7,6 +7,8 @@ import static io.openaev.helper.StreamHelper.fromIterable;
 import static io.openaev.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openaev.context.TxCtx;
+import io.openaev.database.audit.IndexEvent;
+import io.openaev.database.audit.ModelBaseListener;
 import io.openaev.database.model.CustomDashboard;
 import io.openaev.database.model.Setting;
 import io.openaev.database.model.Tenant;
@@ -40,6 +42,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
@@ -50,6 +53,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CustomDashboardService {
 
+  private final ApplicationEventPublisher eventPublisher;
+
   private final CustomDashboardRepository customDashboardRepository;
   private final CustomDashboardMapper customDashboardMapper;
   private final TenantSettingsService tenantSettingsService;
@@ -58,6 +63,16 @@ public class CustomDashboardService {
   private final ExerciseRepository exerciseRepository;
 
   // -- CRUD --
+
+  /**
+   * Whether the custom dashboard exists in the given tenant. The tenant is compared in the query,
+   * so the answer does not depend on the tenant scope of the transaction.
+   */
+  @Transactional(readOnly = true)
+  public boolean existsInTenant(@NotBlank final String customDashboardId, final String tenantId) {
+    return tenantId != null
+        && this.customDashboardRepository.existsByIdAndTenantId(customDashboardId, tenantId);
+  }
 
   /**
    * Creates a new {@link CustomDashboard} entity in the database.
@@ -194,6 +209,8 @@ public class CustomDashboardService {
       throw new EntityNotFoundException("Custom dashboard not found with id: " + id);
     }
     this.customDashboardRepository.deleteByIdNative(id);
+    // The native delete fires no JPA lifecycle event: announce it like the other native deletes.
+    this.eventPublisher.publishEvent(new IndexEvent(ModelBaseListener.DATA_DELETE, id));
   }
 
   // -- OPTION --

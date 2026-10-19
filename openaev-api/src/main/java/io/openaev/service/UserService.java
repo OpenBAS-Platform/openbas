@@ -17,6 +17,8 @@ import io.openaev.config.cache.MarkingClearanceCacheManager;
 import io.openaev.config.cache.TenantMembershipCacheManager;
 import io.openaev.context.TenantScopedTransaction;
 import io.openaev.context.TxCtx;
+import io.openaev.database.audit.IndexEvent;
+import io.openaev.database.audit.ModelBaseListener;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.*;
 import io.openaev.database.specification.GroupSpecification;
@@ -330,6 +332,8 @@ public class UserService {
     sessionManager.invalidateUserSession(userId);
     userRepository.deleteByIdNative(userId);
     tenantMembershipCacheManager.evictForUser(userId, tenantIds);
+    // The native delete fires no JPA lifecycle event: announce it like the other native deletes.
+    eventPublisher.publishEvent(new IndexEvent(ModelBaseListener.DATA_DELETE, userId));
   }
 
   // -- AUTH --

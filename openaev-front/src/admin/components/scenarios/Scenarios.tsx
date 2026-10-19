@@ -25,6 +25,9 @@ import useAuth from '../../../utils/hooks/useAuth';
 import useEntityToggle from '../../../utils/hooks/useEntityToggle';
 import { Can, useAbility } from '../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../utils/permissions/types';
+import { SCENARIOS_LIST_KEY } from '../../../utils/query/keys';
+import queryClient from '../../../utils/query/queryClient';
+import { isFeatureEnabled } from '../../../utils/utils';
 import ImportFromHubButton from '../common/ImportFromHubButton';
 import ToolBar from '../common/ToolBar';
 import ImportUploaderScenario from './ImportUploaderScenario';
@@ -57,6 +60,8 @@ const Scenarios = () => {
   const { isXTMHubAccessible } = useAuth();
   const [loading, setLoading] = useState<boolean>(true);
   const [reloadCount, setReloadCount] = useState<number>(0);
+  // With live updates on, the list is a query that stream invalidations refetch.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
 
   // Headers
   const headers = useMemo(() => [
@@ -172,6 +177,14 @@ const Scenarios = () => {
     return searchScenarios(input).finally(() => setLoading(false));
   };
 
+  const refresh = () => {
+    if (liveUpdates) {
+      queryClient.invalidateQueries({ queryKey: SCENARIOS_LIST_KEY });
+    } else {
+      setReloadCount(count => count + 1);
+    }
+  };
+
   // Bulk selection
   const ability = useAbility();
   const canManage = ability.can(ACTIONS.MANAGE, SUBJECTS.ASSESSMENT);
@@ -209,7 +222,9 @@ const Scenarios = () => {
         }]}
       />
       <PaginationComponentV2
-        fetch={search}
+        fetch={liveUpdates ? searchScenarios : search}
+        queryKey={liveUpdates ? SCENARIOS_LIST_KEY : undefined}
+        setLoading={liveUpdates ? setLoading : undefined}
         reloadContentCount={reloadCount}
         searchPaginationInput={searchPaginationInput}
         setContent={setScenarios}
@@ -243,7 +258,7 @@ const Scenarios = () => {
                 exportProps={exportProps}
               />
               <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSESSMENT}>
-                <ImportUploaderScenario refresh={() => setReloadCount(count => count + 1)} />
+                <ImportUploaderScenario refresh={refresh} />
               </Can>
             </Box>
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSESSMENT}>

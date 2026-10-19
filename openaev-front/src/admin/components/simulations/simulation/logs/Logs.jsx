@@ -7,18 +7,17 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
 
-import { addLog, fetchLogs } from '../../../../../actions/Log';
-import { fetchExerciseObjectives } from '../../../../../actions/Objective';
+import { addLog } from '../../../../../actions/Log';
 import ButtonCreate from '../../../../../components/common/ButtonCreate';
 import { SECTION_LABEL_SX } from '../../../../../components/common/detail/detailStyles';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemTags from '../../../../../components/ItemTags';
 import { useHelper } from '../../../../../store';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { resolveUserName } from '../../../../../utils/String';
 import { PermissionsContext } from '../../../common/Context';
 import ExecutionMenu from '../ExecutionMenu';
+import useSimulationStoreData from '../simulationStoreQueries';
 import LogForm from './LogForm';
 import LogPopover from './LogPopover';
 
@@ -48,10 +47,9 @@ const Logs = () => {
       usersMap: helper.getUsersMap(),
     };
   });
-  useDataLoader(() => {
-    dispatch(fetchExerciseObjectives(exerciseId));
-    dispatch(fetchLogs(exerciseId));
-  });
+  // Store queries under simulationKey(id) with live updates on (data loader otherwise): the topic
+  // 'simulation:<id>' announces the logs written by other users.
+  useSimulationStoreData(exerciseId, ['objectives', 'logs']);
   const scrollToBottom = () => {
     setTimeout(() => {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' });

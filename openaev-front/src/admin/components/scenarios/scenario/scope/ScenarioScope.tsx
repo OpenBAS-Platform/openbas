@@ -1,4 +1,5 @@
-import { useContext, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 
 import type { WorkflowConfigurationHelper } from '../../../../../actions/chaining/workflow-helper';
@@ -6,6 +7,10 @@ import { searchScenarioHealthcheks } from '../../../../../actions/scenarios/scen
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import { useHelper } from '../../../../../store';
 import { type HealthCheck, type Scenario } from '../../../../../utils/api-types';
+import { scenarioKey } from '../../../../../utils/query/keys';
+import queryClient from '../../../../../utils/query/queryClient';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../../utils/query/useNotifiedQuery';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import ScopeDefinition from '../../../chaining/ScopeDefinition';
 import { PermissionsContext } from '../../../common/Context';
 import Healthchecks from '../../../common/healthchecks/Healthchecks';
@@ -31,11 +36,37 @@ const ScenarioScope = ({ readOnly = false, autonomousTimeoutSeconds }: Props) =>
 
   const { permissions } = useContext(PermissionsContext);
 
-  const [healthchecks, setHealthchecks] = useState<HealthCheck[]>([]);
+  // With live updates on, the healthchecks and the scope are queries under the scenario key.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const healthchecksKey = [...scenarioKey(scenarioId), 'healthchecks'];
 
+  const [legacyHealthchecks, setLegacyHealthchecks] = useState<HealthCheck[]>([]);
   useEffect(() => {
-    searchScenarioHealthcheks(scenarioId).then((result: { data: HealthCheck[] }) => setHealthchecks(result.data));
+    if (!liveUpdates) {
+      searchScenarioHealthcheks(scenarioId).then((result: { data: HealthCheck[] }) => setLegacyHealthchecks(result.data));
+    }
   }, [scenarioId, scenario, workflowConfiguration]);
+
+  const { data: queriedHealthchecks } = useQuery({
+    queryKey: healthchecksKey,
+    queryFn: () => searchScenarioHealthcheks(scenarioId).then((result: { data: HealthCheck[] }) => result.data),
+    enabled: liveUpdates,
+    refetchInterval: FALLBACK_REFETCH_INTERVAL_MS,
+    // simpleCall shows its own error toast: no retry, so one toast only.
+    retry: false,
+  });
+  // A local scope edit changes the scenario or its workflow configuration in the store: the
+  // healthchecks follow it, as in legacy mode. The first render is the query's own load.
+  const firstRender = useRef(true);
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+    } else if (liveUpdates) {
+      queryClient.invalidateQueries({ queryKey: healthchecksKey });
+    }
+  }, [scenario, workflowConfiguration]);
+
+  const healthchecks = liveUpdates ? (queriedHealthchecks ?? []) : legacyHealthchecks;
 
   if (!scenario?.scenario_workflow_id) return null;
 
@@ -59,6 +90,7 @@ const ScenarioScope = ({ readOnly = false, autonomousTimeoutSeconds }: Props) =>
         readOnly={isReadOnly}
         autonomous={readOnly}
         autonomousTimeoutSeconds={autonomousTimeoutSeconds}
+        queryKey={liveUpdates ? scenarioKey(scenarioId) : undefined}
       />
     </div>
   );

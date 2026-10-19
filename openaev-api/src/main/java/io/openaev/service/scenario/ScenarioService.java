@@ -645,6 +645,15 @@ public class ScenarioService {
     }
   }
 
+  /**
+   * Whether the scenario exists in the given tenant. The tenant is compared in the query, so the
+   * answer does not depend on the tenant filter being active (a lookup by id is not filtered).
+   */
+  @Transactional(readOnly = true)
+  public boolean existsInTenant(@NotBlank final String scenarioId, final String tenantId) {
+    return tenantId != null && this.scenarioRepository.existsByIdAndTenantId(scenarioId, tenantId);
+  }
+
   @Transactional(rollbackFor = Exception.class)
   public void deleteScenario(@NotBlank final String scenarioId) {
     existsByIdAndTenantId(scenarioId);

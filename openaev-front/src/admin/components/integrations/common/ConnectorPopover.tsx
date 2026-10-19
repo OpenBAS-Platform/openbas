@@ -9,10 +9,12 @@ import { DATA_DELETE_SUCCESS } from '../../../../constants/ActionTypes';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import UpdateConnectorInstanceDrawer from '../connector_instance/UpdateConnectorInstanceDrawer';
 import { isHeartbeatFresh } from './connector-liveliness';
 import { ConnectorContext } from './ConnectorContext';
 import type { ConnectorContextLayoutType } from './ConnectorLayout';
+import { invalidateIntegrations } from './integrationsQueries';
 
 type ConnectorPopoverProps = {
   connectorInstanceId: string;
@@ -50,6 +52,9 @@ const ConnectorPopover = ({ connectorInstanceId, connectorName, disabled = false
       });
     }
     await dispatch(apiRequest.fetchAll());
+    if (isFeatureEnabled('STREAM_INVALIDATION')) {
+      invalidateIntegrations();
+    }
     setOpenDialogDelete(false);
     navigate('..');
   };

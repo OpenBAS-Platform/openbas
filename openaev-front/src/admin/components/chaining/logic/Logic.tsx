@@ -1,5 +1,6 @@
 import { Button } from '@filigran/design-system';
 import { AccountTreeOutlined, Add } from '@mui/icons-material';
+import { type QueryKey, useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { fetchConditions, fetchSteps } from '../../../../actions/chaining/chaining-actions';
@@ -14,6 +15,7 @@ import type {
 } from '../../../../utils/api-types';
 import useLivePolling from '../../../../utils/hooks/useLivePolling';
 import useRemainingViewportHeight from '../../../../utils/hooks/useRemainingViewportHeight';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../utils/query/useNotifiedQuery';
 import { type LogicContext } from './AddComponentButton';
 import ComponentStepperDrawer, { type DrawerView } from './drawer/ComponentStepperDrawer';
 import LogicGraph from './logic-graph/LogicGraph';
@@ -36,9 +38,12 @@ interface LogicProps {
   /** Message shown in the read-only banner explaining WHY the map is frozen. When omitted, no
    *  banner is rendered (the read-only affordances are still hidden). */
   readOnlyMessage?: string;
+  /** Given a key, the workflow shape is read by a query under it, refetched when the key is
+   *  invalidated, instead of the live polling. */
+  queryKey?: QueryKey;
 }
 
-const Logic = ({ workflowId, context, scenarioId, exerciseId, readOnly = false, readOnlyMessage }: LogicProps) => {
+const Logic = ({ workflowId, context, scenarioId, exerciseId, readOnly = false, readOnlyMessage, queryKey }: LogicProps) => {
   const { t } = useFormatter();
   // The canvas sizes itself to the exact space left under the page chrome (no page scrollbar).
   const [graphContainerRef, graphHeight] = useRemainingViewportHeight();
@@ -120,18 +125,35 @@ const Logic = ({ workflowId, context, scenarioId, exerciseId, readOnly = false, 
     shapeSignatureRef.current = signature;
   }, [workflowId]);
 
-  // Re-seed and re-read whenever the workflow changes (simulation/scenario switch).
+  const queryMode = queryKey !== undefined;
+
+  // Re-seed and re-read whenever the workflow changes (simulation/scenario switch). In query mode
+  // the query below does the read.
   useEffect(() => {
     shapeSignatureRef.current = null;
     setHasExistingData(null);
-    void syncShape();
+    if (!queryMode) {
+      void syncShape();
+    }
   }, [workflowId, syncShape]);
 
   // Keep the Logic tab live: while it is open and visible, poll for shape changes the AI (or another
   // user) commits, so authored steps appear without a manual tab reload. Refreshes on change only.
+  // Query mode polls too: workflow steps and conditions emit no stream invalidation.
   useLivePolling(() => {
     void syncShape();
   }, { enabled: !!workflowId });
+
+  // Query mode: the same read runs when the key is invalidated (and on the fallback interval).
+  // Its data is unused: syncShape updates the local state.
+  useQuery({
+    queryKey: [...(queryKey ?? []), 'logic', workflowId],
+    queryFn: () => syncShape().then(() => null),
+    enabled: queryMode && !!workflowId,
+    refetchInterval: FALLBACK_REFETCH_INTERVAL_MS,
+    // The fetch actions show their own error toast: no retry, so one toast only.
+    retry: false,
+  });
 
   const handleStepCreated = useCallback(() => {
     setHasExistingData(true);

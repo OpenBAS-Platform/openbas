@@ -1,7 +1,8 @@
 import { Chip } from '@filigran/design-system';
 import { AssignmentOutlined, GroupsOutlined, HelpOutlineOutlined, HubOutlined, KeyboardArrowRight, PersonOutlined, TrackChangesOutlined } from '@mui/icons-material';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Alert, AlertTitle, Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { useQuery } from '@tanstack/react-query';
 import { type CSSProperties, useCallback, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
@@ -35,6 +36,8 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import { isClientError } from '../../../../utils/query/queryErrors';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import InjectResultList from '../../atomic_testings/InjectResultList';
 import injectResultDetailPath from '../../atomic_testings/injectResultUtils';
 import { TeamContext, type TeamContextType } from '../../common/Context';
@@ -42,6 +45,7 @@ import TeamPlayers from '../../components/teams/TeamPlayers';
 import TeamPopover from '../../components/teams/TeamPopover';
 import FindingList from '../../findings/FindingList';
 import EntityReportsPanel from '../../reporting/EntityReportsPanel';
+import { invalidateTeam, teamEntityKey, teamFindingsKey, teamInjectsKey, teamPersonsKey } from '../teamQueries';
 
 const withFilter = (input: SearchPaginationInput, key: string, values: string[]): SearchPaginationInput => {
   const filter: Filter = {
@@ -80,9 +84,26 @@ const TeamDetail = () => {
     organizationsMap: helper.getOrganizationsMap(),
   }));
 
+  // With live updates on, every query of the screen starts with teamKey(id): the topic
+  // 'team:<id>' refetches the team (hero counters included), its persons, findings and injects
+  // played together.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  // The team and its players stay in the store (read by the popover and the players drawer); the
+  // query only reloads them.
+  const teamQuery = useQuery({
+    queryKey: teamEntityKey(teamId),
+    queryFn: () => Promise.all([dispatch(fetchTeam(teamId)), dispatch(fetchTeamPlayers(teamId))]).then(() => null),
+    enabled: liveUpdates,
+    // The fetch actions show their own error toast: no retry, so one toast per failed load.
+    retry: false,
+  });
+  // The data loader also keeps the legacy stream open; with live updates on, it only loads the
+  // organizations referential.
   useDataLoader(() => {
-    dispatch(fetchTeam(teamId));
-    dispatch(fetchTeamPlayers(teamId));
+    if (!liveUpdates) {
+      dispatch(fetchTeam(teamId));
+      dispatch(fetchTeamPlayers(teamId));
+    }
     dispatch(fetchOrganizations());
   });
 
@@ -99,20 +120,22 @@ const TeamDetail = () => {
   // remove, update, delete) so the list refreshes reactively - never on a mere
   // open/close of the manage-players drawer.
   const [personsReload, setPersonsReload] = useState(0);
+  // With live updates on, the team query refetches the membership and the persons list.
+  const refreshPersons = () => (liveUpdates ? invalidateTeam(teamId) : setPersonsReload(count => count + 1));
 
   const teamContext: TeamContextType = useMemo(() => ({
     async onAddUsersTeam(id: Team['team_id'], userIds: string[]): Promise<void> {
       await dispatch(updateTeamPlayers(id, { team_users: [...(team?.team_users ?? []), ...userIds] }));
-      setPersonsReload(count => count + 1);
+      refreshPersons();
     },
     async onRemoveUsersTeam(id: Team['team_id'], userIds: string[]): Promise<void> {
       await dispatch(updateTeamPlayers(id, { team_users: (team?.team_users ?? []).filter((u: string) => !userIds.includes(u)) }));
-      setPersonsReload(count => count + 1);
+      refreshPersons();
     },
     searchTeams(input: SearchPaginationInput): Promise<{ data: Page<TeamOutput> }> {
       return searchTeams(input) as Promise<{ data: Page<TeamOutput> }>;
     },
-  }), [dispatch, team]);
+  }), [dispatch, team, liveUpdates]);
 
   const { queryableHelpers: injectsHelpers, searchPaginationInput: injectsInput } = useQueryableWithLocalStorage(
     'team-injects',
@@ -123,8 +146,8 @@ const TeamDetail = () => {
   // expectations persisted at execution time. Same scope as the expectation
   // counters in the hero, so the list and the counters stay consistent.
   const fetchInjectsPlayed = useCallback(
-    (input: SearchPaginationInput): Promise<{ data: Page<InjectResultOutput> }> =>
-      searchInjectsForTeam(teamId, input) as Promise<{ data: Page<InjectResultOutput> }>,
+    (input: SearchPaginationInput, notifyError?: boolean): Promise<{ data: Page<InjectResultOutput> }> =>
+      searchInjectsForTeam(teamId, input, notifyError) as Promise<{ data: Page<InjectResultOutput> }>,
     [teamId],
   );
 
@@ -133,8 +156,8 @@ const TeamDetail = () => {
     buildSearchPagination({ sorts: initSorting('user_email') }),
   );
   const fetchTeamPersons = useCallback(
-    (input: SearchPaginationInput): Promise<{ data: Page<PlayerOutput> }> =>
-      searchPlayers(withFilter(input, 'user_teams', [teamId])) as Promise<{ data: Page<PlayerOutput> }>,
+    (input: SearchPaginationInput, notifyError?: boolean): Promise<{ data: Page<PlayerOutput> }> =>
+      searchPlayers(withFilter(input, 'user_teams', [teamId]), notifyError) as Promise<{ data: Page<PlayerOutput> }>,
     [teamId],
   );
 
@@ -179,6 +202,16 @@ const TeamDetail = () => {
     },
   ], [organizationsMap]);
 
+  // Deleted or no longer visible while on screen: the store may still hold the team, so the
+  // query's 4xx shows the warning too.
+  if (liveUpdates && !teamQuery.isPending && (isClientError(teamQuery.error) || !team)) {
+    return (
+      <Alert severity="warning">
+        <AlertTitle>{t('Warning')}</AlertTitle>
+        {t('Team is currently unavailable or you do not have sufficient permissions to access it.')}
+      </Alert>
+    );
+  }
   if (!team) {
     return <Loader />;
   }
@@ -232,7 +265,7 @@ const TeamDetail = () => {
                 variant="toggle"
                 team={team}
                 managePlayers={() => setManaging(true)}
-                onUpdate={() => dispatch(fetchTeam(teamId))}
+                onUpdate={() => (liveUpdates ? invalidateTeam(teamId) : dispatch(fetchTeam(teamId)))}
                 onDelete={() => navigate(TEAM_BASE_URL)}
               />
             </>
@@ -276,6 +309,7 @@ const TeamDetail = () => {
             availableFilterNames={['user_email', 'user_firstname', 'user_lastname', 'user_organization', 'user_tags']}
             queryableHelpers={personsHelpers}
             reloadContentCount={personsReload}
+            queryKey={liveUpdates ? teamPersonsKey(teamId) : undefined}
           />
           <List>
             <ListItem
@@ -341,8 +375,9 @@ const TeamDetail = () => {
         <SectionBlock title={t('Findings')}>
           <FindingList
             filterLocalStorageKey="team-findings"
-            searchDistinctFindings={(input: SearchPaginationInput) => searchDistinctFindings(withFilter(input, 'finding_teams', [teamId]))}
+            searchDistinctFindings={(input: SearchPaginationInput, notifyError?: boolean) => searchDistinctFindings(withFilter(input, 'finding_teams', [teamId]), notifyError)}
             contextId={teamId}
+            queryKey={liveUpdates ? teamFindingsKey(teamId) : undefined}
           />
         </SectionBlock>
 
@@ -353,6 +388,7 @@ const TeamDetail = () => {
             queryableHelpers={injectsHelpers}
             searchPaginationInput={injectsInput}
             contextId={teamId}
+            queryKey={liveUpdates ? teamInjectsKey(teamId) : undefined}
           />
         </SectionBlock>
 
@@ -363,7 +399,7 @@ const TeamDetail = () => {
             // every mutation already refreshes reactively (context handlers +
             // onPlayersChange below).
             handleClose={() => setManaging(false)}
-            onPlayersChange={() => setPersonsReload(count => count + 1)}
+            onPlayersChange={refreshPersons}
             canManage={ability.can(ACTIONS.MANAGE, SUBJECTS.TEAMS_AND_PLAYERS)}
           />
         )}

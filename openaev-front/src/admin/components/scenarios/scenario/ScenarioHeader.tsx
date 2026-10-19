@@ -20,15 +20,14 @@ import {
 } from '@mui/icons-material';
 import { Box, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type Dispatch, type ReactNode, type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { type Dispatch, type ReactNode, type SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 
 import { fetchScenarioAutonomousConfig, launchAutonomousFromScenario, planAutonomousScenario, saveScenarioAutonomousConfig } from '../../../../actions/autonomous/autonomous-actions';
 import { type AutonomousRun, type AutonomousRunCreateInput } from '../../../../actions/autonomous/autonomous-types';
 import { fetchSteps } from '../../../../actions/chaining/chaining-actions';
 import type { WorkflowConfigurationHelper } from '../../../../actions/chaining/workflow-helper';
-import { fetchScenarioChallenges } from '../../../../actions/challenge-action';
-import { fetchScenarioArticles } from '../../../../actions/channels/article-action';
 import { type ArticlesHelper } from '../../../../actions/channels/article-helper';
 import { type ChallengeHelper } from '../../../../actions/helper';
 import { type InjectHelper } from '../../../../actions/injects/inject-helper';
@@ -37,7 +36,6 @@ import {
   dismissScenarioExpectationsDrift,
   fetchScenario,
   fetchScenarioExpectationsDrift,
-  fetchScenarioTeams,
   realignScenarioExpectations,
   searchScenarioHealthcheks,
   updateScenarioRecurrence,
@@ -66,12 +64,15 @@ import {
 import { MESSAGING$, useQueryParameter } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useAuth from '../../../../utils/hooks/useAuth';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 import { type Cron } from '../../../../utils/period/Cron';
 import handle from '../../../../utils/period/Period';
 import useScenarioPermissions from '../../../../utils/permissions/useScenarioPermissions';
+import queryClient from '../../../../utils/query/queryClient';
+import { retryUnlessClientError } from '../../../../utils/query/queryErrors';
+import useNotifiedQuery from '../../../../utils/query/useNotifiedQuery';
 import { truncate } from '../../../../utils/String';
+import { isFeatureEnabled } from '../../../../utils/utils';
 import isXtmOneAvailable from '../../ariane/xtmOneAvailability';
 import AutonomousRunConfigDrawer from '../../autonomous/AutonomousRunConfigDrawer';
 import { type RebuildMode } from '../../autonomous/AutonomousRunConfigFields';
@@ -95,6 +96,16 @@ import {
 } from '../ScenarioConfigurationTab';
 import ScenarioConfiguration from './ScenarioConfiguration';
 import ScenarioPopover from './ScenarioPopover';
+import {
+  invalidateScenario,
+  scenarioExpectationsDriftKey,
+  scenarioHealthchecksKey,
+  scenarioWorkflowStepsKey,
+  useScenarioHealthchecks,
+} from './scenarioQueries';
+import useScenarioStoreData, { type ScenarioStoreDataset } from './scenarioStoreQueries';
+
+const HEADER_STORE_DATASETS: ScenarioStoreDataset[] = ['challenges', 'injects', 'teams', 'articles'];
 
 interface ScenarioHeaderProps {
   setOpenInstantiateSimulationAndStart: Dispatch<SetStateAction<boolean>>;
@@ -137,12 +148,15 @@ const ScenarioHeader = ({
   const [openConfiguration, setOpenConfiguration] = useState(false);
   const [configurationInitialTab, setConfigurationInitialTab] = useState<ScenarioConfigurationTab>(ScenarioConfigurationTab.TEAMS);
   const [openScheduling, setOpenScheduling] = useState(false);
-  const [healthchecks, setHealthchecks] = useState<HealthCheck[]>([]);
-  const [expectationsDrift, setExpectationsDrift] = useState<ExpectationsDriftOutput | null>(null);
+  // With live updates on, the header data are queries under scenarioKey(id), refetched by the topic
+  // 'scenario:<id>'; the state below only serves the legacy path.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const [legacyHealthchecks, setHealthchecks] = useState<HealthCheck[]>([]);
+  const [legacyExpectationsDrift, setExpectationsDrift] = useState<ExpectationsDriftOutput | null>(null);
   // Number of authored attack-path steps on the scenario's chaining workflow. A chained scenario
   // builds its attack path as workflow step templates, not classic scenario injects, so this is the
   // meaningful "how big is the attack path" stat for the hero.
-  const [attackPathStepCount, setAttackPathStepCount] = useState<number | null>(null);
+  const [legacyAttackPathStepCount, setAttackPathStepCount] = useState<number | null>(null);
   // The shared AI-run configuration drawer (objective, agents, scope, time budget), plus which
   // action it is scoped to: "build" (the AI builder - Save the config for later or Build/plan it
   // now, authoring onto the scenario) or "launch" (Autonomous - live run). Also its in-flight /
@@ -184,17 +198,38 @@ const ScenarioHeader = ({
   // usage-aware hero stats: the GET /scenarios/{id} ScenarioOutput DTO carries
   // no scenario_injects / scenario_teams / scenario_articles relations, so
   // counting those entity fields would always render 0 after a reload.
-  useDataLoader(() => {
-    dispatch(fetchScenarioChallenges(scenarioId));
-    dispatch(fetchScenarioInjectsSimple(scenarioId));
-    dispatch(fetchScenarioTeams(scenarioId));
-    dispatch(fetchScenarioArticles(scenarioId));
-  });
+  // Store queries shared with the tabs, which read the same store entries: one invalidation
+  // refreshes the header counts and the tabs together, and they share one request.
+  useScenarioStoreData(scenarioId, HEADER_STORE_DATASETS);
   const hasChallenges = challenges.length > 0;
 
   const scenarioWorkflowId = (scenario as unknown as Record<string, unknown>).scenario_workflow_id as string | undefined;
   const isScenarioChaining = !!scenarioWorkflowId;
   const canOpenConfiguration = canManage && !isScenarioChaining;
+
+  const healthchecksQuery = useScenarioHealthchecks(scenarioId, liveUpdates);
+  const healthchecks = liveUpdates ? healthchecksQuery.data ?? [] : legacyHealthchecks;
+  const driftQuery = useNotifiedQuery({
+    queryKey: scenarioExpectationsDriftKey(scenarioId),
+    queryFn: () => fetchScenarioExpectationsDrift(scenarioId, false).then((result: { data: ExpectationsDriftOutput }) => result.data),
+    retry: retryUnlessClientError,
+    enabled: liveUpdates,
+  });
+  const expectationsDrift = liveUpdates ? driftQuery.data ?? null : legacyExpectationsDrift;
+  const stepCountQueryOptions = (workflowId: string) => ({
+    queryKey: scenarioWorkflowStepsKey(scenarioId, workflowId),
+    queryFn: () => fetchSteps(workflowId).then(result => result.data?.length ?? 0),
+    // fetchSteps shows its own error toast: no retry, so one toast per failed load.
+    retry: false,
+  });
+  const stepCountQuery = useQuery({
+    ...stepCountQueryOptions(scenarioWorkflowId ?? ''),
+    enabled: liveUpdates && !!scenarioWorkflowId,
+  });
+  let attackPathStepCount = legacyAttackPathStepCount;
+  if (liveUpdates) {
+    attackPathStepCount = scenarioWorkflowId ? stepCountQuery.data ?? null : null;
+  }
 
   // "?config=variables" deep link (e.g. from the "manage custom variables" link in
   // AvailableVariablesDialog): the query param is always stripped afterward - whether or not it
@@ -263,8 +298,12 @@ const ScenarioHeader = ({
     // actual data; a failure keeps it null and hasExistingLogic fails SAFE (refine default).
     if (intent === 'build' && scenarioWorkflowId && attackPathStepCount === null) {
       try {
-        const result = await fetchSteps(scenarioWorkflowId);
-        setAttackPathStepCount(result.data?.length ?? 0);
+        if (liveUpdates) {
+          await queryClient.fetchQuery(stepCountQueryOptions(scenarioWorkflowId));
+        } else {
+          const result = await fetchSteps(scenarioWorkflowId);
+          setAttackPathStepCount(result.data?.length ?? 0);
+        }
       } catch {
         // Leave null: hasExistingLogic treats the unknown count as existing logic (fail safe).
       }
@@ -380,7 +419,17 @@ const ScenarioHeader = ({
       filterValuesMap,
     );
 
+  // With live updates on, the scenario and its invalidations already refetch the healthchecks; only
+  // a workflow configuration change (scope edited in another tab) refetches them from here.
+  const healthcheckWorkflowConfiguration = useRef(workflowConfiguration);
   useEffect(() => {
+    if (liveUpdates) {
+      if (healthcheckWorkflowConfiguration.current !== workflowConfiguration) {
+        healthcheckWorkflowConfiguration.current = workflowConfiguration;
+        queryClient.invalidateQueries({ queryKey: scenarioHealthchecksKey(scenarioId) });
+      }
+      return;
+    }
     searchScenarioHealthcheks(scenarioId).then((result: { data: HealthCheck[] }) => setHealthchecks(result.data));
   }, [scenarioId, scenario, workflowConfiguration]);
 
@@ -388,6 +437,9 @@ const ScenarioHeader = ({
   // (its authored step templates).
   useEffect(() => {
     let stale = false;
+    if (liveUpdates) {
+      return undefined;
+    }
     if (scenarioWorkflowId) {
       fetchSteps(scenarioWorkflowId)
         .then((result) => {
@@ -409,6 +461,9 @@ const ScenarioHeader = ({
     // the previous scenario must not overwrite the current one. simpleCall has
     // already notified the user on failure, hence the deliberately empty catch.
     let stale = false;
+    if (liveUpdates) {
+      return undefined;
+    }
     fetchScenarioExpectationsDrift(scenarioId)
       .then((result: { data: ExpectationsDriftOutput }) => {
         if (!stale) setExpectationsDrift(result.data);
@@ -421,6 +476,11 @@ const ScenarioHeader = ({
 
   const onRealignExpectations = async () => {
     await realignScenarioExpectations(scenarioId);
+    if (liveUpdates) {
+      // Realigning rewrites injects: refetch the drift, the injects and the rest of the screen.
+      await invalidateScenario(scenarioId);
+      return;
+    }
     const result = await fetchScenarioExpectationsDrift(scenarioId);
     setExpectationsDrift(result.data);
     dispatch(fetchScenarioInjectsSimple(scenarioId));
@@ -430,6 +490,10 @@ const ScenarioHeader = ({
   // returns the refreshed drift report.
   const onDismissExpectations = async (dismissed: boolean) => {
     const result = await dismissScenarioExpectationsDrift(scenarioId, dismissed);
+    if (liveUpdates) {
+      queryClient.setQueryData(scenarioExpectationsDriftKey(scenarioId), result.data);
+      return;
+    }
     setExpectationsDrift(result.data);
   };
 
@@ -520,7 +584,11 @@ const ScenarioHeader = ({
       onAutonomousRunUpdate?.(data);
       // Refresh the scenario so its exercise list (Execution / Attack path tabs) picks up the live
       // simulation the launch just provisioned - keeping the scenario view in sync with the run.
-      dispatch(fetchScenario(scenarioId));
+      if (liveUpdates) {
+        invalidateScenario(scenarioId);
+      } else {
+        dispatch(fetchScenario(scenarioId));
+      }
       setAiDrawerOpen(false);
       MESSAGING$.notifySuccess(t('Autonomous run launched; the orchestrator is now driving the simulation'));
       navigate(`/admin/scenarios/${scenarioId}`);

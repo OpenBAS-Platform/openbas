@@ -1,5 +1,6 @@
 import { Button, Chip } from '@filigran/design-system';
 import { Box, TablePagination } from '@mui/material';
+import { keepPreviousData, type QueryKey } from '@tanstack/react-query';
 import { type ChangeEvent, cloneElement, type MouseEvent as ReactMouseEvent, type ReactElement, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -8,6 +9,7 @@ import MitreFilter, { MITRE_FILTER_KEY } from '../../../admin/components/common/
 import useKillChains from '../../../admin/components/common/filters/useKillChains';
 import mitreAttack from '../../../static/images/misc/attack.png';
 import { type AttackPattern, type Filter, type SearchPaginationInput } from '../../../utils/api-types';
+import useNotifiedQuery, { FALLBACK_REFETCH_INTERVAL_MS } from '../../../utils/query/useNotifiedQuery';
 import { useFormatter } from '../../i18n';
 import SearchFilter from '../../SearchFilter';
 import Drawer from '../Drawer';
@@ -43,8 +45,37 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
+type Fetch<T> = (input: SearchPaginationInput, notifyError?: boolean) => Promise<{ data: Page<T> }>;
+
+interface PageQueryProps<T> {
+  queryKey: QueryKey;
+  fetch: Fetch<T>;
+  input: SearchPaginationInput;
+  onPage: (page: Page<T>) => void;
+}
+
+// Query mode: the page lives in the query cache under [...queryKey, input], so a stream
+// invalidation, a window refocus or the fallback interval reloads it with the same input.
+const PageQuery = <T extends object>({ queryKey, fetch, input, onPage }: PageQueryProps<T>) => {
+  const { data, isPlaceholderData } = useNotifiedQuery({
+    queryKey: [...queryKey, input],
+    // The error toast is shown once by useNotifiedQuery, after the library's retries.
+    queryFn: () => fetch(input, false).then(result => result.data),
+    placeholderData: keepPreviousData,
+    refetchInterval: FALLBACK_REFETCH_INTERVAL_MS,
+  });
+
+  useEffect(() => {
+    if (data && !isPlaceholderData) {
+      onPage(data);
+    }
+  }, [data, isPlaceholderData]);
+
+  return null;
+};
+
 interface Props<T> {
-  fetch: (input: SearchPaginationInput) => Promise<{ data: Page<T> }>;
+  fetch: Fetch<T>;
   searchPaginationInput: SearchPaginationInput;
   setContent: (data: T[]) => void;
   exportProps?: ExportProps<T>;
@@ -64,6 +95,9 @@ interface Props<T> {
   // Notified whenever the total number of elements changes (e.g. for bulk
   // select-all counting in the parent list).
   onTotalElementsChange?: (totalElements: number) => void;
+  // Given a key, the page is fetched through the query cache under [...queryKey, input] instead of
+  // the effect below: invalidate the key to reload it.
+  queryKey?: QueryKey;
 }
 
 /**
@@ -83,6 +117,7 @@ const PaginationComponent = <T extends object>({
   createButton,
   topRightSlot,
   onTotalElementsChange,
+  queryKey,
 }: Props<T>) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -120,28 +155,34 @@ const PaginationComponent = <T extends object>({
   // body stays free of chrome.
   const { killChains, activeKillChain, selectKillChain } = useKillChains();
 
-  useEffect(() => {
-    const finalSearchPaginationInput = {
-      ...searchPaginationInput,
-      textSearch,
-      page,
-      size: rowsPerPage,
-    };
+  const finalSearchPaginationInput = {
+    ...searchPaginationInput,
+    textSearch,
+    page,
+    size: rowsPerPage,
+  };
 
-    fetch(finalSearchPaginationInput).then((result: { data: Page<T> }) => {
-      const { data } = result;
-      setContent(data.content);
-      setTotalElements(data.totalElements);
-      onTotalElementsChange?.(data.totalElements);
-      // The current page fell past the end (dataset shrank or a parent filter
-      // narrowed the results): restart from the first page instead of showing
-      // a stuck empty page. Guarded on page > 0 so an empty dataset does not
-      // loop.
-      if (page > 0 && data.totalPages <= page) {
-        setPage(0);
-      }
-    });
-  }, [searchPaginationInput, page, rowsPerPage, textSearch]);
+  const applyPage = (data: Page<T>) => {
+    setContent(data.content);
+    setTotalElements(data.totalElements);
+    onTotalElementsChange?.(data.totalElements);
+    // The current page fell past the end (dataset shrank or a parent filter
+    // narrowed the results): restart from the first page instead of showing
+    // a stuck empty page. Guarded on page > 0 so an empty dataset does not
+    // loop.
+    if (page > 0 && data.totalPages <= page) {
+      setPage(0);
+    }
+  };
+
+  const queryMode = queryKey !== undefined;
+
+  useEffect(() => {
+    if (queryMode) {
+      return;
+    }
+    fetch(finalSearchPaginationInput).then((result: { data: Page<T> }) => applyPage(result.data));
+  }, [searchPaginationInput, page, rowsPerPage, textSearch, queryMode]);
 
   // Utils
   const computeAttackPatternNameForFilter = () => {
@@ -162,6 +203,14 @@ const PaginationComponent = <T extends object>({
 
   return (
     <>
+      {queryMode && (
+        <PageQuery
+          queryKey={queryKey}
+          fetch={fetch}
+          input={finalSearchPaginationInput}
+          onPage={applyPage}
+        />
+      )}
       <div className={disablePagination ? classes.parametersWithoutPagination : classes.parameters}>
         <div style={{
           display: 'flex',

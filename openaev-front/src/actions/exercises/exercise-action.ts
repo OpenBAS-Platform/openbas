@@ -21,9 +21,9 @@ import * as schema from '../Schema';
 
 export const EXERCISE_URI = '/api/exercises';
 
-export const fetchExerciseExpectationResult = (exerciseId: Exercise['exercise_id']) => {
+export const fetchExerciseExpectationResult = (exerciseId: Exercise['exercise_id'], notifyError: boolean = true) => {
   const uri = `${EXERCISE_URI}/${exerciseId}/results`;
-  return simpleCall(uri);
+  return simpleCall(uri, undefined, notifyError);
 };
 
 export const fetchPlayersByExercise = (exerciseId: Exercise['exercise_id']) => (dispatch: Dispatch) => {
@@ -31,20 +31,20 @@ export const fetchPlayersByExercise = (exerciseId: Exercise['exercise_id']) => (
   return getReferential(schema.arrayOfUsers, uri)(dispatch);
 };
 
-export const fetchExerciseInjectExpectationResults = (exerciseId: Exercise['exercise_id']) => {
+export const fetchExerciseInjectExpectationResults = (exerciseId: Exercise['exercise_id'], notifyError: boolean = true) => {
   const uri = `${EXERCISE_URI}/${exerciseId}/injects/results-by-attack-patterns`;
-  return simpleCall(uri);
+  return simpleCall(uri, undefined, notifyError);
 };
 
-export const searchExerciseInjects = (exerciseId: Exercise['exercise_id'], searchPaginationInput: SearchPaginationInput) => {
+export const searchExerciseInjects = (exerciseId: Exercise['exercise_id'], searchPaginationInput: SearchPaginationInput, notifyError: boolean = true) => {
   const data = searchPaginationInput;
   const uri = `${EXERCISE_URI}/${exerciseId}/injects/search`;
-  return simplePostCall(uri, data);
+  return simplePostCall(uri, data, undefined, notifyError);
 };
 
-export const exerciseInjectsResultOutput = (exerciseId: Exercise['exercise_id']) => {
+export const exerciseInjectsResultOutput = (exerciseId: Exercise['exercise_id'], notifyError: boolean = true) => {
   const uri = `${EXERCISE_URI}/${exerciseId}/injects/results`;
-  return simpleCall(uri);
+  return simpleCall(uri, undefined, notifyError);
 };
 
 // -- IMPORT --
@@ -183,10 +183,10 @@ export const addLessonsAnswers = (
   return postReferential(schema.arrayOfLessonsAnswers, uri, data)(dispatch);
 };
 
-export const fetchExercisesGlobalScores = (exercisesGlobalScoresInput: ExercisesGlobalScoresInput) => {
+export const fetchExercisesGlobalScores = (exercisesGlobalScoresInput: ExercisesGlobalScoresInput, notifyError: boolean = true) => {
   const data = exercisesGlobalScoresInput;
   const uri = `${EXERCISE_URI}/global-scores`;
-  return simplePostCall(uri, data);
+  return simplePostCall(uri, data, undefined, notifyError);
 };
 
 export const checkExerciseTagRules = (exerciseId: string, newTagIds: string[]) => {
@@ -205,8 +205,8 @@ export const fetchScenarioFromSimulation = (simulationId: string) => (dispatch: 
   return getReferential(scenario, uri)(dispatch);
 };
 
-export const fetchCustomDashboardFromSimulation = (simulationId: string) => {
-  return simpleCall(`${EXERCISE_URI}/${simulationId}/dashboard`);
+export const fetchCustomDashboardFromSimulation = (simulationId: string, notifyError: boolean = true) => {
+  return simpleCall(`${EXERCISE_URI}/${simulationId}/dashboard`, undefined, notifyError);
 };
 
 export const countBySimulation = (simulationId: string, widgetId: string, parameters: Record<string, string | undefined>) => {

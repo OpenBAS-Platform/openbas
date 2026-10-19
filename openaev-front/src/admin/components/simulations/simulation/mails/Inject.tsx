@@ -9,9 +9,8 @@ import { fetchInjectCommunications } from '../../../../../actions/Communication'
 import { type CommunicationHelper } from '../../../../../actions/communications/communication-helper';
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { type UserHelper } from '../../../../../actions/helper';
-import { executeInject, fetchExerciseInjects } from '../../../../../actions/Inject';
+import { executeInject } from '../../../../../actions/Inject';
 import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
-import { fetchPlayers } from '../../../../../actions/users/User';
 import { SectionLabel } from '../../../../../components/common/detail/EntityDetailCommon';
 import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
@@ -21,8 +20,14 @@ import { useHelper } from '../../../../../store';
 import { type Communication as CommunicationType, type Exercise } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import { simulationKey } from '../../../../../utils/query/keys';
+import queryClient from '../../../../../utils/query/queryClient';
+import { FALLBACK_REFETCH_INTERVAL_MS } from '../../../../../utils/query/useNotifiedQuery';
+import useStoreQuery from '../../../../../utils/query/useStoreQuery';
+import { isFeatureEnabled } from '../../../../../utils/utils';
 import { PermissionsContext } from '../../../common/Context';
 import ExecutionMenu from '../ExecutionMenu';
+import useSimulationStoreData from '../simulationStoreQueries';
 import CommunicationItem from './Communication';
 import CommunicationForm from './CommunicationForm';
 
@@ -54,6 +59,9 @@ type ReplyFormData = {
   communication_file?: File[];
 };
 
+// Store query of the communications of one inject, under the simulation key.
+const injectCommunicationsKey = (simulationId: string, injectId: string) => [...simulationKey(simulationId), 'communications', injectId] as const;
+
 const InjectComponent: FunctionComponent = () => {
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
@@ -75,10 +83,20 @@ const InjectComponent: FunctionComponent = () => {
     }),
   );
 
+  // With live updates on, store queries under simulationKey(id): the topic 'simulation:<id>'
+  // announces new communications (mails received or sent); the fallback interval covers the rest
+  // while the simulation runs. With live updates off, the data loaders load them as before.
+  const liveUpdates = isFeatureEnabled('STREAM_INVALIDATION');
+  const refetchInterval = exercise?.exercise_status === 'RUNNING' ? FALLBACK_REFETCH_INTERVAL_MS : false;
+  useSimulationStoreData(exerciseId, ['injects', 'all-players'], { refetchInterval });
+  useStoreQuery(injectCommunicationsKey(exerciseId, injectId), () => dispatch(fetchInjectCommunications(exerciseId, injectId)), {
+    enabled: liveUpdates,
+    refetchInterval,
+  });
   useDataLoader(() => {
-    dispatch(fetchExerciseInjects(exerciseId));
-    dispatch(fetchInjectCommunications(exerciseId, injectId));
-    dispatch(fetchPlayers());
+    if (!liveUpdates) {
+      dispatch(fetchInjectCommunications(exerciseId, injectId));
+    }
   });
 
   // --- Event handlers ---
@@ -126,7 +144,14 @@ const InjectComponent: FunctionComponent = () => {
     };
 
     return dispatch(executeInject(exerciseId, inputValues, data.communication_file ?? null))
-      .then(() => handleCloseReply());
+      .then(() => {
+        handleCloseReply();
+        // The reply is a new inject and communication that the response does not carry: refetch
+        // the screen at once instead of waiting for the stream.
+        if (liveUpdates) {
+          queryClient.invalidateQueries({ queryKey: simulationKey(exerciseId) });
+        }
+      });
   };
 
   if (!inject || !communications) {

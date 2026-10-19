@@ -2,6 +2,7 @@ import { Checkbox, Tooltip, TooltipContent, TooltipTrigger } from '@filigran/des
 import { AutoAwesome, PlayCircleOutlineOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { type QueryKey } from '@tanstack/react-query';
 import { type CSSProperties, type FunctionComponent, type ReactNode, useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -18,6 +19,7 @@ import Loader from '../../../components/Loader';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import { type ExercisesGlobalScoresOutput, type ExerciseSimple, type ExpectationResultsByType } from '../../../utils/api-types';
 import { type UseEntityToggle } from '../../../utils/hooks/useEntityToggle';
+import useNotifiedQuery from '../../../utils/query/useNotifiedQuery';
 import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
 import ExerciseStatus from './simulation/ExerciseStatus';
 
@@ -75,6 +77,10 @@ interface Props {
   // Optional bulk selection support (checkboxes + toolbar replacing the sort headers)
   entityToggle?: UseEntityToggle<ExerciseSimple>;
   toolBar?: ReactNode;
+  // Given a key, the async global scores of the page are a query under
+  // [...globalScoresQueryKey, 'global-scores', ids], so the invalidation of the list's topic
+  // refreshes them with the list.
+  globalScoresQueryKey?: QueryKey;
 }
 
 const SimulationList: FunctionComponent<Props> = ({
@@ -87,6 +93,7 @@ const SimulationList: FunctionComponent<Props> = ({
   isGlobalScoreAsync = false,
   entityToggle,
   toolBar,
+  globalScoresQueryKey,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -95,8 +102,19 @@ const SimulationList: FunctionComponent<Props> = ({
   const inlineStyles = getInlineStyles(variant);
   const { t, nsdt, vnsdt } = useFormatter();
 
-  const [loadingGlobalScores, setLoadingGlobalScores] = useState(true);
-  const [globalScores, setGlobalScores] = useState<Record<string, ExpectationResultsByType[]>>();
+  const queryMode = globalScoresQueryKey !== undefined;
+  const pageExerciseIds = exercises.map(exercise => exercise.exercise_id);
+  const globalScoresQuery = useNotifiedQuery({
+    queryKey: [...(globalScoresQueryKey ?? []), 'global-scores', pageExerciseIds],
+    queryFn: () => fetchExercisesGlobalScores({ exercise_ids: pageExerciseIds }, false)
+      .then((result: { data: ExercisesGlobalScoresOutput }) => result.data.global_scores_by_exercise_ids),
+    // Only the async column reads them: the synchronous one shows the scores of the search.
+    enabled: queryMode && isGlobalScoreAsync && pageExerciseIds.length > 0,
+  });
+  const [legacyLoadingGlobalScores, setLoadingGlobalScores] = useState(true);
+  const [legacyGlobalScores, setGlobalScores] = useState<Record<string, ExpectationResultsByType[]>>();
+  const loadingGlobalScores = queryMode ? globalScoresQuery.isPending : legacyLoadingGlobalScores;
+  const globalScores = queryMode ? globalScoresQuery.data : legacyGlobalScores;
   const fetchGlobalScores = (exerciseIds: string[]) => {
     setLoadingGlobalScores(true);
     fetchExercisesGlobalScores({ exercise_ids: exerciseIds })
@@ -105,10 +123,10 @@ const SimulationList: FunctionComponent<Props> = ({
   };
 
   useEffect(() => {
-    if (exercises.length > 0) {
+    if (!queryMode && exercises.length > 0) {
       fetchGlobalScores(exercises.map(exercise => exercise.exercise_id));
     }
-  }, [exercises]);
+  }, [exercises, queryMode]);
 
   // Headers
   const headers: Header[] = [
