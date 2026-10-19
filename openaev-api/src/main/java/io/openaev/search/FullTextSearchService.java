@@ -160,7 +160,12 @@ public class FullTextSearchService<T extends Base> {
                     Grant.GRANT_TYPE.OBSERVER))
             .and(TenantSpecification.fromTenant(TenantContext.getCurrentTenant()));
 
-    return buildPaginationJPA(repository::findAll, searchPaginationInput, clazzT, specs)
+    // findBy skips the entity graphs some repositories put on findAll (e.g. scenario injects).
+    return buildPaginationJPA(
+            (spec, pageable) -> repository.findBy(spec, query -> query.page(pageable)),
+            searchPaginationInput,
+            clazzT,
+            specs)
         .map(this::transform);
   }
 
