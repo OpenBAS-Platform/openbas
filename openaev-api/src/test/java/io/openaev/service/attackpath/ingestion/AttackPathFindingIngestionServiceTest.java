@@ -296,6 +296,7 @@ class AttackPathFindingIngestionServiceTest extends IntegrationTest {
     Team team = persistTeam();
     User victim = persistUser();
     Inject inject = persistInjectWithCredentials("deferred", List.of(victim), List.of(team));
+    String findingId = inject.getFindings().getFirst().getId();
     freezeTeamExecution("exec-team", team.getId());
     freezePersonExecution("exec-victim", victim.getId(), team.getId());
     Step step = new Step();
@@ -307,7 +308,7 @@ class AttackPathFindingIngestionServiceTest extends IntegrationTest {
         new TransactionTemplate(transactionManager)
             .execute(
                 s -> {
-                  findingIngestionService.copyFindingsAfterCommit(inject, step);
+                  findingIngestionService.copyFindingAfterCommit(inject, step, findingId);
                   return findingCountForValue("deferred", victim.getId());
                 });
     TenantContext.clearCurrentTenant();
@@ -316,6 +317,40 @@ class AttackPathFindingIngestionServiceTest extends IntegrationTest {
     assertThat(beforeCommit).isZero();
     assertThat(findingCountForValue("deferred", victim.getId())).isEqualTo(1);
     assertThat(linkCount("exec-victim")).isEqualTo(1);
+  }
+
+  @Test
+  @DisplayName("the deferred copy writes only the given finding, not the inject's other findings")
+  void given_deferredCopyOfOneFinding_should_writeOnlyThatFinding() {
+    // -- ARRANGE -- two submissions on the same chained phishing step, by two recipients.
+    Team team = persistTeam();
+    User victim = persistUser();
+    User other = persistUser();
+    Finding submitted = FindingFixture.createDefaultFindingCredentials();
+    submitted.setValue("victim / hunter2");
+    submitted.setUsers(new ArrayList<>(List.of(victim)));
+    Finding earlier = FindingFixture.createDefaultFindingCredentials();
+    earlier.setValue("other / letmein");
+    earlier.setUsers(new ArrayList<>(List.of(other)));
+    Inject inject = persistInjectWithFindings(List.of(submitted, earlier));
+    freezeTeamExecution("exec-team", team.getId());
+    freezePersonExecution("exec-victim", victim.getId(), team.getId());
+    freezePersonExecution("exec-other", other.getId(), team.getId());
+    Step step = new Step();
+    step.setId(STEP_ID);
+
+    // -- ACT --
+    TenantContext.setCurrentTenant(tenant.getId());
+    new TransactionTemplate(transactionManager)
+        .executeWithoutResult(
+            s -> findingIngestionService.copyFindingAfterCommit(inject, step, submitted.getId()));
+    TenantContext.clearCurrentTenant();
+
+    // -- ASSERT -- the given finding is on the snapshot, the inject's other one is not.
+    assertThat(findingCountForValue("victim / hunter2", victim.getId())).isEqualTo(1);
+    assertThat(linkCount("exec-victim")).isEqualTo(1);
+    assertThat(findingCountForValue("other / letmein", other.getId())).isZero();
+    assertThat(linkCount("exec-other")).isZero();
   }
 
   // -- helpers --
@@ -347,10 +382,14 @@ class AttackPathFindingIngestionServiceTest extends IntegrationTest {
   }
 
   private Inject persistInjectWithFinding(Finding finding) {
+    return persistInjectWithFindings(List.of(finding));
+  }
+
+  private Inject persistInjectWithFindings(List<Finding> findings) {
     TenantContext.setCurrentTenant(tenant.getId());
-    FindingComposer.Composer findingWrapper = findingComposer.forFinding(finding);
     InjectComposer.Composer injectWrapper =
-        injectComposer.forInject(InjectFixture.getDefaultInject()).withFinding(findingWrapper);
+        injectComposer.forInject(InjectFixture.getDefaultInject());
+    findings.forEach(finding -> injectWrapper.withFinding(findingComposer.forFinding(finding)));
     ExerciseComposer.Composer exerciseWrapper =
         exerciseComposer
             .forExercise(ExerciseFixture.createDefaultExercise())

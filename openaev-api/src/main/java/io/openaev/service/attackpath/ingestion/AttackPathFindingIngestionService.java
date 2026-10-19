@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -63,34 +64,49 @@ public class AttackPathFindingIngestionService {
   }
 
   /**
-   * Same copy as {@link #copyFindings}, deferred until the caller's transaction commits, for a
-   * finding created outside the step's execution events: credentials a phishing recipient submits
-   * long after the step ran raise no workflow update, so no later {@code
+   * Same copy as {@link #copyFindings}, deferred until the caller's transaction commits and limited
+   * to the one finding just created outside the step's execution events: credentials a phishing
+   * recipient submits long after the step ran raise no workflow update, so no later {@code
    * InjectExecutionStep#update} would copy them, and a copy run inline would not see the
-   * still-uncommitted finding from its own REQUIRES_NEW transaction. The ids are read now, while
-   * the caller's session is open. Non-fatal: a failure is logged and never reaches the caller.
+   * still-uncommitted finding from its own REQUIRES_NEW transaction. Only that finding is copied:
+   * re-copying all of the inject's findings on each submission would process O(N²) findings over a
+   * campaign of N recipients, each copy holding the simulation's version row lock for longer. The
+   * ids are read now, while the caller's session is open. Non-fatal: a failure is logged and never
+   * reaches the caller.
    */
-  public void copyFindingsAfterCommit(Inject inject, Step step) {
-    if (inject.getExercise() == null) {
-      return; // simulation-scoped: no simulation, nothing to copy
+  public void copyFindingAfterCommit(Inject inject, Step step, String findingId) {
+    if (inject.getExercise() == null || findingId == null) {
+      return; // simulation-scoped (nothing to copy into) or no finding to copy
     }
     String injectId = inject.getId();
     String stepId = step.getId();
     String simulationId = inject.getExercise().getId();
     String tenantId = inject.getTenant().getId();
+    Supplier<List<Finding>> findingLoader =
+        () ->
+            findingRepository
+                .findByIdAndInjectIdAndTenantId(findingId, injectId, tenantId)
+                .map(List::of)
+                .orElse(List.of());
     Runnable deferredCopy =
         () -> {
           try {
             // Still flagged active in afterCommit: the copy nests as REQUIRES_NEW, as above.
             if (TransactionSynchronizationManager.isActualTransactionActive()) {
               tenantTx.executeNew(
-                  TxCtx.forTenant(tenantId), () -> copy(injectId, stepId, simulationId, tenantId));
+                  TxCtx.forTenant(tenantId),
+                  () -> copy(stepId, simulationId, tenantId, findingLoader));
             } else {
               tenantTx.execute(
-                  TxCtx.forTenant(tenantId), () -> copy(injectId, stepId, simulationId, tenantId));
+                  TxCtx.forTenant(tenantId),
+                  () -> copy(stepId, simulationId, tenantId, findingLoader));
             }
           } catch (Exception e) {
-            log.warn("Attack-path findings copy skipped for inject {} (non-fatal)", injectId, e);
+            log.warn(
+                "Attack-path finding copy skipped for finding {} of inject {} (non-fatal)",
+                findingId,
+                injectId,
+                e);
           }
         };
     if (TransactionSynchronizationManager.isSynchronizationActive()) {
@@ -189,11 +205,25 @@ public class AttackPathFindingIngestionService {
   }
 
   private void copy(String injectId, String stepId, String simulationId, String tenantId) {
+    copy(
+        stepId,
+        simulationId,
+        tenantId,
+        () -> findingRepository.findAllByInjectIdAndTenantId(injectId, tenantId));
+  }
+
+  /**
+   * Copies the findings {@code findingsLoader} returns onto the step's frozen execution rows. The
+   * loader runs only once the step is known to have rows, so a step not frozen yet reads no
+   * finding.
+   */
+  private void copy(
+      String stepId, String simulationId, String tenantId, Supplier<List<Finding>> findingsLoader) {
     List<AttackPathExecution> rows = executionRepository.findByStepIdAndTenantId(stepId, tenantId);
     if (rows.isEmpty()) {
       return; // no frozen endpoint to attribute a finding to yet
     }
-    List<Finding> findings = findingRepository.findAllByInjectIdAndTenantId(injectId, tenantId);
+    List<Finding> findings = findingsLoader.get();
     if (findings.isEmpty()) {
       return;
     }

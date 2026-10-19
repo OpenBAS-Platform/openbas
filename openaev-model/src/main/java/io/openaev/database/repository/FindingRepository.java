@@ -98,6 +98,20 @@ public interface FindingRepository
   List<Finding> findAllByInjectIdAndTenantId(
       @NotBlank @Param("injectId") String injectId, @NotBlank @Param("tenantId") String tenantId);
 
+  /**
+   * One of an inject's findings, scoped explicitly to a tenant, with its assets fetch-joined. Same
+   * shape as {@link #findAllByInjectIdAndTenantId} for the attack-path copy of a single finding (a
+   * phishing credentials submission): the inject and tenant predicates keep the scope explicit off
+   * the request thread, and the fetch-join preloads {@code assets} read by the copy.
+   */
+  @Query(
+      "SELECT DISTINCT f FROM Finding f LEFT JOIN FETCH f.assets"
+          + " WHERE f.id = :findingId AND f.inject.id = :injectId AND f.tenant.id = :tenantId")
+  Optional<Finding> findByIdAndInjectIdAndTenantId(
+      @NotBlank @Param("findingId") String findingId,
+      @NotBlank @Param("injectId") String injectId,
+      @NotBlank @Param("tenantId") String tenantId);
+
   // For testing purposes only
   @Query(
       value =

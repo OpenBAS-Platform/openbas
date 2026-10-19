@@ -713,13 +713,15 @@ public class PhishingTrackingService {
       return;
     }
     // A chained run copies its findings onto the attack path on each step execution event, but a
-    // submission raises none: copy this one once it is committed, or the attack path never shows
-    // it. Only a chained execution carries a step (see createResult).
+    // submission raises none: copy this one (and only this one, by its id set on create) once it
+    // is committed, or the attack path never shows it. Only a chained execution carries a step
+    // (see createResult).
     if (result.getStep() != null) {
       try {
-        attackPathFindingIngestion.copyFindingsAfterCommit(inject, result.getStep());
+        attackPathFindingIngestion.copyFindingAfterCommit(
+            inject, result.getStep(), finding.getId());
       } catch (Exception e) {
-        log.warn("Attack-path findings copy skipped for inject {} (non-fatal)", inject.getId(), e);
+        log.warn("Attack-path finding copy skipped for inject {} (non-fatal)", inject.getId(), e);
       }
     }
   }

@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -592,13 +593,23 @@ class PhishingTrackingServiceTest {
     when(phishingResultRepository.save(any(PhishingResult.class)))
         .thenAnswer(i -> i.getArgument(0));
     when(injectExpectationRepository.findAllByInjectId(anyString())).thenReturn(List.of());
+    // The mocked service persists nothing: set the id the real create would generate.
+    doAnswer(
+            i -> {
+              List<Finding> findings = i.getArgument(0);
+              findings.getFirst().setId("finding-1");
+              return null;
+            })
+        .when(findingService)
+        .createFindings(anyList(), anyString());
 
     // -- ACT --
     phishingTrackingService.markSubmitted(
         "token-1", Map.of("username", "victim@corp.test", "password", "hunter2"), "1.2.3.4", "ua");
 
-    // -- ASSERT --
-    verify(attackPathFindingIngestion).copyFindingsAfterCommit(result.getInject(), step);
+    // -- ASSERT -- only the submitted finding is copied, by its id.
+    verify(attackPathFindingIngestion)
+        .copyFindingAfterCommit(result.getInject(), step, "finding-1");
   }
 
   @Test
