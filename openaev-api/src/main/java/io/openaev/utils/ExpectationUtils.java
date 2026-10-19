@@ -166,33 +166,6 @@ public class ExpectationUtils {
     return e.getUser() != null;
   }
 
-  // -- TEAM --
-
-  /**
-   * Retrieves team-level expectations matching the given expectation's team and type.
-   *
-   * <p>Filters to find team expectations (those with a team but no individual user) that match the
-   * reference expectation's team and type.
-   *
-   * @param injectExpectation the reference expectation to match against
-   * @return list of matching team-level expectations
-   */
-  public static List<TableTopInjectExpectation> getTeamsExpectations(
-      @NotNull final TableTopInjectExpectation injectExpectation) {
-    return injectExpectation.getInject().getExpectations().stream()
-        .filter(TableTopInjectExpectation.class::isInstance)
-        .map(TableTopInjectExpectation.class::cast)
-        .filter(ExpectationUtils::isTeamExpectation)
-        .filter(e -> e.getTeam().getId().equals(injectExpectation.getTeam().getId()))
-        .filter(e -> e.getType().equals(injectExpectation.getType()))
-        .filter(e -> Objects.equals(e.getName(), injectExpectation.getName()))
-        .toList();
-  }
-
-  private static boolean isTeamExpectation(TableTopInjectExpectation e) {
-    return e.getTeam() != null && e.getUser() == null;
-  }
-
   // -- AGENT --
 
   /**

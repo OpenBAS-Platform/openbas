@@ -264,7 +264,8 @@ public class InjectExpectationService {
    * scores (team, asset, asset group) are recomputed from their children. A parent is never
    * answered directly: it stays pending until its children expire.
    *
-   * @param expectations the expired, unanswered expectations
+   * @param expectations the expired, unanswered leaf expectations (see {@link
+   *     #expectationsNotFillAndExpired})
    * @param collector the expiration collector the verdicts are attributed to
    * @return the number of expectations concluded by this run: the expired leaves and the parents
    *     that received their score
@@ -272,6 +273,9 @@ public class InjectExpectationService {
   @WorkflowUpdateEvent(expectationIds = "#expectations.![id]")
   public int expireExpectations(
       @NotNull final List<BaseInjectExpectation> expectations, @NotNull final Collector collector) {
+    // The parents are not in the batch: their scores are read before the run to tell which ones
+    // this run concludes
+    Map<String, Double> scoresBeforeRun = scoresOfInjectExpectations(expectations);
     Map<ExpectationBehavior<BaseInjectExpectation>, List<BaseInjectExpectation>>
         expectationsByBehavior =
             expectations.stream()
@@ -293,11 +297,12 @@ public class InjectExpectationService {
           allUpdated.addAll(expiredLeaves);
           allUpdated.addAll(recomputedParents);
           concluded.addAll(expiredLeaves);
-          // A parent is audited only when this run concludes it: it was pending (in the batch) and
+          // A parent is audited only when this run concludes it: it was pending before the run and
           // now has a score. A parent already scored, recomputed again, is not audited twice
           recomputedParents.stream()
               .filter(
-                  parent -> parent.getScore() != null && expectationsOfBehavior.contains(parent))
+                  parent ->
+                      parent.getScore() != null && scoresBeforeRun.get(parent.getId()) == null)
               .forEach(concluded::add);
         });
     injectExpectationRepository.saveAll(allUpdated);
@@ -314,6 +319,21 @@ public class InjectExpectationService {
       securityCoverageSendJobService.createOrUpdateCoverageSendJobForSimulationsIfReady(exercises);
     }
     return concluded.size();
+  }
+
+  /**
+   * Scores of every expectation of the injects of the given expectations, keyed by ID. A pending
+   * expectation maps to {@code null}.
+   */
+  private static Map<String, Double> scoresOfInjectExpectations(
+      @NotNull final List<BaseInjectExpectation> expectations) {
+    Map<String, Double> scores = new HashMap<>();
+    expectations.stream()
+        .map(BaseInjectExpectation::getInject)
+        .distinct()
+        .flatMap(inject -> inject.getExpectations().stream())
+        .forEach(expectation -> scores.put(expectation.getId(), expectation.getScore()));
+    return scores;
   }
 
   // -- TECHNICAL --
@@ -715,15 +735,16 @@ public class InjectExpectationService {
   // -- FETCH INJECT EXPECTATIONS --
 
   /**
-   * Retrieves unfilled inject expectations (no score and either no results or bound to an agent)
-   * and expired Returns a bounded batch for incremental processing.
+   * Retrieves pending (no score) and expired leaf expectations, as a bounded batch for incremental
+   * processing. The parents are left out: they are derived from their children, so they never hold
+   * a slot of the batch that their children need to progress.
    *
    * @param tenantId the tenant to scope the query to
    * @param limit maximum number of expectations to return
-   * @return a list of unfilled inject expectations ordered by creation date (oldest first)
+   * @return a list of pending leaf expectations ordered by creation date (oldest first)
    */
   public List<BaseInjectExpectation> expectationsNotFillAndExpired(String tenantId, int limit) {
-    return this.injectExpectationRepository.findExpectationsNotFilledAndExpired(tenantId, limit);
+    return this.injectExpectationRepository.findPendingExpiredLeafExpectations(tenantId, limit);
   }
 
   // -- EXPECTATIONS BY TYPE --

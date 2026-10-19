@@ -22,15 +22,14 @@ public class ExpectationsExpirationManagerService {
 
   public static final String EXPIRED = "Expired";
 
-  private static final int BATCH_SIZE = 1000;
-
   @Transactional(rollbackFor = Exception.class)
   public void computeExpectations(String tenantId) {
     Collector collector = this.collectorService.collector(config.getId());
     List<BaseInjectExpectation> expectations =
-        this.injectExpectationService.expectationsNotFillAndExpired(tenantId, BATCH_SIZE);
+        this.injectExpectationService.expectationsNotFillAndExpired(
+            tenantId, config.getBatchSize());
     log.debug(
-        "Found {} pending expired expectations for tenant {} (expirationTime={}s, assetExpirationTime={}s)",
+        "Found {} pending expired leaf expectations for tenant {} (expirationTime={}s, assetExpirationTime={}s)",
         expectations.size(),
         tenantId,
         config.getExpirationTime(),

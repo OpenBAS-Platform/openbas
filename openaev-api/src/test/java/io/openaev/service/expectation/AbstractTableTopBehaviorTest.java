@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.openaev.IntegrationTest;
 import io.openaev.collectors.expectations_expiration_manager.ExpectationsExpirationManagerJob;
+import io.openaev.collectors.expectations_expiration_manager.config.ExpectationsExpirationManagerConfig;
 import io.openaev.collectors.expectations_expiration_manager.service.ExpectationsExpirationManagerService;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.InjectExpectationRepository;
@@ -45,6 +46,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
   @Autowired private InjectExpectationRepository injectExpectationRepository;
   @Autowired private ExpectationsExpirationManagerService expectationsExpirationManagerService;
   @Autowired private ExpectationsExpirationManagerJob expectationsExpirationManagerJob;
+  @Autowired private ExpectationsExpirationManagerConfig expectationsExpirationManagerConfig;
 
   @Autowired private ArticleComposer articleComposer;
   @Autowired private ChannelComposer channelComposer;
@@ -1154,6 +1156,60 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
       assertThat(findTeamExpectation(article2).getScore()).isNull();
     }
 
+    @Test
+    @DisplayName("given players of first article expired should only derive team of first article")
+    void given_expiredPlayersOfFirstArticle_should_onlyDeriveTeamOfFirstArticle() throws Exception {
+      // Arrange: only the players of the first article are expired
+      entityManager
+          .createNativeQuery(
+              "UPDATE injects_expectations SET inject_expectation_created_at = :past WHERE inject_expectation_id IN (:ids)")
+          .setParameter("past", Instant.now().minus(1, ChronoUnit.DAYS))
+          .setParameter(
+              "ids",
+              findPlayerExpectations(article1).stream().map(BaseInjectExpectation::getId).toList())
+          .executeUpdate();
+      entityManager.flush();
+      entityManager.clear();
+      String tenantId = inject.getTenant().getId();
+      expectationsExpirationManagerJob.registerForTenant(tenantId);
+
+      // Act
+      expectationsExpirationManagerService.computeExpectations(tenantId);
+      entityManager.flush();
+      entityManager.clear();
+
+      // Assert
+      assertThat(findPlayerExpectations(article1))
+          .hasSize(2)
+          .allSatisfy(player -> assertThat(player.getScore()).isEqualTo(0.0));
+      assertThat(findTeamExpectation(article1).getScore()).isEqualTo(0.0);
+      assertThat(findPlayerExpectations(article2))
+          .hasSize(2)
+          .allSatisfy(player -> assertThat(player.getScore()).isNull());
+      assertThat(findTeamExpectation(article2).getScore()).isNull();
+    }
+
+    @Test
+    @DisplayName("given several players of the same team should recompute their team once")
+    void given_severalPlayersOfSameTeam_should_recomputeTheirTeamOnce() {
+      // Arrange
+      List<ArticleInjectExpectation> players = findPlayerExpectations(article1);
+      players.forEach(player -> player.setScore(100.0));
+
+      // Act
+      List<? extends BaseInjectExpectation> recomputed =
+          articleBehavior.recomputeParentScores(players);
+
+      // Assert: only the team of the first article, once
+      assertThat(recomputed)
+          .singleElement()
+          .satisfies(
+              team -> {
+                assertThat(team.getId()).isEqualTo(findTeamExpectation(article1).getId());
+                assertThat(team.getScore()).isEqualTo(100.0);
+              });
+    }
+
     private Article persistArticle() {
       return articleComposer
           .forArticle(ArticleFixture.getDefaultArticle())
@@ -1217,37 +1273,44 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("given players already answered when team expired should derive the team score")
-    void given_expiredTeamWithAnsweredPlayers_should_deriveTeamScore() throws Exception {
-      // Arrange
+    @DisplayName(
+        "given players answered from UI should score the team before expiration and keep it after")
+    void given_playersAnsweredFromUi_should_scoreTeamBeforeExpirationAndKeepItAfter()
+        throws Exception {
+      // Arrange: the players answer through the behaviors, which recompute their team at once. A
+      // team is thus never left pending with all its players scored, and the expiration, which
+      // selects the pending leaves only, has nothing left to derive.
       Team team = persistTeamWithPlayers(2);
       Inject inject = persistInjectForTeam(team);
       List<ManualInjectExpectation> expectations =
           new ArrayList<>(
               team.getUsers().stream()
                   .map(
-                      player -> {
-                        ManualInjectExpectation playerExpectation =
-                            createPlayerExpectation(
-                                team,
-                                player,
-                                inject,
-                                buildForPlayerManualValidation("Success", 100.0));
-                        playerExpectation.setScore(100.0);
-                        return playerExpectation;
-                      })
+                      player ->
+                          createPlayerExpectation(
+                              team, player, inject, buildDefaultForPlayerManualValidation()))
                   .toList());
       expectations.add(InjectExpectationFixture.createManualInjectExpectation(team, inject));
       persistExpectations(inject, expectations);
+      expectations.stream()
+          .filter(expectation -> expectation.getUser() != null)
+          .forEach(
+              player ->
+                  injectExpectationService.updateInjectExpectationUsingBehaviors(
+                      player.getId(),
+                      ExpectationFixture.getExpectationVerdict(UI_SOURCE_ID, 100.0)));
+      entityManager.flush();
+      entityManager.clear();
+      assertThat(findTeamExpectation(inject).getScore()).isEqualTo(100.0);
       backdateExpectations(inject);
 
       // Act
       expireExpectations(inject);
 
-      // Assert
+      // Assert: the answers are kept, the expiration did not touch the players nor the team
       assertThat(findPlayerExpectations(inject))
           .hasSize(2)
-          .allSatisfy(player -> assertThat(player.getScore()).isEqualTo(100.0));
+          .allSatisfy(player -> assertOnlyResultFromUi(player, 100.0));
       TableTopInjectExpectation savedTeam = findTeamExpectation(inject);
       assertThat(savedTeam.getScore()).isEqualTo(100.0);
       assertThat(savedTeam.getResults())
@@ -1308,6 +1371,91 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
       assertThat(savedTeam.getScore()).isEqualTo(0.0);
       assertThat(savedTeam.getResults())
           .noneMatch(result -> COLLECTOR_ID.equals(result.getSourceId()));
+    }
+
+    @Test
+    @DisplayName(
+        "given team older than its players beyond the batch limit should still expire the players")
+    void given_teamOlderThanPlayersBeyondBatchLimit_should_expirePlayersAndDeriveTeam()
+        throws Exception {
+      // Arrange: a team is saved before its players, so it is older. With a batch of one, a batch
+      // holding parents would select the pending team on every run and never reach the players
+      Team team = persistTeamWithPlayers(2);
+      Inject inject = persistInjectForTeam(team);
+      List<ManualInjectExpectation> expectations =
+          new ArrayList<>(
+              team.getUsers().stream()
+                  .map(
+                      player ->
+                          createPlayerExpectation(
+                              team, player, inject, buildDefaultForPlayerManualValidation()))
+                  .toList());
+      expectations.add(InjectExpectationFixture.createManualInjectExpectation(team, inject));
+      persistExpectations(inject, expectations);
+      backdateTeamBeforePlayers(inject);
+      int batchSize = expectationsExpirationManagerConfig.getBatchSize();
+      expectationsExpirationManagerConfig.setBatchSize(1);
+
+      // Act: one player per run
+      try {
+        expireExpectations(inject);
+        expireExpectations(inject);
+      } finally {
+        expectationsExpirationManagerConfig.setBatchSize(batchSize);
+      }
+
+      // Assert
+      assertThat(findPlayerExpectations(inject))
+          .hasSize(2)
+          .allSatisfy(player -> assertOnlyExpirationResult(player, 0.0));
+      assertThat(findTeamExpectation(inject).getScore()).isEqualTo(0.0);
+    }
+
+    @Test
+    @DisplayName("given players of two teams expired in one run should derive both teams")
+    void given_expiredPlayersOfTwoTeams_should_deriveBothTeams() throws Exception {
+      // Arrange
+      Team firstTeam = persistTeamWithPlayers(2);
+      Team secondTeam = persistTeamWithPlayers(1);
+      Inject inject = persistInjectForTeam(firstTeam);
+      List<ManualInjectExpectation> expectations = new ArrayList<>();
+      for (Team team : List.of(firstTeam, secondTeam)) {
+        team.getUsers()
+            .forEach(
+                player ->
+                    expectations.add(
+                        createPlayerExpectation(
+                            team, player, inject, buildDefaultForPlayerManualValidation())));
+        expectations.add(InjectExpectationFixture.createManualInjectExpectation(team, inject));
+      }
+      persistExpectations(inject, expectations);
+      backdateExpectations(inject);
+
+      // Act
+      expireExpectations(inject);
+
+      // Assert: each team is derived from its own players
+      assertThat(findPlayerExpectations(inject))
+          .hasSize(3)
+          .allSatisfy(player -> assertThat(player.getScore()).isEqualTo(0.0));
+      assertThat(injectExpectationRepository.findAllByInjectId(inject.getId()))
+          .map(TableTopInjectExpectation.class::cast)
+          .filteredOn(expectation -> expectation.getUser() == null)
+          .hasSize(2)
+          .allSatisfy(team -> assertThat(team.getScore()).isEqualTo(0.0));
+    }
+
+    /** Moves the team creation date further back than its players, as when it is saved first. */
+    private void backdateTeamBeforePlayers(Inject inject) {
+      backdateExpectations(inject);
+      entityManager
+          .createNativeQuery(
+              "UPDATE injects_expectations SET inject_expectation_created_at = :past WHERE inject_id = :injectId AND user_id IS NULL")
+          .setParameter("past", Instant.now().minus(2, ChronoUnit.DAYS))
+          .setParameter("injectId", inject.getId())
+          .executeUpdate();
+      entityManager.flush();
+      entityManager.clear();
     }
 
     /** Moves the creation date back so the expiration query picks the expectations up. */

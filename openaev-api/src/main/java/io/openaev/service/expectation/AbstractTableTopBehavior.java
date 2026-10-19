@@ -9,11 +9,13 @@ import io.openaev.database.model.*;
 import io.openaev.database.repository.InjectExpectationRepository;
 import io.openaev.execution.ExecutableInject;
 import io.openaev.expectation.ExpectationPropertiesConfig;
+import io.openaev.utils.ExpectationUtils;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -234,41 +236,51 @@ public abstract class AbstractTableTopBehavior
   }
 
   /**
-   * Recomputes team-level scores from their player expectations. A team without players keeps its
-   * own score, as it is its own leaf (see {@link #getLeaves}).
+   * The affected parents are the teams of the given expectations, matched on team, name and
+   * context, recomputed from their players. A team without players keeps its own score, as it is
+   * its own leaf (see {@link #getLeaves}), and an expectation without team has no parent.
    */
   @Override
-  public List<? extends BaseInjectExpectation> recomputeParentScores(
-      BaseInjectExpectation expectation) {
-    return recomputeParentScores(List.of(expectation));
-  }
+  public List<TableTopInjectExpectation> recomputeAffectedParents(
+      Inject inject,
+      BaseInjectExpectation.EXPECTATION_TYPE type,
+      List<TableTopInjectExpectation> expectations) {
+    // An inject may hold technical expectations too
+    List<TableTopInjectExpectation> expectationsOfInjectWithSameType =
+        inject.getExpectations().stream()
+            .filter(TableTopInjectExpectation.class::isInstance)
+            .map(TableTopInjectExpectation.class::cast)
+            .filter(e -> type.equals(e.getType()))
+            .filter(e -> e.getTeam() != null)
+            .toList();
 
-  /**
-   * The players of a team share the same parent: the parent teams of the batch are collected first
-   * (same matching as a single expectation, context included), then each team is recomputed once,
-   * instead of once per player of the batch.
-   */
-  @Override
-  public List<? extends BaseInjectExpectation> recomputeParentScores(
-      List<? extends BaseInjectExpectation> expectations) {
-    Set<TableTopInjectExpectation> parentTeams = new LinkedHashSet<>();
-    for (BaseInjectExpectation expectation : expectations) {
-      if (!(expectation instanceof TableTopInjectExpectation tableTop)
-          || tableTop.getTeam() == null) {
-        continue;
-      }
-      getTeamsExpectations(tableTop).stream()
-          .filter(teamExpectation -> isSameContext(teamExpectation, tableTop))
-          .forEach(parentTeams::add);
-    }
-    return parentTeams.stream().map(this::recomputeTeamScore).flatMap(Optional::stream).toList();
+    // Affected teams: the tree (team, name, context) of each player or team
+    Set<TeamTree> affectedTeamTrees =
+        expectations.stream()
+            .filter(e -> e.getTeam() != null)
+            .map(this::teamTree)
+            .collect(Collectors.toSet());
+
+    Map<TeamTree, List<TableTopInjectExpectation>> playersByTeamTree =
+        expectationsOfInjectWithSameType.stream()
+            .filter(ExpectationUtils::isPlayerExpectation)
+            .collect(Collectors.groupingBy(this::teamTree));
+
+    List<TableTopInjectExpectation> updatedTeams = new ArrayList<>();
+    expectationsOfInjectWithSameType.stream()
+        .filter(e -> !isPlayerExpectation(e))
+        .filter(team -> affectedTeamTrees.contains(teamTree(team)))
+        .forEach(
+            team ->
+                recomputeTeamScore(team, playersByTeamTree.getOrDefault(teamTree(team), List.of()))
+                    .ifPresent(updatedTeams::add));
+    return updatedTeams;
   }
 
   /** Derives the team score from its players; a team without players keeps its own score. */
   private Optional<TableTopInjectExpectation> recomputeTeamScore(
-      TableTopInjectExpectation teamExpectation) {
-    List<TableTopInjectExpectation> playersExpectations =
-        getPlayersExpectationsInSameContext(teamExpectation);
+      TableTopInjectExpectation teamExpectation,
+      List<TableTopInjectExpectation> playersExpectations) {
     if (playersExpectations.isEmpty()) {
       return Optional.empty();
     }
@@ -283,17 +295,32 @@ public abstract class AbstractTableTopBehavior
   // -- CONTEXT --
 
   /**
-   * Returns {@code true} if both expectations target the same context entity. Defaults to a single
+   * Returns the ID of the context entity of the expectation. Defaults to {@code null}, a single
    * context per team; behaviors expanding one expectation tree per entity ({@link
    * #expandTemplatesForContext}) override it, so a team and its players are matched per entity and
    * never mixed with the trees of the other entities of the inject.
    *
-   * @param expectation the expectation to check
-   * @param reference the expectation whose context must be matched
+   * @param expectation the expectation whose context is read, of a type handled by this behavior
    */
-  protected boolean isSameContext(
+  @Nullable
+  protected String contextId(TableTopInjectExpectation expectation) {
+    return null;
+  }
+
+  /**
+   * The expectation tree of a team within an inject and a type: a team expectation and the
+   * expectations of its players share it. The name and the context may be {@code null}.
+   */
+  private record TeamTree(String teamId, @Nullable String name, @Nullable String contextId) {}
+
+  private TeamTree teamTree(TableTopInjectExpectation expectation) {
+    return new TeamTree(
+        expectation.getTeam().getId(), expectation.getName(), contextId(expectation));
+  }
+
+  private boolean isSameContext(
       TableTopInjectExpectation expectation, TableTopInjectExpectation reference) {
-    return true;
+    return Objects.equals(contextId(expectation), contextId(reference));
   }
 
   private List<TableTopInjectExpectation> getPlayersExpectationsInSameContext(

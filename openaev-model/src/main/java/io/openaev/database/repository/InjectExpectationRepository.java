@@ -188,10 +188,23 @@ public interface InjectExpectationRepository
       @Param("tenantId") String tenantId, @Param("type") String type, @Param("limit") int limit);
 
   /**
-   * Finds pending (without score) and expired expectations for the expiration manager, scoped by
-   * tenant. Their results are not filtered: a leaf answered by some sources only is still pending,
-   * and its behavior decides which expectations receive the expiration verdict.
+   * Finds pending (without score) and expired LEAF expectations for the expiration manager.
+   *
+   * <p>A parent is never answered directly: it is derived from its children once they expire. It is
+   * therefore excluded from the batch, otherwise parents older than their children (a team is saved
+   * before its players) would fill the limit run after run and starve the leaves. The leaf rule
+   * mirrors the behaviors' {@code getLeaves}, on the target columns only (results may stay empty,
+   * e.g. no collector):
+   *
+   * <ul>
+   *   <li>an asset group expectation is always a parent;
+   *   <li>an asset expectation is a parent when agent expectations of the same asset exist;
+   *   <li>a team expectation is a parent when player expectations of the same team, name and
+   *       context (article, challenge) exist.
+   * </ul>
    */
+  // Native: correlated NOT EXISTS on the same table and interval arithmetic; read-only, so no
+  // session side effect is lost.
   @Query(
       value =
           "SELECT e.* FROM injects_expectations e "
@@ -199,10 +212,28 @@ public interface InjectExpectationRepository
               + "WHERE i.tenant_id = :tenantId "
               + "AND e.inject_expectation_score IS NULL "
               + "AND e.inject_expectation_created_at + (e.inject_expiration_time * interval '1 second') < now() "
+              + "AND NOT (e.asset_group_id IS NOT NULL "
+              + "  AND e.asset_id IS NULL AND e.agent_id IS NULL) "
+              + "AND NOT (e.asset_id IS NOT NULL AND e.agent_id IS NULL "
+              + "  AND EXISTS (SELECT 1 FROM injects_expectations child "
+              + "    WHERE child.inject_id = e.inject_id "
+              + "    AND child.inject_expectation_type = e.inject_expectation_type "
+              + "    AND child.asset_id = e.asset_id "
+              + "    AND child.agent_id IS NOT NULL)) "
+              + "AND NOT (e.team_id IS NOT NULL AND e.user_id IS NULL "
+              + "  AND EXISTS (SELECT 1 FROM injects_expectations child "
+              + "    WHERE child.inject_id = e.inject_id "
+              + "    AND child.inject_expectation_type = e.inject_expectation_type "
+              + "    AND child.team_id = e.team_id "
+              + "    AND child.user_id IS NOT NULL "
+              + "    AND child.inject_expectation_name "
+              + "      IS NOT DISTINCT FROM e.inject_expectation_name "
+              + "    AND child.article_id IS NOT DISTINCT FROM e.article_id "
+              + "    AND child.challenge_id IS NOT DISTINCT FROM e.challenge_id)) "
               + "ORDER BY e.inject_expectation_created_at ASC "
               + "LIMIT :limit",
       nativeQuery = true)
-  List<BaseInjectExpectation> findExpectationsNotFilledAndExpired(
+  List<BaseInjectExpectation> findPendingExpiredLeafExpectations(
       @Param("tenantId") String tenantId, @Param("limit") int limit);
 
   @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId")

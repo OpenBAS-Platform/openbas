@@ -16,7 +16,10 @@ import io.openaev.model.inject.form.Expectation;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Strategy interface for the inject expectation lifecycle.
@@ -210,22 +213,53 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @param expectation the expectation that received the update
    * @return the list of parent expectations that were modified
    */
-  List<? extends BaseInjectExpectation> recomputeParentScores(BaseInjectExpectation expectation);
+  default List<? extends BaseInjectExpectation> recomputeParentScores(
+      BaseInjectExpectation expectation) {
+    return recomputeParentScores(List.of(expectation));
+  }
 
   /**
-   * Batched variant of {@link #recomputeParentScores(BaseInjectExpectation)}: recomputes the
-   * parents of every given expectation once.
+   * Batched variant of {@link #recomputeParentScores(BaseInjectExpectation)}: the expectations are
+   * grouped by inject and type, then the parents of each group are recomputed once by {@link
+   * #recomputeAffectedParents}.
    *
    * @param expectations the expectations that received an update
-   * @return the distinct parent expectations that were modified
+   * @return the parent expectations that were modified
    */
   default List<? extends BaseInjectExpectation> recomputeParentScores(
       List<? extends BaseInjectExpectation> expectations) {
-    return expectations.stream()
-        .flatMap(expectation -> recomputeParentScores(expectation).stream())
-        .distinct()
+    Map<InjectAndType, List<T>> expectationsByInjectAndType =
+        expectations.stream()
+            .filter(this::supports)
+            .map(expectation -> (T) expectation)
+            .collect(
+                Collectors.groupingBy(
+                    e -> new InjectAndType(e.getInject(), e.getType()),
+                    LinkedHashMap::new,
+                    Collectors.toList()));
+    return expectationsByInjectAndType.entrySet().stream()
+        .flatMap(
+            entry ->
+                recomputeAffectedParents(
+                    entry.getKey().inject(), entry.getKey().type(), entry.getValue())
+                    .stream())
         .toList();
   }
+
+  record InjectAndType(Inject inject, BaseInjectExpectation.EXPECTATION_TYPE type) {}
+
+  /**
+   * Recomputes only the parents affected by the given expectations, each once. The other parents of
+   * the inject are left untouched.
+   *
+   * @param inject the inject the expectations belong to
+   * @param type the type of the expectations
+   * @param expectations the expectations whose parents are recomputed, all of the given inject and
+   *     type
+   * @return the parent expectations that were modified
+   */
+  List<T> recomputeAffectedParents(
+      Inject inject, BaseInjectExpectation.EXPECTATION_TYPE type, List<T> expectations);
 
   /**
    * Returns {@code true} if this behavior can build a template from a content-form expectation of
