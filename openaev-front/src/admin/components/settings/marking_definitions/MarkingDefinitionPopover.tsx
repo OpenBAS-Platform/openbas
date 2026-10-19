@@ -97,9 +97,9 @@ const MarkingDefinitionPopover: FunctionComponent<Props> = ({
     fetchMarkingDefinitionAssigned(markingDefinition.marking_definition_id)
       .then((result: { data: boolean }) => {
         setIsAssigned(result.data);
-        setOpenDelete(true);
       })
-      .catch((error: unknown) => error);
+      .catch(() => {})
+      .finally(() => setOpenDelete(true));
   };
 
   const submitDelete = () => {

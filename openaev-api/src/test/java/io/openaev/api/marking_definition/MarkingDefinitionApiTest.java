@@ -9,22 +9,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
 import io.openaev.IntegrationTest;
-import io.openaev.database.model.Asset;
 import io.openaev.database.model.Capability;
+import io.openaev.database.model.Endpoint;
 import io.openaev.database.model.Filters;
+import io.openaev.database.model.Group;
 import io.openaev.database.model.MarkingDefinition;
 import io.openaev.database.model.Tenant;
-import io.openaev.database.repository.AssetRepository;
 import io.openaev.database.repository.MarkingDefinitionRepository;
 import io.openaev.utils.TenantIsolationTestHelper;
-import io.openaev.utils.fixtures.AssetFixture;
+import io.openaev.utils.fixtures.EndpointFixture;
+import io.openaev.utils.fixtures.TenantGroupFixture;
+import io.openaev.utils.fixtures.composers.EndpointComposer;
 import io.openaev.utils.fixtures.composers.MarkingDefinitionComposer;
+import io.openaev.utils.fixtures.composers.TenantGroupComposer;
 import io.openaev.utils.mockUser.WithMockUser;
 import io.openaev.utils.pagination.SearchPaginationInput;
 import io.openaev.utils.pagination.SortField;
@@ -57,7 +59,8 @@ class MarkingDefinitionApiTest extends IntegrationTest {
   @Autowired private EntityManager entityManager;
   @Autowired private TenantIsolationTestHelper tenantIsolationTestHelper;
   @Autowired private MarkingDefinitionComposer markingDefinitionComposer;
-  @Autowired private AssetRepository assetRepository;
+  @Autowired private EndpointComposer endpointComposer;
+  @Autowired private TenantGroupComposer tenantGroupComposer;
 
   @Nested
   @WithMockUser(
@@ -482,6 +485,8 @@ class MarkingDefinitionApiTest extends IntegrationTest {
     @BeforeEach
     void setUp() {
       markingDefinitionComposer.reset();
+      endpointComposer.reset();
+      tenantGroupComposer.reset();
     }
 
     @Test
@@ -499,7 +504,25 @@ class MarkingDefinitionApiTest extends IntegrationTest {
               get(URI + "/{id}/assigned", Tenant.DEFAULT_TENANT_UUID, marking.getId())
                   .accept(MediaType.APPLICATION_JSON))
           .andExpect(status().isOk())
-          .andExpect(content().string("true"));
+          .andExpect(jsonPath("$").value(true));
+    }
+
+    @Test
+    @WithMockUser(
+        withCapabilities = Capability.ACCESS_MARKING_DEFINITION,
+        autoJoinDefaultTenant = true)
+    @DisplayName("given_markingGrantedOnlyToAGroup_should_returnTrue")
+    void given_markingGrantedOnlyToAGroup_should_returnTrue() throws Exception {
+      // Arrange - no entity carries the marking, so only groups_markings can make it assigned.
+      MarkingDefinition marking = persistedMarking(Tenant.DEFAULT_TENANT_UUID);
+      persistedGroupGranting(marking);
+
+      // Act & Assert
+      mvc.perform(
+              get(URI + "/{id}/assigned", Tenant.DEFAULT_TENANT_UUID, marking.getId())
+                  .accept(MediaType.APPLICATION_JSON))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$").value(true));
     }
 
     @Test
@@ -517,7 +540,7 @@ class MarkingDefinitionApiTest extends IntegrationTest {
               get(URI + "/{id}/assigned", Tenant.DEFAULT_TENANT_UUID, marking.getId())
                   .accept(MediaType.APPLICATION_JSON))
           .andExpect(status().isOk())
-          .andExpect(content().string("false"));
+          .andExpect(jsonPath("$").value(false));
     }
 
     @Test
@@ -579,11 +602,17 @@ class MarkingDefinitionApiTest extends IntegrationTest {
           .get();
     }
 
-    /** Flushes so the raw-JDBC probe behind the endpoint sees the row, not just the session. */
     private void persistedAssetCarrying(MarkingDefinition marking) {
-      Asset asset = AssetFixture.createDefaultAsset("marking-assigned-" + uniqueDefinition());
-      asset.setMarkingIds(new String[] {marking.getId()});
-      assetRepository.save(asset);
+      Endpoint endpoint = EndpointFixture.createEndpoint("marking-assigned-" + uniqueDefinition());
+      endpoint.setMarkingIds(new String[] {marking.getId()});
+      endpointComposer.forEndpoint(endpoint).persist();
+      entityManager.flush();
+    }
+
+    private void persistedGroupGranting(MarkingDefinition marking) {
+      Group group = TenantGroupFixture.getGroup("marking-assigned-" + uniqueDefinition());
+      group.getMarkings().add(marking);
+      tenantGroupComposer.forGroup(group).persist();
       entityManager.flush();
     }
   }

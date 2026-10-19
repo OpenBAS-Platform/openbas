@@ -131,16 +131,8 @@ public class MarkingDefinitionService {
 
   /**
    * Tells whether a marking definition is currently assigned, i.e. whether its id appears in the
-   * {@code marking_ids} array of any row of any marked table, or is granted to a group through
-   * {@code groups_markings}.
-   *
-   * <p>Checks the same schema-driven table set as {@link #scrubMarkingIds(String)} rather than the
-   * allowlist-narrowed {@link io.openaev.config.MarkedTables}: a marking write is not
-   * feature-gated, so an inactive table can still hold the id. Raw JDBC also bypasses the caller's
-   * marking clearance, so a row the caller cannot see still counts as an assignment.
-   *
-   * <p>Short-circuits on the first table that holds the id; the {@code @>} containment predicate
-   * lets each table probe use the GIN index on {@code marking_ids}. Group grants are checked last.
+   * {@code marking_ids} array of any row of any marked table, or granted to a group through {@code
+   * groups_markings}.
    *
    * @param ctx transaction context containing tenant scope
    * @param markingDefinitionId identifier of the marking definition
@@ -153,7 +145,9 @@ public class MarkingDefinitionService {
     for (String table : allTablesWithMarkingIds.tableNames()) {
       Boolean assigned =
           jdbcTemplate.queryForObject(
-              "SELECT EXISTS (SELECT 1 FROM " + table + " WHERE marking_ids @> ARRAY[?]::text[])",
+              "SELECT EXISTS (SELECT 1 FROM "
+                  + table
+                  + " WHERE COALESCE(marking_ids, '{}'::text[]) @> ARRAY[?]::text[])",
               Boolean.class,
               markingDefinitionId);
       if (Boolean.TRUE.equals(assigned)) {
@@ -298,7 +292,7 @@ public class MarkingDefinitionService {
       jdbcTemplate.update(
           "UPDATE "
               + table
-              + " SET marking_ids = array_remove(marking_ids, ?) WHERE marking_ids @> ARRAY[?]::text[]",
+              + " SET marking_ids = array_remove(marking_ids, ?) WHERE COALESCE(marking_ids, '{}'::text[]) @> ARRAY[?]::text[])",
           markingDefinitionId,
           markingDefinitionId);
     }
