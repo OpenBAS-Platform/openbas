@@ -445,8 +445,9 @@ public class CredentialService {
   }
 
   /**
-   * Resolves a set of credentials from their identifiers, restricted to the caller's tenant scope
-   * so crafted ids can never reach another tenant's credentials.
+   * Resolves a set of credentials from their identifiers. {@code secret_references} is v2-active:
+   * the read is scoped to the caller's tenants by the transaction's {@link TxCtx}, so crafted ids
+   * can never reach another tenant's credentials.
    *
    * @param ctx transaction context carrying tenant scope
    * @param credentialIds credential identifiers to resolve
@@ -458,14 +459,7 @@ public class CredentialService {
     if (CollectionUtils.isEmpty(credentialIds)) {
       return List.of();
     }
-    Set<String> tenantIds = TxCtxScopeUtils.tenantIdsFromHTTPCtx(ctx);
-    if (tenantIds.isEmpty()) {
-      return List.of();
-    }
-    Specification<CredentialSecretReference> tenantSpecification =
-        (root, query, criteriaBuilder) -> root.get("tenant").get("id").in(tenantIds);
-    return credentialSecretReferenceRepository.findAll(
-        tenantSpecification.and(SpecificationUtils.hasIdIn(credentialIds)));
+    return credentialSecretReferenceRepository.findAll(SpecificationUtils.hasIdIn(credentialIds));
   }
 
   private Page<CredentialSecretReference> findAllByTenantIds(
