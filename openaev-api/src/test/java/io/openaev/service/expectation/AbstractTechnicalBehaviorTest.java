@@ -17,6 +17,7 @@ import io.openaev.service.InjectExpectationService;
 import io.openaev.utils.fixtures.*;
 import io.openaev.utils.fixtures.composers.*;
 import io.openaev.utils.mockUser.WithMockUser;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.*;
@@ -1183,6 +1184,10 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
                 List.of(
                     InjectExpectationResult.builder()
                         .sourceId(SOURCE_ID)
+                        .sourceType("unit-test")
+                        .sourcePlatform("test-harness")
+                        .sourceName("unit tests")
+                        .date(Instant.now())
                         .result(null)
                         .score(null)
                         .build())));
