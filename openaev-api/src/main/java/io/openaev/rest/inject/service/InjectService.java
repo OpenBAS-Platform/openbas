@@ -114,7 +114,6 @@ public class InjectService {
   private final ExecutionTraceRepository executionTraceRepository;
   private final AssetService assetService;
   private final AssetGroupService assetGroupService;
-  private final MarkingClearanceCacheManager markingClearanceCacheManager;
   private final InjectAgentResolverService injectAgentResolverService;
   // Dispatch-time marking clearance enforcement (resolveAllAssetsToExecute). Called directly -
   // never through HttpMarkingScopeSupplier, which folds in the unrelated AGENT_RUNTIME_ACCESS
