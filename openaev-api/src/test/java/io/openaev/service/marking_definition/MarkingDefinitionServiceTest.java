@@ -241,7 +241,7 @@ class MarkingDefinitionServiceTest {
                     "UPDATE "
                         + table
                         + " SET marking_ids = array_remove(marking_ids, ?) WHERE COALESCE(marking_ids, '{}'::text[])"
-                        + " @> ARRAY[?]::text[])"),
+                        + " @> ARRAY[?]::text[]"),
                 eq(existing.getId()),
                 eq(existing.getId()));
       }
@@ -288,7 +288,7 @@ class MarkingDefinitionServiceTest {
                     "UPDATE "
                         + table
                         + " SET marking_ids = array_remove(marking_ids, ?) WHERE COALESCE(marking_ids, '{}'::text[])"
-                        + " @> ARRAY[?]::text[])"),
+                        + " @> ARRAY[?]::text[]"),
                 eq(existing.getId()),
                 eq(existing.getId()));
       }

@@ -292,7 +292,7 @@ public class MarkingDefinitionService {
       jdbcTemplate.update(
           "UPDATE "
               + table
-              + " SET marking_ids = array_remove(marking_ids, ?) WHERE COALESCE(marking_ids, '{}'::text[]) @> ARRAY[?]::text[])",
+              + " SET marking_ids = array_remove(marking_ids, ?) WHERE COALESCE(marking_ids, '{}'::text[]) @> ARRAY[?]::text[]",
           markingDefinitionId,
           markingDefinitionId);
     }
