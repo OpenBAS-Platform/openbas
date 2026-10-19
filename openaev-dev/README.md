@@ -63,7 +63,7 @@ docker compose up -d openaev-dev-pgsql openaev-dev-minio openaev-dev-elasticsear
 | **Elasticsearch (dev)** | 9200, 9300 | Full-text search & indexing engine |
 | **RabbitMQ** | 5672 (AMQP), 15672 (Management) | Async messaging between backend components |
 
-> **Tip:** If you prefer OpenSearch over Elasticsearch, start `openaev-dev-opensearch` instead and set `engine.engine-selector=opensearch` / `engine.url=http://localhost:9202` in your `application-dev.properties`.
+> **Tip:** If you prefer OpenSearch over Elasticsearch, start `openaev-dev-opensearch` instead and set `engine.url=http://localhost:9202` in your `application-dev.properties`: the engine is detected automatically.
 
 #### Full start (all services)
 
@@ -85,6 +85,7 @@ This starts everything, including optional services:
 | RabbitMQ | 5672 (AMQP), 15672 (Management) | Message queue |
 | Elasticsearch (dev) | 9200, 9300 | Search engine |
 | Elasticsearch (test) | 9201, 9301 | Test search engine |
+| Elasticsearch 8 | 9203, 9303 | Oldest supported Elasticsearch major (optional, ephemeral) |
 | OpenSearch (dev) | 9202, 9600 | Alternative search engine |
 | Kibana (dev) | 5601 | Elasticsearch UI |
 | Kibana (test) | 5602 | Test Elasticsearch UI (optional) |
@@ -173,9 +174,10 @@ Both Elasticsearch and OpenSearch are included for flexibility. They are configu
 |--------|-----------|----------------------|
 | Elasticsearch (dev) | 9200 | 9300 |
 | Elasticsearch (test) | 9201 | 9301 |
+| Elasticsearch 8 | 9203 | 9303 |
 | OpenSearch (dev) | 9202 | 9600 |
 
-In most cases, you only need to run one search engine at a time. Configure your backend application properties to point to the correct port (9200 for Elasticsearch, 9202 for OpenSearch).
+In most cases, you only need to run one search engine at a time. Point `engine.url` at the one you run (9200 for Elasticsearch, 9203 for Elasticsearch 8, 9202 for OpenSearch): the engine is detected automatically.
 
 ### Apple Silicon Support
 
