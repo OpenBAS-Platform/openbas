@@ -17,9 +17,11 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Utility class for building and managing InjectExpectationResult objects.
@@ -301,13 +303,16 @@ public final class ExpectationResultBuilder {
     }
   }
 
-  public static void deleteResult(
+  /**
+   * Removes the result of a source from the expectation. The score is left untouched: it is the
+   * caller's job to recompute it.
+   */
+  public static void removeResult(
       @NotNull final BaseInjectExpectation expectation, @NotBlank final String sourceId) {
     expectation.setResults(
-        expectation.getResults().stream().filter(r -> !sourceId.equals(r.getSourceId())).toList());
-
-    final Double score = computeScore(expectation.getResults(), expectation);
-    expectation.setScore(score);
+        expectation.getResults().stream()
+            .filter(r -> !sourceId.equals(r.getSourceId()))
+            .collect(Collectors.toCollection(ArrayList::new)));
   }
 
   private static InjectExpectationResult buildForMediaPressure(
@@ -330,10 +335,13 @@ public final class ExpectationResultBuilder {
         : null;
   }
 
-  public static InjectExpectationResult buildForMediaPressure(
-      @NotNull final BaseInjectExpectation baseInjectExpectation) {
-    return buildForMediaPressure(
-        Instant.now().toString(), baseInjectExpectation.getExpectedScore());
+  public static ExpectationUpdateInput buildMediaPressureUpdateInput(@NotNull final Double score) {
+    return ExpectationUpdateInput.builder()
+        .sourceId(MEDIA_PRESSURE_SOURCE_ID)
+        .sourceType(MEDIA_PRESSURE_SOURCE_TYPE)
+        .sourceName(MEDIA_PRESSURE_SOURCE_NAME)
+        .score(score)
+        .build();
   }
 
   public static InjectExpectationResult buildDefaultForMediaPressure() {

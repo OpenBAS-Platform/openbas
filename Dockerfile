@@ -1,4 +1,4 @@
-FROM node:24.21.0-alpine3.24 AS front-builder
+FROM node:24.22.0-alpine3.24 AS front-builder
 
 WORKDIR /opt/openaev-build/openaev-front
 COPY openaev-front/packages ./packages
@@ -9,7 +9,7 @@ RUN yarn install
 COPY openaev-front /opt/openaev-build/openaev-front
 RUN yarn build
 
-FROM maven:3.9.16-eclipse-temurin-21-noble AS api-builder
+FROM maven:3.10.0-eclipse-temurin-21-noble AS api-builder
 
 WORKDIR /opt/openaev-build/openaev
 COPY openaev-build-services ./openaev-build-services
