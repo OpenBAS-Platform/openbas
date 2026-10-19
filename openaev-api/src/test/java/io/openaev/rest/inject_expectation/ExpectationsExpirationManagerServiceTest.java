@@ -888,6 +888,19 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
               .noneMatch(result -> COLLECTOR_ID.equals(result.getSourceId())));
     }
 
+    private InjectExpectationResult makeFailedNucleiResult() {
+      return InjectExpectationResult.builder()
+          .sourceId("nuclei-security-platform")
+          .sourceName("Nuclei")
+          .sourceType("security-platform")
+          .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.VULNERABILITY_SCANNER.name())
+          .result("Vulnerable")
+          .date(Instant.now())
+          .sourceAssetId(UUID.randomUUID().toString())
+          .score(0.0)
+          .build();
+    }
+
     @Test
     @DisplayName(
         "A direct VULNERABLE verdict on the asset group is not contradicted by an expiration stamp")
@@ -911,28 +924,17 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       em.clear();
 
       // The assessment injector answers the ASSET and ASSET GROUP rows directly: proven vulnerable
-      InjectExpectationResult nucleiVerdict =
-          InjectExpectationResult.builder()
-              .sourceId("nuclei-security-platform")
-              .sourceName("Nuclei")
-              .sourceType("security-platform")
-              .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.VULNERABILITY_SCANNER.name())
-              .result("Vulnerable")
-              .date(Instant.now())
-              .sourceAssetId(UUID.randomUUID().toString())
-              .score(0.0)
-              .build();
       BaseInjectExpectation assetExpectation =
           injectExpectationRepository
               .findAllByInjectAndAsset(savedInject.getId(), savedEndpoint.getId())
               .getFirst();
-      assetExpectation.setResults(new ArrayList<>(List.of(nucleiVerdict)));
+      assetExpectation.setResults(new ArrayList<>(List.of(makeFailedNucleiResult())));
       assetExpectation.setScore(0.0);
       BaseInjectExpectation assetGroupExpectation =
           injectExpectationRepository
               .findAllByInjectAndAssetGroup(savedInject.getId(), savedAssetGroup.getId())
               .getFirst();
-      assetGroupExpectation.setResults(new ArrayList<>(List.of(nucleiVerdict)));
+      assetGroupExpectation.setResults(new ArrayList<>(List.of(makeFailedNucleiResult())));
       assetGroupExpectation.setScore(0.0);
       injectExpectationRepository.saveAll(List.of(assetExpectation, assetGroupExpectation));
 
@@ -968,6 +970,19 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
               .noneMatch(result -> COLLECTOR_ID.equals(result.getSourceId())));
     }
 
+    private InjectExpectationResult makeSuccessfulNucleiResult() {
+      return InjectExpectationResult.builder()
+          .sourceId("nuclei-security-platform")
+          .sourceName("Nuclei")
+          .sourceType("security-platform")
+          .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.VULNERABILITY_SCANNER.name())
+          .result("Not vulnerable")
+          .date(Instant.now())
+          .sourceAssetId(UUID.randomUUID().toString())
+          .score(100.0)
+          .build();
+    }
+
     @Test
     @DisplayName(
         "The expiration manager never stamps a vulnerability row a platform already answered")
@@ -991,28 +1006,17 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       em.clear();
 
       // The scanner answers the ASSET and ASSET GROUP rows directly: nothing found
-      InjectExpectationResult nucleiVerdict =
-          InjectExpectationResult.builder()
-              .sourceId("nuclei-security-platform")
-              .sourceName("Nuclei")
-              .sourceType("security-platform")
-              .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.VULNERABILITY_SCANNER.name())
-              .result("Not vulnerable")
-              .date(Instant.now())
-              .sourceAssetId(UUID.randomUUID().toString())
-              .score(100.0)
-              .build();
       BaseInjectExpectation assetExpectation =
           injectExpectationRepository
               .findAllByInjectAndAsset(savedInject.getId(), savedEndpoint.getId())
               .getFirst();
-      assetExpectation.setResults(new ArrayList<>(List.of(nucleiVerdict)));
+      assetExpectation.setResults(new ArrayList<>(List.of(makeSuccessfulNucleiResult())));
       assetExpectation.setScore(100.0);
       BaseInjectExpectation assetGroupExpectation =
           injectExpectationRepository
               .findAllByInjectAndAssetGroup(savedInject.getId(), savedAssetGroup.getId())
               .getFirst();
-      assetGroupExpectation.setResults(new ArrayList<>(List.of(nucleiVerdict)));
+      assetGroupExpectation.setResults(new ArrayList<>(List.of(makeSuccessfulNucleiResult())));
       assetGroupExpectation.setScore(100.0);
       injectExpectationRepository.saveAll(List.of(assetExpectation, assetGroupExpectation));
 
