@@ -9,6 +9,8 @@ import * as Constants from '../../../../../../constants/ActionTypes';
 import { useHelper } from '../../../../../../store';
 import { type CredentialOutput } from '../../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../../utils/hooks';
+import { Can } from '../../../../../../utils/permissions/permissionsContext';
+import { ACTIONS, SUBJECTS } from '../../../../../../utils/permissions/types';
 import CredentialPopover from '../../../../assets/credentials/CredentialPopover';
 import CredentialsList from '../../../../assets/credentials/CredentialsList';
 import InjectAddCredentials from '../../../../simulations/simulation/injects/credentials/InjectAddCredentials';
@@ -75,15 +77,17 @@ const InjectCredentialReferencesList = ({ disabled = false, errorLabel, label, m
           />
         )}
       />
-      <InjectAddCredentials
-        selectedCredentialIds={credentialIds}
-        onSubmit={onCredentialChange}
-        disabled={disabled}
-        errorLabel={errorLabel}
-        label={label}
-        multiple={multiple}
-        credentialType={credentialType}
-      />
+      <Can I={ACTIONS.ACCESS} a={SUBJECTS.CREDENTIALS}>
+        <InjectAddCredentials
+          selectedCredentialIds={credentialIds}
+          onSubmit={onCredentialChange}
+          disabled={disabled}
+          errorLabel={errorLabel}
+          label={label}
+          multiple={multiple}
+          credentialType={credentialType}
+        />
+      </Can>
     </>
   );
 };
