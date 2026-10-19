@@ -274,3 +274,12 @@ export const sendErrorToBackend = async (error: Error, stack: ErrorInfo) => {
   };
   await simplePostCall('/api/logs', errorDetails);
 };
+
+export const sendWarningToBackend = (message: string) => {
+  const warningDetails = {
+    message: OPENAEV_FRONTEND + message,
+    timestamp: new Date().toISOString(),
+    level: 'WARNING',
+  };
+  simplePostCall('/api/logs', warningDetails, undefined, false).catch(() => {});
+};
