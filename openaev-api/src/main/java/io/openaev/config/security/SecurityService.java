@@ -4,6 +4,7 @@ import static io.jsonwebtoken.lang.Strings.hasText;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasLength;
 
+import io.openaev.config.cache.TenantMembershipCacheManager;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.model.User;
 import io.openaev.database.repository.TenantRepository;
@@ -41,6 +42,7 @@ public class SecurityService {
   private final Environment env;
   private final UserEventService userEventService;
   private final TenantRepository tenantRepository;
+  private final TenantMembershipCacheManager tenantMembershipCacheManager;
 
   @Transactional(rollbackFor = Exception.class)
   public User userManagement(
@@ -69,10 +71,12 @@ public class SecurityService {
                 String.class,
                 "");
         userMappingService.mapCurrentUserWithGroup(groupsManagementObject, user, groups);
-        attachTenant(registrationId, user)
-            .ifPresent(
-                tenantId -> userService.assignAutoAssignGroups(user.getId(), List.of(tenantId)));
-        return this.userService.saveUser(user);
+        Optional<String> attachedTenantId = attachTenant(registrationId, user);
+        attachedTenantId.ifPresent(
+            tenantId -> userService.assignAutoAssignGroups(user.getId(), List.of(tenantId)));
+        User savedUser = this.userService.saveUser(user);
+        attachedTenantId.ifPresent(tenantId -> evictTenantMembership(savedUser, tenantId));
+        return savedUser;
       } else {
         // If user exists, update it
         User currentUser = optionalUser.get();
@@ -88,11 +92,12 @@ public class SecurityService {
                 String.class,
                 "");
         userMappingService.mapCurrentUserWithGroup(groupsManagementObject, currentUser, groups);
-        attachTenant(registrationId, currentUser)
-            .ifPresent(
-                tenantId ->
-                    userService.assignAutoAssignGroups(currentUser.getId(), List.of(tenantId)));
-        return this.userService.saveUser(currentUser);
+        Optional<String> attachedTenantId = attachTenant(registrationId, currentUser);
+        attachedTenantId.ifPresent(
+            tenantId -> userService.assignAutoAssignGroups(currentUser.getId(), List.of(tenantId)));
+        User savedUser = this.userService.saveUser(currentUser);
+        attachedTenantId.ifPresent(tenantId -> evictTenantMembership(savedUser, tenantId));
+        return savedUser;
       }
     }
     return null;
@@ -129,6 +134,16 @@ public class SecurityService {
     Tenant tenant = tenantRepository.getReferenceById(tenantId);
     user.getTenants().add(tenant);
     return Optional.of(tenantId);
+  }
+
+  /**
+   * The new membership is only flushed at commit, but the transaction already read the user's
+   * tenants through the JDBC-backed membership cache (granting the auto-assign groups evicts the
+   * marking clearance, which lists them) and cached them without the new tenant. Every request in
+   * that tenant would be denied until the entry expires. The eviction runs again after commit.
+   */
+  private void evictTenantMembership(User user, String tenantId) {
+    tenantMembershipCacheManager.evict(user.getId(), tenantId);
   }
 
   private List<String> getAdminRoles(@NotBlank final String registrationId) {
