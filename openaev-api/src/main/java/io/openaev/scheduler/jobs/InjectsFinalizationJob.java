@@ -172,33 +172,23 @@ public class InjectsFinalizationJob implements Job {
   }
 
   public void handlePendingInject() {
-    List<Inject> pendingInjects =
-        injectHelper.getAllPendingInjectsWithThresholdMinutes(this.injectExecutionThreshold);
-
-    if (pendingInjects.isEmpty()) {
-      return;
-    }
-
-    // Finalize each inject inside its own tenant's scope, the way handleAutoClosingSimulations
-    // already does. The sweep above is deliberately cross-tenant and stays so; what needs a scope
-    // is the per-inject work, because resolving the agents walks the inject's assets and asset
-    // groups. asset_groups is v2-active and the statement inspector rewrites by SQL text: with no
-    // scope it filters a findById like any other read, so AssetGroupService.assetGroup(id) finds
-    // nothing and throws.
-    // That exception escapes to execute(), so one inject targeting an asset group would stop the
-    // whole sweep, for every tenant. PendingInjectAssetGroupScopeTest pins both halves.
+    // The sweep is cross-tenant and reads under allTenants(). Its sub-query leaves out the injects
+    // of a running chaining workflow: once workflows is tenant-isolated, an unscoped sub-query
+    // reads nothing, and the sweep would time out the injects the chaining engine owns.
     //
-    // Only the ids cross the scope boundary, and each inject is refetched inside its tenant's
-    // transaction, exactly like the simulations above. Carrying the entities over would keep the
-    // eager Inject.assets collection loaded by the unscoped sweep, which is the very state this
-    // activation makes wrong: once assets is v2-active that collection comes back empty, and the
-    // finalization would silently see an agentless inject where there are agents.
-    Map<String, List<String>> pendingIdsByTenant = new LinkedHashMap<>();
-    for (Inject inject : pendingInjects) {
-      pendingIdsByTenant
-          .computeIfAbsent(inject.getTenant().getId(), key -> new ArrayList<>())
-          .add(inject.getId());
-    }
+    // Only the ids leave the sweep. Each inject is finalized inside its own tenant's scope, the way
+    // handleAutoClosingSimulations does, because resolving its agents walks its assets and asset
+    // groups: asset_groups is tenant-isolated, so with no scope AssetGroupService.assetGroup(id)
+    // finds nothing and throws, which escapes to execute() and stops the sweep for every tenant
+    // (PendingInjectAssetGroupScopeTest). Carrying the entities over instead would keep the eager
+    // Inject.assets collection the sweep loaded, which comes back empty once assets is isolated,
+    // and the finalization would see an agentless inject where there are agents.
+    Map<String, List<String>> pendingIdsByTenant =
+        tenantScopedJobRunner.supplyAcrossTenants(
+            () ->
+                idsByTenant(
+                    injectHelper.getAllPendingInjectsWithThresholdMinutes(
+                        this.injectExecutionThreshold)));
 
     pendingIdsByTenant.forEach(
         (tenantId, injectIds) ->
@@ -206,6 +196,16 @@ public class InjectsFinalizationJob implements Job {
                 tenantId,
                 () ->
                     injectRepository.findAllById(injectIds).forEach(this::finalizePendingInject)));
+  }
+
+  private static Map<String, List<String>> idsByTenant(List<Inject> injects) {
+    Map<String, List<String>> idsByTenant = new LinkedHashMap<>();
+    for (Inject inject : injects) {
+      idsByTenant
+          .computeIfAbsent(inject.getTenant().getId(), key -> new ArrayList<>())
+          .add(inject.getId());
+    }
+    return idsByTenant;
   }
 
   private void finalizePendingInject(Inject inject) {
