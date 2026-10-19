@@ -5169,6 +5169,8 @@ export interface EsFinding {
   /** @format date-time */
   base_updated_at?: string;
   finding_field?: string;
+  /** @format int64 */
+  finding_masking_version?: number;
   finding_type?: string;
   finding_value?: string;
 }
