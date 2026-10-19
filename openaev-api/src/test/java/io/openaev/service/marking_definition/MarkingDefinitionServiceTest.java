@@ -2,6 +2,7 @@ package io.openaev.service.marking_definition;
 
 import static io.openaev.utils.fixtures.MarkingDefinitionFixture.createDefaultMarkingDefinition;
 import static io.openaev.utils.fixtures.MarkingDefinitionFixture.toInput;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -10,6 +11,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import io.openaev.api.marking_definition.form.MarkingDefinitionInput;
@@ -20,6 +23,7 @@ import io.openaev.database.model.MarkingDefinition;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.MarkingDefinitionRepository;
 import io.openaev.rest.exception.BadRequestException;
+import io.openaev.rest.exception.ElementNotFoundException;
 import io.openaev.telemetry.metric_collectors.ActionMetricCollector;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -343,30 +347,36 @@ class MarkingDefinitionServiceTest {
     }
 
     @Test
-    @DisplayName("given_idGrantedOnlyToGroup_should_returnTrue")
-    void given_idGrantedOnlyToGroup_should_returnTrue() {
+    @DisplayName("given_noMarkedTablesInSchema_should_checkOnlyGroupGrants")
+    void given_noMarkedTablesInSchema_should_checkOnlyGroupGrants() {
       // Arrange
       MarkingDefinition existing = existingIn(TENANT_ID);
       when(repository.findById(existing.getId())).thenReturn(Optional.of(existing));
-      Set<String> markedTableNames = new LinkedHashSet<>(List.of("assets", "asset_groups"));
-      when(allTablesWithMarkingIds.tableNames()).thenReturn(markedTableNames);
-      for (String table : markedTableNames) {
-        when(jdbcTemplate.queryForObject(existsQuery(table), Boolean.class, existing.getId()))
-            .thenReturn(false);
-      }
+      when(allTablesWithMarkingIds.tableNames()).thenReturn(Set.of());
       when(jdbcTemplate.queryForObject(GROUPS_QUERY, Boolean.class, existing.getId()))
-          .thenReturn(true);
+          .thenReturn(false);
 
       // Act
       boolean assigned = service().isAssigned(TxCtx.forTenant(TENANT_ID), existing.getId());
 
       // Assert
-      assertTrue(assigned);
-      for (String table : markedTableNames) {
-        verify(jdbcTemplate, times(1))
-            .queryForObject(existsQuery(table), Boolean.class, existing.getId());
-      }
+      assertFalse(assigned);
       verify(jdbcTemplate, times(1)).queryForObject(GROUPS_QUERY, Boolean.class, existing.getId());
+      verifyNoMoreInteractions(jdbcTemplate);
+    }
+
+    @Test
+    @DisplayName("given_definitionOfAnotherTenant_should_throwNotFoundAndProbeNothing")
+    void given_definitionOfAnotherTenant_should_throwNotFoundAndProbeNothing() {
+      // Arrange - the caller must not learn whether another tenant's definition is in use.
+      MarkingDefinition existing = existingIn("tenant-2");
+      when(repository.findById(existing.getId())).thenReturn(Optional.of(existing));
+
+      // Act & Assert
+      assertThrows(
+          ElementNotFoundException.class,
+          () -> service().isAssigned(TxCtx.forTenant(TENANT_ID), existing.getId()));
+      verifyNoInteractions(allTablesWithMarkingIds, jdbcTemplate);
     }
   }
 }
