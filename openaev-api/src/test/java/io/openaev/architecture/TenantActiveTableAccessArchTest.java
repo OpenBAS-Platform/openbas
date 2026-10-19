@@ -82,6 +82,7 @@ import io.openaev.database.repository.attackpath.AttackPathExecutionRepository;
 import io.openaev.database.repository.attackpath.AttackPathFindingRepository;
 import io.openaev.database.repository.autonomous.AutonomousDirectiveRepository;
 import io.openaev.database.repository.autonomous.AutonomousEventRepository;
+import io.openaev.database.repository.autonomous.AutonomousObjectiveTemplateRepository;
 import io.openaev.database.repository.autonomous.AutonomousRunRepository;
 import io.openaev.engine.model.attackpattern.AttackPatternHandler;
 import io.openaev.engine.model.finding.FindingHandler;
@@ -128,12 +129,14 @@ import io.openaev.processor.datapack.V20260101_Starter_pack;
 import io.openaev.processor.datapack.V20260330_Default_tenant_data;
 import io.openaev.processor.datapack.V20260708_Dynamic_injectors_base_url;
 import io.openaev.processor.datapack.V20260914_Default_tenant_markings;
+import io.openaev.processor.datapack.V20261002_Default_group_markings;
 import io.openaev.rest.asset.endpoint.EndpointApi;
 import io.openaev.rest.asset.security_platforms.SecurityPlatformApi;
 import io.openaev.rest.atomic_testing.AtomicTestingApi;
 import io.openaev.rest.attack_pattern.AttackPatternApi;
 import io.openaev.rest.attack_pattern.AttackPatternInitializer;
 import io.openaev.rest.attack_pattern.service.AttackPatternService;
+import io.openaev.rest.attack_pattern.service.AttackPatternUpsertService;
 import io.openaev.rest.challenge.ChallengeApi;
 import io.openaev.rest.challenge.ScenarioChallengeApi;
 import io.openaev.rest.challenge.SimulationChallengeApi;
@@ -228,6 +231,7 @@ import io.openaev.service.attackpath.AttackPathSecurityPlatformResolver;
 import io.openaev.service.attackpath.ingestion.AttackPathExecutionIngestionService;
 import io.openaev.service.attackpath.ingestion.AttackPathFindingIngestionService;
 import io.openaev.service.autonomous.AutonomousEventService;
+import io.openaev.service.autonomous.AutonomousObjectiveTemplateService;
 import io.openaev.service.autonomous.AutonomousRunReconciliationWriter;
 import io.openaev.service.autonomous.AutonomousRunService;
 import io.openaev.service.autonomous.AutonomousTimeoutService;
@@ -350,7 +354,8 @@ class TenantActiveTableAccessArchTest {
           "datapacks",
           "teams",
           "attack_patterns",
-          "agents");
+          "agents",
+          "autonomous_objective_templates");
 
   @ArchTest
   static void every_active_table_is_guarded(JavaClasses classes) throws Exception {
@@ -548,6 +553,11 @@ class TenantActiveTableAccessArchTest {
               // tenantTx.execute/setScopeOnCurrentTransaction with TxCtx.forTenant(...)), so it
               // needs no waiver.
               V20260914_Default_tenant_markings.class,
+              // Provisioning datapack: grants each default group (Admin/Manager/Observer) the TLP
+              // marking matching its role. Runs under the same tenant-scoped transaction primitive
+              // as the two datapacks above (MigrationProcessor -> tenantTx.execute/
+              // setScopeOnCurrentTransaction with TxCtx.forTenant(...)), so it needs no waiver.
+              V20261002_Default_group_markings.class,
               // Background primitive: reads the tenant's markings to assign the system clearance a
               // background transaction runs at (all markings of the tenants in scope — a scheduler
               // is not a user). Scoped, and in the strongest sense the rule asks for: the read
@@ -1623,7 +1633,7 @@ class TenantActiveTableAccessArchTest {
               KillChainPhaseService.class,
               // Reads phases by id for an upserted attack pattern; driven by the TxCtx-carrying
               // AttackPatternApi#upsertAttackPatterns:
-              AttackPatternService.class)
+              AttackPatternUpsertService.class)
           .should()
           .dependOnClassesThat()
           .areAssignableTo(KillChainPhaseRepository.class)
@@ -1654,6 +1664,7 @@ class TenantActiveTableAccessArchTest {
               InjectService.class,
               ScenarioService.class,
               AttackPatternService.class,
+              AttackPatternUpsertService.class,
               WorkflowExportInitializer.class,
               EsAttackPathService.class,
               V1_DataImporter.class)
@@ -1677,6 +1688,7 @@ class TenantActiveTableAccessArchTest {
               // Services behind wired handlers; every lookup names the tenant it writes to, or
               // relies on the handler's scope:
               AttackPatternService.class,
+              AttackPatternUpsertService.class,
               InjectorContractService.class,
               PayloadCreationService.class,
               PayloadUpdateService.class,
@@ -2274,4 +2286,20 @@ class TenantActiveTableAccessArchTest {
           .because(
               "teams is tenant-active: an accessor without a tenant scope silently reads zero rows."
                   + " New accessors must carry a scope and be allowlisted here");
+
+  static final ArchRule autonomous_objective_templates_repository_access_is_reviewed =
+      noClasses()
+          .that()
+          .doNotBelongToAnyOf(
+              // Sole accessor: the objective-template gallery service, reached only from
+              // AutonomousRunApi.objectiveTemplates, whose TxCtx carries @RequireTenantSelector so
+              // the scope pins exactly one tenant for both the read and the lazy built-in seed.
+              AutonomousObjectiveTemplateService.class)
+          .should()
+          .dependOnClassesThat()
+          .areAssignableTo(AutonomousObjectiveTemplateRepository.class)
+          .because(
+              "autonomous_objective_templates is tenant-active: an accessor without a tenant scope"
+                  + " silently reads zero rows, and the seed it drives would attribute its rows to"
+                  + " the wrong tenant. New accessors must carry a scope and be allowlisted here");
 }

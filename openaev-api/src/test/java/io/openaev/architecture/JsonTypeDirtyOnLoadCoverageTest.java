@@ -61,8 +61,7 @@ class JsonTypeDirtyOnLoadCoverageTest {
           "Scenario.autonomousConfig",
           "UserEvent.payload",
           "WorkflowScopeRule.snapshotEnd",
-          "WorkflowScopeRule.snapshotStart",
-          "WorkflowState.entries");
+          "WorkflowScopeRule.snapshotStart");
 
   @Nested
   @DisplayName("the inventory it is built on")

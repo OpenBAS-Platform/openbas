@@ -257,9 +257,17 @@ path, non-marking case unaffected.
 
 ## Chunk 2 — BYPASS capability must not widen marking clearance
 
+Size: M 
+
 A user who belongs to a group holding a `BYPASS` role plus the marking `TLP:GREEN` could see `TLP:RED`.
 Principle: markings sit above capabilities, so `BYPASS` is secondary to markings, except for the
-`ACCESS`-type capabilities that grant clearance on their own (see "Open point").
+`ACCESS`-type capabilities that grant clearance on their own. 
+
+AC:
+- The first OpenAEV admin user root from the start is kept as the root and can still do/see what he wants, 
+he is out of this scope.
+- Users with BYPASS role shouldn't BYPASS the markings.
+- Order: Admin user root > markings > capa.
 
 Today two code paths disagree on who is a bypass user:
 
@@ -299,6 +307,8 @@ its members at execution time nor its aggregated result follow the launcher's cl
 
 ### 3a) Asset groups are not resolved per launcher clearance at execution time
 
+Size: S
+
 - `.assets(...)` of the external-push payload is filtered by the launcher's clearance
   (`getAssetsToExecute()`, with `resolveAllAssetsToExecute()` as the fallback, step 4.9).
 - `.assetGroups(...)` is left unfiltered on purpose (see the "`.assetGroups(...)` decision" note at the end
@@ -309,6 +319,8 @@ its members at execution time nor its aggregated result follow the launcher's cl
   members, it reads under its own account's clearance, not the launcher's.
 
 ### 3b) The asset-group expectation row still includes RED in its verdict
+
+Size: M
 
 - An inject that targets an asset group stores one group expectation row (`asset_group_id` set, `asset_id`
   NULL). Its verdict rolls up every member's result, using the group's validation mode.
@@ -339,6 +351,8 @@ Options for 3b, to settle before coding and check with Vertical 2:
 - **3.4** Check the admin still sees the full group, its members and its true verdict.
 
 ## Chunk 4 — Agentless traces of a RED asset
+
+Size: M, check with Laurent for a refacto in a table or if it's just a list of ids.
 
 External injectors that do not run through an agent (for example network scanners targeting agentless
 endpoints) report their results in an execution callback. The callback carries `contextIdentifiers`, the ids
@@ -381,6 +395,8 @@ filters ANDed together. Small-to-medium change in `MarkedTable` and `MarkingDime
   the admin sees every trace.
 
 ## Chunk 5 — SSE - Stream API revisited
+
+Size: L, check with Guillaume and Damien for the POC to revisit Stream.
 
 **Status**: leak reproduced (2026-10-08), fix not started.
 
@@ -498,18 +514,36 @@ never leak state.
 
 ## Chunk 6 — OCTI: scenario create
 
+Size: M, try the best option (around 3-4 days) else "short term" solution.
+
 We need to add all the markings to the OpenCTI service account, in addition to adding the OpenCTI user to the scheduled scenario.
 See `resolveLaunchedByClearance`.
 
 **Question**: which user to add to `launchedBy` / `scheduledBy`?
-Special bypass with OpenCTI user (shadow user not visible with all markings added).
+
+3 identified ideas:
+- Add all markings to OpenCTI user service account or new user not visible
+- "Don't check" markings when a scenario is launched from OpenCTI
+- Best option: Unlock markings for user service account + add service account user to the OpenCTI scenario. 
+Think about default init and manually created markings. Be careful with other service account.
+- Other?
 
 ## Chunk 7 — Tests chained simulation and autonomous run
 
+Size: M, schedule a meeting between Verticals 1 and 3 for the tests.
+
 Check that autonomous run and chained scenario work: check with Vertical 1 for the behavior with findings, assets,... 
-If not, add the user for the scenarios and fix/adapt the different missing things.
+If not, add the user for the scenarios and fix/adapt the different missing things to match the time-based scenario.
+
+Remarks:
+- Check for chained scenario if a new asset can be created during a scan of an inject? -> flag markings or not?
+- Check the code for chained scenario to resolve the assets and refacto if necessary.
+
+Create new tasks if big issues are found.
 
 ## Chunk 8 — Asset not targeted
+
+Size: S.
 
 "Asset not targeted" vs "No asset executed", line 100 in `ExecutionExecutorService.java`: compare the list of assets the user's clearance holds to the list of assets.
 For the admin user looking at each asset overview, display "asset not targeted" when the user has no clearance on that asset.
@@ -517,6 +551,8 @@ Same test with an agentless test with Nuclei: a scenario was created with an age
 A user can only see one agentless asset => make sure the admin sees "asset not targeted" on the RED asset.
 
 ## Chunk 9 — UX/UI: show who launched and what was skipped
+
+Size: M, check for refactoring the assets lists. S for the dev only.
 
 **Status**: not started. **The PO needs to design it** before any code: the points below are the needs, not
 a design.
@@ -557,7 +593,9 @@ contracts, so the marking filter does not apply.
 
 ## Chunk 13 — Dashboards: last spike to POC
 
-**Status**: POC done. Tracked as a separate issue and PR, outside this plan's scope because it needs product definition.
+Size: M.
+
+**Status**: POC done in a PR. It needs product definition.
 The RBAC and grands have not been implemented yet, a first adjustment must be done before implementing markings 
 for dashboards.
 

@@ -4,6 +4,7 @@ import static io.openaev.injectors.phishing.service.PhishingTrackingService.NO_I
 import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.MEDIA_PRESSURE_SOURCE_ID;
 import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.buildDefaultForPlayerManualValidation;
 import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.buildForPlayerManualValidation;
+import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.buildForTeamManualValidation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -891,65 +892,175 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
       assertThat(findPlayerExpectations(inject)).isEmpty();
       assertOnlyResultFromUi(findTeamExpectation(inject), 100.0);
     }
+  }
 
-    // -- Shared helpers --
+  @Nested
+  @DisplayName("Delete result from UI")
+  class DeleteResultFromUi {
 
-    private Team persistTeamWithPlayers(int playerCount) {
-      TeamComposer.Composer teamWrapper =
-          teamComposer.forTeam(TeamFixture.getDefaultContextualTeam());
-      for (int i = 0; i < playerCount; i++) {
-        teamWrapper.withUser(userComposer.forUser(UserFixture.getUserWithDefaultEmail()));
-      }
-      return teamWrapper.persist().get();
-    }
-
-    private Inject persistInjectForTeam(Team team) {
-      return injectComposer
-          .forInject(InjectFixture.getDefaultInject())
-          .withInjectorContract(
-              injectorContractComposer.forInjectorContract(
-                  InjectorContractFixture.createDefaultInjectorContract()))
-          .withTeam(teamComposer.forTeam(team))
-          .persist()
-          .get();
-    }
-
-    private ManualInjectExpectation createPlayerExpectation(
-        Team team, User player, Inject inject, InjectExpectationResult defaultResult) {
-      ManualInjectExpectation expectation =
+    @Test
+    @DisplayName("given player validated from UI when result deleted should reset player and team")
+    void given_player_validated_from_ui_when_result_deleted_should_reset_player_and_team() {
+      // Arrange
+      Team team = persistTeamWithPlayers(1);
+      Inject inject = persistInjectForTeam(team);
+      ManualInjectExpectation playerExpectation =
+          createPlayerExpectation(
+              team, team.getUsers().getFirst(), inject, buildDefaultForPlayerManualValidation());
+      ManualInjectExpectation teamExpectation =
           InjectExpectationFixture.createManualInjectExpectation(team, inject);
-      expectation.setUser(player);
-      expectation.setResults(new ArrayList<>(List.of(defaultResult)));
-      return expectation;
-    }
+      persistExpectations(inject, List.of(playerExpectation, teamExpectation));
+      injectExpectationService.updateInjectExpectationUsingBehaviors(
+          playerExpectation.getId(),
+          ExpectationFixture.getExpectationUpdateInput(UI_SOURCE_ID, 100.0));
 
-    private void persistExpectations(
-        Inject inject, List<? extends BaseInjectExpectation> expectations) {
-      injectExpectationRepository.saveAll(expectations);
+      // Act
+      injectExpectationService.deleteInjectExpectationResult(
+          playerExpectation.getId(), UI_SOURCE_ID);
       entityManager.flush();
-      entityManager.refresh(inject);
+      entityManager.clear();
+
+      // Assert
+      List<TableTopInjectExpectation> savedPlayers = findPlayerExpectations(inject);
+      assertThat(savedPlayers).hasSize(1);
+      assertNoResult(savedPlayers.getFirst());
+      assertThat(findTeamExpectation(inject).getScore()).isNull();
     }
 
-    private List<TableTopInjectExpectation> findPlayerExpectations(Inject inject) {
-      return injectExpectationRepository.findAllByInjectId(inject.getId()).stream()
-          .map(TableTopInjectExpectation.class::cast)
-          .filter(e -> e.getUser() != null)
-          .toList();
+    @Test
+    @DisplayName("given team validated from UI when result deleted should reset players and team")
+    void given_team_validated_from_ui_when_result_deleted_should_reset_players_and_team() {
+      // Arrange
+      Team team = persistTeamWithPlayers(2);
+      Inject inject = persistInjectForTeam(team);
+      List<ManualInjectExpectation> expectations =
+          new ArrayList<>(
+              team.getUsers().stream()
+                  .map(
+                      player ->
+                          createPlayerExpectation(
+                              team, player, inject, buildDefaultForPlayerManualValidation()))
+                  .toList());
+      ManualInjectExpectation teamExpectation =
+          InjectExpectationFixture.createManualInjectExpectation(team, inject);
+      expectations.add(teamExpectation);
+      persistExpectations(inject, expectations);
+      injectExpectationService.updateInjectExpectationUsingBehaviors(
+          teamExpectation.getId(),
+          ExpectationFixture.getExpectationUpdateInput(UI_SOURCE_ID, 100.0));
+
+      // Act
+      injectExpectationService.deleteInjectExpectationResult(teamExpectation.getId(), UI_SOURCE_ID);
+      entityManager.flush();
+      entityManager.clear();
+
+      // Assert
+      List<TableTopInjectExpectation> savedPlayers = findPlayerExpectations(inject);
+      assertThat(savedPlayers).hasSize(2).allSatisfy(player -> assertNoResult(player));
+      assertThat(findTeamExpectation(inject).getScore()).isNull();
     }
 
-    private TableTopInjectExpectation findTeamExpectation(Inject inject) {
-      return injectExpectationRepository.findAllByInjectId(inject.getId()).stream()
-          .map(TableTopInjectExpectation.class::cast)
-          .filter(e -> e.getUser() == null)
-          .findFirst()
-          .orElseThrow();
+    @Test
+    @DisplayName(
+        "given team validated before behavior update when result deleted should reset players and team")
+    void
+        given_team_validated_before_behavior_update_when_result_deleted_should_reset_players_and_team() {
+      // Arrange
+      Team team = persistTeamWithPlayers(2);
+      Inject inject = persistInjectForTeam(team);
+      List<ManualInjectExpectation> expectations =
+          new ArrayList<>(
+              team.getUsers().stream()
+                  .map(
+                      player -> {
+                        ManualInjectExpectation playerExpectation =
+                            createPlayerExpectation(
+                                team,
+                                player,
+                                inject,
+                                buildForTeamManualValidation("Success", 100.0));
+                        playerExpectation.setScore(100.0);
+                        return playerExpectation;
+                      })
+                  .toList());
+      ManualInjectExpectation teamExpectation =
+          InjectExpectationFixture.createManualInjectExpectation(team, inject);
+      teamExpectation.setResults(
+          new ArrayList<>(
+              List.of(
+                  InjectExpectationResult.builder()
+                      .sourceId(UI_SOURCE_ID)
+                      .result("Success")
+                      .score(100.0)
+                      .build())));
+      teamExpectation.setScore(100.0);
+      expectations.add(teamExpectation);
+      persistExpectations(inject, expectations);
+
+      // Act
+      injectExpectationService.deleteInjectExpectationResult(teamExpectation.getId(), UI_SOURCE_ID);
+      entityManager.flush();
+      entityManager.clear();
+
+      // Assert
+      List<TableTopInjectExpectation> savedPlayers = findPlayerExpectations(inject);
+      assertThat(savedPlayers).hasSize(2).allSatisfy(player -> assertNoResult(player));
+      assertNoResult(findTeamExpectation(inject));
     }
 
-    private void assertOnlyResultFromUi(TableTopInjectExpectation player, Double expectedScore) {
-      assertThat(player.getScore()).isEqualTo(expectedScore);
-      assertThat(player.getResults()).hasSize(1);
-      assertThat(player.getResults().getFirst().getSourceId()).isEqualTo(UI_SOURCE_ID);
-      assertThat(player.getResults().getFirst().getScore()).isEqualTo(expectedScore);
+    @Test
+    @DisplayName("given team without players when result deleted should reset the team")
+    void given_team_without_players_when_result_deleted_should_reset_the_team() {
+      // Arrange
+      Team team = persistTeamWithPlayers(0);
+      Inject inject = persistInjectForTeam(team);
+      ManualInjectExpectation teamExpectation =
+          InjectExpectationFixture.createManualInjectExpectation(team, inject);
+      persistExpectations(inject, List.of(teamExpectation));
+      injectExpectationService.updateInjectExpectationUsingBehaviors(
+          teamExpectation.getId(),
+          ExpectationFixture.getExpectationUpdateInput(UI_SOURCE_ID, 100.0));
+
+      // Act
+      injectExpectationService.deleteInjectExpectationResult(teamExpectation.getId(), UI_SOURCE_ID);
+      entityManager.flush();
+      entityManager.clear();
+
+      // Assert
+      assertThat(findPlayerExpectations(inject)).isEmpty();
+      assertNoResult(findTeamExpectation(inject));
+    }
+
+    @Test
+    @DisplayName("given another source when result deleted should still reset player and team")
+    void given_another_source_when_result_deleted_should_still_reset_player_and_team() {
+      // Arrange
+      Team team = persistTeamWithPlayers(1);
+      Inject inject = persistInjectForTeam(team);
+      ManualInjectExpectation playerExpectation =
+          createPlayerExpectation(
+              team, team.getUsers().getFirst(), inject, buildDefaultForPlayerManualValidation());
+      ManualInjectExpectation teamExpectation =
+          InjectExpectationFixture.createManualInjectExpectation(team, inject);
+      persistExpectations(inject, List.of(playerExpectation, teamExpectation));
+      injectExpectationService.updateInjectExpectationUsingBehaviors(
+          playerExpectation.getId(),
+          ExpectationFixture.getExpectationUpdateInput(UI_SOURCE_ID, 100.0));
+
+      // Act
+      injectExpectationService.deleteInjectExpectationResult(
+          playerExpectation.getId(), MEDIA_PRESSURE_SOURCE_ID);
+      entityManager.flush();
+      entityManager.clear();
+
+      // Assert
+      assertNoResult(findPlayerExpectations(inject).getFirst());
+      assertThat(findTeamExpectation(inject).getScore()).isNull();
+    }
+
+    private void assertNoResult(TableTopInjectExpectation expectation) {
+      assertThat(expectation.getResults()).isEmpty();
+      assertThat(expectation.getScore()).isNull();
     }
   }
 
@@ -1069,5 +1180,65 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
           .findFirst()
           .orElseThrow();
     }
+  }
+
+  // -- Shared helpers for human response tests --
+
+  private Team persistTeamWithPlayers(int playerCount) {
+    TeamComposer.Composer teamWrapper =
+        teamComposer.forTeam(TeamFixture.getDefaultContextualTeam());
+    for (int i = 0; i < playerCount; i++) {
+      teamWrapper.withUser(userComposer.forUser(UserFixture.getUserWithDefaultEmail()));
+    }
+    return teamWrapper.persist().get();
+  }
+
+  private Inject persistInjectForTeam(Team team) {
+    return injectComposer
+        .forInject(InjectFixture.getDefaultInject())
+        .withInjectorContract(
+            injectorContractComposer.forInjectorContract(
+                InjectorContractFixture.createDefaultInjectorContract()))
+        .withTeam(teamComposer.forTeam(team))
+        .persist()
+        .get();
+  }
+
+  private ManualInjectExpectation createPlayerExpectation(
+      Team team, User player, Inject inject, InjectExpectationResult defaultResult) {
+    ManualInjectExpectation expectation =
+        InjectExpectationFixture.createManualInjectExpectation(team, inject);
+    expectation.setUser(player);
+    expectation.setResults(new ArrayList<>(List.of(defaultResult)));
+    return expectation;
+  }
+
+  private void persistExpectations(
+      Inject inject, List<? extends BaseInjectExpectation> expectations) {
+    injectExpectationRepository.saveAll(expectations);
+    entityManager.flush();
+    entityManager.refresh(inject);
+  }
+
+  private List<TableTopInjectExpectation> findPlayerExpectations(Inject inject) {
+    return injectExpectationRepository.findAllByInjectId(inject.getId()).stream()
+        .map(TableTopInjectExpectation.class::cast)
+        .filter(e -> e.getUser() != null)
+        .toList();
+  }
+
+  private TableTopInjectExpectation findTeamExpectation(Inject inject) {
+    return injectExpectationRepository.findAllByInjectId(inject.getId()).stream()
+        .map(TableTopInjectExpectation.class::cast)
+        .filter(e -> e.getUser() == null)
+        .findFirst()
+        .orElseThrow();
+  }
+
+  private void assertOnlyResultFromUi(TableTopInjectExpectation player, Double expectedScore) {
+    assertThat(player.getScore()).isEqualTo(expectedScore);
+    assertThat(player.getResults()).hasSize(1);
+    assertThat(player.getResults().getFirst().getSourceId()).isEqualTo(UI_SOURCE_ID);
+    assertThat(player.getResults().getFirst().getScore()).isEqualTo(expectedScore);
   }
 }

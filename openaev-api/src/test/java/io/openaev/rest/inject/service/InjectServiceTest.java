@@ -1045,6 +1045,7 @@ class InjectServiceTest {
                 InjectorFixture.createDefaultPayloadInjector(), null, List.of()));
     inject.setTenant(new Tenant("test-tenant-id"));
     inject.getInjectorContract().get().setNeedsExecutor(true);
+    inject.setAssets(new ArrayList<>(List.of(EndpointFixture.createEndpoint())));
 
     // MOCK
     when(collectorService.securityPlatformCollectors(any())).thenReturn(List.of());
