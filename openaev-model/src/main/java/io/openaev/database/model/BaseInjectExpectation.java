@@ -132,6 +132,10 @@ public class BaseInjectExpectation implements Base, Cloneable {
   }
 
   public void setResults(List<InjectExpectationResult> results) {
+    if (results == null) {
+      this.results = new ArrayList<>();
+      return;
+    }
     for (InjectExpectationResult result : results) {
       result.setInjectExpectation(this);
     }

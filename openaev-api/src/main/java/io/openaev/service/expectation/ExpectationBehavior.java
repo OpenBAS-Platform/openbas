@@ -7,6 +7,7 @@ import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilde
 import io.openaev.database.model.BaseInjectExpectation;
 import io.openaev.database.model.Exercise;
 import io.openaev.database.model.Inject;
+import io.openaev.database.repository.InjectExpectationResultRepository;
 import io.openaev.execution.ExecutableInject;
 import io.openaev.model.inject.form.Expectation;
 import io.openaev.rest.exercise.form.ExpectationUpdateInput;
@@ -21,14 +22,20 @@ import java.util.List;
  * @param <T> the concrete expectation type this behavior builds templates for (technical or
  *     table-top)
  */
-public interface ExpectationBehavior<T extends BaseInjectExpectation> {
+public abstract class ExpectationBehavior<T extends BaseInjectExpectation> {
+
+  private final InjectExpectationResultRepository injectExpectationResultRepository;
+
+  public ExpectationBehavior(InjectExpectationResultRepository injectExpectationResultRepository) {
+    this.injectExpectationResultRepository = injectExpectationResultRepository;
+  }
 
   /**
    * Returns {@code true} if this behavior handles the given expectation type.
    *
    * @param expectation the expectation to check
    */
-  boolean supports(BaseInjectExpectation expectation);
+  public abstract boolean supports(BaseInjectExpectation expectation);
 
   /**
    * Creates and persists inject expectations for each target from a template expectation, reusing
@@ -38,7 +45,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @param expectationTemplate the expectation template to apply on each target
    * @param implantType the implant/injector type used to compute signatures when relevant
    */
-  void initializeAndSaveInjectExpectationsFromExecutableInject(
+  public abstract void initializeAndSaveInjectExpectationsFromExecutableInject(
       ExecutableInject executableInject, T expectationTemplate, @Nullable String implantType);
 
   /**
@@ -46,7 +53,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    *
    * @param expectation the inject expectation to initialize
    */
-  void initializeResults(BaseInjectExpectation expectation);
+  public abstract void initializeResults(BaseInjectExpectation expectation);
 
   /**
    * Retrieve the leaf-level expectations.
@@ -57,7 +64,8 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @param expectation the expectation whose leaves should be resolved
    * @return the list of leaf expectations to update (empty if the expectation type does not match)
    */
-  List<? extends BaseInjectExpectation> getLeaves(BaseInjectExpectation expectation);
+  public abstract List<? extends BaseInjectExpectation> getLeaves(
+      BaseInjectExpectation expectation);
 
   /**
    * Validates that the given expectation can be updated directly; throws otherwise.
@@ -65,7 +73,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @param expectation the expectation to validate
    * @throws IllegalArgumentException if direct update is not allowed
    */
-  default void throwIfCannotUpdateThisExpectation(BaseInjectExpectation expectation) {}
+  public void throwIfCannotUpdateThisExpectation(BaseInjectExpectation expectation) {}
 
   /**
    * Applies a result to every leaf expectation and recomputes their score.
@@ -74,7 +82,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @param input the update input containing the new score
    * @return the list of leaf expectations that were modified
    */
-  default List<? extends BaseInjectExpectation> applyResultToLeaves(
+  public List<? extends BaseInjectExpectation> applyResultToLeaves(
       BaseInjectExpectation expectation, ExpectationUpdateInput input) {
     if (input.getScore() == null) {
       throw new IllegalArgumentException("Expectation score cannot be null");
@@ -96,7 +104,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @param input the update input carrying the source and the score
    * @param resultLabel the success/failure label of the result
    */
-  default void addResultToLeaf(
+  public void addResultToLeaf(
       BaseInjectExpectation leaf, ExpectationUpdateInput input, String resultLabel) {
     addResult(leaf, input, resultLabel);
   }
@@ -109,7 +117,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @return the list of expectations that were modified (the leaves, and the expectation itself
    *     when it is a parent)
    */
-  default List<? extends BaseInjectExpectation> deleteResultFromLeaves(
+  public List<? extends BaseInjectExpectation> deleteResultFromLeaves(
       BaseInjectExpectation expectation, String sourceId) {
     List<? extends BaseInjectExpectation> leaves = getLeaves(expectation);
     for (BaseInjectExpectation leaf : leaves) {
@@ -136,7 +144,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @param leaf the leaf expectation losing the result
    * @param sourceId the ID of the source whose result is removed
    */
-  default void removeResultFromLeaf(BaseInjectExpectation leaf, String sourceId) {
+  public void removeResultFromLeaf(BaseInjectExpectation leaf, String sourceId) {
     removeResult(leaf, sourceId);
   }
 
@@ -148,8 +156,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @return {@link BaseInjectExpectation#getSuccessLabel()} or {@link
    *     BaseInjectExpectation#getFailureLabel()}
    */
-  default String resolveResultLabel(
-      BaseInjectExpectation expectation, @NotNull double actualScore) {
+  public String resolveResultLabel(BaseInjectExpectation expectation, @NotNull double actualScore) {
     return actualScore >= expectation.getExpectedScore()
         ? expectation.getSuccessLabel()
         : expectation.getFailureLabel();
@@ -161,7 +168,8 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @param expectation the expectation that received the update
    * @return the list of parent expectations that were modified
    */
-  List<? extends BaseInjectExpectation> recomputeParentScores(BaseInjectExpectation expectation);
+  public abstract List<? extends BaseInjectExpectation> recomputeParentScores(
+      BaseInjectExpectation expectation);
 
   /**
    * Returns {@code true} if this behavior can build a template from a content-form expectation of
@@ -169,7 +177,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    *
    * @param type the content-form expectation type
    */
-  default boolean supportsFormExpectationType(BaseInjectExpectation.EXPECTATION_TYPE type) {
+  public boolean supportsFormExpectationType(BaseInjectExpectation.EXPECTATION_TYPE type) {
     return false;
   }
 
@@ -181,7 +189,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @param formExpectation the content-form expectation
    * @param inject the inject the expectation is attached to
    */
-  default boolean supportsFormExpectation(Expectation formExpectation, Inject inject) {
+  public boolean supportsFormExpectation(Expectation formExpectation, Inject inject) {
     return supportsFormExpectationType(formExpectation.getType());
   }
 
@@ -197,7 +205,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @param inject the inject the expectation is attached to
    * @return an untargeted expectation template
    */
-  default T convertFormExpectationToBaseInjectExpectation(
+  public T convertFormExpectationToBaseInjectExpectation(
       Expectation formExpectation, Exercise exercise, Inject inject) {
     throw new UnsupportedOperationException(
         "Behavior " + getClass().getSimpleName() + " does not support form conversion");
