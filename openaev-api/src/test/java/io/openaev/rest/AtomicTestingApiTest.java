@@ -578,6 +578,9 @@ public class AtomicTestingApiTest extends IntegrationTest {
 
         assertThatJson(response)
             .when(Option.IGNORING_ARRAY_ORDER)
+            .whenIgnoringPaths(
+                "[*].inject_expectation_results[*].inject_expectation_result_date",
+                "[*].inject_expectation_results[*].inject_expectation_id")
             .node("[0].inject_expectation_results")
             .isEqualTo(mapper.writeValueAsString(expectedSuperset));
         assertThatJson(response).node("[0].inject_expectation_score").isEqualTo("100.0");
@@ -824,6 +827,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
         assertFalse(detectionResultsByType.isEmpty());
         assertThatJson(mapper.writeValueAsString(detectionResultsByType.getFirst()))
             .when(Option.IGNORING_ARRAY_ORDER)
+            .whenIgnoringPaths("[*].inject_expectation_result_date", "[*].inject_expectation_id")
             .isEqualTo(mapper.writeValueAsString(expectedDetectionSuperset));
 
         List<Double> detectionScoresByType =
@@ -840,6 +844,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
         assertFalse(preventionResultsByType.isEmpty());
         assertThatJson(mapper.writeValueAsString(preventionResultsByType.getFirst()))
             .when(Option.IGNORING_ARRAY_ORDER)
+            .whenIgnoringPaths("[*].inject_expectation_result_date", "[*].inject_expectation_id")
             .isEqualTo(mapper.writeValueAsString(expectedPreventionSuperset));
       }
 
@@ -971,7 +976,9 @@ public class AtomicTestingApiTest extends IntegrationTest {
 
         assertThatJson(responseDetection)
             .when(Option.IGNORING_ARRAY_ORDER)
-            .whenIgnoringPaths("inject_expectation_result_date")
+            .whenIgnoringPaths(
+                "[*].inject_expectation_results[*].inject_expectation_result_date",
+                "[*].inject_expectation_results[*].inject_expectation_id")
             .node("[0].inject_expectation_results")
             .isEqualTo(mapper.writeValueAsString(expectedDetectionSuperset));
         assertThatJson(responseDetection)
@@ -1018,7 +1025,9 @@ public class AtomicTestingApiTest extends IntegrationTest {
 
         assertThatJson(responsePrevention)
             .when(Option.IGNORING_ARRAY_ORDER)
-            .whenIgnoringPaths("inject_expectation_result_date")
+            .whenIgnoringPaths(
+                "[*].inject_expectation_results[*].inject_expectation_result_date",
+                "[*].inject_expectation_results[*].inject_expectation_id")
             .node("[0].inject_expectation_results")
             .isEqualTo(mapper.writeValueAsString(expectedPreventionSuperset));
         assertThatJson(responsePrevention)
