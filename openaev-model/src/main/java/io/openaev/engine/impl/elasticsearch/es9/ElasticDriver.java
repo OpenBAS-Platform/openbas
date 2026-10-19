@@ -209,8 +209,14 @@ public class ElasticDriver {
     client.cluster().putComponentTemplate(coreSettings.build());
   }
 
+  /**
+   * Creates the index of a model, or brings the existing one up to date.
+   *
+   * @return true when the index is up to date with the model's mapping, false when the existing
+   *     index cannot take that mapping in place and has to be reset
+   */
   @SuppressWarnings("SameParameterValue")
-  private void setupIndex(
+  private boolean setupIndex(
       ElasticsearchClient client, String name, String version, Map<String, Property> mappings)
       throws IOException {
     // Create template
@@ -260,7 +266,7 @@ public class ElasticDriver {
     // Create the index, or bring the existing one up to date
     try {
       client.indices().get(new GetIndexRequest.Builder().index(indexName).build());
-      addNewFieldsToExistingIndex(client, indexName, mappings);
+      return addNewFieldsToExistingIndex(client, indexName, mappings);
     } catch (ElasticsearchException e) {
       try {
         log.info("Creating index {}", indexName);
@@ -281,6 +287,7 @@ public class ElasticDriver {
         log.error("cannot create index", e2);
       }
     }
+    return true;
   }
 
   /**
@@ -291,20 +298,25 @@ public class ElasticDriver {
    * wiped and rebuilt, and dashboards stay incomplete for the whole rebuild. Adding a field to a
    * live index keeps its documents in place, and a re-put of an unchanged mapping is a no-op.
    *
-   * <p>A field whose type changed cannot be updated in place: the engine refuses the whole request.
-   * That case still needs an index reset, so the refusal is logged and the boot goes on with the
-   * index as it was, as it did before this update existed.
+   * <p>When the engine refuses the update - a field whose type changed, missing privileges - the
+   * index cannot take the current mapping, and must be reset: every document carrying a new field
+   * would otherwise be rejected by the strict mapping, a rejection the indexer treats as a poison
+   * document and skips for good, so the documents in place would never be rewritten.
+   *
+   * @return true when the index now carries the model's mapping, false when it must be reset
    */
-  private void addNewFieldsToExistingIndex(
+  private boolean addNewFieldsToExistingIndex(
       ElasticsearchClient client, String indexName, Map<String, Property> mappings) {
     try {
       client.indices().putMapping(p -> p.index(indexName).properties(mappings));
+      return true;
     } catch (Exception e) {
       log.error(
-          "Cannot add the new fields of index {} to its mapping: documents carrying them are"
-              + " rejected until the index is reset",
+          "Cannot add the new fields of index {} to its mapping: resetting the index to rebuild it"
+              + " with the current mapping",
           indexName,
           e);
+      return false;
     }
   }
 
@@ -445,7 +457,11 @@ public class ElasticDriver {
               EsIndexingUtils.isRollingDeployReset(modelName, status));
         } else {
           log.debug("Ensuring index {}", modelName);
-          setupIndex(elasticClient, modelName, ES_MODEL_VERSION, mappings);
+          if (!setupIndex(elasticClient, modelName, ES_MODEL_VERSION, mappings)) {
+            // Other instances may still run, as during any deploy: the epoch re-assertion of the
+            // reset repairs a stale cursor one of them writes meanwhile.
+            resetIndex(elasticClient, modelName, mappings, true);
+          }
         }
       } catch (IOException e) {
         throw new RuntimeException(e);

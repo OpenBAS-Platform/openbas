@@ -28,9 +28,26 @@ public class FindingHandler implements Handler<EsFinding> {
 
   @Override
   public List<EsFinding> fetch(Instant from, int limit) {
+    return fetch(from, null, limit);
+  }
+
+  /**
+   * Keyset-paged: findings sharing one {@code finding_updated_at} are common (an upsert stamps a
+   * whole transaction with {@code now()}), and a timestamp-only cursor skips the part of such a
+   * group beyond a full batch - for good, since the incremental indexing never revisits an
+   * unchanged finding, and again on every re-feed.
+   */
+  @Override
+  public List<EsFinding> fetch(Instant from, String fromId, int limit) {
     Instant queryFrom = from != null ? from : Instant.ofEpochMilli(0);
-    List<RawFindingIndexing> forIndexing = findingRepository.findForIndexing(queryFrom, limit);
+    List<RawFindingIndexing> forIndexing =
+        findingRepository.findForIndexing(queryFrom, fromId, limit);
     return forIndexing.stream().map(FindingHandler::toEsFinding).toList();
+  }
+
+  @Override
+  public boolean isKeysetPaged() {
+    return true;
   }
 
   /**

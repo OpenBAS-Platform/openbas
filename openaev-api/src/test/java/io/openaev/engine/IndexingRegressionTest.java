@@ -25,6 +25,7 @@ import io.openaev.utils.mockUser.WithMockUser;
 import io.openaev.utilstest.RabbitMQTestListener;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -965,6 +966,48 @@ class IndexingRegressionTest extends IntegrationTest {
   @Nested
   @DisplayName("FindingHandler.findForIndexing")
   class FindingIndexing {
+
+    @Test
+    @DisplayName("Findings sharing one timestamp beyond a full batch are all served, none skipped")
+    void given_timestampGroupLargerThanBatch_should_serveEveryFindingOfTheGroup() {
+      // Arrange: three findings stamped with one timestamp, as one upsert transaction does
+      List<String> findingIds = new ArrayList<>();
+      for (int i = 0; i < 3; i++) {
+        FindingComposer.Composer findingWrapper =
+            findingComposer.forFinding(FindingFixture.createDefaultCveFindingWithRandomTitle());
+        injectComposer
+            .forInject(InjectFixture.getDefaultInject())
+            .withFinding(findingWrapper)
+            .persist();
+        findingIds.add(findingWrapper.get().getId());
+      }
+      entityManager.flush();
+      Instant sharedTimestamp = PAST.truncatedTo(ChronoUnit.MILLIS);
+      entityManager
+          .createNativeQuery(
+              "UPDATE findings SET finding_updated_at = :ts WHERE finding_id IN (:ids)")
+          .setParameter("ts", sharedTimestamp)
+          .setParameter("ids", findingIds)
+          .executeUpdate();
+      entityManager.clear();
+
+      // Act: a batch of 2 ends inside the group, the next one resumes after its last id
+      List<EsFinding> firstBatch = findingHandler.fetch(sharedTimestamp, null, 2);
+      List<EsFinding> secondBatch =
+          findingHandler.fetch(sharedTimestamp, firstBatch.getLast().getBase_id(), 2);
+
+      // Assert
+      assertThat(findingHandler.isKeysetPaged()).isTrue();
+      assertThat(firstBatch)
+          .extracting(EsFinding::getBase_updated_at)
+          .as("the group sits at the cursor: the first batch is entirely inside it")
+          .containsOnly(sharedTimestamp);
+      assertThat(Stream.concat(firstBatch.stream(), secondBatch.stream()))
+          .extracting(EsFinding::getBase_id)
+          .as("every finding of the group, each once")
+          .containsAll(findingIds)
+          .doesNotHaveDuplicates();
+    }
 
     @Test
     @DisplayName("Multi-asset finding is indexed as ONE doc aggregating ALL asset ids")

@@ -32,7 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * The boot-time setup of an index that already exists: the fields its model gained since the index
  * was created are added in place, so documents carrying them are accepted without wiping and
- * rebuilding the index - which would leave its dashboards incomplete for the whole rebuild.
+ * rebuilding the index - which would leave its dashboards incomplete for the whole rebuild. An
+ * index that cannot take the current mapping in place is reset instead: its documents carrying a
+ * new field would otherwise be rejected and skipped for good.
  *
  * <p>Runs on whichever engine the suite is configured with (Elasticsearch 8 in CI, Elasticsearch 9
  * and OpenSearch in the nightly matrix). Two things have no path through the {@link EngineService}
@@ -233,21 +235,36 @@ class EngineIndexMappingUpdateTest extends IntegrationTest {
   }
 
   @Nested
-  @DisplayName("When a field changed type since the index was created")
-  class WhenAFieldChangedType {
+  @DisplayName("When the existing index cannot take the current mapping")
+  class WhenTheMappingCannotBeUpdated {
 
     @Test
-    @DisplayName("Boot does not fail, and leaves the conflicting field as it was")
-    void given_legacyIndexWithConflictingFieldType_should_notFailTheBoot() throws Exception {
+    @DisplayName("Boot resets the index, which is rebuilt with the current mapping")
+    void given_legacyIndexWithConflictingFieldType_should_resetTheIndex() throws Exception {
       // Arrange
       createLegacyFindingIndex(Map.of(NEW_FIELD, Map.of("type", "keyword")));
-
-      // Act
-      runBootSetup();
+      assertThat(indexRawDocument("existing", Map.of(NEW_FIELD, "legacy"))).isTrue();
+      IndexingStatus status = indexingStatusRepository.findByType(FINDING_MODEL).orElseThrow();
+      status.setLastIndexing(Instant.parse(LEGACY_DATE));
+      indexingStatusRepository.save(status);
+      // The reset schedules an epoch re-assertion of the finding cursor: none may fire later in
+      // the suite
+      long resetDelay = engineConfig.getIndexingResetEpochReassertDelaySeconds();
+      engineConfig.setIndexingResetEpochReassertDelaySeconds(0);
+      try {
+        // Act
+        runBootSetup();
+      } finally {
+        engineConfig.setIndexingResetEpochReassertDelaySeconds(resetDelay);
+      }
 
       // Assert
-      assertThat(mappingOfFindingIndex().path(NEW_FIELD).path("type").asText())
-          .isEqualTo("keyword");
+      assertThat(mappingOfFindingIndex().path(NEW_FIELD).path("type").asText()).isEqualTo("long");
+      assertThat(documentExists("existing"))
+          .as("the index was wiped: the sync rebuilds it from the database")
+          .isFalse();
+      assertThat(indexingStatusRepository.findByType(FINDING_MODEL).orElseThrow().getLastIndexing())
+          .isEqualTo(Instant.EPOCH);
     }
   }
 }

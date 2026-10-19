@@ -179,12 +179,12 @@ class FindingRefeedMigrationTest extends IntegrationTest {
   }
 
   @Nested
-  @DisplayName("When the finding index needs no re-feed")
-  class WhenNoRefeedIsNeeded {
+  @DisplayName("When the finding cursor is not a regular one")
+  class WhenTheCursorIsNotRegular {
 
     @Test
-    @DisplayName("Leaves a pending reset request untouched, and does not register a re-feed")
-    void given_pendingResetRequest_should_leaveItAndNotRegister() {
+    @DisplayName("Leaves a pending reset request untouched, and still registers the re-feed")
+    void given_pendingResetRequest_should_leaveItAndRegisterTheRefeed() {
       // Arrange
       putCursor(FINDING_MODEL, EsIndexingUtils.REINDEX_REQUESTED_CURSOR, null);
 
@@ -194,12 +194,14 @@ class FindingRefeedMigrationTest extends IntegrationTest {
       // Assert
       assertThat(storedCursor(FINDING_MODEL))
           .contains(new StoredCursor(EsIndexingUtils.REINDEX_REQUESTED_CURSOR, null));
-      assertThat(EsIndexingUtils.drainRefeedRequests()).isEmpty();
+      assertThat(EsIndexingUtils.drainRefeedRequests())
+          .as("the reset's own re-assertion does not outlast the old pods")
+          .containsExactly(FINDING_MODEL);
     }
 
     @Test
-    @DisplayName("Leaves a missing row missing, and does not register a re-feed")
-    void given_missingRow_should_notInsertItNorRegister() {
+    @DisplayName("Leaves a missing row missing, and still registers the re-feed")
+    void given_missingRow_should_notInsertItAndRegisterTheRefeed() {
       // Arrange
       removeCursor(FINDING_MODEL);
 
@@ -208,7 +210,9 @@ class FindingRefeedMigrationTest extends IntegrationTest {
 
       // Assert
       assertThat(storedCursor(FINDING_MODEL)).isEmpty();
-      assertThat(EsIndexingUtils.drainRefeedRequests()).isEmpty();
+      assertThat(EsIndexingUtils.drainRefeedRequests())
+          .as("an old pod may re-create the row at epoch before the boot check")
+          .containsExactly(FINDING_MODEL);
     }
   }
 

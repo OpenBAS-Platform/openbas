@@ -35,13 +35,27 @@ import org.springframework.stereotype.Component;
  * </ul>
  *
  * <p><b>Rolling deploy.</b> Pods still running the previous version take part in the re-feed and
- * write cleartext documents; the oldest ones may also overwrite the epoch cursor. So, when the row
- * was actually moved back to epoch, the model is also registered in-process ({@link
- * EsIndexingUtils#requestRefeedAtStartup}): the pod applying this migration re-asserts epoch once
- * more after {@code engine.indexing-refeed-reassert-delay-seconds}, by which time the old pods are
- * expected to be gone. A rollout longer than that delay, a rollback followed by a new upgrade, or
- * this pod restarting before the delay leaves cleartext documents behind; the ops workaround is to
- * move the {@code finding} cursor back to epoch by hand, as this migration does.
+ * write cleartext documents; the oldest ones may also overwrite the epoch cursor. So the model is
+ * also registered in-process ({@link EsIndexingUtils#requestRefeedAtStartup}): the pod applying
+ * this migration re-asserts epoch once more after {@code
+ * engine.indexing-refeed-reassert-delay-seconds}, by which time the old pods are expected to be
+ * gone. A rollout longer than that delay, a rollback followed by a new upgrade, or this pod
+ * restarting before the delay leaves cleartext documents behind; the ops workaround is to move the
+ * {@code finding} cursor back to epoch by hand, as this migration does.
+ *
+ * <p>The registration does not depend on the update having moved the row, because old pods write
+ * cleartext whatever state the row was in:
+ *
+ * <ul>
+ *   <li>a pending reset only gets the reset's own re-assertion, timed to drain one stale sync
+ *       round, not to outlast the old pods;
+ *   <li>a missing row - deleted by an earlier migration of the same upgrade, such as {@code
+ *       V6_20260811090000000__Reindex_after_phishing_contract_delete_cleanup_fix} - is re-created
+ *       at epoch by an old pod before the boot check, which then rebuilds nothing.
+ * </ul>
+ *
+ * <p>On a fresh install, the second re-feed runs over an index with nothing to rewrite: it costs
+ * nothing. The re-assertion itself never replaces a reset request nor re-creates a missing row.
  *
  * <p>Idempotent and lock-light: a single row of a bookkeeping table.
  */
@@ -53,23 +67,19 @@ public class V6_20261015163917000__Request_finding_refeed_after_sensitive_value_
 
   @Override
   public void migrate(Context context) throws Exception {
-    int updated;
     try (Statement statement = context.getConnection().createStatement()) {
       // ISO-8601 UTC literals: PostgreSQL stores the absolute instants in the timestamptz column,
       // with no JVM time zone involved.
-      updated =
-          statement.executeUpdate(
-              "UPDATE indexing_status SET indexing_status_indexing_date = '"
-                  + Instant.EPOCH
-                  + "', indexing_status_last_id = NULL"
-                  + " WHERE indexing_status_type = '"
-                  + FINDING_MODEL
-                  + "' AND indexing_status_indexing_date < '"
-                  + EsIndexingUtils.REINDEX_REQUESTED_THRESHOLD
-                  + "'");
+      statement.executeUpdate(
+          "UPDATE indexing_status SET indexing_status_indexing_date = '"
+              + Instant.EPOCH
+              + "', indexing_status_last_id = NULL"
+              + " WHERE indexing_status_type = '"
+              + FINDING_MODEL
+              + "' AND indexing_status_indexing_date < '"
+              + EsIndexingUtils.REINDEX_REQUESTED_THRESHOLD
+              + "'");
     }
-    if (updated == 1) {
-      EsIndexingUtils.requestRefeedAtStartup(FINDING_MODEL);
-    }
+    EsIndexingUtils.requestRefeedAtStartup(FINDING_MODEL);
   }
 }

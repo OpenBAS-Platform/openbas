@@ -270,6 +270,8 @@ Tuning parameters applicable to both engines:
      WHERE indexing_status_type = 'finding';
     ```
 
+    A re-feed only rewrites the documents of existing Findings. A document left behind by a Finding whose deletion did not reach the search engine keeps the value it was indexed with. Only a full reindex removes such documents: during a maintenance window, with a single instance running, delete the `finding` row of the `indexing_status` table and restart.
+
 !!! warning "Switching engines"
 
     After you change `engine.engine-selector`, delete the `indexing_status` table in PostgreSQL to trigger a full reindex.

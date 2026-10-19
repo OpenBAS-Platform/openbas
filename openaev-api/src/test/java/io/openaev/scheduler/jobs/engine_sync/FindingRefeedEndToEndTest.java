@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import io.openaev.IntegrationTest;
 import io.openaev.context.TenantScopedTransaction;
 import io.openaev.context.TxCtx;
+import io.openaev.database.model.ContractOutputType;
 import io.openaev.database.model.Finding;
 import io.openaev.database.model.Tenant;
 import io.openaev.engine.EngineContext;
@@ -81,6 +82,7 @@ class FindingRefeedEndToEndTest extends IntegrationTest {
   private static final String CLEARTEXT_CREDENTIALS =
       FindingFixture.CREDENTIALS_USERNAME + ":" + FindingFixture.CREDENTIALS_PASSWORD;
   private static final String MASKED_CREDENTIALS = "admin:mo******";
+  private static final String HARMLESS_VALUE = "not a secret";
 
   @Autowired
   private V6_20261015163917000__Request_finding_refeed_after_sensitive_value_masking migration;
@@ -158,8 +160,10 @@ class FindingRefeedEndToEndTest extends IntegrationTest {
 
   /**
    * Writes the documents of the given findings the way an instance that did not mask yet would: the
-   * real document, with the value in cleartext and no masking version. Also writes a ghost: a copy
-   * of the credentials document under an id that never existed in PostgreSQL.
+   * real document, with the value in cleartext and no masking version. Also writes a ghost: a
+   * harmless text finding document under an id that never existed in PostgreSQL. It holds no secret
+   * on purpose: the re-feed never revisits a document whose finding is gone, so a sensitive ghost
+   * would keep its cleartext (a documented residual risk), which is not what it proves.
    *
    * @return the id of the ghost document
    */
@@ -173,12 +177,15 @@ class FindingRefeedEndToEndTest extends IntegrationTest {
             if (!document.getBase_id().equals(credentialsFindingId)) {
               continue;
             }
-            document.setFinding_value(CLEARTEXT_CREDENTIALS);
-            document.setBase_representative(CLEARTEXT_CREDENTIALS);
-            document.setFinding_masking_version(null);
             EsFinding ghost =
                 engineService.getObjectMapper().convertValue(document, EsFinding.class);
             ghost.setBase_id(ghostId);
+            ghost.setFinding_type(ContractOutputType.Text.name());
+            ghost.setFinding_value(HARMLESS_VALUE);
+            ghost.setBase_representative(HARMLESS_VALUE);
+            document.setFinding_value(CLEARTEXT_CREDENTIALS);
+            document.setBase_representative(CLEARTEXT_CREDENTIALS);
+            document.setFinding_masking_version(null);
             documents.add(document);
             documents.add(ghost);
           }
@@ -275,6 +282,9 @@ class FindingRefeedEndToEndTest extends IntegrationTest {
                       .map(document -> CLEARTEXT_CREDENTIALS.equals(document.getFinding_value()))
                       .orElse(false));
       assertThat(indexedDocument(ghost)).as("the ghost is indexed before the re-feed").isPresent();
+      // The cursor moved on since the finding was indexed, as it does in production: it no longer
+      // sits on the finding's timestamp, whose group a cursor without id would serve again
+      moveFindingCursorTo(Instant.now().minus(30, ChronoUnit.MINUTES));
       runSyncRound();
       assertThat(indexedDocument(credentialsFinding).orElseThrow().getFinding_value())
           .as("without the re-feed, the regular sync never revisits an unchanged finding")
