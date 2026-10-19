@@ -1,3 +1,4 @@
+import { Alert, DialogContentText } from '@mui/material';
 import { type FunctionComponent, useMemo, useState } from 'react';
 
 import {
@@ -22,7 +23,6 @@ import {
   extractMarkingDefinitionFromStoreResult,
   type MarkingDefinitionStoreResult,
 } from './MarkingDefinitionStoreHelper';
-import {Alert, DialogContentText} from "@mui/material";
 
 interface Props {
   markingDefinition: MarkingDefinitionOutput;
@@ -144,14 +144,14 @@ const MarkingDefinitionPopover: FunctionComponent<Props> = ({
         handleSubmit={submitDelete}
         text={t('Do you want to delete this marking definition?')}
         richContent={isAssigned ? (
-            <>
-              <DialogContentText>
-                {t('Do you want to delete this marking definition?')}
-              </DialogContentText>
-              <Alert severity="warning" style={{ marginTop: 16 }}>
-                {t('This marking definition is currently assigned. Deleting it will remove it from every entity that carries it.')}
-              </Alert>
-            </>
+          <>
+            <DialogContentText>
+              {t('Do you want to delete this marking definition?')}
+            </DialogContentText>
+            <Alert severity="warning" style={{ marginTop: 16 }}>
+              {t('This marking definition is currently assigned. Deleting it will remove it from every entity that carries it.')}
+            </Alert>
+          </>
         ) : undefined}
       />
       <DialogConfirmation
