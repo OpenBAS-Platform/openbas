@@ -56,7 +56,8 @@ describe('useXtmHubUserPlatformToken', () => {
     expect(result.current.userPlatformToken).toBe('hub-token');
   });
 
-  it('ignores a token sent from another origin', () => {
+  it('ignores and logs a token sent from another origin', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const { result } = renderHook(() => useXtmHubUserPlatformToken(HUB_URL));
 
     act(() => {
@@ -67,6 +68,20 @@ describe('useXtmHubUserPlatformToken', () => {
     });
 
     expect(result.current.userPlatformToken).toBeNull();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('"https://other.example"'));
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('other-token'));
+  });
+
+  it('silently ignores an unknown message sent from another origin', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { result } = renderHook(() => useXtmHubUserPlatformToken(HUB_URL));
+
+    act(() => {
+      dispatchMessage(opener, 'https://other.example', { type: 'analytics' });
+    });
+
+    expect(result.current.userPlatformToken).toBeNull();
+    expect(warn).not.toHaveBeenCalled();
   });
 
   it('does not ask for a token when the XTM Hub URL is unknown', () => {

@@ -8,6 +8,8 @@ interface UseExternalTabProps {
   onClosingTab: () => void;
 }
 
+const CLOSING_TAB_ACTIONS = ['cancel', 'register', 'unregister'];
+
 interface UseExternalTabReturn {
   isTabOpen: boolean;
   openTab: () => void;
@@ -58,13 +60,21 @@ const useExternalTab = ({
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.source === tabRef.current && event.origin === expectedOrigin) {
-        const closingTabEvent = ['cancel', 'register', 'unregister'];
-        if (closingTabEvent.includes(event.data.action)) {
-          closeTab();
-        }
-        onMessageRef.current(event);
+      if (event.source !== tabRef.current) {
+        return;
       }
+      const isClosingTabAction = CLOSING_TAB_ACTIONS.includes(event.data?.action);
+      if (event.origin !== expectedOrigin) {
+        if (isClosingTabAction) {
+          // eslint-disable-next-line no-console
+          console.warn(`XTM Hub: message ignored, it comes from "${event.origin}" but the configured XTM Hub origin is "${expectedOrigin}"`);
+        }
+        return;
+      }
+      if (isClosingTabAction) {
+        closeTab();
+      }
+      onMessageRef.current(event);
     };
     let checkInterval: ReturnType<typeof setInterval> | undefined;
     if (isTabOpen) {
