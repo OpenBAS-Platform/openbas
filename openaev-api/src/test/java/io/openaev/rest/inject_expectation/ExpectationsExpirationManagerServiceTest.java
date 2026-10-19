@@ -301,16 +301,18 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       agentExpectations.forEach(
           e -> {
             e.setResults(
-                List.of(
-                    InjectExpectationResult.builder()
-                        .sourceId(COLLECTOR_ID)
-                        .sourceName("collector-name")
-                        .sourceType("collector")
-                        .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.EDR.name())
-                        .result("result")
-                        .sourceAssetId(UUID.randomUUID().toString())
-                        .score(100.0)
-                        .build()));
+                new ArrayList<>(
+                    List.of(
+                        InjectExpectationResult.builder()
+                            .sourceId(COLLECTOR_ID)
+                            .sourceName("collector-name")
+                            .sourceType("collector")
+                            .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.EDR.name())
+                            .result("result")
+                            .date(Instant.now())
+                            .sourceAssetId(UUID.randomUUID().toString())
+                            .score(100.0)
+                            .build())));
             e.setScore(100.0);
           });
       injectExpectationRepository.saveAll(agentExpectations);
@@ -439,16 +441,18 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
 
       BaseInjectExpectation ie = injectExpectations.getFirst();
       ie.setResults(
-          List.of(
-              InjectExpectationResult.builder()
-                  .sourceId("collector-id")
-                  .sourceName("collector-name")
-                  .sourceType("collector-type")
-                  .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.EDR.name())
-                  .result("result")
-                  .sourceAssetId(UUID.randomUUID().toString())
-                  .score(50.0)
-                  .build()));
+          new ArrayList<>(
+              List.of(
+                  InjectExpectationResult.builder()
+                      .sourceId("collector-id")
+                      .sourceName("collector-name")
+                      .sourceType("collector-type")
+                      .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.EDR.name())
+                      .result("result")
+                      .date(Instant.now())
+                      .sourceAssetId(UUID.randomUUID().toString())
+                      .score(50.0)
+                      .build())));
       ie.setScore(50.0);
 
       injectExpectationRepository.save(ie);
@@ -533,16 +537,18 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       injectExpectations.forEach(
           BaseInjectExpectation -> {
             BaseInjectExpectation.setResults(
-                List.of(
-                    InjectExpectationResult.builder()
-                        .sourceId("collector-id")
-                        .sourceName("collector-name")
-                        .sourceType("collector-type")
-                        .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.EDR.name())
-                        .result("result")
-                        .sourceAssetId(UUID.randomUUID().toString())
-                        .score(100.0)
-                        .build()));
+                new ArrayList<>(
+                    List.of(
+                        InjectExpectationResult.builder()
+                            .sourceId("collector-id")
+                            .sourceName("collector-name")
+                            .sourceType("collector-type")
+                            .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.EDR.name())
+                            .result("result")
+                            .date(Instant.now())
+                            .sourceAssetId(UUID.randomUUID().toString())
+                            .score(100.0)
+                            .build())));
             BaseInjectExpectation.setScore(100.0);
           });
 
@@ -638,16 +644,18 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       agentExpectations.forEach(
           expectation -> {
             expectation.setResults(
-                List.of(
-                    InjectExpectationResult.builder()
-                        .sourceId("microsoft-defender")
-                        .sourceName("Microsoft Defender")
-                        .sourceType("security-platform")
-                        .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.EDR.name())
-                        .result("Prevented")
-                        .sourceAssetId(UUID.randomUUID().toString())
-                        .score(100.0)
-                        .build()));
+                new ArrayList<>(
+                    List.of(
+                        InjectExpectationResult.builder()
+                            .sourceId("microsoft-defender")
+                            .sourceName("Microsoft Defender")
+                            .sourceType("security-platform")
+                            .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.EDR.name())
+                            .result("Prevented")
+                            .date(Instant.now())
+                            .sourceAssetId(UUID.randomUUID().toString())
+                            .score(100.0)
+                            .build())));
             expectation.setScore(100.0);
           });
       injectExpectationRepository.saveAll(agentExpectations);
@@ -840,17 +848,19 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
               savedInject.getId(), savedEndpoint.getId());
       BaseInjectExpectation assetExpectation = assetExpectations.getFirst();
       assetExpectation.setResults(
-          List.of(
-              InjectExpectationResult.builder()
-                  .sourceId("nuclei-security-platform")
-                  .sourceName("Nuclei")
-                  .sourceType("security-platform")
-                  .sourcePlatform(
-                      SecurityPlatform.SECURITY_PLATFORM_TYPE.VULNERABILITY_SCANNER.name())
-                  .result("Vulnerable")
-                  .sourceAssetId(UUID.randomUUID().toString())
-                  .score(0.0)
-                  .build()));
+          new ArrayList<>(
+              List.of(
+                  InjectExpectationResult.builder()
+                      .sourceId("nuclei-security-platform")
+                      .sourceName("Nuclei")
+                      .sourceType("security-platform")
+                      .sourcePlatform(
+                          SecurityPlatform.SECURITY_PLATFORM_TYPE.VULNERABILITY_SCANNER.name())
+                      .result("Vulnerable")
+                      .date(Instant.now())
+                      .sourceAssetId(UUID.randomUUID().toString())
+                      .score(0.0)
+                      .build())));
       assetExpectation.setScore(0.0);
       injectExpectationRepository.save(assetExpectation);
 
@@ -908,6 +918,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
               .sourceType("security-platform")
               .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.VULNERABILITY_SCANNER.name())
               .result("Vulnerable")
+              .date(Instant.now())
               .sourceAssetId(UUID.randomUUID().toString())
               .score(0.0)
               .build();
@@ -987,6 +998,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
               .sourceType("security-platform")
               .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.VULNERABILITY_SCANNER.name())
               .result("Not vulnerable")
+              .date(Instant.now())
               .sourceAssetId(UUID.randomUUID().toString())
               .score(100.0)
               .build();
