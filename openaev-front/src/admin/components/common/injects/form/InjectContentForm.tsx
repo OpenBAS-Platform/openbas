@@ -164,7 +164,7 @@ const InjectContentForm = ({
   // -- DYNAMIC FIELDS --
   const [openVariables, setOpenVariables] = useState(false);
   const openVariablesDialog = () => setOpenVariables(true);
-  const dynamicFields = enhancedFields.filter(field => field.isInjectContentType || field.type === 'asset-group' || field.type === 'asset');
+  const dynamicFields = enhancedFields.filter(field => field.isInjectContentType || field.type === 'asset-group' || field.type === 'asset' || field.type === 'credential-reference');
 
   const resetDefaultValue = () => {
     dynamicFields

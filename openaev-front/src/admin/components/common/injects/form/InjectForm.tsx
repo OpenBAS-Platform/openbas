@@ -130,7 +130,7 @@ const InjectForm = ({
     // Enrich initialValues with default contract value
     if (injectorContractContent) {
       injectorContractContent.fields
-        .filter(f => !notDynamicFields.includes(f.key))
+        .filter(f => !notDynamicFields.includes(f.key) && isInjectContentType(f.type))
         .forEach((field: ContractElement) => {
           if (!initialValues.inject_content[field.key]) {
             initialValues.inject_content = {
@@ -233,6 +233,10 @@ const InjectForm = ({
   const cleanInvisibleFields = (injectValues: InjectInput) => {
     injectorContractContent?.fields.forEach((fieldContract) => {
       if (isVisibleField(fieldContract, injectorContractContent.fields, injectValues)) {
+        return;
+      }
+      if (fieldContract.type === 'credential-reference') {
+        injectValues.inject_secret_references = [];
         return;
       }
 
