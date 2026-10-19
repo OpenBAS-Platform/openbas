@@ -1,12 +1,11 @@
 package io.openaev.service.expectation;
 
-import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.addResult;
-import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.computeResultsScore;
-import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.removeResult;
+import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.*;
 
 import io.openaev.database.model.BaseInjectExpectation;
 import io.openaev.database.model.Exercise;
 import io.openaev.database.model.Inject;
+import io.openaev.database.model.InjectExpectationResult;
 import io.openaev.database.repository.InjectExpectationResultRepository;
 import io.openaev.execution.ExecutableInject;
 import io.openaev.model.inject.form.Expectation;
@@ -121,7 +120,10 @@ public abstract class ExpectationBehavior<T extends BaseInjectExpectation> {
       BaseInjectExpectation expectation, String sourceId) {
     List<? extends BaseInjectExpectation> leaves = getLeaves(expectation);
     for (BaseInjectExpectation leaf : leaves) {
-      removeResultFromLeaf(leaf, sourceId);
+      List<InjectExpectationResult> removed = removeResultFromLeaf(leaf, sourceId);
+      if (!removed.isEmpty()) {
+        injectExpectationResultRepository.deleteAll(removed);
+      }
       leaf.setScore(computeResultsScore(leaf.getResults(), leaf));
     }
     // The expectation is a leaf itself: the loop above already cleaned it
@@ -131,7 +133,10 @@ public abstract class ExpectationBehavior<T extends BaseInjectExpectation> {
     // Otherwise the parent may still hold a result of its own, written by a path not yet migrated
     // to the behaviors (legacy team validation, direct or propagated security platform result on
     // an asset). Its score is recomputed from its children by recomputeParentScores.
-    removeResult(expectation, sourceId);
+    List<InjectExpectationResult> removed = removeResultsFromSource(expectation, sourceId);
+    if (!removed.isEmpty()) {
+      injectExpectationResultRepository.deleteAll(removed);
+    }
     List<BaseInjectExpectation> updated = new ArrayList<>(leaves);
     updated.add(expectation);
     return updated;
@@ -144,8 +149,9 @@ public abstract class ExpectationBehavior<T extends BaseInjectExpectation> {
    * @param leaf the leaf expectation losing the result
    * @param sourceId the ID of the source whose result is removed
    */
-  public void removeResultFromLeaf(BaseInjectExpectation leaf, String sourceId) {
-    removeResult(leaf, sourceId);
+  public List<InjectExpectationResult> removeResultFromLeaf(
+      BaseInjectExpectation leaf, String sourceId) {
+    return removeResultsFromSource(leaf, sourceId);
   }
 
   /**

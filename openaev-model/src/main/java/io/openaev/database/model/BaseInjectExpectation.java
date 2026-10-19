@@ -121,7 +121,11 @@ public class BaseInjectExpectation implements Base, Cloneable {
   @JsonProperty("inject_expectation_description")
   private String description;
 
-  @OneToMany(mappedBy = "injectExpectation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @OneToMany(
+      mappedBy = "injectExpectation",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.EAGER,
+      orphanRemoval = true)
   @Fetch(FetchMode.SUBSELECT)
   @JsonProperty("inject_expectation_results")
   private List<InjectExpectationResult> results = new ArrayList<>();
@@ -140,6 +144,19 @@ public class BaseInjectExpectation implements Base, Cloneable {
       result.setInjectExpectation(this);
     }
     this.results = results;
+  }
+
+  public List<InjectExpectationResult> clearResults() {
+    List<InjectExpectationResult> toRemove = new ArrayList<>(this.results);
+    this.results.clear();
+    return toRemove;
+  }
+
+  public List<InjectExpectationResult> clearResultsFromSource(String sourceId) {
+    List<InjectExpectationResult> toRemove =
+        this.results.stream().filter(result -> sourceId.equals(result.getSourceId())).toList();
+    this.results.removeAll(toRemove);
+    return toRemove;
   }
 
   @Setter

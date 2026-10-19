@@ -222,7 +222,7 @@ public abstract class AbstractTableTopBehavior
   @Override
   public void addResultToLeaf(
       BaseInjectExpectation leaf, ExpectationUpdateInput input, String resultLabel) {
-    leaf.setResults(new ArrayList<>());
+    leaf.clearResults();
     addResult(leaf, input, resultLabel);
   }
 
@@ -232,8 +232,9 @@ public abstract class AbstractTableTopBehavior
    * deleting it clears the leaf.
    */
   @Override
-  public void removeResultFromLeaf(BaseInjectExpectation leaf, String sourceId) {
-    leaf.setResults(new ArrayList<>());
+  public List<InjectExpectationResult> removeResultFromLeaf(
+      BaseInjectExpectation leaf, String sourceId) {
+    return leaf.clearResults();
   }
 
   /**
