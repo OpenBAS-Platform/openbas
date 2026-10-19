@@ -41,7 +41,10 @@ vi.mock('../../../../../components/common/queryable/pagination/PaginationCompone
 }));
 vi.mock('../../../../../components/common/queryable/useQueryableWithLocalStorage', () => ({
   useQueryableWithLocalStorage: () => ({
-    queryableHelpers: { sortHelpers: {}, paginationHelpers: { incrementTotalElements: vi.fn() } },
+    queryableHelpers: {
+      sortHelpers: {},
+      paginationHelpers: { incrementTotalElements: vi.fn() },
+    },
     searchPaginationInput: {
       page: 0,
       size: 20,

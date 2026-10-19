@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import type { APIRequestContext } from '@playwright/test';
 
 import { type RoleInput } from '../../src/utils/api-types';
@@ -24,7 +26,7 @@ class AccessApiHelpers {
   constructor(private request: APIRequestContext) {}
 
   async createUserWithCapabilities(capabilities: Capability[]): Promise<TenantUser> {
-    const suffix = `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
+    const suffix = `${Date.now()}-${randomUUID().slice(0, 8)}`;
     const email = `e2e-${suffix}@test.io`;
     const password = `E2e-${suffix}`;
 
