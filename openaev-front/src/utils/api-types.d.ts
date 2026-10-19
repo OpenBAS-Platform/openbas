@@ -6271,7 +6271,7 @@ export interface FullTextSearchResult {
   /** @minLength 1 */
   name: string;
   /** @uniqueItems true */
-  tags?: Tag[];
+  tags?: string[];
 }
 
 export type GcpOAuth2 = Value & {

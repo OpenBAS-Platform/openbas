@@ -1,6 +1,8 @@
 package io.openaev.search;
 
-import static io.openaev.utils.pagination.PaginationUtils.buildPaginationJPA;
+import static io.openaev.utils.FilterUtilsJpa.computeFilterGroupJpa;
+import static io.openaev.utils.pagination.PaginationUtils.buildPageable;
+import static io.openaev.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static io.openaev.utils.pagination.SortUtilsRuntime.toSortRuntime;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -12,6 +14,9 @@ import io.openaev.database.specification.TenantSpecification;
 import io.openaev.service.UserService;
 import io.openaev.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Tuple;
+import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
@@ -20,6 +25,7 @@ import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +46,7 @@ public class FullTextSearchService<T extends Base> {
   private final ScenarioRepository scenarioRepository;
   private final ExerciseRepository exerciseRepository;
   private final UserService userService;
+  private final EntityManager entityManager;
 
   private Map<Class<T>, JpaSpecificationExecutor<T>> repositoryMap;
 
@@ -145,8 +152,6 @@ public class FullTextSearchService<T extends Base> {
       }
     }
 
-    JpaSpecificationExecutor<T> repository = repositoryMap.get(clazzT);
-
     String finalSearchTerm = getFinalSearchTerm(searchPaginationInput.getTextSearch());
 
     // Specification building
@@ -158,96 +163,82 @@ public class FullTextSearchService<T extends Base> {
                     currentUser.isAdminOrBypass(),
                     currentUser.getCapabilities().contains(capaForClass),
                     Grant.GRANT_TYPE.OBSERVER))
-            .and(TenantSpecification.fromTenant(TenantContext.getCurrentTenant()));
+            .and(TenantSpecification.fromTenant(TenantContext.getCurrentTenant()))
+            .and(computeFilterGroupJpa(searchPaginationInput.getFilterGroup()));
 
-    // findBy skips the entity graphs some repositories put on findAll (e.g. scenario injects).
-    return buildPaginationJPA(
-            (spec, pageable) -> repository.findBy(spec, query -> query.page(pageable)),
-            searchPaginationInput,
-            clazzT,
-            specs)
-        .map(this::transform);
+    return findResults(clazzT, specs, buildPageable(searchPaginationInput, clazzT));
   }
 
-  private FullTextSearchResult transform(T element) {
-    switch (element) {
-      // Security platforms live in the assets table (single-table inheritance) so the
-      // Asset repository returns them too: expose the precise class so the frontend can
-      // route to the security platform overview and show the right icon.
-      case SecurityPlatform securityPlatform -> {
-        FullTextSearchResult result = new FullTextSearchResult();
-        result.setId(securityPlatform.getId());
-        result.setName(securityPlatform.getName());
-        result.setDescription(securityPlatform.getDescription());
-        result.setTags(securityPlatform.getTags());
-        result.setClazz(SecurityPlatform.class.getSimpleName());
-        return result;
-      }
-      case Asset asset -> {
-        FullTextSearchResult result = new FullTextSearchResult();
-        result.setId(asset.getId());
-        result.setName(asset.getName());
-        result.setDescription(asset.getDescription());
-        result.setTags(asset.getTags());
-        result.setClazz(Asset.class.getSimpleName());
-        return result;
-      }
-      case AssetGroup assetGroup -> {
-        FullTextSearchResult result = new FullTextSearchResult();
-        result.setId(assetGroup.getId());
-        result.setName(assetGroup.getName());
-        result.setDescription(assetGroup.getDescription());
-        result.setTags(assetGroup.getTags());
-        result.setClazz(AssetGroup.class.getSimpleName());
-        return result;
-      }
-      case User user -> {
-        FullTextSearchResult result = new FullTextSearchResult();
-        result.setId(user.getId());
-        result.setName(user.getEmail());
-        result.setTags(user.getTags());
-        result.setClazz(User.class.getSimpleName());
-        return result;
-      }
-      case Team team -> {
-        FullTextSearchResult result = new FullTextSearchResult();
-        result.setId(team.getId());
-        result.setName(team.getName());
-        result.setDescription(team.getDescription());
-        result.setTags(team.getTags());
-        result.setClazz(Team.class.getSimpleName());
-        return result;
-      }
-      case Organization organization -> {
-        FullTextSearchResult result = new FullTextSearchResult();
-        result.setId(organization.getId());
-        result.setName(organization.getName());
-        result.setDescription(organization.getDescription());
-        result.setTags(organization.getTags());
-        result.setClazz(Organization.class.getSimpleName());
-        return result;
-      }
-      case Scenario scenario -> {
-        FullTextSearchResult result = new FullTextSearchResult();
-        result.setId(scenario.getId());
-        result.setName(scenario.getName());
-        result.setDescription(scenario.getDescription());
-        result.setTags(scenario.getTags());
-        result.setClazz(Scenario.class.getSimpleName());
-        return result;
-      }
-      case Exercise exercise -> {
-        FullTextSearchResult result = new FullTextSearchResult();
-        result.setId(exercise.getId());
-        result.setName(exercise.getName());
-        result.setDescription(exercise.getDescription());
-        result.setTags(exercise.getTags());
-        result.setClazz(Exercise.class.getSimpleName());
-        return result;
-      }
-      default -> {}
+  // Projection: entities are never loaded, so their eager associations and graphs are skipped.
+  private Page<FullTextSearchResult> findResults(
+      Class<T> clazz, Specification<T> specification, Pageable pageable) {
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+    Root<T> root = cq.from(clazz);
+
+    HibernateCriteriaBuilder hcb = (HibernateCriteriaBuilder) cb;
+    Join<T, Tag> tagsJoin = root.join("tags", JoinType.LEFT);
+    Expression<String[]> tagIdsWithNulls = hcb.arrayAgg(null, tagsJoin.get("id"));
+    Expression<String> nullString = cb.nullLiteral(String.class);
+    Expression<String[]> tagIds = hcb.arrayRemove(tagIdsWithNulls, nullString);
+    boolean isUser = User.class.equals(clazz);
+    boolean isAsset = Asset.class.equals(clazz);
+
+    List<Selection<?>> selections = new ArrayList<>();
+    selections.add(root.get("id").alias("id"));
+    selections.add(root.get(isUser ? "email" : "name").alias("name"));
+    selections.add(
+        (isUser ? cb.nullLiteral(String.class) : root.<String>get("description"))
+            .alias("description"));
+    selections.add(tagIds.alias("tags"));
+    if (isAsset) {
+      selections.add(root.type().alias("type"));
     }
-    return null;
+    cq.multiselect(selections).groupBy(root.get("id"));
+
+    Predicate predicate = specification.toPredicate(root, cq, cb);
+    if (predicate != null) {
+      cq.where(predicate);
+    }
+    // Keep the rank order set by the full text specification unless a sort is requested
+    if (pageable.getSort().isSorted()) {
+      cq.orderBy(toSortCriteriaBuilder(cb, root, pageable.getSort()));
+    }
+
+    List<FullTextSearchResult> results =
+        entityManager
+            .createQuery(cq)
+            .setFirstResult((int) pageable.getOffset())
+            .setMaxResults(pageable.getPageSize())
+            .getResultList()
+            .stream()
+            .map(
+                tuple ->
+                    new FullTextSearchResult(
+                        tuple.get("id", String.class),
+                        tuple.get("name", String.class),
+                        tuple.get("description", String.class),
+                        Set.copyOf(Arrays.asList(tuple.get("tags", String[].class))),
+                        isAsset && SecurityPlatform.class.equals(tuple.get("type"))
+                            ? SecurityPlatform.class.getSimpleName()
+                            : clazz.getSimpleName()))
+            .toList();
+
+    return new PageImpl<>(results, pageable, count(clazz, specification));
+  }
+
+  private long count(Class<T> clazz, Specification<T> specification) {
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+    Root<T> root = cq.from(clazz);
+    cq.select(cb.countDistinct(root));
+    Predicate predicate = specification.toPredicate(root, cq, cb);
+    if (predicate != null) {
+      cq.where(predicate);
+    }
+    // The full text specification adds a rank order, invalid in a count
+    cq.orderBy(List.of());
+    return entityManager.createQuery(cq).getSingleResult();
   }
 
   /**
@@ -336,13 +327,10 @@ public class FullTextSearchService<T extends Base> {
     @NotBlank private long count;
   }
 
-  @Data
-  public static class FullTextSearchResult {
-
-    @NotBlank private String id;
-    @NotBlank private String name;
-    private String description;
-    private Set<Tag> tags;
-    @NotBlank private String clazz;
-  }
+  public record FullTextSearchResult(
+      @NotBlank String id,
+      @NotBlank String name,
+      String description,
+      Set<String> tags,
+      @NotBlank String clazz) {}
 }
