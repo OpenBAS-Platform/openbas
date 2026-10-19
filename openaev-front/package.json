@@ -77,7 +77,7 @@
     "moment-timezone": "0.6.5",
     "normalizr": "3.6.2",
     "prop-types": "15.8.1",
-    "qs": "6.16.0",
+    "qs": "6.16.1",
     "ramda": "0.32.0",
     "react": "19.3.0",
     "react-apexcharts": "1.7.0",
