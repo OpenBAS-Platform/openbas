@@ -12,6 +12,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import io.openaev.api.marking_definition.form.MarkingDefinitionInput;
@@ -319,6 +320,9 @@ class MarkingDefinitionServiceTest {
       return "SELECT EXISTS (SELECT 1 FROM " + table + " WHERE marking_ids @> ARRAY[?]::text[])";
     }
 
+    private static final String GROUPS_QUERY =
+        "SELECT EXISTS (SELECT 1 FROM groups_markings WHERE marking_id = ?)";
+
     @Test
     @DisplayName("given_idHeldByFirstTable_should_returnTrueWithoutProbingTheRest")
     void given_idHeldByFirstTable_should_returnTrueWithoutProbingTheRest() {
@@ -337,6 +341,7 @@ class MarkingDefinitionServiceTest {
       assertTrue(assigned);
       verify(jdbcTemplate, never())
           .queryForObject(existsQuery("asset_groups"), Boolean.class, existing.getId());
+      verify(jdbcTemplate, never()).queryForObject(GROUPS_QUERY, Boolean.class, existing.getId());
     }
 
     @Test
@@ -364,19 +369,49 @@ class MarkingDefinitionServiceTest {
     }
 
     @Test
-    @DisplayName("given_noMarkedTablesInSchema_should_returnFalseWithoutQuerying")
-    void given_noMarkedTablesInSchema_should_returnFalseWithoutQuerying() {
+    @DisplayName("given_idGrantedOnlyToGroup_should_returnTrue")
+    void given_idGrantedOnlyToGroup_should_returnTrue() {
+      // Arrange
+      MarkingDefinition existing = existingIn(TENANT_ID);
+      when(repository.findById(existing.getId())).thenReturn(Optional.of(existing));
+      Set<String> markedTableNames = new LinkedHashSet<>(List.of("assets", "asset_groups"));
+      when(allTablesWithMarkingIds.tableNames()).thenReturn(markedTableNames);
+      for (String table : markedTableNames) {
+        when(jdbcTemplate.queryForObject(existsQuery(table), Boolean.class, existing.getId()))
+            .thenReturn(false);
+      }
+      when(jdbcTemplate.queryForObject(GROUPS_QUERY, Boolean.class, existing.getId()))
+          .thenReturn(true);
+
+      // Act
+      boolean assigned = service().isAssigned(TxCtx.forTenant(TENANT_ID), existing.getId());
+
+      // Assert
+      assertTrue(assigned);
+      for (String table : markedTableNames) {
+        verify(jdbcTemplate, times(1))
+            .queryForObject(existsQuery(table), Boolean.class, existing.getId());
+      }
+      verify(jdbcTemplate, times(1)).queryForObject(GROUPS_QUERY, Boolean.class, existing.getId());
+    }
+
+    @Test
+    @DisplayName("given_noMarkedTablesInSchema_should_checkOnlyGroupGrants")
+    void given_noMarkedTablesInSchema_should_checkOnlyGroupGrants() {
       // Arrange
       MarkingDefinition existing = existingIn(TENANT_ID);
       when(repository.findById(existing.getId())).thenReturn(Optional.of(existing));
       when(allTablesWithMarkingIds.tableNames()).thenReturn(Set.of());
+      when(jdbcTemplate.queryForObject(GROUPS_QUERY, Boolean.class, existing.getId()))
+          .thenReturn(false);
 
       // Act
       boolean assigned = service().isAssigned(TxCtx.forTenant(TENANT_ID), existing.getId());
 
       // Assert
       assertFalse(assigned);
-      verifyNoInteractions(jdbcTemplate);
+      verify(jdbcTemplate, times(1)).queryForObject(GROUPS_QUERY, Boolean.class, existing.getId());
+      verifyNoMoreInteractions(jdbcTemplate);
     }
 
     @Test

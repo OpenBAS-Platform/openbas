@@ -130,8 +130,9 @@ public class MarkingDefinitionService {
   }
 
   /**
-   * Tells whether a marking definition is currently assigned to at least one marked entity, i.e.
-   * whether its id appears in the {@code marking_ids} array of any row of any marked table.
+   * Tells whether a marking definition is currently assigned, i.e. whether its id appears in the
+   * {@code marking_ids} array of any row of any marked table, or is granted to a group through
+   * {@code groups_markings}.
    *
    * <p>Checks the same schema-driven table set as {@link #scrubMarkingIds(String)} rather than the
    * allowlist-narrowed {@link io.openaev.config.MarkedTables}: a marking write is not
@@ -139,11 +140,12 @@ public class MarkingDefinitionService {
    * marking clearance, so a row the caller cannot see still counts as an assignment.
    *
    * <p>Short-circuits on the first table that holds the id; the {@code @>} containment predicate
-   * lets each probe use the GIN index on {@code marking_ids}.
+   * lets each table probe use the GIN index on {@code marking_ids}. Group grants are checked last.
    *
    * @param ctx transaction context containing tenant scope
    * @param markingDefinitionId identifier of the marking definition
-   * @return {@code true} if at least one marked entity carries the definition
+   * @return {@code true} if at least one marked entity carries the definition or at least one group
+   *     is granted it
    */
   @Transactional(readOnly = true)
   public boolean isAssigned(@NotNull TxCtx ctx, @NotBlank String markingDefinitionId) {
@@ -158,7 +160,11 @@ public class MarkingDefinitionService {
         return true;
       }
     }
-    return false;
+    return Boolean.TRUE.equals(
+        jdbcTemplate.queryForObject(
+            "SELECT EXISTS (SELECT 1 FROM groups_markings WHERE marking_id = ?)",
+            Boolean.class,
+            markingDefinitionId));
   }
 
   private MarkingDefinition findByIdOrThrow(
