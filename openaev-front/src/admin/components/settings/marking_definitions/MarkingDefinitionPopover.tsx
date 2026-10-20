@@ -98,7 +98,7 @@ const MarkingDefinitionPopover: FunctionComponent<Props> = ({
       .then((result: { data: boolean }) => {
         setIsAssigned(result.data);
       })
-      .catch(() => {})
+      .catch(() => setIsAssigned(false))
       .finally(() => setOpenDelete(true));
   };
 
