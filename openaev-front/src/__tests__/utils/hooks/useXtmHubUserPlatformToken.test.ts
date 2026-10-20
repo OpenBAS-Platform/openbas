@@ -1,10 +1,16 @@
 import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { sendErrorMessageToBackend } from '../../../utils/Action';
 import useXtmHubUserPlatformToken from '../../../utils/hooks/useXtmHubUserPlatformToken';
+import { reportXtmHubOriginMismatch } from '../../../utils/xtm-hub-client';
 
-vi.mock('../../../utils/Action', () => ({ sendErrorMessageToBackend: vi.fn() }));
+vi.mock(import('../../../utils/xtm-hub-client'), async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    reportXtmHubOriginMismatch: vi.fn(),
+  };
+});
 
 const HUB_URL = 'https://hub.filigran.io';
 const HUB_ORIGIN = 'https://hub.filigran.io';
@@ -72,8 +78,7 @@ describe('useXtmHubUserPlatformToken', () => {
     });
 
     expect(result.current.userPlatformToken).toBeNull();
-    expect(sendErrorMessageToBackend).toHaveBeenCalledExactlyOnceWith(expect.stringContaining('"https://other.example"'));
-    expect(sendErrorMessageToBackend).not.toHaveBeenCalledWith(expect.stringContaining('other-token'));
+    expect(reportXtmHubOriginMismatch).toHaveBeenCalledExactlyOnceWith('set-token', 'https://other.example', HUB_ORIGIN);
   });
 
   it('silently ignores an unknown message sent from another origin', () => {
@@ -84,7 +89,7 @@ describe('useXtmHubUserPlatformToken', () => {
     });
 
     expect(result.current.userPlatformToken).toBeNull();
-    expect(sendErrorMessageToBackend).not.toHaveBeenCalled();
+    expect(reportXtmHubOriginMismatch).not.toHaveBeenCalled();
   });
 
   it('does not ask for a token when the XTM Hub URL is unknown', () => {
