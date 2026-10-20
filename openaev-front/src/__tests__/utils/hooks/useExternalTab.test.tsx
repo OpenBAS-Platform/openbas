@@ -1,10 +1,10 @@
 import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { sendWarningToBackend } from '../../../utils/Action';
+import { sendErrorMessageToBackend } from '../../../utils/Action';
 import useExternalTab from '../../../utils/hooks/useExternalTab';
 
-vi.mock('../../../utils/Action', () => ({ sendWarningToBackend: vi.fn() }));
+vi.mock('../../../utils/Action', () => ({ sendErrorMessageToBackend: vi.fn() }));
 
 const HUB_ORIGIN = 'https://hub.filigran.io';
 
@@ -74,8 +74,8 @@ describe('useExternalTab', () => {
 
     expect(onMessage).not.toHaveBeenCalled();
     expect(tab.close).not.toHaveBeenCalled();
-    expect(sendWarningToBackend).toHaveBeenCalledExactlyOnceWith(expect.stringContaining('"https://other.example"'));
-    expect(sendWarningToBackend).not.toHaveBeenCalledWith(expect.stringContaining('token'));
+    expect(sendErrorMessageToBackend).toHaveBeenCalledExactlyOnceWith(expect.stringContaining('"https://other.example"'));
+    expect(sendErrorMessageToBackend).not.toHaveBeenCalledWith(expect.stringContaining('token'));
   });
 
   it('keeps listening after a message from another origin and handles a later one from the expected origin', () => {
@@ -129,7 +129,7 @@ describe('useExternalTab', () => {
 
     expect(onMessage).not.toHaveBeenCalled();
     expect(tab.close).not.toHaveBeenCalled();
-    expect(sendWarningToBackend).not.toHaveBeenCalled();
+    expect(sendErrorMessageToBackend).not.toHaveBeenCalled();
   });
 
   it('ignores a message from the expected origin sent by another window', () => {
@@ -159,6 +159,6 @@ describe('useExternalTab', () => {
 
     expect(onMessage).not.toHaveBeenCalled();
     expect(tab.close).not.toHaveBeenCalled();
-    expect(sendWarningToBackend).not.toHaveBeenCalled();
+    expect(sendErrorMessageToBackend).not.toHaveBeenCalled();
   });
 });

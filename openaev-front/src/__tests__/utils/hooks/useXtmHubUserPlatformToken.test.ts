@@ -1,10 +1,10 @@
 import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { sendWarningToBackend } from '../../../utils/Action';
+import { sendErrorMessageToBackend } from '../../../utils/Action';
 import useXtmHubUserPlatformToken from '../../../utils/hooks/useXtmHubUserPlatformToken';
 
-vi.mock('../../../utils/Action', () => ({ sendWarningToBackend: vi.fn() }));
+vi.mock('../../../utils/Action', () => ({ sendErrorMessageToBackend: vi.fn() }));
 
 const HUB_URL = 'https://hub.filigran.io';
 const HUB_ORIGIN = 'https://hub.filigran.io';
@@ -72,8 +72,8 @@ describe('useXtmHubUserPlatformToken', () => {
     });
 
     expect(result.current.userPlatformToken).toBeNull();
-    expect(sendWarningToBackend).toHaveBeenCalledExactlyOnceWith(expect.stringContaining('"https://other.example"'));
-    expect(sendWarningToBackend).not.toHaveBeenCalledWith(expect.stringContaining('other-token'));
+    expect(sendErrorMessageToBackend).toHaveBeenCalledExactlyOnceWith(expect.stringContaining('"https://other.example"'));
+    expect(sendErrorMessageToBackend).not.toHaveBeenCalledWith(expect.stringContaining('other-token'));
   });
 
   it('silently ignores an unknown message sent from another origin', () => {
@@ -84,7 +84,7 @@ describe('useXtmHubUserPlatformToken', () => {
     });
 
     expect(result.current.userPlatformToken).toBeNull();
-    expect(sendWarningToBackend).not.toHaveBeenCalled();
+    expect(sendErrorMessageToBackend).not.toHaveBeenCalled();
   });
 
   it('does not ask for a token when the XTM Hub URL is unknown', () => {

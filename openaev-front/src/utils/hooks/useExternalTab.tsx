@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { sendWarningToBackend } from '../Action';
+import { sendErrorMessageToBackend } from '../Action';
 
 interface UseExternalTabProps {
   url: string;
@@ -68,7 +68,7 @@ const useExternalTab = ({
       const isClosingTabAction = CLOSING_TAB_ACTIONS.includes(event.data?.action);
       if (event.origin !== expectedOrigin) {
         if (isClosingTabAction) {
-          sendWarningToBackend(`XTM Hub: message ignored, it comes from "${event.origin}" but the configured XTM Hub origin is "${expectedOrigin}"`);
+          sendErrorMessageToBackend(`XTM Hub: message ignored, it comes from "${event.origin}" but the configured XTM Hub origin is "${expectedOrigin}"`);
         }
         return;
       }

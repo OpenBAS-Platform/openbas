@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { sendWarningToBackend } from '../Action';
+import { sendErrorMessageToBackend } from '../Action';
 import { getXtmHubOrigin } from '../xtm-hub-client';
 
 const XTM_HUB_USER_PLATFORM_TOKEN_KEY = 'XTM_HUB_USER_PLATFORM_TOKEN_KEY';
@@ -20,7 +20,7 @@ const useXtmHubUserPlatformToken = (hubUrl?: string | null): Return => {
       const { action, token: newToken } = event.data ?? {};
       if (event.origin !== hubOrigin) {
         if (action === 'set-token') {
-          sendWarningToBackend(`XTM Hub: token ignored, it comes from "${event.origin}" but the configured XTM Hub origin is "${hubOrigin}"`);
+          sendErrorMessageToBackend(`XTM Hub: token ignored, it comes from "${event.origin}" but the configured XTM Hub origin is "${hubOrigin}"`);
         }
         return;
       }
