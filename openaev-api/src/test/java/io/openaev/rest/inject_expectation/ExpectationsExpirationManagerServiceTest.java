@@ -293,41 +293,33 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       em.flush();
       em.clear();
 
-      List<BaseInjectExpectation> agentExpectations =
-          List.of(
-              injectExpectationRepository
-                  .findAllByInjectAndAgent(savedInject.getId(), savedAgent1.getId())
-                  .getFirst(),
-              injectExpectationRepository
-                  .findAllByInjectAndAgent(savedInject.getId(), savedAgent2.getId())
-                  .getFirst());
-      agentExpectations.forEach(
-          e -> {
-            e.setResults(
-                List.of(
-                    InjectExpectationResult.builder()
-                        .sourceId(COLLECTOR_ID)
-                        .sourceName("collector-name")
-                        .sourceType("collector")
-                        .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.EDR.name())
-                        .result("result")
-                        .sourceAssetId(UUID.randomUUID().toString())
-                        .score(100.0)
-                        .build()));
-            e.setScore(100.0);
-          });
-      injectExpectationRepository.saveAll(agentExpectations);
+      // The collector answers the first agent only: without expectation group, the asset and the
+      // asset group stay pending until the second agent expires
+      injectExpectationService.updateInjectExpectation(
+          injectExpectationRepository
+              .findAllByInjectAndAgent(savedInject.getId(), savedAgent1.getId())
+              .getFirst()
+              .getId(),
+          InjectExpectationUpdateFromCollectorInput.builder()
+              .collectorId(savedEDRCollector.getId())
+              .result("Detected")
+              .isSuccess(true)
+              .build());
+      em.flush();
+      em.clear();
 
-      String parentAssetExpectationId =
+      BaseInjectExpectation parentAssetExpectation =
           injectExpectationRepository
               .findAllByInjectAndAsset(savedInject.getId(), savedEndpoint.getId())
-              .getFirst()
-              .getId();
-      String parentGroupExpectationId =
+              .getFirst();
+      BaseInjectExpectation parentGroupExpectation =
           injectExpectationRepository
               .findAllByInjectAndAssetGroup(savedInject.getId(), savedAssetGroup.getId())
-              .getFirst()
-              .getId();
+              .getFirst();
+      assertNull(parentAssetExpectation.getScore());
+      assertNull(parentGroupExpectation.getScore());
+      String parentAssetExpectationId = parentAssetExpectation.getId();
+      String parentGroupExpectationId = parentGroupExpectation.getId();
 
       expireExpectationsInDbByInjectId(savedInject.getId());
       reset(auditLogTransportDispatcherUtils);
@@ -335,8 +327,9 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       // Act
       expectationsExpirationManagerService.computeExpectations(savedInject.getTenant().getId());
 
-      // Assert: both the asset parent and the asset-group parent must be recomputed and logged
-      List<LogEvent> expectationEvents = captureExpectationResultEvents(2);
+      // Assert: the run concludes the second agent, then derives the asset and the asset group
+      // from it, so both parents are recomputed and logged
+      List<LogEvent> expectationEvents = captureExpectationResultEvents(3);
       List<String> loggedIds =
           expectationEvents.stream()
               .map(event -> extractExpectationId(event))
@@ -508,9 +501,8 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
     @Test
     @DisplayName("The agent expectations are already filled")
     void agentExpectationsAreAlreadyFilled() {
-      // -- PREPARE --
+      // Arrange
       // Build and save expectations for asset group with one asset and two agents
-
       ExecutableInject executableInject = newExecutableInjectWithTargets();
       Expectation detectionExpectation =
           createExpectation(
@@ -519,89 +511,74 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       detectionExpectation.setExpectationGroup(true);
       injectExpectationService.computeAndSaveExpectations(
           executableInject, List.of(detectionExpectation), "implantType");
-
       em.flush();
       em.clear();
 
-      // Update agent expectations with source collector-id
-      List<BaseInjectExpectation> injectExpectations =
-          List.of(
-              injectExpectationRepository
-                  .findAllByInjectAndAgent(savedInject.getId(), savedAgent1.getId())
-                  .getFirst(),
-              injectExpectationRepository
-                  .findAllByInjectAndAgent(savedInject.getId(), savedAgent2.getId())
-                  .getFirst());
+      // The collector answers both agents through the collector path, which rolls the verdict up
+      // to the asset and the asset group
+      InjectExpectationUpdateFromCollectorInput input =
+          InjectExpectationUpdateFromCollectorInput.builder()
+              .collectorId(savedEDRCollector.getId())
+              .result("Detected")
+              .isSuccess(true)
+              .build();
+      List.of(savedAgent1, savedAgent2)
+          .forEach(
+              agent ->
+                  injectExpectationService.updateInjectExpectation(
+                      injectExpectationRepository
+                          .findAllByInjectAndAgent(savedInject.getId(), agent.getId())
+                          .getFirst()
+                          .getId(),
+                      input));
+      em.flush();
+      em.clear();
 
-      injectExpectations.forEach(
-          BaseInjectExpectation -> {
-            BaseInjectExpectation.setResults(
-                List.of(
-                    InjectExpectationResult.builder()
-                        .sourceId("collector-id")
-                        .sourceName("collector-name")
-                        .sourceType("collector-type")
-                        .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.EDR.name())
-                        .result("result")
-                        .sourceAssetId(UUID.randomUUID().toString())
-                        .score(100.0)
-                        .build()));
-            BaseInjectExpectation.setScore(100.0);
-          });
-
-      injectExpectationRepository.saveAll(injectExpectations);
-
-      // -- VERIFY --
-      // Agent Expectation
-      injectExpectations =
-          injectExpectationRepository.findAllByInjectAndAgent(
-              savedInject.getId(), savedAgent1.getId());
-      assertEquals(100.0, injectExpectations.getFirst().getScore());
-      injectExpectations =
-          injectExpectationRepository.findAllByInjectAndAgent(
-              savedInject.getId(), savedAgent2.getId());
-      assertEquals(100.0, injectExpectations.getFirst().getScore());
-      // Asset
-      injectExpectations =
-          injectExpectationRepository.findAllByInjectAndAsset(
-              savedInject.getId(), savedEndpoint.getId());
-      assertEquals(null, injectExpectations.getFirst().getScore());
-      // Asset Group
-      injectExpectations =
-          injectExpectationRepository.findAllByInjectAndAssetGroup(
-              savedInject.getId(), savedAssetGroup.getId());
-      assertEquals(null, injectExpectations.getFirst().getScore());
-
-      // -- EXECUTE --
+      // The parents are concluded before the expiration manager runs
+      assertEquals(
+          detectionExpectation.getScore(),
+          injectExpectationRepository
+              .findAllByInjectAndAsset(savedInject.getId(), savedEndpoint.getId())
+              .getFirst()
+              .getScore());
+      assertEquals(
+          detectionExpectation.getScore(),
+          injectExpectationRepository
+              .findAllByInjectAndAssetGroup(savedInject.getId(), savedAssetGroup.getId())
+              .getFirst()
+              .getScore());
       expireExpectationsInDbByInjectId(savedInject.getId());
-      expectationsExpirationManagerService.computeExpectations(savedInject.getTenant().getId());
 
-      // -- ASSERT --
-      // Agent Expectation
-      injectExpectations =
-          injectExpectationRepository.findAllByInjectAndAgent(
-              savedInject.getId(), savedAgent1.getId());
-      assertEquals(100.0, injectExpectations.getFirst().getScore());
-      injectExpectations =
-          injectExpectationRepository.findAllByInjectAndAgent(
-              savedInject.getId(), savedAgent2.getId());
-      assertEquals(100.0, injectExpectations.getFirst().getScore());
-      // Asset: rolled up from its (green) agents by the expiration manager, NOT force-failed
-      injectExpectations =
-          injectExpectationRepository.findAllByInjectAndAsset(
-              savedInject.getId(), savedEndpoint.getId());
-      assertEquals(detectionExpectation.getScore(), injectExpectations.getFirst().getScore());
+      // Act
+      expectationsExpirationManagerService.computeExpectations(savedInject.getTenant().getId());
+      em.flush();
+      em.clear();
+
+      // Assert
+      // Every verdict is kept: the agents, the asset and the asset group are not force-failed
+      for (Agent agent : List.of(savedAgent1, savedAgent2)) {
+        BaseInjectExpectation agentExpectation =
+            injectExpectationRepository
+                .findAllByInjectAndAgent(savedInject.getId(), agent.getId())
+                .getFirst();
+        assertEquals(detectionExpectation.getScore(), agentExpectation.getScore());
+        assertEquals(
+            BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS, agentExpectation.getResponse());
+      }
+      BaseInjectExpectation assetExpectation =
+          injectExpectationRepository
+              .findAllByInjectAndAsset(savedInject.getId(), savedEndpoint.getId())
+              .getFirst();
+      assertEquals(detectionExpectation.getScore(), assetExpectation.getScore());
       assertEquals(
-          BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS,
-          injectExpectations.getFirst().getResponse());
-      // Asset Group: rolled up from its (green) assets by the expiration manager
-      injectExpectations =
-          injectExpectationRepository.findAllByInjectAndAssetGroup(
-              savedInject.getId(), savedAssetGroup.getId());
-      assertEquals(detectionExpectation.getScore(), injectExpectations.getFirst().getScore());
+          BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS, assetExpectation.getResponse());
+      BaseInjectExpectation assetGroupExpectation =
+          injectExpectationRepository
+              .findAllByInjectAndAssetGroup(savedInject.getId(), savedAssetGroup.getId())
+              .getFirst();
+      assertEquals(detectionExpectation.getScore(), assetGroupExpectation.getScore());
       assertEquals(
-          BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS,
-          injectExpectations.getFirst().getResponse());
+          BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS, assetGroupExpectation.getResponse());
     }
 
     @Test
@@ -613,6 +590,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       // when the expiration manager ran. The manager used to force-fail the parents with an
       // "Expired" result, permanently showing "Not prevented"/"Not detected" on the asset while
       // its only agent showed green, corrupting the verdicts and all statistics built on them.
+      // Arrange
       ExecutableInject executableInject = newExecutableInjectWithTargets();
 
       Expectation detectionExpectation =
@@ -633,33 +611,34 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       em.flush();
       em.clear();
 
-      // The security platform answers the agent green on both prevention and detection
+      // The security platform answers the first agent green on both prevention and detection,
+      // through the security platform path, which rolls the verdict up to the asset and the asset
+      // group. The second agent stays pending
+      SecurityPlatform defender =
+          securityPlatformRepository.save(
+              SecurityPlatformFixture.createDefault(
+                  "Microsoft Defender", SecurityPlatform.SECURITY_PLATFORM_TYPE.EDR.name()));
+      InjectExpectationUpdateFromCollectorInput input =
+          new InjectExpectationUpdateFromCollectorInput();
+      input.setIsSuccess(true);
+      input.setResult("Prevented");
       List<BaseInjectExpectation> agentExpectations =
           injectExpectationRepository.findAllByInjectAndAgent(
               savedInject.getId(), savedAgent1.getId());
       assertEquals(2, agentExpectations.size());
       agentExpectations.forEach(
-          expectation -> {
-            expectation.setResults(
-                List.of(
-                    InjectExpectationResult.builder()
-                        .sourceId("microsoft-defender")
-                        .sourceName("Microsoft Defender")
-                        .sourceType("security-platform")
-                        .sourcePlatform(SecurityPlatform.SECURITY_PLATFORM_TYPE.EDR.name())
-                        .result("Prevented")
-                        .sourceAssetId(UUID.randomUUID().toString())
-                        .score(100.0)
-                        .build()));
-            expectation.setScore(100.0);
-          });
-      injectExpectationRepository.saveAll(agentExpectations);
-
-      // -- EXECUTE --
+          expectation ->
+              injectExpectationService.updateInjectExpectationFromSecurityPlatform(
+                  expectation.getId(), input, defender));
       expireExpectationsInDbByInjectId(savedInject.getId());
-      expectationsExpirationManagerService.computeExpectations(savedInject.getTenant().getId());
 
-      // -- ASSERT -- full green on agent, asset and asset group for both types
+      // Act
+      expectationsExpirationManagerService.computeExpectations(savedInject.getTenant().getId());
+      em.flush();
+      em.clear();
+
+      // Assert
+      // The first agent keeps its green verdict, the second one is expired
       injectExpectationRepository
           .findAllByInjectAndAgent(savedInject.getId(), savedAgent1.getId())
           .forEach(
@@ -668,13 +647,21 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
                 assertEquals(
                     BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS, expectation.getResponse());
               });
+      injectExpectationRepository
+          .findAllByInjectAndAgent(savedInject.getId(), savedAgent2.getId())
+          .forEach(
+              expectation ->
+                  assertEquals(
+                      BaseInjectExpectation.EXPECTATION_STATUS.FAILED, expectation.getResponse()));
+      // The asset and the asset group stay green for both types (expectation group: one green
+      // agent is enough)
       List<BaseInjectExpectation> assetExpectations =
           injectExpectationRepository.findAllByInjectAndAsset(
               savedInject.getId(), savedEndpoint.getId());
       assertEquals(2, assetExpectations.size());
       assetExpectations.forEach(
           expectation -> {
-            assertEquals(expectation.getScore(), expectation.getScore());
+            assertEquals(100.0, expectation.getScore());
             assertEquals(
                 BaseInjectExpectation.EXPECTATION_STATUS.SUCCESS, expectation.getResponse());
           });
@@ -1122,6 +1109,9 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
                   "asset group with siblings", List.of(savedEndpoint, siblingEndpoint)));
       savedInject.setAssetGroups(List.of(assetGroup));
       injectRepository.save(savedInject);
+      // The active agents are read from the endpoint: reload it so it carries its new agent
+      em.flush();
+      em.clear();
       Expectation expectation =
           createExpectation(
               BaseInjectExpectation.EXPECTATION_TYPE.VULNERABILITY, "Vulnerability Expectation");
@@ -1204,8 +1194,14 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
           assetGroupRepository.save(
               AssetGroupFixture.createAssetGroupWithAssets(
                   "asset group with two assets", List.of(savedEndpoint, secondEndpoint)));
+      // The expectations are resolved from the inject targets: the first asset is targeted both
+      // directly and through the group
+      savedInject.setAssets(new ArrayList<>(List.of(savedEndpoint)));
       savedInject.setAssetGroups(List.of(assetGroup));
       injectRepository.save(savedInject);
+      // The active agents are read from the endpoint: reload it so it carries its new agent
+      em.flush();
+      em.clear();
       Expectation expectation =
           createExpectation(
               BaseInjectExpectation.EXPECTATION_TYPE.DETECTION, "Detection Expectation");

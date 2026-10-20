@@ -310,9 +310,9 @@ public abstract class AbstractTechnicalBehavior
   // -- RECOMPUTE PARENT SCORE --
 
   /**
-   * The affected parents are the assets the expectations belong to (every row of an
-   * asset, one per asset group it is targeted through), then the asset groups of those assets. A
-   * given asset group recomputes all its assets, as its leaves are all affected.
+   * The affected parents are the assets the expectations belong to (every row of an asset, one per
+   * asset group it is targeted through), then the asset groups of those assets. A given asset group
+   * recomputes all its assets, as its leaves are all affected.
    */
   @Override
   public List<TechnicalInjectExpectation> recomputeAffectedParents(
