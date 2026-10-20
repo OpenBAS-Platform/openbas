@@ -499,7 +499,7 @@ public interface InjectExpectationRepository
     base AS (
         -- One row per ranked expectation (1:1 joins only — no fan-out).
         SELECT ie.inject_expectation_id, ie.inject_expectation_name, ie.inject_expectation_description, ie.inject_expectation_type,
-               '[]'::json as inject_expectation_results, ie.inject_expectation_score, ie.inject_expectation_expected_score, ie.inject_expiration_time,
+               ie.inject_expectation_score, ie.inject_expectation_expected_score, ie.inject_expiration_time,
                ie.inject_expectation_group, ie.inject_expectation_created_at,
                ie.exercise_id, ie.inject_id, ie.user_id, ie.team_id, ie.agent_id, ie.asset_id, ie.asset_group_id,
                i.tenant_id, i.inject_title, i.inject_injector_contract AS contract_id,
@@ -548,10 +548,10 @@ public interface InjectExpectationRepository
                COALESCE(array_agg(DISTINCT c.collector_security_platform::text) FILTER (WHERE c.collector_security_platform IS NOT NULL), ARRAY[]::text[])
                || COALESCE(array_agg(DISTINCT a.asset_id::text) FILTER (WHERE a.asset_id IS NOT NULL), ARRAY[]::text[]) AS ids
         FROM base b
-        LEFT JOIN LATERAL jsonb_array_elements(b.inject_expectation_results::jsonb) AS r(elem) ON true
-        LEFT JOIN collectors c ON r.elem->>'sourceId' = c.collector_id::text
+        LEFT JOIN inject_expectation_results ier ON b.inject_expectation_id = ier.inject_expectation_result_inject_expectation_id
+        LEFT JOIN collectors c ON ier.inject_expectation_result_source_id = c.collector_id::text
                               AND c.tenant_id = b.tenant_id
-        LEFT JOIN assets a ON r.elem->>'sourceId' = a.asset_id::text
+        LEFT JOIN assets a ON ier.inject_expectation_result_source_id = a.asset_id::text
         GROUP BY b.inject_expectation_id
     ),
     agent_security_platforms AS (
@@ -571,14 +571,14 @@ public interface InjectExpectationRepository
          AND child_ie.inject_expectation_type = b.inject_expectation_type
          AND (b.asset_id IS NULL OR child_ie.asset_id = b.asset_id)
          AND (b.asset_group_id IS NULL OR child_ie.asset_group_id = b.asset_group_id)
-        LEFT JOIN LATERAL jsonb_array_elements('[]'::jsonb) AS child_r(elem) ON true
-        LEFT JOIN collectors child_c ON child_r.elem->>'sourceId' = child_c.collector_id::text
+        LEFT JOIN inject_expectation_results child_ier ON child_ie.inject_expectation_id = child_ier.inject_expectation_result_inject_expectation_id
+        LEFT JOIN collectors child_c ON child_ier.inject_expectation_result_source_id = child_c.collector_id::text
                                     AND child_c.tenant_id = b.tenant_id
-        LEFT JOIN assets child_a ON child_r.elem->>'sourceId' = child_a.asset_id::text
+        LEFT JOIN assets child_a ON child_ier.inject_expectation_result_source_id = child_a.asset_id::text
         GROUP BY b.inject_expectation_id
     )
     SELECT b.inject_expectation_id, b.inject_expectation_name, b.inject_expectation_description, b.inject_expectation_type,
-           b.inject_expectation_results, b.inject_expectation_score, b.inject_expectation_expected_score, b.inject_expiration_time,
+           b.inject_expectation_score, b.inject_expectation_expected_score, b.inject_expiration_time,
            b.inject_expectation_group, b.inject_expectation_created_at,
            b.inject_expectation_updated_at,
            b.exercise_id, b.inject_id, b.user_id, b.team_id, b.agent_id, b.asset_id, b.asset_group_id, b.tenant_id, b.inject_title,
@@ -588,6 +588,7 @@ public interface InjectExpectationRepository
            sa.scenario_id,
            COALESCE(spself.ids, ARRAY[]::text[]) || COALESCE(asp.security_platform_ids, ARRAY[]::text[]) AS security_platform_ids
     FROM base b
+    LEFT JOIN inject_expectation_results ier ON b.inject_expectation_id = ier.inject_expectation_result_inject_expectation_id
     LEFT JOIN ap_agg apa ON apa.injector_contract_id = b.contract_id AND apa.tenant_id = b.tenant_id
     LEFT JOIN dom_agg da ON da.injector_contract_id = b.contract_id AND da.tenant_id = b.tenant_id
     LEFT JOIN track_agg ta ON ta.inject_id = b.inject_id
