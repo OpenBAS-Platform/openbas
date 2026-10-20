@@ -711,6 +711,7 @@ class IndexingRegressionTest extends IntegrationTest {
                   .sourceName(collector.getName())
                   .result("detected")
                   .score(100.0)
+                  .date(Instant.now())
                   .build()));
       InjectExpectationComposer.Composer agentExpectationWrapper =
           injectExpectationComposer.forExpectation(agentExpectation).withEndpoint(endpointWrapper);
@@ -831,6 +832,7 @@ class IndexingRegressionTest extends IntegrationTest {
                   .sourceName(collector.getName())
                   .result("prevented")
                   .score(100.0)
+                  .date(Instant.now())
                   .build()));
       InjectExpectationComposer.Composer agentPreventionWrapper =
           injectExpectationComposer.forExpectation(agentPrevention).withEndpoint(endpointWrapper);

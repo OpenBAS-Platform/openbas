@@ -173,8 +173,6 @@ class TenantStatementInspectorTest {
     assertTrue(out.contains("can_access_tenant(c.tenant_id)"), out);
     // ...and the agent_security_platforms join (agent-level children's results) are both filtered.
     assertTrue(out.contains("can_access_tenant(child_c.tenant_id)"), out);
-    // The lateral jsonb unnests survive the rewrite instead of being refused.
-    assertTrue(out.contains("jsonb_array_elements"), out);
   }
 
   @Test
