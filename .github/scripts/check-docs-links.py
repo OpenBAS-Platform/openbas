@@ -11,22 +11,27 @@ breaks an in-app link fails here instead of on the published site.
 import re
 import subprocess
 import sys
-import unicodedata
+from functools import cache
 from pathlib import Path
 from urllib.parse import urlsplit
+
+import markdown
 
 REPO = Path(__file__).resolve().parents[2]
 DOCS_ROOT = REPO / "docs" / "docs"
 MKDOCS_CONFIG = REPO / "docs" / "mkdocs.yml"
 SOURCE_DIRS = ["openaev-api/src", "openaev-model/src", "openaev-front/src"]
-SOURCE_SUFFIXES = {".java", ".ts", ".tsx", ".js", ".jsx"}
+SOURCE_SUFFIXES = {".properties", ".java", ".ts", ".tsx", ".js", ".jsx"}
 
 URL_RE = re.compile(r"https://docs\.openaev\.io[^\s\"'`<>)\\]*")
 REDIRECT_RE = re.compile(r"^\s+'([^']+\.md)':\s*'([^']+\.md)'\s*$")
-FENCE_RE = re.compile(r"^\s*(```|~~~)")
-HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*#*\s*$")
-EXPLICIT_ID_RE = re.compile(r"\{[^}]*#([\w-]+)[^}]*\}\s*$")
-HTML_ID_RE = re.compile(r"<[^>]+\b(?:id|name)=[\"']([^\"']+)[\"']")
+HTML_ID_RE = re.compile(r"""\b(?:id|name)=["']([^"']+)["']""")
+# The subset of the markdown_extensions in docs/mkdocs.yml that changes how headings and
+# ids are produced. "toc" is what MkDocs adds itself to generate the heading ids.
+MARKDOWN_EXTENSIONS = [
+    "toc", "attr_list", "md_in_html", "tables", "admonition", "def_list",
+    "pymdownx.superfences", "pymdownx.details", "pymdownx.tabbed",
+]
 
 
 def load_redirects() -> dict[str, str]:
@@ -38,43 +43,12 @@ def load_redirects() -> dict[str, str]:
     return redirects
 
 
-def slugify(text: str) -> str:
-    # Same rules as Python-Markdown's toc extension, which MkDocs uses for heading ids.
-    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
-    text = re.sub(r"[^\w\s-]", "", text).strip().lower()
-    return re.sub(r"[-\s]+", "-", text)
-
-
-def heading_text(raw: str) -> str:
-    text = re.sub(r"\{[^}]*\}\s*$", "", raw)
-    text = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", text)
-    text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)
-    text = re.sub(r"<[^>]+>", "", text)
-    text = re.sub(r"\*+|(?<!\w)_+|_+(?!\w)|`", "", text)
-    return text.strip()
-
-
+@cache
 def page_anchors(page: Path) -> set[str]:
-    anchors, in_fence = set(), False
-    for line in page.read_text(encoding="utf-8").splitlines():
-        if FENCE_RE.match(line):
-            in_fence = not in_fence
-            continue
-        if in_fence:
-            continue
-        anchors.update(HTML_ID_RE.findall(line))
-        match = HEADING_RE.match(line)
-        if not match:
-            continue
-        explicit = EXPLICIT_ID_RE.search(match.group(2))
-        slug = explicit.group(1) if explicit else slugify(heading_text(match.group(2)))
-        # Repeated headings get _1, _2... suffixes, as in Python-Markdown.
-        unique, n = slug, 0
-        while unique in anchors:
-            n += 1
-            unique = f"{slug}_{n}"
-        anchors.add(unique)
-    return anchors
+    html = markdown.Markdown(extensions=MARKDOWN_EXTENSIONS).convert(
+        page.read_text(encoding="utf-8")
+    )
+    return set(HTML_ID_RE.findall(html))
 
 
 def resolve_page(path: str, redirects: dict[str, str]) -> Path | None:

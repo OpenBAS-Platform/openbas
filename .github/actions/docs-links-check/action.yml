@@ -2,12 +2,17 @@ name: Docs Links Check
 description: >
   Every docs.openaev.io link in the API, model and front sources must resolve to a page under
   docs/docs, directly or through a mkdocs-redirects entry, and its anchor must exist on that page.
-  Runs offline against the checkout with the runner's python3, so a docs move that breaks an
-  in-app link fails here instead of on the published site.
+  Runs offline against the checkout with the runner's python3 and the Python-Markdown that MkDocs
+  uses to build the heading anchors, so a docs move that breaks an in-app link fails here instead
+  of on the published site.
 
 runs:
   using: composite
   steps:
+    - name: Install the Markdown parser
+      shell: bash
+      run: pip install --quiet markdown pymdown-extensions
+
     - name: Check in-app documentation links
       shell: bash
       run: python3 .github/scripts/check-docs-links.py
