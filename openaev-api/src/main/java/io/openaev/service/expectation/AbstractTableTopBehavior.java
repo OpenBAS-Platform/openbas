@@ -221,6 +221,16 @@ public abstract class AbstractTableTopBehavior
   }
 
   /**
+   * A human response is the only result of the expectation, whatever its source (the player, the
+   * admin overwriting it, or the team validation copied on the players by the legacy flow):
+   * deleting it clears the leaf.
+   */
+  @Override
+  public void removeResultFromLeaf(BaseInjectExpectation leaf, String sourceId) {
+    leaf.setResults(new ArrayList<>());
+  }
+
+  /**
    * Recomputes team-level scores from their player expectations. A team without players keeps its
    * own score, as it is its own leaf (see {@link #getLeaves}).
    */

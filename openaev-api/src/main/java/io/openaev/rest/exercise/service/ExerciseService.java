@@ -819,6 +819,7 @@ public class ExerciseService {
       throwIfExerciseNotLaunchable(exercise);
       Instant nextMinute = now().truncatedTo(MINUTES).plus(1, MINUTES);
       exercise.setStart(nextMinute);
+      exercise.setLaunchedBy(userService.currentUser());
       actionMetricCollector.addSimulationPlayedCount();
     }
     // If exercise move from pause to running state,
