@@ -53,6 +53,22 @@ public interface InjectRepository
   Optional<Inject> findByIdAndTenantId(@NotNull String id, @NotNull String tenantId);
 
   /**
+   * The inject's id and its tenant, and nothing else. For the one read that has to cross every
+   * tenant because its input carries no tenant: an inbound email routed by the inject id in its
+   * footer. Loading the entity there would pull its associations across the tenant boundary to
+   * answer a question about two columns.
+   */
+  @Query("select i.id as id, i.tenant.id as tenantId from Inject i where i.id = :id")
+  Optional<InjectTenantRef> findTenantRefById(@Param("id") @NotNull String id);
+
+  /** Projection of {@link #findTenantRefById(String)}. */
+  interface InjectTenantRef {
+    String getId();
+
+    String getTenantId();
+  }
+
+  /**
    * Updates only an inject's {@code updated_at} timestamp, through Hibernate so the tenant
    * statement inspector covers it (a previous raw-JDBC helper bypassed it). Returns the number of
    * rows updated.
@@ -249,7 +265,7 @@ public interface InjectRepository
           "insert into injects (inject_id, inject_title, inject_description, inject_country, inject_city,"
               + "inject_injector_contract, inject_all_teams, inject_enabled, inject_exercise, "
               + "inject_depends_duration, inject_content, tenant_id) "
-              + "values (:id, :title, :description, :country, :city, :contract, :allTeams, :enabled, :exercise, :dependsDuration, :content, :#{#tenantContext.currentTenant})",
+              + "values (:id, :title, :description, :country, :city, :contract, :allTeams, :enabled, :exercise, :dependsDuration, :content, :tenantId)",
       nativeQuery = true)
   void importSaveForExercise(
       @Param("id") String id,
@@ -262,7 +278,8 @@ public interface InjectRepository
       @Param("enabled") boolean enabled,
       @Param("exercise") String exerciseId,
       @Param("dependsDuration") Long dependsDuration,
-      @Param("content") String content);
+      @Param("content") String content,
+      @Param("tenantId") String tenantId);
 
   @Modifying
   @Query(
@@ -270,7 +287,7 @@ public interface InjectRepository
           "insert into injects (inject_id, inject_title, inject_description, inject_country, inject_city,"
               + "inject_injector_contract, inject_all_teams, inject_enabled, inject_scenario, "
               + "inject_depends_duration, inject_content, tenant_id) "
-              + "values (:id, :title, :description, :country, :city, :contract, :allTeams, :enabled, :scenario, :dependsDuration, :content, :#{#tenantContext.currentTenant})",
+              + "values (:id, :title, :description, :country, :city, :contract, :allTeams, :enabled, :scenario, :dependsDuration, :content, :tenantId)",
       nativeQuery = true)
   void importSaveForScenario(
       @Param("id") String id,
@@ -283,7 +300,8 @@ public interface InjectRepository
       @Param("enabled") boolean enabled,
       @Param("scenario") String scenarioId,
       @Param("dependsDuration") Long dependsDuration,
-      @Param("content") String content);
+      @Param("content") String content,
+      @Param("tenantId") String tenantId);
 
   @Modifying
   @Query(
@@ -291,7 +309,7 @@ public interface InjectRepository
           "insert into injects (inject_id, inject_title, inject_description, inject_country, inject_city,"
               + "inject_injector_contract, inject_all_teams, inject_enabled, "
               + "inject_depends_duration, inject_content, tenant_id) "
-              + "values (:id, :title, :description, :country, :city, :contract, :allTeams, :enabled, :dependsDuration, :content, :#{#tenantContext.currentTenant})",
+              + "values (:id, :title, :description, :country, :city, :contract, :allTeams, :enabled, :dependsDuration, :content, :tenantId)",
       nativeQuery = true)
   void importSaveStandAlone(
       @Param("id") String id,
@@ -303,7 +321,8 @@ public interface InjectRepository
       @Param("allTeams") boolean allTeams,
       @Param("enabled") boolean enabled,
       @Param("dependsDuration") Long dependsDuration,
-      @Param("content") String content);
+      @Param("content") String content,
+      @Param("tenantId") String tenantId);
 
   @Modifying
   @Query(

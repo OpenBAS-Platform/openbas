@@ -30,6 +30,7 @@ import io.openaev.ee.EnterpriseEditionException;
 import io.openaev.ee.EnterpriseEditionService;
 import io.openaev.injectors.challenge.model.ChallengeContent;
 import io.openaev.injectors.channel.model.ChannelContent;
+import io.openaev.rest.document.DocumentService;
 import io.openaev.rest.domain.DomainService;
 import io.openaev.rest.domain.enums.PresetDomain;
 import io.openaev.rest.exercise.exports.VariableWithValueMixin;
@@ -272,6 +273,30 @@ public class V1_DataImporter implements Importer {
       return scenario.getTenant().getId();
     }
     return null;
+  }
+
+  /**
+   * The tenant an imported inject is written in: its simulation's or scenario's, or the bundle's
+   * write tenant for an atomic testing, which has no parent. Never the ambient one. Same rule as
+   * the chaining rows' parent attribution, applied here because the native insert skips the entity
+   * listeners.
+   *
+   * @throws IllegalStateException when there is neither, or when they differ
+   */
+  static String injectTenant(Exercise exercise, Scenario scenario, String writeTenant) {
+    String parentTenant = parentTenantId(exercise, scenario);
+    if (parentTenant == null) {
+      if (writeTenant == null) {
+        throw new IllegalStateException(
+            "unattributed tenant write: Inject has no parent to take a tenant from");
+      }
+      return writeTenant;
+    }
+    if (writeTenant != null && !writeTenant.equals(parentTenant)) {
+      throw new IllegalStateException(
+          "cross-tenant write: Inject carries a tenant other than its parent's");
+    }
+    return parentTenant;
   }
 
   /**
@@ -1010,7 +1035,7 @@ public class V1_DataImporter implements Importer {
     Document document = new Document();
     document.setTenant(new Tenant(writeTenant));
     document.setTarget(target);
-    document.setName(nodeDoc.get("document_name").textValue());
+    document.setName(DocumentService.safeFileName(nodeDoc.get("document_name").textValue()));
     document.setDescription(nodeDoc.get("document_description").textValue());
     if (savedExercise != null) {
       document.setExercises(new HashSet<>(Set.of(savedExercise)));
@@ -1540,6 +1565,8 @@ public class V1_DataImporter implements Importer {
       List<JsonNode> injectsToAdd,
       List<JsonNode> allInjects,
       Map<String, String> resolvedContracts) {
+    String injectTenant =
+        injectTenant(exercise, scenario, tenantWriteScopeResolver.tenantForWrite(ctx, null));
     List<String> originalIds = new ArrayList<>();
     injectsToAdd.forEach(
         injectNode -> {
@@ -1627,7 +1654,8 @@ public class V1_DataImporter implements Importer {
                 enabled,
                 exercise.getId(),
                 dependsDuration,
-                content);
+                content,
+                injectTenant);
           } else if (scenario != null) {
             injectRepository.importSaveForScenario(
                 injectId,
@@ -1640,7 +1668,8 @@ public class V1_DataImporter implements Importer {
                 enabled,
                 scenario.getId(),
                 dependsDuration,
-                content);
+                content,
+                injectTenant);
           } else {
             injectRepository.importSaveStandAlone(
                 injectId,
@@ -1652,7 +1681,8 @@ public class V1_DataImporter implements Importer {
                 allTeams,
                 enabled,
                 dependsDuration,
-                content);
+                content,
+                injectTenant);
           }
           baseIds.put(id, new BaseHolder(injectId));
           originalIds.add(id);
@@ -3527,6 +3557,7 @@ public class V1_DataImporter implements Importer {
         Condition condition =
             Condition.builder()
                 .workflowId(workflow.getId())
+                .tenant(workflow.getTenant())
                 .key(
                     condNode.has("condition_key") && !condNode.get("condition_key").isNull()
                         ? condNode.get("condition_key").asText()

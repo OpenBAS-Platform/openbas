@@ -628,6 +628,7 @@ public class ExerciseApi extends RestBehavior {
     }
     exerciseService.throwIfExerciseNotLaunchable(exercise);
     exercise.setUpdateAttributes(input);
+    exercise.setLaunchedBy(userService.currentUser());
     return hydrateForResponse(exerciseRepository.save(exercise));
   }
 

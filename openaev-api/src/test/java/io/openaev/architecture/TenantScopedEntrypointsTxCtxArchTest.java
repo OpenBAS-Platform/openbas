@@ -199,6 +199,7 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.api.marking_definition.MarkingDefinitionApi#create",
           "io.openaev.api.marking_definition.MarkingDefinitionApi#update",
           "io.openaev.api.marking_definition.MarkingDefinitionApi#delete",
+          "io.openaev.api.marking_definition.MarkingDefinitionApi#assigned",
           "io.openaev.api.attackpath.AttackPathApi#relations",
           "io.openaev.api.attackpath.AttackPathApi#findings",
           "io.openaev.api.attackpath.AttackPathApi#executionDetail",
@@ -456,6 +457,9 @@ class TenantScopedEntrypointsTxCtxArchTest {
           // SecurityCoverageSendJobService#shouldCreateCoverageSendJob.
           // Both overloads (with/without agentId) are covered by the single name entry.
           "io.openaev.rest.inject.InjectApi#injectExecutionCallback",
+          // implant endpoints: InjectService#checkAgentTargetsInject reads the agent's asset and
+          // the inject's asset groups (assets / asset_groups, v2) before serving the payload.
+          "io.openaev.rest.inject.InjectApi#getExecutablePayloadInject",
           // security platforms: serialize the collectors association (tenant-active table) so the
           // UI can keep collector-managed platforms read-only (#7025). Both overloads of
           // securityPlatforms (GET list and POST search) are covered by the single name entry.

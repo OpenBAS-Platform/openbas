@@ -13,12 +13,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openaev.config.OpenAEVPrincipal;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TxCtx;
 import io.openaev.database.audit.BaseEvent;
 import io.openaev.database.model.*;
 import io.openaev.helper.ObjectMapperHelper;
 import io.openaev.rest.exception.ElementNotFoundException;
-import io.openaev.rest.helper.RestBehavior;
 import io.openaev.service.PermissionService;
+import io.openaev.service.StreamService;
 import io.openaev.service.UserService;
 import io.openaev.service.attackpath.AttackPathAccessControl;
 import io.openaev.service.attackpath.ingestion.AttackPathVersionEvent;
@@ -54,7 +55,7 @@ import reactor.core.publisher.FluxSink;
 
 @MockitoSettings(strictness = Strictness.LENIENT) // class-wide
 @ExtendWith(MockitoExtension.class)
-public class StreamApiTest {
+public class StreamServiceTest {
 
   private static final String RESOURCE_ID = "id";
   private static final String USER_ID = "userid";
@@ -76,7 +77,7 @@ public class StreamApiTest {
 
   @Mock private AttackPathAccessControl attackPathAccessControl;
 
-  @InjectMocks private StreamApi streamApi;
+  @InjectMocks private StreamService streamService;
 
   @BeforeEach
   public void setup() throws Exception {
@@ -86,21 +87,21 @@ public class StreamApiTest {
     when(userService.user(USER_ID)).thenReturn(mockUser);
 
     // mock objectmapper using reflection
-    Field mapperField = RestBehavior.class.getDeclaredField("mapper");
+    Field mapperField = StreamService.class.getDeclaredField("mapper");
     mapperField.setAccessible(true);
-    mapperField.set(streamApi, mapper);
+    mapperField.set(streamService, mapper);
 
     // inject into consumers using reflection
-    Field consumersField = StreamApi.class.getDeclaredField("consumers");
+    Field consumersField = StreamService.class.getDeclaredField("consumers");
     consumersField.setAccessible(true);
     @SuppressWarnings("unchecked")
-    Map<String, Object> consumers = (Map<String, Object>) consumersField.get(streamApi);
+    Map<String, Object> consumers = (Map<String, Object>) consumersField.get(streamService);
     consumers.put(SESSION_ID, buildStreamConsumer(mockPrincipal, null, mockSink));
   }
 
   private static Object buildStreamConsumer(
       OpenAEVPrincipal principal, String tenantId, FluxSink<Object> sink) throws Exception {
-    Class<?> streamConsumerClass = Class.forName("io.openaev.rest.stream.StreamApi$StreamConsumer");
+    Class<?> streamConsumerClass = Class.forName("io.openaev.service.StreamService$StreamConsumer");
     RecordComponent[] components = streamConsumerClass.getRecordComponents();
     Class<?>[] parameterTypes =
         new Class<?>[] {
@@ -113,9 +114,9 @@ public class StreamApiTest {
 
   private boolean invokeIsVisibleForTenant(BaseEvent event, String tenantId) throws Exception {
     Method method =
-        StreamApi.class.getDeclaredMethod("isVisibleForTenant", BaseEvent.class, String.class);
+        StreamService.class.getDeclaredMethod("isVisibleForTenant", BaseEvent.class, String.class);
     method.setAccessible(true);
-    return (boolean) method.invoke(streamApi, event, tenantId);
+    return (boolean) method.invoke(streamService, event, tenantId);
   }
 
   private static Tenant tenant(String id) {
@@ -126,14 +127,14 @@ public class StreamApiTest {
 
   private ObjectMapper useRealMapper() {
     ObjectMapper jsonMapper = ObjectMapperHelper.openAEVJsonMapper();
-    ReflectionTestUtils.setField(streamApi, "mapper", jsonMapper);
+    ReflectionTestUtils.setField(streamService, "mapper", jsonMapper);
     return jsonMapper;
   }
 
   private JsonNode captureWireEvent(FluxSink<Object> sink, ObjectMapper jsonMapper) {
     ArgumentCaptor<ServerSentEvent> captor = ArgumentCaptor.forClass(ServerSentEvent.class);
     verify(sink).next(captor.capture());
-    assertEquals(StreamApi.EVENT_TYPE_MESSAGE, captor.getValue().event());
+    assertEquals(StreamService.EVENT_TYPE_MESSAGE, captor.getValue().event());
     return jsonMapper.valueToTree(captor.getValue().data());
   }
 
@@ -169,7 +170,7 @@ public class StreamApiTest {
     FluxSink<Object> sink = mock(FluxSink.class);
     @SuppressWarnings("unchecked")
     Map<String, Object> consumers =
-        (Map<String, Object>) ReflectionTestUtils.getField(streamApi, "consumers");
+        (Map<String, Object>) ReflectionTestUtils.getField(streamService, "consumers");
     consumers.put(OTHER_SESSION_ID, buildStreamConsumer(principal, null, sink));
     return sink;
   }
@@ -180,7 +181,7 @@ public class StreamApiTest {
 
     BaseEvent event = new BaseEvent(DATA_DELETE, resource, jsonMapper);
     JsonNode originalData = event.getInstanceData().deepCopy();
-    streamApi.listenDatabaseUpdate(event);
+    streamService.listenDatabaseUpdate(event);
 
     JsonNode wire = captureWireEvent(mockSink, jsonMapper);
     ObjectNode expectedInstance = jsonMapper.createObjectNode().put(idProperty, RESOURCE_ID);
@@ -196,7 +197,7 @@ public class StreamApiTest {
 
     BaseEvent event = new BaseEvent(eventType, resource, jsonMapper);
     JsonNode originalData = event.getInstanceData().deepCopy();
-    streamApi.listenDatabaseUpdate(event);
+    streamService.listenDatabaseUpdate(event);
 
     verify(mockSink, never()).next(any());
     assertEquals(eventType, event.getType());
@@ -216,7 +217,7 @@ public class StreamApiTest {
     BaseEvent event = new BaseEvent(DATA_UPDATE, scenario, mock(ObjectMapper.class));
 
     // call the method
-    streamApi.listenDatabaseUpdate(event);
+    streamService.listenDatabaseUpdate(event);
 
     // capture the event and verify data
     ArgumentCaptor<ServerSentEvent> captor = ArgumentCaptor.forClass(ServerSentEvent.class);
@@ -340,7 +341,7 @@ public class StreamApiTest {
 
     BaseEvent event = new BaseEvent(eventType, simulationExpectation(RESOURCE_ID), jsonMapper);
     JsonNode originalData = event.getInstanceData().deepCopy();
-    streamApi.listenDatabaseUpdate(event);
+    streamService.listenDatabaseUpdate(event);
 
     JsonNode wire = captureWireEvent(mockSink, jsonMapper);
     assertEquals(eventType, wire.path("event_type").asText());
@@ -354,9 +355,9 @@ public class StreamApiTest {
             mockUser, Optional.empty(), SIMULATION_ID, ResourceType.SIMULATION, Action.READ))
         .thenReturn(true);
 
-    streamApi.listenDatabaseUpdate(
+    streamService.listenDatabaseUpdate(
         new BaseEvent(DATA_UPDATE, simulationExpectation("expectation-1"), jsonMapper));
-    streamApi.listenDatabaseUpdate(
+    streamService.listenDatabaseUpdate(
         new BaseEvent(DATA_UPDATE, simulationExpectation("expectation-2"), jsonMapper));
 
     verify(permissionService, times(1))
@@ -377,7 +378,7 @@ public class StreamApiTest {
             mockUser, Optional.empty(), "endpoint-1", ResourceType.ASSET, Action.READ))
         .thenReturn(canReadAssets);
 
-    streamApi.listenDatabaseUpdate(new BaseEvent(DATA_UPDATE, agent, jsonMapper));
+    streamService.listenDatabaseUpdate(new BaseEvent(DATA_UPDATE, agent, jsonMapper));
 
     verify(mockSink, times(canReadAssets ? 1 : 0)).next(any());
   }
@@ -393,7 +394,7 @@ public class StreamApiTest {
     BaseEvent event = new BaseEvent(DATA_DELETE, scenario, jsonMapper);
     event.setAttributeId(attributeId);
 
-    streamApi.listenDatabaseUpdate(event);
+    streamService.listenDatabaseUpdate(event);
 
     verify(mockSink, never()).next(any());
   }
@@ -419,7 +420,7 @@ public class StreamApiTest {
 
     BaseEvent event = new BaseEvent(DATA_DELETE, scenario, jsonMapper);
     JsonNode originalData = event.getInstanceData().deepCopy();
-    streamApi.listenDatabaseUpdate(event);
+    streamService.listenDatabaseUpdate(event);
 
     assertEquals(
         jsonMapper.createObjectNode().put("scenario_id", RESOURCE_ID),
@@ -445,7 +446,7 @@ public class StreamApiTest {
 
     BaseEvent event = new BaseEvent(DATA_DELETE, scenario, jsonMapper);
     JsonNode originalData = event.getInstanceData().deepCopy();
-    streamApi.listenDatabaseUpdate(event);
+    streamService.listenDatabaseUpdate(event);
 
     assertEquals(
         jsonMapper.createObjectNode().put("scenario_id", RESOURCE_ID),
@@ -466,7 +467,7 @@ public class StreamApiTest {
     FluxSink<Object> failingSink = defaultConsumerFails ? mockSink : otherSink;
     FluxSink<Object> healthySink = defaultConsumerFails ? otherSink : mockSink;
 
-    streamApi.listenDatabaseUpdate(new BaseEvent(DATA_UPDATE, agent, jsonMapper));
+    streamService.listenDatabaseUpdate(new BaseEvent(DATA_UPDATE, agent, jsonMapper));
 
     verify(failingSink, never()).next(any());
     verify(healthySink).next(any());
@@ -481,8 +482,8 @@ public class StreamApiTest {
         .thenThrow(new ElementNotFoundException("transient"))
         .thenReturn(true);
 
-    streamApi.listenDatabaseUpdate(new BaseEvent(DATA_UPDATE, agent, jsonMapper));
-    streamApi.listenDatabaseUpdate(new BaseEvent(DATA_UPDATE, agent, jsonMapper));
+    streamService.listenDatabaseUpdate(new BaseEvent(DATA_UPDATE, agent, jsonMapper));
+    streamService.listenDatabaseUpdate(new BaseEvent(DATA_UPDATE, agent, jsonMapper));
 
     verify(permissionService, times(2))
         .hasPermission(
@@ -505,7 +506,7 @@ public class StreamApiTest {
     FluxSink<Object> failingSink = defaultConsumerFails ? mockSink : otherSink;
     FluxSink<Object> healthySink = defaultConsumerFails ? otherSink : mockSink;
 
-    streamApi.listenDatabaseUpdate(new BaseEvent(DATA_UPDATE, agent, jsonMapper));
+    streamService.listenDatabaseUpdate(new BaseEvent(DATA_UPDATE, agent, jsonMapper));
 
     verify(failingSink, never()).next(any());
     verify(healthySink).next(any());
@@ -524,15 +525,19 @@ public class StreamApiTest {
     FluxSink<Object> privilegedSink = mock(FluxSink.class);
     @SuppressWarnings("unchecked")
     Map<String, Object> consumers =
-        (Map<String, Object>) ReflectionTestUtils.getField(streamApi, "consumers");
+        (Map<String, Object>) ReflectionTestUtils.getField(streamService, "consumers");
     consumers.put(
         "privileged-session", buildStreamConsumer(privilegedPrincipal, TENANT_ID, privilegedSink));
 
-    when(permissionService.hasPermission(
-            mockUser, Optional.empty(), RESOURCE_ID, ResourceType.NOTIFIER, Action.READ))
+    when(permissionService.hasPermissionInTenant(
+            TxCtx.forTenant(TENANT_ID), mockUser, RESOURCE_ID, ResourceType.NOTIFIER, Action.READ))
         .thenReturn(true);
-    when(permissionService.hasPermission(
-            privilegedUser, Optional.empty(), RESOURCE_ID, ResourceType.NOTIFIER, Action.READ))
+    when(permissionService.hasPermissionInTenant(
+            TxCtx.forTenant(TENANT_ID),
+            privilegedUser,
+            RESOURCE_ID,
+            ResourceType.NOTIFIER,
+            Action.READ))
         .thenReturn(true);
     when(permissionService.hasCapabilityPermission(mockUser, ResourceType.NOTIFIER, Action.READ))
         .thenAnswer(
@@ -557,7 +562,7 @@ public class StreamApiTest {
     BaseEvent event = new BaseEvent(eventType, notifier, jsonMapper);
     JsonNode originalData = event.getInstanceData().deepCopy();
 
-    streamApi.listenDatabaseUpdate(event);
+    streamService.listenDatabaseUpdate(event);
 
     JsonNode restrictedWire = captureWireEvent(restrictedSink, jsonMapper);
     JsonNode privilegedWire = captureWireEvent(privilegedSink, jsonMapper);
@@ -581,7 +586,7 @@ public class StreamApiTest {
     notification.setId(RESOURCE_ID);
     notification.setUser(owner);
 
-    streamApi.listenDatabaseUpdate(
+    streamService.listenDatabaseUpdate(
         new BaseEvent(DATA_UPDATE, notification, mock(ObjectMapper.class)));
 
     verify(mockSink, never()).next(any());
@@ -589,7 +594,8 @@ public class StreamApiTest {
 
   @Test
   public void given_bulkOperation_when_consumerIsNotOwner_should_notReceiveIt() {
-    streamApi.listenBulkOperation(new BulkOperationEvent(bulkOperation(TENANT_ID, "other-user")));
+    streamService.listenBulkOperation(
+        new BulkOperationEvent(bulkOperation(TENANT_ID, "other-user")));
 
     verify(mockSink, never()).next(any());
   }
@@ -599,7 +605,7 @@ public class StreamApiTest {
       throws Exception {
     FluxSink<Object> sink = registerTenantConsumer(OTHER_TENANT_ID);
 
-    streamApi.listenBulkOperation(new BulkOperationEvent(bulkOperation(TENANT_ID, USER_ID)));
+    streamService.listenBulkOperation(new BulkOperationEvent(bulkOperation(TENANT_ID, USER_ID)));
 
     verify(sink, never()).next(any());
   }
@@ -630,8 +636,10 @@ public class StreamApiTest {
     Scenario scenario = ScenarioFixture.getScenario();
     scenario.setId(RESOURCE_ID);
 
-    streamApi.listenDatabaseUpdate(new BaseEvent(DATA_UPDATE, scenario, mock(ObjectMapper.class)));
-    streamApi.listenDatabaseUpdate(new BaseEvent(DATA_UPDATE, scenario, mock(ObjectMapper.class)));
+    streamService.listenDatabaseUpdate(
+        new BaseEvent(DATA_UPDATE, scenario, mock(ObjectMapper.class)));
+    streamService.listenDatabaseUpdate(
+        new BaseEvent(DATA_UPDATE, scenario, mock(ObjectMapper.class)));
 
     verify(permissionService, times(1))
         .hasPermission(mockUser, Optional.empty(), RESOURCE_ID, ResourceType.SCENARIO, Action.READ);
@@ -639,11 +647,54 @@ public class StreamApiTest {
   }
 
   @Test
+  public void given_rowInATenant_when_consumerHasNoTenant_should_checkInTheRowsTenant() {
+    // Arrange
+    Scenario scenario = ScenarioFixture.getScenario();
+    scenario.setId(RESOURCE_ID);
+    scenario.setTenant(tenant(TENANT_ID));
+    when(permissionService.hasPermissionInTenant(
+            TxCtx.forTenant(TENANT_ID), mockUser, RESOURCE_ID, ResourceType.SCENARIO, Action.READ))
+        .thenReturn(true);
+
+    // Act
+    streamService.listenDatabaseUpdate(
+        new BaseEvent(DATA_UPDATE, scenario, mock(ObjectMapper.class)));
+
+    // Assert
+    verify(mockSink).next(any());
+    verify(permissionService, never()).hasPermission(any(), any(), any(), any(), any());
+  }
+
+  @Test
+  public void given_rowWithoutTenant_when_consumerHasATenant_should_checkInTheConsumersTenant()
+      throws Exception {
+    // Arrange
+    FluxSink<Object> sink = registerTenantConsumer(TENANT_ID);
+    Communication communication = new Communication();
+    communication.setId(RESOURCE_ID);
+    when(permissionService.hasPermissionInTenant(
+            TxCtx.forTenant(TENANT_ID),
+            mockUser,
+            RESOURCE_ID,
+            communication.getPermissionResourceType(),
+            Action.READ))
+        .thenReturn(true);
+
+    // Act
+    streamService.listenDatabaseUpdate(
+        new BaseEvent(DATA_UPDATE, communication, mock(ObjectMapper.class)));
+
+    // Assert
+    verify(sink).next(any());
+    verify(permissionService, never()).hasPermission(any(), any(), any(), any(), any());
+  }
+
+  @Test
   public void test_given_databaseEvent_when_eventIsCVE_then_doNothing() {
     Vulnerability vulnerability = new Vulnerability();
     BaseEvent event = new BaseEvent(DATA_UPDATE, vulnerability, mock(ObjectMapper.class));
 
-    streamApi.listenDatabaseUpdate(event);
+    streamService.listenDatabaseUpdate(event);
 
     verify(mockSink, never()).next(any());
   }
@@ -719,10 +770,10 @@ public class StreamApiTest {
     OpenAEVPrincipal principal = mock(OpenAEVPrincipal.class);
     when(principal.getId()).thenReturn(USER_ID);
     FluxSink<Object> sink = mock(FluxSink.class);
-    Field consumersField = StreamApi.class.getDeclaredField("consumers");
+    Field consumersField = StreamService.class.getDeclaredField("consumers");
     consumersField.setAccessible(true);
     @SuppressWarnings("unchecked")
-    Map<String, Object> consumers = (Map<String, Object>) consumersField.get(streamApi);
+    Map<String, Object> consumers = (Map<String, Object>) consumersField.get(streamService);
     consumers.clear();
     consumers.put(SESSION_ID, buildStreamConsumer(principal, tenantId, sink));
     return sink;
@@ -738,13 +789,14 @@ public class StreamApiTest {
     when(attackPathAccessControl.canRead(mockUser, SIMULATION_ID)).thenReturn(true);
 
     // Act
-    streamApi.listenAttackPathVersion(new AttackPathVersionEvent(SIMULATION_ID, TENANT_ID, 42L));
+    streamService.listenAttackPathVersion(
+        new AttackPathVersionEvent(SIMULATION_ID, TENANT_ID, 42L));
 
     // Assert: one event, of the attack-path type, carrying the notification and nothing else.
     ArgumentCaptor<ServerSentEvent> captor = ArgumentCaptor.forClass(ServerSentEvent.class);
     verify(sink).next(captor.capture());
     ServerSentEvent<?> sent = captor.getValue();
-    assertEquals(StreamApi.EVENT_TYPE_ATTACK_PATH_VERSION, sent.event());
+    assertEquals(StreamService.EVENT_TYPE_ATTACK_PATH_VERSION, sent.event());
     AttackPathVersionEvent payload = (AttackPathVersionEvent) sent.data();
     assertEquals(SIMULATION_ID, payload.simulationId());
     assertEquals(42L, payload.version());
@@ -769,7 +821,7 @@ public class StreamApiTest {
     when(attackPathAccessControl.canRead(mockUser, SIMULATION_ID)).thenReturn(false);
 
     // Act
-    streamApi.listenAttackPathVersion(new AttackPathVersionEvent(SIMULATION_ID, TENANT_ID, 7L));
+    streamService.listenAttackPathVersion(new AttackPathVersionEvent(SIMULATION_ID, TENANT_ID, 7L));
 
     // Assert
     verify(sink, never()).next(any());
@@ -783,7 +835,7 @@ public class StreamApiTest {
     when(attackPathAccessControl.canRead(mockUser, SIMULATION_ID)).thenReturn(true);
 
     // Act
-    streamApi.listenAttackPathVersion(new AttackPathVersionEvent(SIMULATION_ID, TENANT_ID, 3L));
+    streamService.listenAttackPathVersion(new AttackPathVersionEvent(SIMULATION_ID, TENANT_ID, 3L));
 
     // Assert: tenant equality runs before the permission check, so nothing is delivered — and the
     // check is never even consulted.
@@ -798,7 +850,7 @@ public class StreamApiTest {
     FluxSink<Object> sink = registerTenantConsumer(TENANT_ID);
 
     // Act
-    streamApi.listenAttackPathVersion(new AttackPathVersionEvent(SIMULATION_ID, null, 1L));
+    streamService.listenAttackPathVersion(new AttackPathVersionEvent(SIMULATION_ID, null, 1L));
 
     // Assert
     verify(sink, never()).next(any());
@@ -812,7 +864,7 @@ public class StreamApiTest {
     when(attackPathAccessControl.canRead(mockUser, SEED_SIMULATION_ID)).thenReturn(true);
 
     // Act
-    streamApi.listenAttackPathVersion(
+    streamService.listenAttackPathVersion(
         new AttackPathVersionEvent(SEED_SIMULATION_ID, TENANT_ID, 5L));
 
     // Assert

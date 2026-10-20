@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.openaev</groupId>
         <artifactId>openaev-platform</artifactId>
-        <version>3.261013.1</version>
+        <version>3.261016.0</version>
     </parent>
 
     <artifactId>openaev-api</artifactId>
@@ -26,7 +26,7 @@
         <bucket4j.version>8.10.1</bucket4j.version>
         <opentelemetry-semconv.version>1.44.0</opentelemetry-semconv.version>
         <!-- Not managed by the Spring Boot BOM; pinned here. Apache-2.0. -->
-        <datasource-proxy.version>1.11.0</datasource-proxy.version>
+        <datasource-proxy.version>1.11.1</datasource-proxy.version>
         <!-- Server-side report rendering (headless Chromium). Apache-2.0. -->
         <playwright.version>1.63.0</playwright.version>
         <!-- Azure credential status validation. Aligned with openaev-model's azure-core-management. MIT. -->
@@ -36,7 +36,7 @@
              HttpClient for the resource probe. BSD-3-Clause. -->
         <google-auth-library.version>1.54.0</google-auth-library.version>
         <!-- AWS STS client for temporary credential handling. Apache-2.0. -->
-        <aws-sts.version>2.55.13</aws-sts.version>
+        <aws-sts.version>2.56.0</aws-sts.version>
     </properties>
 
     <profiles>
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>io.openaev</groupId>
             <artifactId>openaev-framework</artifactId>
-            <version>3.261013.1</version>
+            <version>3.261016.0</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>

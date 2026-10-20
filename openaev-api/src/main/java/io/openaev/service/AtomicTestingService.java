@@ -309,6 +309,10 @@ public class AtomicTestingService {
     // normalized recurrence expression; clearing the schedule stays allowed.
     if (recurrence != null) {
       injectService.throwIfInjectNotLaunchable(inject);
+      inject.setScheduledBy(
+          userRepository
+              .findById(currentUser().getId())
+              .orElseThrow(ElementNotFoundException::new));
     }
     inject.setRecurrence(recurrence);
     inject.setRecurrenceStart(input.getRecurrenceStart());
