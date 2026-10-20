@@ -275,6 +275,26 @@
             ],
             rebaseWhen: 'auto',
         },
+        // The local ESLint plugin only runs in development, but its rule helpers are dependencies of
+        // its package, which the batch above would take. They join the devDependencies batch, so that
+        // @typescript-eslint/utils moves in the same PR as typescript-eslint.
+        {
+            groupName: 'devDependencies (non-major)',
+            groupSlug: 'dev-dependencies-non-major',
+            description: 'Dependencies of the local ESLint plugin follow the dev dependencies batch',
+            schedule: [
+                '* * * * 0',
+            ],
+            matchFileNames: [
+                'openaev-front/packages/**',
+            ],
+            matchUpdateTypes: [
+                'minor',
+                'patch',
+                'pin',
+                'digest',
+            ],
+        },
         {
             groupName: 'back-end production dependencies (non-major)',
             groupSlug: 'back-prod-non-major',
