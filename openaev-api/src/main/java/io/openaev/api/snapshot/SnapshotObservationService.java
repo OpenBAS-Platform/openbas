@@ -1,5 +1,7 @@
 package io.openaev.api.snapshot;
 
+import static io.openaev.config.SessionHelper.currentUser;
+
 import io.openaev.annotation.Indexable;
 import io.openaev.api.snapshot.SnapshotCursorCodec.SnapshotCursor;
 import io.openaev.api.snapshot.form.AttackObservationOutput;
@@ -8,18 +10,28 @@ import io.openaev.api.snapshot.form.SnapshotSearchOutput;
 import io.openaev.api.snapshot.form.VulnerabilityObservationOutput;
 import io.openaev.config.EngineConfig;
 import io.openaev.context.TxCtx;
+import io.openaev.database.model.Capability;
 import io.openaev.database.model.IndexingStatus;
+import io.openaev.database.model.User;
+import io.openaev.database.raw.RawUserAuth;
+import io.openaev.database.raw.RawUserAuthFlat;
 import io.openaev.database.repository.AttackObservationRepository;
 import io.openaev.database.repository.IndexingStatusRepository;
+import io.openaev.database.repository.UserRepository;
 import io.openaev.database.repository.VulnerabilityObservationRepository;
 import io.openaev.engine.api.CursorPageQuery;
 import io.openaev.engine.facade.EngineService;
 import io.openaev.engine.model.EsBase;
 import io.openaev.engine.model.snapshotobservation.EsAttackObservation;
 import io.openaev.engine.model.snapshotobservation.EsVulnerabilityObservation;
+import io.openaev.engine.security.EngineReadScope;
 import io.openaev.rest.exception.BadRequestException;
+import io.openaev.rest.settings.PreviewFeature;
 import io.openaev.service.EsIndexingUtils;
+import io.openaev.service.PreviewFeatureService;
+import io.openaev.service.UserService;
 import io.openaev.service.engine.EngineReadScopeResolver;
+import io.openaev.utils.mapper.RawUserAuthMapper;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -56,7 +68,11 @@ public class SnapshotObservationService {
   private final IndexingStatusRepository indexingStatusRepository;
   private final AttackObservationRepository attackObservationRepository;
   private final VulnerabilityObservationRepository vulnerabilityObservationRepository;
+  private final UserRepository userRepository;
+  private final UserService userService;
+  private final RawUserAuthMapper rawUserAuthMapper;
   private final EngineReadScopeResolver scopeResolver;
+  private final PreviewFeatureService previewFeatureService;
   private final SnapshotCursorCodec cursorCodec;
   private final SnapshotObservationMapper mapper;
 
@@ -131,9 +147,7 @@ public class SnapshotObservationService {
     CursorPageQuery query =
         new CursorPageQuery(tenantId, input.since(), keyset, snapshotWindowEnd, size);
 
-    List<T> docs =
-        engineService.searchCursorPaged(
-            scopeResolver.resolve(TxCtx.forTenant(tenantId)), modelClass, query);
+    List<T> docs = engineService.searchCursorPaged(readScope(tenantId), modelClass, query);
 
     boolean hasMore = docs.size() == size;
     // An empty page echoes the cursor it was given, so a client can always assign next_cursor
@@ -213,6 +227,38 @@ public class SnapshotObservationService {
   @FunctionalInterface
   private interface PendingProbe {
     boolean test(String tenantId, Instant cursorTs, String cursorId, Instant upperTs);
+  }
+
+  /**
+   * The reader scope of the page. With {@link PreviewFeature#MARKING} on, the same scope as the
+   * dashboards (capabilities, grants, markings). With it off, the former grant-only filter: an
+   * unrestricted scope carrying the user whose grants the engine filters on.
+   */
+  private EngineReadScope readScope(String tenantId) {
+    if (previewFeatureService.isFeatureEnabled(PreviewFeature.MARKING)) {
+      return scopeResolver.resolve(TxCtx.forTenant(tenantId));
+    }
+    return EngineReadScope.unrestricted(grantFilter());
+  }
+
+  /**
+   * The grants the page is filtered on, or null when the caller sees every observation. Same rule
+   * as the scenario and simulation listings ({@code ScenarioService}, {@code ExerciseService}):
+   * admin, BYPASS or {@code ACCESS_ASSESSMENT} see every scenario and simulation, so every
+   * observation restricted to one of them; anyone else only sees those its grants cover, plus the
+   * unrestricted ones. Used when {@link PreviewFeature#MARKING} is off.
+   */
+  private RawUserAuth grantFilter() {
+    User user = userService.currentUser();
+    if (user.isAdminOrBypass() || user.getCapabilities().contains(Capability.ACCESS_ASSESSMENT)) {
+      return null;
+    }
+    return currentUserAuth();
+  }
+
+  private RawUserAuth currentUserAuth() {
+    List<RawUserAuthFlat> usersWithAuthFlat = userRepository.getUserWithAuth(currentUser().getId());
+    return rawUserAuthMapper.toRawUserAuth(usersWithAuthFlat);
   }
 
   private static String indexingType(Class<? extends EsBase> modelClass) {

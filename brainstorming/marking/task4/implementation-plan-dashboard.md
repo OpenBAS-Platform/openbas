@@ -1,13 +1,38 @@
 # Task 4 — Markings, grants and capabilities in dashboards: Implementation Plan (POC)
 
-**Design doc**: [`tech-design-dashboard.md`](./tech-design-dashboard.md) — Part 2 (requirements M/G/C/X)
-and Part 3 (security decided in SQL, the index filtered by ids at query time).
+**Design doc**: [`tech-design-dashboard.md`](./tech-design-dashboard.md):
+- Part 1: how RBAC works today (Option B: The editor follows the parent);
+- Part 2: how grants work today;
+- Part 3: how dashboards work today;
+- Part 4: the approach, security resolved in SQL with the filtered ids passed to Elasticsearch.
 
 **Depends on**: Task 2 (`MarkingClearanceCacheManager`), Task 3 / Task 4 (asset markings,
 `is_marking_set_allowed`), the tenant filter of the engine (`tenantFilter(TxCtx)`, #8162).
 
-**Status** (2026-10-09): steps 1–6 done on es8, step 7 partly done, steps 8–9 not started. es9 and
-OpenSearch accept the scope but ignore it until step 9 (today's behaviour, unfiltered).
+**Status** (2026-10-20):
+- **Steps 1–6:** done on es8. **Step 7** (everything behind `MARKING`): done.
+- **Step 8 (e2e matrix):** API tests partly done.
+- **Steps 9–20:** not started.
+- **es9 and OpenSearch:** they accept the scope but ignore it until steps 11–12 (today's behaviour, unfiltered).
+- **Branch `task4-poc-dashboard`:** rebased on `main` (2026-10-19) and compiles. The dashboard, engine, snapshot and coverage tests pass.
+
+**What's left**
+
+| Step | What | Blocked by |
+|---|---|---|
+| 8 | End-to-end tests: RBAC, grants, markings (matrix §4) | — |
+| 9 | Performance measurement on a main dump → SLO | — |
+| 10 | Asset labels in breakdowns ("deleted") | Soumaya: Option 1 or 2 |
+| 11 | Port to es9, dashboards and OpenGRC export | steps 8, 10 |
+| 12 | Port to OpenSearch, dashboards and OpenGRC export | steps 8, 10 |
+| 13 | Full test suite and CI on the three engines | steps 11, 12 |
+| 14 | ADR (with the SLO), user documentation, release note | step 9 |
+| 15 | Bug: atomic testing edit form shows no target without `ACCESS_ASSETS` | — |
+| 16 | Bug: "Add assets" offered without `ACCESS_ASSETS` | — |
+| 17 | Bug: embedded findings rows link to a page needing `ACCESS_FINDINGS` | — |
+| 18 | Bug: "Select dashboard" hidden for `MANAGE_ASSESSMENT` without a grant | — |
+| 19 | Bug: asset posture data checked on `ACCESS_DASHBOARDS` | — |
+| 20 | Bug: custom home dashboard needs `ACCESS_TENANT_SETTINGS` | — |
 
 ---
 
@@ -17,12 +42,15 @@ Prove the approach end to end on **one engine**, then port it.
 
 **In scope**
 
-- The three dimensions of Part 3: **capability** per indexed type, **grant** per scenario /
-  simulation / atomic testing, **marking** per asset.
+- The three dimensions of Part 4:
+  - **capability** per indexed type;
+  - **grant** per scenario, simulation or atomic testing;
+  - **marking** per asset.
+- **One rule for every dashboard read** (§4.5). A dashboard attached to a scenario's or simulation's
+  Statistics tab is filtered exactly like a custom dashboard. There is no context-dependent rule.
 - One engine: **es8** (`engine.engine-selector=elk`, the default). es9 and OpenSearch are ported once
-  the POC is validated (step 9).
+  the POC is validated (steps 11–12).
 - **Every API that reaches `EngineService`** (inventory below), so no engine read stays unfiltered.
-- Requirements targeted: **M1, M2, M3, M5, M6, M7**, **G1, G2, G4, G5**, **C1, C3**, **X3**.
 
 **Endpoints in scope.** Each also exists without the tenant prefix (`/api/…`); paths below are the
 tenant-prefixed form `/api/tenants/{tenantId}/…`.
@@ -39,22 +67,20 @@ tenant-prefixed form `/api/tenants/{tenantId}/…`.
 | `GET attack_patterns/coverage` | `AttackPatternCoverageApi` | `AttackPatternService.getGlobalCoverage` → `multiTermHistogram` |
 | `POST snapshot/{attack,vulnerability}-observations/search` (dev feature `BULK_SNAPSHOT_EXPORT`) | `SnapshotObservationApi` | `SnapshotObservationService` → `searchCursorPaged` |
 
-**Related, but not an engine read:** `GET custom-dashboards/{customDashboardId}` (and the home /
-scenario / simulation `…/dashboard` GETs) return the dashboard **definition** from SQL: its widgets
-and their configuration. The page then calls the endpoints above for the data. They need no engine
-filter, but widget filters can hold ids chosen by the author (e.g. an asset id): to check whether a
-widget configuration pointing at a hidden asset reveals anything.
+**Related, but not an engine read:** `GET custom-dashboards/{customDashboardId}` (and the home,
+scenario and simulation `…/dashboard` GETs) return the dashboard **definition** from SQL: its widgets
+and their configuration. The page then calls the endpoints above for the data. These GETs need no
+engine filter. But widget filters can hold ids chosen by the author (e.g. an asset id): still to check
+whether a widget configuration pointing at a hidden asset reveals anything.
 
-Step 6 (plumbing) and step 7 (tests) cover every row of this table.
+Step 6 (plumbing) and step 8 (tests) cover every row of this table.
 
 **Out of scope (listed, not built)**
 
-- Decisions still open with Soumaya: **M4** (multi-asset finding: strict or permissive — the POC
-  takes strict, the natural result of a deny-list), **G3** (threat arsenal), **C2** (full
-  capability table per index — the POC covers asset, finding, security platform and the
-  scenario/simulation family), **C4** (capability of the home dashboard).
-- **X1** (response field minimization) and **X2** (`base_tenant_side` in responses).
+- The decision still open with Soumaya, logged in the tech design (§4.5).
+- Field minimisation in responses, and `base_tenant_side` returned to the client.
 - Indexing: **no change**, no new field, no reindex. That is the point of the approach.
+- The REST and UI bugs found while writing the design: they get their own issues (steps 15–20).
 
 ---
 
@@ -62,12 +88,17 @@ Step 6 (plumbing) and step 7 (tests) cover every row of this table.
 
 - The security decision stays in **SQL and `PermissionService`**. The engine only receives id lists
   (types, granted ids, hidden asset ids): no copy of the rules in ES queries.
-- The scope is computed **per request**, from current data, so a marking, grant or role change
-  applies on the next request (M5, M6, G5) and the history of past simulations is covered.
-- **Fail closed**: a missing scope means "no per-user filter possible" → only the tenant filter would
-  apply, so the engine must refuse a read without a scope rather than run it unfiltered.
+- The scope is computed **per request**, from current data. A marking, grant or role change applies
+  on the next request, and the history of past simulations is covered.
+- **Fail closed**: the engine refuses a read without a scope rather than run it with the tenant filter
+  only.
+- **One rule for every dashboard** (§4.5): the scenario or simulation only decides which dashboard is
+  displayed, never what its widgets return. This also closes the parameter bug of the scenario and
+  simulation dashboards, which could otherwise read another scenario's data (flag on; with the flag off it stays as on `main`).
 - The new filters sit **next to `tenantFilter`** in `buildQuery`, the single function every read goes
-  through (`ElasticService.java:301-339`).
+  through.
+- **Everything behind `MARKING`** (step 7): with the flag off, dashboards and the OpenGRC export
+  behave exactly as on `main`.
 - The scope object lives in `openaev-model` (the engine is there); the resolver lives in
   `openaev-api` (it needs `PermissionService` and the clearance cache).
 
@@ -77,15 +108,15 @@ Step 6 (plumbing) and step 7 (tests) cover every row of this table.
 
 #### Step 1 — Failing tests first ✅ done
 
-Engine integration tests, in the style of `EngineServiceIntegrationTest` "Tenant scope (#6462)":
-index a small dataset (two scenarios S1/S2 with a simulation each, an unmarked asset, an asset marked
-`TLP:RED`, findings and expectations on both) and query it through `EngineService` as:
+Engine integration tests, in the style of `EngineServiceIntegrationTest` "Tenant scope (#6462)". They
+index a small dataset: two scenarios S1/S2 with a simulation each, an unmarked asset, an asset marked
+`TLP:RED`, and findings and expectations on both. They query it through `EngineService` as:
 
-- a `TLP:GREEN` user with every capability → nothing of `ASSET_RED` (M1, M2), parents still visible
-  without `ASSET_RED` in their "by asset" buckets (M3);
-- a user without `ACCESS_ASSESSMENT`, granted on S1 only → only S1 data (G1);
-- a user without `ACCESS_ASSETS` → no asset document, no asset label (C1);
-- an admin → everything (M7, G4).
+- a `TLP:GREEN` user with every capability: nothing of `ASSET_RED`, parents still visible without
+  `ASSET_RED` in their "by asset" buckets;
+- a user without `ACCESS_ASSESSMENT`, granted on S1 only: only S1 data;
+- a user without `ACCESS_ASSETS`: no asset document;
+- an admin: everything.
 
 **DoD**: the tests compile and fail for the expected reason (today every user sees everything).
 
@@ -98,130 +129,434 @@ each indexed type:
 |---|---|---|---|
 | `asset` | `ASSET` | `base_id` | — |
 | `security-platform` | `SECURITY_PLATFORM` | `base_id` | — |
-| `vulnerable-endpoint` | `ASSET` + `FINDING` (to confirm) | `vulnerable_endpoint_id` | `base_scenario_side` → SCENARIO, `base_simulation_side` → SIMULATION |
-| `finding` | `FINDING` | `base_endpoint_side` | scenario, simulation sides |
-| `expectation-inject` | parent (SCENARIO / SIMULATION / ATOMIC_TESTING) | `base_asset_side` | scenario, simulation sides; inject id → ATOMIC_TESTING |
-| `inject` | parent | — (targets in `base_assets_side`, stripped, step 5) | scenario, simulation sides; `base_id` → ATOMIC_TESTING |
-| `scenario` | `SCENARIO` | — (`base_assets_side` stripped) | `base_id` → SCENARIO |
-| `simulation` | `SIMULATION` | — (`base_assets_side` stripped) | `base_id` → SIMULATION, scenario side → SCENARIO |
+| `vulnerable-endpoint` | `ASSET` + `FINDING` | `vulnerable_endpoint_id` | `base_scenario_side` → SCENARIO, `base_simulation_side` → SIMULATION |
+| `finding` | `FINDING` | `base_endpoint_side` | scenario, simulation sides; `base_inject_side` → ATOMIC_TESTING |
+| `expectation-inject` | grants (bypass: `ACCESS_ASSESSMENT`) | `base_asset_side` | scenario, simulation sides; `base_inject_side` → ATOMIC_TESTING |
+| `inject` | grants (bypass: `ACCESS_ASSESSMENT`) | — (targets in `base_assets_side`, stripped, step 5) | scenario, simulation sides; `base_id` → ATOMIC_TESTING |
+| `scenario` | grants (bypass: `SCENARIO` READ) | — (`base_assets_side` stripped) | `base_id` → SCENARIO |
+| `simulation` | grants (bypass: `ACCESS_ASSESSMENT`) | — (`base_assets_side` stripped) | `base_id` → SIMULATION, scenario side → SCENARIO |
 | `asset-group`, `tag`, `team`, `domain`, `attack-pattern` | `ASSET_GROUP`, open types | — | — |
 | snapshot observations | `SNAPSHOT_OBSERVATION` | `base_asset_side` | scenario, simulation sides |
 
-Exact field names to confirm per `Es*` class while writing it.
-
-**DoD**: a unit test fails if a `Handler` bean's index is missing from the registry, or if a field
-named in it does not exist on the `Es*` class.
+**DoD**: a unit test fails if an `@Indexable` index is missing from the registry.
 
 #### Step 3 — The scope object and its resolver ✅ done
 
-- `EngineReadScope` (`openaev-model`): `unrestricted` flag (admin / BYPASS), readable `base_entity`
-  values, grant filter per index (field → allowed ids), hidden asset ids.
+- `EngineReadScope` (`openaev-model`): `unrestricted` flag (admin), readable `base_entity` values,
+  grant filters per index (field → allowed ids), hidden asset ids, and `legacyGrantUser` for the es9 /
+  OpenSearch snapshot export until they are ported.
 - `EngineReadScopeResolver` (`openaev-api`), built from the current user and the request's `TxCtx`:
   - **capability**: for each index of the registry, `PermissionService` READ on its resource type;
   - **grant**: when the capability is missing and the type is grant-managed, the user's grants of
     the matching `Grant.GRANT_RESOURCE_TYPE` (`RawUserAuth.getUser_grants()` already carries it);
-  - **marking**: `SELECT asset_id FROM assets WHERE marking_ids <> '{}' AND NOT
-    is_marking_set_allowed(marking_ids)`, run inside a transaction scoped to the user's clearance (the
-    same SQL function as the REST API);
-  - cached per (user, tenant), evicted with the clearance cache and on asset marking changes
-    (`AssetMarkingsService`).
+  - **marking**: the hidden asset ids, under the same clearance as the SQL rewrite.
+- **No cache** in the POC: the scope is resolved on every call. Caching is a step 9 decision,
+  driven by the measurements.
 
-**DoD**: unit tests per dimension (admin, BYPASS, `ACCESS_ASSESSMENT`, grant-only, no capability,
-`TLP:GREEN` vs `TLP:RED`); an asset re-marked RED appears in the hidden list on the next call.
+**DoD**: unit tests per dimension (admin, `ACCESS_ASSESSMENT`, grant-only, no capability, fail
+closed); an asset re-marked RED appears in the hidden list on the next call.
 
 #### Step 4 — Filters in `buildQuery` (es8) ✅ done
 
 Next to `tenantFilter(ctx)`:
 
-1. **capability**: `terms(base_entity, readable types)`;
+1. **capability**: one clause per readable type;
 2. **grant**: per grant-managed index, `(base_entity = X AND grant-key ∈ allowed ids) OR …`;
 3. **marking**: `must_not terms(<asset field of X>, hidden ids)`, per index.
 
-`buildQuery` refuses a missing scope (fail closed). Delete the commented-out `buildQueryRestrictions`
-call and its "issue/3768" TODO.
+`buildQuery` refuses a missing scope (fail closed). The commented-out `buildQueryRestrictions` call
+and its "issue/3768" TODO are gone from es8.
 
-**DoD**: step 1's document-level tests pass (M1, M2, G1, G2, C1, M7, G4).
+**DoD**: step 1's document-level tests pass.
 
 #### Step 5 — Buckets, labels and returned documents ✅ done
+
+A **bucket** is one group of an Elasticsearch aggregation, i.e. one bar or slice of a chart. In a
+"scenarios broken down by asset" widget there is one bucket per asset: its key is the asset id,
+its count the number of documents; the label shown (the asset name) is resolved afterwards.
 
 What `buildQuery` does not cover:
 
 - **aggregations** on asset-id fields (`base_assets_side`, `base_asset_side`, `base_endpoint_side`…):
   `exclude: <hidden ids>` on the terms aggregation;
-- **labels**: `resolveIdsRepresentative` goes through `buildQuery`, so hidden assets do not resolve —
-  check that the bucket itself is gone (previous point), not only its label;
-- **returned documents**: strip hidden asset ids from every `*_side` array of `entities` results.
+- **labels**: `resolveIdsRepresentative` goes through `buildQuery`, so hidden assets do not resolve;
+- **returned documents**: hidden asset ids stripped from every `*_side` array of `entities` results.
 
-**DoD**: step 1's M3 test passes: a scenario targeting `ASSET_GREEN` and `ASSET_RED` shows only
-`ASSET_GREEN` in its "by asset" breakdown and in its returned `base_assets_side`.
+**Known gap**: for a user without `ACCESS_ASSETS`, the asset names of a breakdown do not resolve and
+the bars are labelled **"deleted"** (§4.5). Fixed in step 10, once Soumaya picks Option 1 or 2.
+
+**DoD**: a scenario targeting `ASSET_GREEN` and `ASSET_RED` shows only `ASSET_GREEN` in its "by
+asset" breakdown and in its returned `base_assets_side`.
 
 #### Step 6 — Plumbing the scope to every caller ✅ done
 
-`EngineService` methods take the scope (or replace `RawUserAuth` by it). Callers to update:
-`DashboardService` (stored widgets, ad-hoc), `CustomDashboardService` / `CustomDashboardTenantService`
-(home, scenario and simulation dashboards), `EsAttackPathService`, `AttackPatternService` (coverage),
-`SnapshotObservationService` (its own `grantFilter` replaced by the resolver): every row of the
-endpoint table in §1.
+`EngineService` read methods take an `EngineReadScope` instead of `RawUserAuth`. Callers:
+`DashboardService` (stored widgets, ad-hoc, search, attack paths), `CustomDashboardService` /
+`CustomDashboardTenantService` (home, scenario and simulation dashboards), `AttackPatternService`
+(coverage), `SnapshotObservationService` (its own `grantFilter` replaced by the resolver).
 
-**DoD**: no `EngineService` read is callable without a scope (compile-time); existing dashboard,
+**DoD**: no `EngineService` read is callable without a scope (compile time); existing dashboard,
 coverage and snapshot tests still pass.
 
-#### Step 7 — Dashboard API tests and the two-browser check 🟡 partly done
+#### Step 7 — Everything behind the `MARKING` feature flag ✅ done (2026-10-20)
 
-- API-level tests, same users as step 1, on at least one endpoint per row of the §1 table
-  (stored widget, ad-hoc, home, scenario and simulation dashboards, attack paths, search, coverage,
-  snapshot export).
-- Manual check, as in Chunk 2: a `TLP:GREEN` user and an admin side by side; the admin marks an
-  asset RED → the GREEN user's widgets and `/adhoc` responses drop it on the next refresh; the admin
-  removes the GREEN user's grant on S1 → S1 disappears on the next refresh.
+**Decided** (2026-10-20): the whole dashboard filter is behind `MARKING`, not only the markings. The
+PR cannot be merged on `main` unless the flag-off path behaves exactly as `main`.
 
-**DoD**: tests green; manual check recorded here with its date.
+Before this step only the **marking** part followed the flag (`MarkingFilteringConfig` returns
+`MarkedTables.EMPTY` when `MARKING` is off); the **capability** and **grant** parts applied to every
+user, and es8 had lost `main`'s grant filter of the OpenGRC snapshot export.
 
-#### Step 8 — Performance check 🔴 not started
+| Where | Flag off: exactly `main` | Flag on: the POC |
+|---|---|---|
+| `EngineReadScopeResolver.resolve` | returns `EngineReadScope.unrestricted(null)` right away: no reader filter, no SQL | capabilities, grants, markings (steps 1–6) |
+| `SnapshotObservationService` (OpenGRC export) | `main`'s `grantFilter()` / `currentUserAuth()`, kept as is, passed as `EngineReadScope.unrestricted(grantFilter())` | `scopeResolver.resolve(ctx)` |
+| es8 `searchCursorPaged` | `main`'s `buildQueryRestrictions(scope.legacyGrantUser())`, kept as is, applied when the scope is unrestricted and carries a legacy user (es9 and OpenSearch already work this way) | the reader filter |
+| es8 dashboards (`buildQuery`, aggregations, labels, stripping) | nothing to change: an unrestricted scope adds no clause, no `exclude`, and stripping is a no-op | unchanged |
+| es9 / OpenSearch | unchanged (already `main`'s behaviour) | unchanged until steps 11–12 |
 
-On a restored main-environment dump: dashboard response times with and without the scope (home
-dashboard, a large simulation dashboard, an expectation list), and the size of the hidden-asset list.
+The flag is read with `PreviewFeatureService.isFeatureEnabled(MARKING)` (cached, `MARKING` or `*` in
+`openaev.enabled-dev-features`).
 
-**DoD**: numbers recorded here; deny-list threshold decided (above it, fail closed for asset types).
+**Effort: about 1 day (S).**
 
-#### Step 9 — Port to es9 and OpenSearch 🔴 not started
+| Task | Size |
+|---|---|
+| Flag check in the resolver | ~10 lines |
+| `main`'s `grantFilter` back in `SnapshotObservationService`, behind the flag | ~30 lines, from `main` |
+| `main`'s `buildQueryRestrictions` back in es8, for the legacy user | ~40 lines, from `main` |
+| Resolver unit tests: flag off → unrestricted | 1–2 tests |
+| `SnapshotObservationServiceTest`: `main`'s "Grant filter" tests back as a flag-off group, the POC test as the flag-on group | restore + regroup |
+| One integration class with the flag off (`@TestPropertySource(properties = "openaev.enabled-dev-features=")`, own Spring context): a role with only `ACCESS_DASHBOARDS` sees assets as on `main`, the resolver returns an unrestricted scope | 1 class |
+| Targeted runs in both modes, spotless | ~1 h |
 
-Same filters, buckets and stripping in `es9/ElasticService` and `os3/OpenSearchService`; run step 1's
-tests against each engine.
+**Risks.** "Exactly `main`" must be proven by tests, not assumed. The flag-off class adds one Spring
+context (a minute or two of CI).
 
-**DoD**: the three engines pass the same tests.
+**Built** (2026-10-20):
+- `EngineReadScopeResolver.resolve`: returns `EngineReadScope.unrestricted(null)` when `MARKING` is
+  off, before any user, permission or SQL lookup.
+- `SnapshotObservationService`: `main`'s `grantFilter()` / `currentUserAuth()` back, used when
+  `MARKING` is off (`readScope(tenantId)`).
+- es8 `ElasticService`: `main`'s `buildQueryRestrictions` back, applied by `searchCursorPaged` to an
+  unrestricted scope carrying a legacy user.
+- Tests:
+  - `EngineReadScopeResolverTest`: flag off → unrestricted, no user lookup;
+  - `SnapshotObservationServiceTest`: `main`'s "Grant filter" tests back, as the flag-off group;
+  - `CursorPagedSearchTest`: `main`'s three restriction tests back, as the flag-off group, on real
+    Elasticsearch;
+  - new `DashboardMarkingFeatureOffTest` (own Spring context, `openaev.enabled-dev-features=` empty):
+    a reader with `ACCESS_DASHBOARDS` only finds an endpoint through the search, as on `main`.
+- Run in a worktree: 318 dashboard, engine, snapshot and attack-pattern tests, all green.
+
+**DoD**:
+- with the flag **off**, `main`'s expectations hold, including `DashboardSearchApiTest`'s original
+  role (`ACCESS_DASHBOARDS` only) and `main`'s snapshot "Grant filter" tests;
+- with the flag **on** (the test default, `openaev.enabled-dev-features=MARKING`), the §4 matrix and
+  the POC tests pass.
+
+#### Step 8 — End-to-end tests: RBAC, grants, markings 🟡 API tests partly done
+
+Through the real endpoints (API integration tests), plus a Playwright pass in `tests_e2e/` on the
+custom dashboard, the Statistics tab and an asset page. The matrix is in §6.
+
+- **RBAC (capabilities)**: rows R1–R7.
+- **Grants**: rows G1–G7.
+- **Markings**: rows M1–M7.
+- **Across the three**: rows X1–X3.
+- Manual two-browser check, as in Chunk 2 of `implementation-plan.md`: an admin and a `TLP:GREEN`
+  user side by side. The admin marks an asset RED, then removes the user's grant on S1. Each change
+  shows on the user's next refresh.
+
+**DoD**: every row of §4 green on es8; manual check recorded here with its date.
+
+#### Step 9 — Performance measurement 🔴 not started
+
+Following §4.7 of the design.
+
+- **Data**: a restored **main-environment dump** (the `dev-db-restore` procedure), reindexed, plus the
+  generated small / medium / large profiles of §4.7.
+- **Readers**: admin (baseline, equal to `main`), a user with every capability and hidden assets, and a
+  grant-only user with hidden assets (worst case).
+- **Measures**:
+  - scope build time (user load, hidden-assets query, `EXPLAIN ANALYZE`);
+  - Elasticsearch `took` and `profile` on one widget;
+  - endpoint p50 / p95, for a 10-widget dashboard with 1 and 20 concurrent users;
+  - Elasticsearch query-cache hit rate and heap;
+  - the size of the grant and hidden-asset lists.
+- Add `@LogExecutionTime` to the dashboard endpoints first (the convention requires it; they lack
+  it).
+
+**AC**:
+- the numbers are recorded here, per profile and per reader, against the admin baseline;
+- they are turned into an **SLO** (e.g. widget p95 within X % of the baseline on the medium
+  profile), written in the dashboard ADR (step 14);
+- the threshold above which a list fails closed (`terms` limit) is decided;
+- if the SLO is missed, the mitigations of §4.7 are planned: scope cache per (user, tenant), an
+  indexable hidden-assets query, shorter grant lists.
+
+#### Step 10 — Asset labels in breakdowns 🔴 waiting for Soumaya
+
+Implement the option chosen in §4.5. **Option 1**: resolve the asset names with the tenant filter and
+the hidden asset ids only, not the `ASSET` capability (consistent with Option B: The editor follows
+the parent). **Option 2**: label unresolved bars "restricted" and keep "deleted" for assets that are
+really deleted.
+
+**DoD**: row R2 of §4 green with the chosen label; never "deleted" for an existing asset.
+
+#### Step 11 — Port to es9 (dashboards and OpenGRC export) 🔴 not started
+
+- Dashboards: same filters, buckets, labels and stripping in `es9/ElasticService` as in es8 (steps
+  4–5).
+- Tests: remove `@DisabledIfEnvironmentVariable(named = "ENGINE_ENGINESELECTOR", ...)` from
+  `EngineReadScopeIntegrationTest` and the flag-on "restrictions" group of `CursorPagedSearchTest`
+  once both engines are ported (they skip es9 and OpenSearch in the nightly until then).
+- OpenGRC snapshot export: `searchCursorPaged` still applies the former grant-only filter
+  (`buildQueryRestrictions(scope.legacyGrantUser())`, no marking). Replace it with the reader filter,
+  as es8 does since step 6.
+
+**DoD**: step 1's engine tests, `SnapshotObservationServiceTest` and the §4 matrix pass with
+`engine.engine-selector=elk9`.
+
+#### Step 12 — Port to OpenSearch (dashboards and OpenGRC export) 🔴 not started
+
+- Same as step 11, in `os3/OpenSearchService`.
+- Once es9 and OpenSearch are both ported: delete `EngineReadScope.legacyGrantUser` and the last
+  `buildQueryRestrictions`.
+
+**DoD**: step 1's engine tests, `SnapshotObservationServiceTest` and the §4 matrix pass with
+`engine.engine-selector=opensearch`; no `legacyGrantUser` left.
+
+#### Step 13 — Full test suite and CI 🔴 not started
+
+- Run the full backend suite (about 3 h locally) and the CI pipeline.
+- Fix the existing tests that relied on dashboards ignoring permissions. Like `DashboardSearchApiTest`,
+  a role with only `ACCESS_DASHBOARDS` no longer sees assets.
+
+**DoD**: CI green on the three engines.
+
+#### Step 14 — ADR and documentation 🔴 not started
+
+- **ADR**: dashboards filtered by capability, grant and marking, with security resolved in SQL and
+  ids passed to Elasticsearch. It records the one-rule decision (§4.5), the sync-lag analysis (§4.6)
+  and the SLO from step 9.
+- **User documentation** (`docs/`) and **release note**: this is a behaviour change. Users who only
+  hold `ACCESS_DASHBOARDS` will see less than today: no assets without `ACCESS_ASSETS`, no findings
+  without `ACCESS_FINDINGS`, only their granted scenarios without `ACCESS_ASSESSMENT`, no data of
+  assets above their clearance. The OpenGRC snapshot export changes the same way: it now also hides the
+  observations of assets above the caller's clearance (observations copy `asset_name` and
+  `asset_hostname`, so the whole observation is excluded). Confirm with the OpenGRC side which user
+  the export runs as, and that its role holds `SNAPSHOT_OBSERVATION` (and `ACCESS_ASSESSMENT` if it
+  must see every scenario).
+
+#### Steps 15–20 — Related bugs, one GitHub issue each 🔴 not started
+
+Found while writing the design, not fixed by this plan. Each step below is ready to paste into the
+**Bug report** issue template (`.github/ISSUE_TEMPLATE/1-bug_report.md`, labels `needs triage`,
+`bug`). Common environment for all of them:
+
+- **OS**: any (seen on macOS, local dev).
+- **Version**: `main` at `3c68cbd53` (2026-10-20); unrelated to the `MARKING` preview feature.
+- **Users**: a non-admin user, for example **Amber** (group `Manager`), whose role is edited as each
+  step says.
+
+#### Step 15 — `fix(atomic-testing): edit form shows no target asset without ACCESS_ASSETS`
+
+**Description.** In an atomic testing, the detail view lists the target assets through the atomic
+testing's own permission, but the edit form loads them from the asset catalogue, which needs
+`ACCESS_ASSETS`. A user allowed to read and edit the atomic testing sees and edits no target.
+Scenarios and simulations do not have the bug: their forms use endpoints scoped to the parent.
+
+**Reproducible steps**
+1. Edit the role `Manager`: remove `ACCESS_ASSETS`, `MANAGE_ASSETS`, `DELETE_ASSETS`; keep
+   `ACCESS_ASSESSMENT` and `MANAGE_ASSESSMENT`.
+2. As an admin, create an atomic testing targeting an endpoint `E1`.
+3. Log in as Amber and open the atomic testing: `E1` is listed in its targets.
+4. Open the atomic testing's edit form, Targets section.
+
+**Expected output.** `E1` is listed, and can be removed (as in a scenario or a simulation).
+
+**Actual output.** No asset is listed. DevTools: `POST /api/endpoints/find` → `403`.
+
+**Additional information.**
+- `EndpointContextForAtomicTesting.ts` calls the global `findEndpoints` / `findAssetGroups`;
+  `EndpointContextForScenario.ts` / `EndpointContextForExercise.ts` call
+  `/api/scenarios/{id}/endpoints/find` / `/api/exercises/{id}/endpoints/find`, checked on the parent.
+- Fix: add `/api/atomic-testings/{id}/endpoints/find` and `/asset-groups/find`, checked on
+  `ATOMIC_TESTING` READ and limited to the assets the inject references; point the atomic-testing
+  context at them. Size S.
+- Design: `tech-design-dashboard.md` §1.1–1.3.
+
+#### Step 16 — `fix(injects): "Add assets" offered without ACCESS_ASSETS`
+
+**Description.** The "Add" button of an inject's targets opens the asset picker, which searches the
+asset catalogue (`ACCESS_ASSETS`). It is shown to users without that capability, in scenarios,
+simulations and atomic testings, and opens an empty picker.
+
+**Reproducible steps**
+1. Same role as step 15 (no `ACCESS_ASSETS`, `MANAGE_ASSESSMENT` kept).
+2. Log in as Amber, open a scenario, edit one of its injects, Targets section.
+3. Click "Add assets" (or "Add asset groups").
+
+**Expected output.** The button is hidden or disabled without `ACCESS_ASSETS`.
+
+**Actual output.** An empty picker opens. DevTools: `POST /api/endpoints/search` → `403`.
+
+**Additional information.** `InjectAddEndpoints.tsx` and `InjectAddAssetGroups.tsx` have no ability
+check; gate them with `ability.can(ACTIONS.ACCESS, SUBJECTS.ASSETS)`. Size XS.
+
+#### Step 17 — `fix(findings): embedded findings rows link to a page the user cannot open`
+
+**Description.** The Findings tab of a scenario, simulation or atomic testing lists findings through
+the parent's permission, but every row links to the finding detail page, which needs
+`ACCESS_FINDINGS`.
+
+**Reproducible steps**
+1. Edit the role `Manager`: remove `ACCESS_FINDINGS`; keep `ACCESS_ASSESSMENT`.
+2. As an admin, run a simulation that produces findings.
+3. Log in as Amber, open the simulation, Findings tab: the findings are listed.
+4. Click a finding.
+
+**Expected output.** Without `ACCESS_FINDINGS`, the rows are not links (or the link is disabled).
+
+**Actual output.** The browser goes to `/admin/findings/{findingId}` and the page is refused (route
+guarded by `ACCESS_FINDINGS`; `GET /api/findings/{id}` → `403`).
+
+**Additional information.** `FindingList.tsx:244` (row `Link`); route `findings/:findingId` in
+`admin/Index.tsx` (`ProtectedRoute` on `ACCESS_FINDINGS`). Size XS.
+
+#### Step 18 — `fix(dashboards): "Select dashboard" hidden for MANAGE_ASSESSMENT without a grant`
+
+**Description.** In the Statistics tab of a scenario or simulation, "Select dashboard" only checks a
+grant on the resource. A user who can manage every scenario through `MANAGE_ASSESSMENT` does not see
+it, although the backend accepts the change.
+
+**Reproducible steps**
+1. Give a role `MANAGE_ASSESSMENT` and `ACCESS_DASHBOARDS`, and no grant on scenario `S1`.
+2. Log in as that user, open `S1`, Statistics tab.
+
+**Expected output.** "Select dashboard" is shown, as for a user with a PLANNER grant on `S1`.
+
+**Actual output.** The button is not shown. Yet `PUT /api/scenarios/{S1}` with
+`scenario_custom_dashboard` succeeds for this user (`SCENARIO` WRITE through the capability).
+
+**Additional information.** `ScenarioAnalysis.tsx:141,158` and `SimulationAnalysis.tsx:98,115` use
+`ability.can(MANAGE, RESOURCE, id)` alone; use `useScenarioPermissions` /
+`useSimulationPermissions` (`canManage` = grant OR capability). Size XS. Design: §2.5.
+
+#### Step 19 — `fix(assets): asset posture data checked on ACCESS_DASHBOARDS instead of ACCESS_ASSETS`
+
+**Description.** The asset pages (detail, asset group detail, posture score column of the lists,
+security platform detail) load their posture and statistics through
+`POST /api/dashboards/adhoc/series`, checked on `ACCESS_DASHBOARDS`. One screen then needs two
+capabilities, and the asset data is reachable without the asset capability.
+
+**Reproducible steps**
+1. Role A: `ACCESS_ASSETS` without `ACCESS_DASHBOARDS`. Log in, open an endpoint's detail page,
+   then its Statistics tab.
+2. Role B: `ACCESS_DASHBOARDS` without `ACCESS_ASSETS`. As an admin, copy from DevTools the body of
+   the `POST /api/dashboards/adhoc/series` call made by step 1's page; send it as role B.
+
+**Expected output.** Role A sees the posture score and the charts; role B gets a `403`.
+
+**Actual output.** Role A: posture score and charts empty, `adhoc/series` → `403`. Role B: `200`
+with the asset's posture data.
+
+**Additional information.** `useExpectationPosture` (`AssetDetail.tsx:136`),
+`PostureScoreOverTimeChart` / `InjectsPlayedOverTimeChart` (`AssetDetail.tsx:258-262`),
+`usePostureScores` (`Endpoints.tsx:138`).
+- **Do not restrict `/adhoc/series` itself**: the default home page (`DefaultHomeDashboard.tsx:70,
+  166`) uses it for every user with `ACCESS_DASHBOARDS`, assets or not, and the security platform
+  page is reached with `ACCESS_SECURITY_PLATFORMS`, not `ACCESS_ASSETS`.
+- Fix: posture endpoints scoped to the resource, which build the widget configuration server-side
+  (the browser no longer chooses index and filters): endpoint and asset group checked on `ASSET` /
+  `ASSET_GROUP` READ, security platform on `SECURITY_PLATFORM` READ, plus one bulk call for the list
+  columns. The asset pages then stop calling `/adhoc`. Size S.
+- With `MARKING` on, the dashboard reader filter already limits role B's response to the
+  expectations it may read (`ACCESS_ASSESSMENT` or a grant); role A's 403 remains.
+
+Design: §3.1.
+
+#### Step 20 — `fix(dashboard): custom home dashboard widgets need ACCESS_TENANT_SETTINGS`
+
+**Description.** Follow-up of
+[OpenAEV-Platform/openaev#8367](https://github.com/OpenAEV-Platform/openaev/issues/8367): the
+`/adhoc` endpoints of the default home dashboard now check `ACCESS_DASHBOARDS`, but a tenant's
+**custom** home dashboard is still served by `TenantSettingsApi`
+(`/api/tenants/{tenantId}/tenant-settings/home-dashboard/{count,average,series,entities,entities-runtime,attack-paths}/{widgetId}`),
+checked on `TENANT_SETTING` READ, i.e. `ACCESS_TENANT_SETTINGS`, an administration capability.
+
+**Reproducible steps**
+1. As an admin, set a custom dashboard as the tenant's home dashboard.
+2. Log in as a user whose role has `ACCESS_DASHBOARDS` but not `ACCESS_TENANT_SETTINGS`.
+3. Open the home page.
+
+**Expected output.** The widgets load, as on the default home dashboard.
+
+**Actual output.** The widgets stay empty; `POST /api/tenants/{tenantId}/tenant-settings/home-dashboard/entities/{widgetId}` →
+`403`.
+
+**Additional information.** `TenantSettingsApi.java` (`@AccessControl(READ, TENANT_SETTING)` on the
+six `home-dashboard/*` data endpoints); same change as [OpenAEV-Platform/openaev#8368](https://github.com/OpenAEV-Platform/openaev/pull/8368). Size XS.
 
 ---
 
-## 4) Open questions (to close with Soumaya, see Part 2)
+## 4) End-to-end test matrix
 
-- **M4**: multi-asset findings, strict (POC default) or permissive.
-- **G3**: are threat arsenal data shown in dashboards, and under which grant?
-- **C2**: the capability required by each index (step 2's table is the proposal).
-- **C4**: which capability opens the home dashboard and the `/adhoc` screens (separate GitHub issue).
-- **X1 / X2**: field minimization and tenant id in responses, now or later.
+**Data**: tenant T, scenarios `S1` and `S2` with one simulation each, atomic testing `AT1`, assets
+`A-GREEN` (`TLP:GREEN`), `A-AMBER` (`TLP:AMBER`), `A-RED` (`TLP:RED`). Each scenario targets the three
+assets, with findings and expectations on each asset. One finding is on both `A-GREEN` and `A-RED`.
 
----
+**Users**
 
-## 5) What was built (2026-10-09)
+| User | Role capabilities | Grants | Clearance |
+|---|---|---|---|
+| `admin` | admin | — | all |
+| `full-green` | every capability | — | `TLP:GREEN` |
+| `amber` (§1.1, §4.5) | Manager without `ACCESS_ASSETS` | — (has `ACCESS_ASSESSMENT`) | `TLP:AMBER` |
+| `granted` | `ACCESS_DASHBOARDS`, `ACCESS_ASSETS`, `ACCESS_FINDINGS`, no `ACCESS_ASSESSMENT` | OBSERVER on `S1` | `TLP:GREEN` |
+| `dash-only` | `ACCESS_DASHBOARDS` only | — | `TLP:GREEN` |
 
-- `openaev-model`: `engine/security/EngineReadScope` (the scope, plus `stripHiddenAssets`),
-  `engine/security/EngineSecurityRegistry` (15 indexed types: capability, grant keys, asset fields).
-  `EngineService` read methods take an `EngineReadScope` instead of `RawUserAuth`. es8 applies it in
-  `buildQuery` (`readerFilter`), excludes hidden assets from "by asset" aggregations, strips them
-  from returned documents, and applies the same filter to the snapshot export; a read without a scope
-  is refused. The dead `buildQueryRestrictions` is gone from es8.
-- `openaev-api`: `service/engine/EngineReadScopeResolver` (capabilities through `PermissionService`,
-  grants from `RawUserAuth`, hidden assets from the same clearance as the SQL rewrite, per request,
-  no cache). Callers: `DashboardService` (stored widgets, ad-hoc, search, attack paths),
-  `AttackPatternService` (coverage), `SnapshotObservationService` (its `grantFilter` removed).
-- Rule decided while building: a document linked to **no** grant-managed resource (none of its
-  grant-key fields set) is not grant-filtered, as before (`must_not exists base_restrictions`).
-- Tests: `EngineSecurityRegistryTest` (2), `EngineReadScopeResolverTest` (8),
-  `EngineReadScopeIntegrationTest` (9, real Elasticsearch). Existing dashboard / engine / snapshot /
-  coverage tests: 281 run, all green after one fix — `DashboardSearchApiTest` searched endpoints
-  with a role holding only `ACCESS_DASHBOARDS`; its role now also has `ACCESS_ASSETS` (the leak C1
-  closes).
-- Not done: the two-browser manual check (step 7), performance on a dump (step 8), es9 / OpenSearch
-  (step 9), the full test suite.
+**RBAC (capabilities)**
 
+| # | User | Where | Expected |
+|---|---|---|---|
+| R1 | `dash-only` | custom dashboard, "Endpoints" list widget | no asset |
+| R2 | `amber` | custom dashboard, scenarios broken down by asset | bars for `A-GREEN` and `A-AMBER`; label per step 10, never "deleted" |
+| R3 | `dash-only` | custom dashboard, "Findings" list widget | no finding |
+| R4 | `dash-only` | full-text search on `A-GREEN`'s hostname | no hit |
+| R5 | `amber` | `S1` Statistics tab with an asset dashboard attached | same result as R2: the tab does not widen what the dashboard shows |
+| R6 | `full-green` | every widget of the dashboard | same as `admin`, minus `A-AMBER` and `A-RED` |
+| R7 | `admin` | every widget | everything (baseline, equal to `main`) |
+
+**Grants**
+
+| # | User | Where | Expected |
+|---|---|---|---|
+| G1 | `granted` | scenarios widget | `S1` only |
+| G2 | `granted` | simulations, injects, expectations, findings widgets | `S1`'s data only |
+| G3 | `granted` | `S1` Statistics tab, `simulation` parameter changed to `S2`'s simulation | nothing of `S2` |
+| G4 | `granted` | atomic testings widget | nothing (no grant on `AT1`); `AT1` appears once granted |
+| G5 | `granted` | after the admin removes the grant on `S1` | `S1` gone on the next refresh |
+| G6 | `granted` | a new simulation of `S1`, created after the grant | visible (grant copied at creation, Part 2) |
+| G7 | `amber` | scenarios widget | `S1` and `S2` (`ACCESS_ASSESSMENT`, no grant needed) |
+
+**Markings**
+
+| # | User | Where | Expected |
+|---|---|---|---|
+| M1 | `full-green` | endpoints list, breakdown by asset, findings, expectations, vulnerable endpoints, attack paths, search | no `A-AMBER` or `A-RED` anywhere, counts included |
+| M2 | `amber` | the same widgets | `A-GREEN` and `A-AMBER`, never `A-RED` |
+| M3 | `full-green` | inject and scenario documents targeting the three assets | the inject is visible; `A-AMBER` and `A-RED` are stripped from its targets |
+| M4 | `full-green` | after the admin marks `A-GREEN` as `TLP:RED` | `A-GREEN` and its history gone on the next refresh |
+| M5 | `full-green` | after the admin gives the user's group `TLP:RED` | `A-RED` appears on the next refresh |
+| M6 | `full-green` | the finding on `A-GREEN` and `A-RED` | hidden: the POC is strict, a finding with one hidden asset is excluded (the REST API is permissive) |
+| M7 | `full-green` | OpenGRC snapshot export (`BULK_SNAPSHOT_EXPORT`) | no observation of `A-AMBER` or `A-RED`; only granted scenarios for a caller without `ACCESS_ASSESSMENT` |
+
+**Across the three**
+
+| # | User | Where | Expected |
+|---|---|---|---|
+| X1 | `granted` | `S1` findings count: REST findings tab vs dashboard widget | same number |
+| X2 | `amber` | default home dashboard (`/adhoc`) | filtered like R2 and M2 |
+| X3 | every user | the same widget on es8, es9 and OpenSearch (steps 11–12) | identical results |

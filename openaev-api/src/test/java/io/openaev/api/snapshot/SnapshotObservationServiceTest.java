@@ -4,8 +4,10 @@ import static io.openaev.api.snapshot.SnapshotObservationService.DEFAULT_PAGE_SI
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,17 +18,25 @@ import io.openaev.api.snapshot.form.SnapshotSearchInput;
 import io.openaev.api.snapshot.form.SnapshotSearchOutput;
 import io.openaev.config.EngineConfig;
 import io.openaev.context.TxCtx;
+import io.openaev.database.model.Capability;
 import io.openaev.database.model.IndexingStatus;
+import io.openaev.database.model.User;
+import io.openaev.database.raw.RawUserAuth;
 import io.openaev.database.repository.AttackObservationRepository;
 import io.openaev.database.repository.IndexingStatusRepository;
+import io.openaev.database.repository.UserRepository;
 import io.openaev.database.repository.VulnerabilityObservationRepository;
 import io.openaev.engine.api.CursorPageQuery;
 import io.openaev.engine.facade.EngineService;
 import io.openaev.engine.model.snapshotobservation.EsAttackObservation;
 import io.openaev.engine.security.EngineReadScope;
 import io.openaev.rest.exception.BadRequestException;
+import io.openaev.rest.settings.PreviewFeature;
 import io.openaev.service.EsIndexingUtils;
+import io.openaev.service.PreviewFeatureService;
+import io.openaev.service.UserService;
 import io.openaev.service.engine.EngineReadScopeResolver;
+import io.openaev.utils.mapper.RawUserAuthMapper;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -57,7 +67,12 @@ class SnapshotObservationServiceTest {
   @Mock private IndexingStatusRepository indexingStatusRepository;
   @Mock private AttackObservationRepository attackObservationRepository;
   @Mock private VulnerabilityObservationRepository vulnerabilityObservationRepository;
+  @Mock private UserRepository userRepository;
+  @Mock private UserService userService;
+  @Mock private User currentUser;
+  @Mock private RawUserAuthMapper rawUserAuthMapper;
   @Mock private EngineReadScopeResolver scopeResolver;
+  @Mock private PreviewFeatureService previewFeatureService;
 
   private SnapshotObservationService service;
   private SnapshotCursorCodec cursorCodec;
@@ -73,11 +88,19 @@ class SnapshotObservationServiceTest {
             indexingStatusRepository,
             attackObservationRepository,
             vulnerabilityObservationRepository,
+            userRepository,
+            userService,
+            rawUserAuthMapper,
             scopeResolver,
+            previewFeatureService,
             cursorCodec,
             new SnapshotObservationMapper());
-    // Lenient: the validation test throws before this is ever reached.
+    // Lenient: the validation test throws before this is ever reached. MARKING is on by default,
+    // as in the test configuration; the "Grant filter" tests turn it off.
+    lenient().when(previewFeatureService.isFeatureEnabled(PreviewFeature.MARKING)).thenReturn(true);
     lenient().when(scopeResolver.resolve(any())).thenReturn(EngineReadScope.unrestricted(null));
+    lenient().when(rawUserAuthMapper.toRawUserAuth(any())).thenReturn(mock(RawUserAuth.class));
+    lenient().when(userService.currentUser()).thenReturn(currentUser);
   }
 
   private SnapshotSearchInput input(
@@ -415,7 +438,69 @@ class SnapshotObservationServiceTest {
   }
 
   @Nested
-  @DisplayName("Reader scope")
+  @DisplayName("Grant filter, MARKING preview feature off (former behaviour)")
+  class GrantFilter {
+
+    @BeforeEach
+    void markingOff() {
+      when(previewFeatureService.isFeatureEnabled(PreviewFeature.MARKING)).thenReturn(false);
+    }
+
+    @Test
+    @DisplayName("an admin or BYPASS user sees every observation: no grant filter")
+    void given_adminOrBypass_should_notFilterOnGrants() {
+      // -- ARRANGE --
+      when(currentUser.isAdminOrBypass()).thenReturn(true);
+      givenDocuments(List.of());
+
+      // -- ACT --
+      search(input(null, null, null, null));
+
+      // -- ASSERT --
+      verify(engineService)
+          .searchCursorPaged(
+              eq(EngineReadScope.unrestricted(null)), eq(EsAttackObservation.class), any());
+    }
+
+    @Test
+    @DisplayName("ACCESS_ASSESSMENT sees every scenario and simulation: no grant filter")
+    void given_accessAssessment_should_notFilterOnGrants() {
+      // -- ARRANGE --
+      when(currentUser.getCapabilities()).thenReturn(Set.of(Capability.ACCESS_ASSESSMENT));
+      givenDocuments(List.of());
+
+      // -- ACT --
+      search(input(null, null, null, null));
+
+      // -- ASSERT --
+      verify(engineService)
+          .searchCursorPaged(
+              eq(EngineReadScope.unrestricted(null)), eq(EsAttackObservation.class), any());
+    }
+
+    @Test
+    @DisplayName("any other user is filtered on its own grants")
+    void given_userWithoutAssessmentCapability_should_filterOnItsGrants() {
+      // -- ARRANGE --
+      when(currentUser.getCapabilities())
+          .thenReturn(Set.of(Capability.ACCESS_SNAPSHOT_OBSERVATION));
+      givenDocuments(List.of());
+
+      // -- ACT --
+      search(input(null, null, null, null));
+
+      // -- ASSERT --
+      verify(engineService)
+          .searchCursorPaged(
+              argThat(scope -> scope.unrestricted() && scope.legacyGrantUser() != null),
+              eq(EsAttackObservation.class),
+              any());
+      verify(scopeResolver, never()).resolve(any());
+    }
+  }
+
+  @Nested
+  @DisplayName("Reader scope, MARKING preview feature on")
   class ReaderScope {
 
     @Test

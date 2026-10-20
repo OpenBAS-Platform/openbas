@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import io.openaev.config.MarkedTables;
@@ -17,7 +18,9 @@ import io.openaev.database.raw.RawGrant;
 import io.openaev.database.raw.RawUserAuth;
 import io.openaev.database.repository.UserRepository;
 import io.openaev.engine.security.EngineReadScope;
+import io.openaev.rest.settings.PreviewFeature;
 import io.openaev.service.PermissionService;
+import io.openaev.service.PreviewFeatureService;
 import io.openaev.service.UserService;
 import io.openaev.utils.mapper.RawUserAuthMapper;
 import java.util.List;
@@ -34,6 +37,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 /**
  * How the reader scope is resolved from the source of truth. The marking lookup itself is covered
  * against real rows by the dashboard API tests; here markings are off ({@code assets} not active).
+ * The {@code MARKING} preview feature is on unless a test says otherwise.
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Engine read scope resolution")
@@ -47,6 +51,7 @@ class EngineReadScopeResolverTest {
   @Mock private RawUserAuthMapper rawUserAuthMapper;
   @Mock private MarkingScopeSupplier markingScopeSupplier;
   @Mock private JdbcTemplate jdbcTemplate;
+  @Mock private PreviewFeatureService previewFeatureService;
   @Mock private User user;
   @Mock private RawUserAuth auth;
 
@@ -62,8 +67,10 @@ class EngineReadScopeResolverTest {
             rawUserAuthMapper,
             markingScopeSupplier,
             MarkedTables.EMPTY,
-            jdbcTemplate);
-    when(userService.currentUser()).thenReturn(user);
+            jdbcTemplate,
+            previewFeatureService);
+    lenient().when(previewFeatureService.isFeatureEnabled(PreviewFeature.MARKING)).thenReturn(true);
+    lenient().when(userService.currentUser()).thenReturn(user);
     lenient().when(user.getId()).thenReturn("user-1");
     lenient().when(rawUserAuthMapper.toRawUserAuth(any())).thenReturn(auth);
     lenient().when(auth.getUser_grants()).thenReturn(Set.of());
@@ -81,6 +88,20 @@ class EngineReadScopeResolverTest {
     when(grant.getGrant_resource()).thenReturn(resourceId);
     when(grant.getGrant_resource_type()).thenReturn(type);
     return grant;
+  }
+
+  @Test
+  @DisplayName("given the MARKING preview feature off, should be unrestricted for every user")
+  void given_markingFeatureOff_should_beUnrestrictedForEveryUser() {
+    // -- ARRANGE --
+    when(previewFeatureService.isFeatureEnabled(PreviewFeature.MARKING)).thenReturn(false);
+
+    // -- ACT --
+    EngineReadScope scope = resolver.resolve(CTX);
+
+    // -- ASSERT --
+    assertThat(scope).isEqualTo(EngineReadScope.unrestricted(null));
+    verifyNoInteractions(userService, permissionService, jdbcTemplate);
   }
 
   @Test

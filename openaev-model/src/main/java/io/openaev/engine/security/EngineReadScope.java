@@ -35,9 +35,10 @@ import java.util.stream.Collectors;
  * @param readableEntities {@code base_entity} values the reader may read
  * @param grantFilters per entity, the grant keys a document must match (OR)
  * @param hiddenAssetIds assets outside the reader's clearance
- * @param legacyGrantUser the reader as {@code RawUserAuth}, only for the engines not ported yet
- *     (es9, OpenSearch), whose snapshot export still applies the former grant filter; {@code null}
- *     when that export skips it
+ * @param legacyGrantUser the reader as {@code RawUserAuth}, for the former grant-only filter of the
+ *     snapshot export: applied by every engine on an unrestricted scope (the {@code MARKING}
+ *     preview feature is off), and by the engines not ported yet (es9, OpenSearch) on any scope;
+ *     {@code null} when that export skips it
  */
 public record EngineReadScope(
     boolean unrestricted,

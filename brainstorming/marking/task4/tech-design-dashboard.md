@@ -440,24 +440,6 @@ sequenceDiagram
     ENG->>ENG: stripHiddenAssets on each document
     ENG-->>B: only what this reader may see
 ```
-
-`readerFilter(scope)` builds one clause per readable type, OR-ed together. A document of a type the
-reader cannot read matches no clause, so it is excluded:
-
-```text
-bool.filter:
-  tenantFilter(ctx)                                    # unchanged since #8162
-  bool.should (minimum_should_match = 1):              # readerFilter(scope)
-    - base_entity = asset    AND NOT base_id            ∈ {A-RED}
-    - base_entity = finding  AND (base_scenario_side ∈ {S1} OR … OR no grant-key field)
-                             AND NOT base_endpoint_side ∈ {A-RED}
-    - base_entity = scenario AND (base_id ∈ {S1} OR no grant-key field)
-    - base_entity = tag                                  # open type: no condition
-    - …                                                  # one clause per readable type
-bool.must:
-  the widget's own filters (unchanged)
-```
-
 ## 4.4 The grant dimension in detail: generic, not scenario-only
 
 The only grant filter that runs today, the snapshot export (`SnapshotObservationService.grantFilter`,
@@ -499,72 +481,57 @@ Reads run on the `openaev_*` wildcard, so the per-index conditions combine as
 marking filter. A new grantable resource is then one registry entry, and `base_restrictions` can be
 retired instead of fixed handler by handler.
 
-## 4.5 Embedded dashboards: any dashboard shown inside a scenario or a simulation
+## 4.5 Embedded dashboards: assets shown in a breakdown
 
-**Status**: proposal, matches the POC as it is.
+### The use case
 
-### What the UI allows today
+- **Amber** belongs to the group `Manager`, which carries the marking `TLP:AMBER`. The role `Manager`
+  has no `ACCESS_ASSETS` (same setup as §1.1).
+- An admin creates a dashboard with a widget on **scenarios, broken down by asset**. The same
+  dashboard can be opened from Workspaces or attached to a scenario's Statistics tab: any dashboard
+  can be attached there, so the rule must not depend on where the dashboard is opened.
+- What Amber sees, with the POC:
+  - ✅ the RED asset's bar is gone: markings are applied;
+  - ✅ only the scenarios she may read (grant or `ACCESS_ASSESSMENT`);
+  - ❌ every other bar is labelled **"deleted"** instead of the asset name.
 
-- The **Statistics** tab of a scenario (or a simulation) shows `scenario_custom_dashboard`
-  (`exercise_custom_dashboard`), else the tenant default `platform_scenario_dashboard`
-  (`ScenarioAnalysis.tsx:128`).
-- A user who can manage the scenario (`canChooseDashboard = ability.can(MANAGE, RESOURCE, scenarioId)`)
-  picks **any** custom dashboard with "Select dashboard" (`SelectDashboardButton`). Nothing requires it
-  to be a scenario dashboard: it can be an asset dashboard, with an "entities" widget listing the
-  endpoints, a posture per asset…
-- Its widgets are then served by `/api/scenarios/{scenarioId}/dashboard/*` (#2 in §3.1), checked on
-  `SCENARIO` READ only.
-- The widgets are tied to the scenario **only through the dashboard parameters, filled by the
-  browser** (`paramsBuilder`, `ScenarioAnalysis.tsx:92`): a `scenario` parameter receives `scenarioId`
-  (hidden), a `simulation` parameter defaults to the last ended simulation and can be changed. A
-  widget that uses no parameter is not scoped at all.
+### Why "deleted"
 
-What a reader of scenario `S1` sees in its Statistics tab when an asset dashboard is attached:
+1. The breakdown counts the scenario data per asset **id**.
+2. The asset names are fetched in a second read, with Amber's permissions. Without `ACCESS_ASSETS`
+   she may not read assets, so no name comes back, and a bar without a name is labelled "deleted": a
+   fallback meant for an asset that really was deleted.
 
-| Widget of the attached dashboard | `main` today | Proposed: the POC rule, the same as everywhere |
-|---|---|---|
-| "Endpoints" list (endpoint index, no parameter) | the whole asset catalogue of the tenant, for anyone who reads `S1` | requires `ACCESS_ASSETS` |
-| "Findings" list | every finding of the tenant | requires `ACCESS_FINDINGS`, then the reader's grants |
-| "Expectations by asset", filtered on the `scenario` parameter | `S1`'s expectations, with the asset names | `S1`'s expectations (the reader may read `S1`); the asset names only with `ACCESS_ASSETS` |
-| "Expectations by asset", with no parameter | every expectation of the tenant | the expectations the reader may read (`ACCESS_ASSESSMENT` or a grant), as on a custom dashboard |
-| Any widget, with the `simulation` parameter changed to a simulation of scenario `S2` | `S2`'s data (🐞 §3.1) | only if the reader may read `S2` |
+### Why it is not consistent with embedded RBAC
 
-### The proposal: one rule for every dashboard
+Part 1 showed that the REST API follows Option B: The editor follows the parent: an asset embedded in
+something the user reads is shown (Amber sees the GREEN asset in an atomic testing's target list).
+Here the assets are embedded in scenarios Amber reads, yet their names are hidden. And "deleted" is
+false: the asset exists.
 
-A dashboard embedded in a scenario or a simulation is filtered **exactly like any other dashboard
-read**: capability per indexed type, then grants, then markings (§4.2 to §4.4). There is no parent
-context and no second rule: the scenario only decides **which** dashboard is displayed, never what
-its widgets may return.
+### Options
 
-- **Why.** Any dashboard can be attached to a scenario, so "embedded" says nothing about the data a
-  widget reads: an asset dashboard in a Statistics tab is still the asset catalogue. A rule that
-  depends on where the dashboard is opened would give two answers for the same widget, and would have
-  to decide, document by document, what "belongs" to the scenario.
-- **Assets are always filtered.** Without `ACCESS_ASSETS`, no asset document is returned, in an
-  embedded dashboard as on a custom one. Asset ids found in documents the reader may read
-  (an expectation's `base_asset_side`) stay, but their names are resolved through the same reader
-  filter, so they are not resolved without `ACCESS_ASSETS`.
-- **The #2 parameter bug of §3.1 closes on its own.** Every document is checked against the reader's
-  own capabilities and grants, whatever the widget parameters say: a simulation of `S2` is only
-  returned if the reader may read `S2`.
-- **Nothing to add to the POC.** `/api/scenarios/{id}/dashboard/*` and `/api/exercises/{id}/dashboard/*`
-  call the same `DashboardService` methods as custom dashboards, which already resolve the reader's
-  `EngineReadScope`. `isWidgetInResourceDashboard` stays: it only checks that the widget belongs to
-  the dashboard attached to that resource.
-- **Known difference with the REST API.** The REST API follows Option B: The editor follows the
-  parent (a simulation's target list shows its assets without `ACCESS_ASSETS`). The Statistics tab
-  does not: it is analytics over the index, filtered like the rest of the dashboards.
+**Option 1: display the name of the asset when it is used in a breakdown.** The names are resolved
+without the asset capability, but still within the tenant and the markings (a RED asset is never
+named; it has no bar anyway).
+
+- ✅ Consistent with the REST API and Option B: The editor follows the parent.
+- ✅ Small backend change, in the name lookup only.
+- ❌ A user without `ACCESS_ASSETS` reads asset names through dashboards, as through the REST API
+  today.
+
+**Option 2: rename "deleted" to "restricted" in the UI.** Names stay hidden; the bars say why.
+
+- ✅ Honest, and no asset name is shown.
+- ❌ Bars without a name are of little use.
+- ❌ Not consistent with the REST API. To keep "deleted" for assets really deleted, the lookup has to
+  tell "not found" from "not readable".
 
 > [!IMPORTANT]
 > **To decide with Soumaya**
-> - Should "Select dashboard" in a scenario or a simulation only offer dashboards that have a
->   `scenario` or `simulation` parameter? Otherwise a catalogue dashboard can be shown inside a
->   scenario: correctly filtered, but confusing.
-> - Without `ACCESS_ASSETS`, what does an asset breakdown ("expectations by asset") show? The POC
->   keeps the buckets with the raw asset id and no name; the alternative is to drop the asset buckets
->   and show "requires access to assets".
-> - Do we accept that the Statistics tab differs from the REST API on assets (Option B: The editor
->   follows the parent in the REST API, the dashboard rule in the Statistics tab)?
+> - Which option for assets in a breakdown: Option 1 (display the asset name, consistent with the
+>   RBAC implemented today, Option B: The editor follows the parent), or Option 2 (keep the names
+>   hidden, label the bars "restricted")?
 
 ## 4.6 The sync lag: what can be stale
 
@@ -594,3 +561,72 @@ The residual risk is limited to **relationships edited after creation**, for at 
 links never change once written (an expectation's asset, a document's scenario or simulation).
 Storing the security state itself in the index would instead make **every** marking, grant or role
 change wait for a re-index.
+
+## 4.7 Performance
+
+The approach adds two costs to every dashboard read: **building the id lists** (in PostgreSQL and
+Java) and **filtering with them** (in Elasticsearch). Neither has been measured yet.
+
+### 1) Building the lists
+
+| Step | What it costs | What makes it grow |
+|---|---|---|
+| Load the user with roles and grants (`getUserWithAuth`) | 1 SQL query | the number of grants of the user's groups |
+| Capability per indexed type | in memory, about 15 checks | nothing |
+| Granted ids per type | in memory, from the grants already loaded | the number of grants. Grants are **copied** to every simulation created from a granted scenario (§2.2): a user granted on one scenario run daily for a year holds about 365 simulation grants |
+| Hidden asset ids (markings) | 1 SQL query on the tenant's assets; the user's clearance itself is cached | the number of marked assets the user may not see. The `NOT (marking_ids <@ clearance)` test cannot use the GIN index on `marking_ids`, so it scans the tenant's assets |
+| How often | once per HTTP call, and a dashboard sends one call per widget | the number of widgets: a 10-widget dashboard resolves the same scope 10 times |
+
+### 2) Filtering in Elasticsearch
+
+| Step | What it costs | What makes it grow |
+|---|---|---|
+| `terms` filters on the granted ids and the hidden asset ids | cheap on keyword fields, run in filter context | the size of the lists. Elasticsearch refuses a `terms` query above 65 536 values (`index.max_terms_count`) |
+| One `should` clause per readable type | about 15 clauses per query | nothing |
+| `exclude` of the hidden ids in asset aggregations | per bucket | the number of hidden assets |
+| Filter cache | the lists differ per user, so Elasticsearch reuses cached filters less than with the tenant filter alone | the number of distinct users |
+| Request size | the lists travel in every query | the size of the lists |
+
+### How to measure
+
+**Data.** A restored dump of a large environment, reindexed, plus three generated profiles:
+
+| Profile | Assets / marked assets hidden from the user | Grants of the user | Documents in the index |
+|---|---|---|---|
+| Small | 1 000 / 50 | 10 | 100 k |
+| Medium | 20 000 / 2 000 | 500 | 5 M |
+| Large | 100 000 / 20 000 | 5 000 | 50 M |
+
+**Readers.** For each profile, the same dashboard opened by:
+- an admin: no per-user filter, the baseline, equal to `main`;
+- a user with every capability and no grant filter, hidden assets only;
+- a user with grants only (no `ACCESS_ASSESSMENT`) and hidden assets: the worst case.
+
+**What to record.**
+
+| Measure | How |
+|---|---|
+| Time to build the scope | a timer around `EngineReadScopeResolver.resolve`, split into the user load and the hidden-assets query |
+| Hidden-assets query plan | `EXPLAIN ANALYZE` on the medium and large profiles |
+| Elasticsearch query time | `took` in the responses, and the `profile` API on one widget to see the cost of the reader filter |
+| Endpoint latency, p50 / p95 | add `@LogExecutionTime` to the dashboard endpoints (they lack it today, while the convention requires it), then load a dashboard of 10 widgets with 1 and 20 concurrent users |
+| Elasticsearch side effects | query-cache hit rate and heap, from the node stats |
+
+Compare each reader with the admin baseline, profile by profile. These measurements belong in a
+benchmark run, not in a test assertion: timings depend on the machine (see `orm.instructions.md`).
+
+**Acceptance (to agree on).** For example: p95 of a widget within 20 % of the admin baseline on the
+medium profile, and no query refused on the large profile.
+
+### If it is too slow
+
+- **Resolve once per dashboard, not per widget**: cache the scope per (user, tenant) for a few seconds,
+  or evict it on the changes that already evict the clearance cache, plus grant changes.
+- **Make the hidden-assets query indexable**: a partial index on the marked assets only
+  (`WHERE cardinality(marking_ids) > 0`), or the list cached per (clearance, tenant) and evicted when
+  an asset's markings change.
+- **Shorten the grant lists**: match simulations through their scenario (`base_scenario_side`)
+  instead of listing every copied simulation grant. This changes the semantics (copy at creation
+  becomes inheritance, §2.2), so it is a product decision, not only an optimisation.
+- **Above the `terms` limit**: fail closed (hide the related types for that user), or move the list
+  into a small per-user document and use a `terms` lookup instead of sending it with every query.

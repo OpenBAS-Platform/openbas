@@ -19,6 +19,8 @@ import io.openaev.context.TxCtx;
 import io.openaev.database.model.CustomDashboardParameters;
 import io.openaev.database.model.Filters;
 import io.openaev.database.model.IndexingStatus;
+import io.openaev.database.raw.RawGrant;
+import io.openaev.database.raw.RawUserAuth;
 import io.openaev.database.repository.IndexingStatusRepository;
 import io.openaev.engine.EngineContext;
 import io.openaev.engine.EsModel;
@@ -241,6 +243,33 @@ public class ElasticService implements EngineService {
         throw new UnsupportedOperationException("Filter operator " + operator + " not supported");
     }
     return boolQuery.build()._toQuery();
+  }
+
+  private Query buildQueryRestrictions(RawUserAuth user) {
+    // If user is admin, no need to check the ACL
+    if (user.getUser_admin()) {
+      return null;
+    }
+    Set<String> grantedResourceIds =
+        user.getUser_grants().stream().map(RawGrant::getGrant_resource).collect(Collectors.toSet());
+    List<FieldValue> values = grantedResourceIds.stream().map(FieldValue::of).toList();
+    BoolQuery.Builder authQuery = new BoolQuery.Builder();
+    Query compliantField =
+        TermsQuery.of(
+                t ->
+                    t.field("base_restrictions.keyword")
+                        .terms(TermsQueryField.of(tq -> tq.value(values))))
+            ._toQuery();
+    BoolQuery.Builder emptyRestrictBuilder = new BoolQuery.Builder();
+    Query existField = ExistsQuery.of(b -> b.field("base_restrictions.keyword"))._toQuery();
+    Query emptyRestrictQuery = emptyRestrictBuilder.mustNot(existField).build()._toQuery();
+    // Explicit: this bool is nested in a filter clause, where an implicit minimum_should_match
+    // would silently make the ACL match everything.
+    return authQuery
+        .should(compliantField, emptyRestrictQuery)
+        .minimumShouldMatch("1")
+        .build()
+        ._toQuery();
   }
 
   private Query queryFromSearch(String search) {
@@ -1330,6 +1359,16 @@ public class ElasticService implements EngineService {
     Query readerFilter = readerFilter(scope);
     if (readerFilter != null) {
       filters.add(readerFilter);
+    }
+    // MARKING preview feature off: the former grant-only filter of the export (issue/3768), carried
+    // by an unrestricted scope. A null legacy user (the caller resolved a grant bypass) and an
+    // admin user both skip it.
+    Query restrictionQuery =
+        scope.unrestricted() && scope.legacyGrantUser() != null
+            ? buildQueryRestrictions(scope.legacyGrantUser())
+            : null;
+    if (restrictionQuery != null) {
+      filters.add(restrictionQuery);
     }
     Query finalQuery = BoolQuery.of(b -> b.filter(filters))._toQuery();
 

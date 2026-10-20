@@ -38,6 +38,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestExecutionListeners;
@@ -60,6 +61,9 @@ import org.springframework.transaction.annotation.Transactional;
     value = {RabbitMQTestListener.class},
     mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 @DisplayName("Engine reads filtered by the reader scope (capability, grant, marking)")
+// es8 only until the reader filter is ported to es9 and OpenSearch (implementation-plan-dashboard
+// steps 11-12): those engines ignore the scope, so the nightly would fail on them.
+@DisabledIfEnvironmentVariable(named = "ENGINE_ENGINESELECTOR", matches = "elk9|opensearch")
 class EngineReadScopeIntegrationTest extends IntegrationTest {
 
   private static final String ASSET = "asset";

@@ -8,9 +8,12 @@ import io.openaev.IntegrationTest;
 import io.openaev.database.model.Asset;
 import io.openaev.database.model.Exercise;
 import io.openaev.database.model.Finding;
+import io.openaev.database.model.Grant;
 import io.openaev.database.model.Inject;
 import io.openaev.database.model.Scenario;
 import io.openaev.database.model.Tenant;
+import io.openaev.database.raw.RawGrant;
+import io.openaev.database.raw.RawUserAuth;
 import io.openaev.database.repository.IndexingStatusRepository;
 import io.openaev.engine.api.CursorPageQuery;
 import io.openaev.engine.facade.EngineService;
@@ -36,6 +39,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +51,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestExecutionListeners;
@@ -125,6 +130,63 @@ class CursorPagedSearchTest extends IntegrationTest {
         Map.of("snapshot-vulnerability-observation", keys, "snapshot-attack-observation", keys),
         Set.of(),
         null);
+  }
+
+  /**
+   * The reader of the former grant-only filter ({@code MARKING} preview feature off), carried by an
+   * unrestricted scope: an admin skips it, anyone else is filtered on its grants.
+   */
+  private static EngineReadScope legacyScope(boolean admin, String... grantedResourceIds) {
+    Set<RawGrant> grants = new HashSet<>();
+    for (String resourceId : grantedResourceIds) {
+      grants.add(rawGrant(resourceId));
+    }
+    return EngineReadScope.unrestricted(
+        new RawUserAuth() {
+          @Override
+          public String getUser_id() {
+            return "test-user-" + UUID.randomUUID();
+          }
+
+          @Override
+          public boolean getUser_admin() {
+            return admin;
+          }
+
+          @Override
+          public Set<RawGrant> getUser_grants() {
+            return grants;
+          }
+        });
+  }
+
+  private static RawGrant rawGrant(String resourceId) {
+    return new RawGrant() {
+      @Override
+      public String getGrant_id() {
+        return UUID.randomUUID().toString();
+      }
+
+      @Override
+      public String getGrant_name() {
+        return "observer";
+      }
+
+      @Override
+      public String getUser_id() {
+        return "n/a";
+      }
+
+      @Override
+      public String getGrant_resource() {
+        return resourceId;
+      }
+
+      @Override
+      public Grant.GRANT_RESOURCE_TYPE getGrant_resource_type() {
+        return Grant.GRANT_RESOURCE_TYPE.SCENARIO;
+      }
+    };
   }
 
   /** Persists an endpoint + CVE finding through a bare atomic-testing inject (no scenario). */
@@ -629,6 +691,9 @@ class CursorPagedSearchTest extends IntegrationTest {
 
   @Nested
   @DisplayName("restrictions")
+  // es8 only until the reader filter is ported to es9 and OpenSearch (implementation-plan-dashboard
+  // steps 11-12): those engines ignore the scope. The legacy group below runs on every engine.
+  @DisabledIfEnvironmentVariable(named = "ENGINE_ENGINESELECTOR", matches = "elk9|opensearch")
   class Restrictions {
 
     @Test
@@ -668,6 +733,61 @@ class CursorPagedSearchTest extends IntegrationTest {
 
       List<EsVulnerabilityObservation> results = page(nonAdminScope(scenario.getId()), null, 100);
 
+      assertThat(containsAsset(results, restricted.assetId())).isTrue();
+    }
+  }
+
+  @Nested
+  @DisplayName("restrictions, MARKING preview feature off (former grant-only filter)")
+  class LegacyRestrictions {
+
+    @Test
+    @DisplayName("admin sees every document regardless of restrictions")
+    void given_legacyAdmin_should_returnRestrictedAndUnrestrictedDocuments() {
+      // -- ARRANGE --
+      Scenario scenario = persistScenario();
+      Grain restricted = newScenarioLinkedGrain(scenario);
+      Grain unrestricted = newGrain();
+      indexAll();
+
+      // -- ACT --
+      List<EsVulnerabilityObservation> results = page(legacyScope(true), null, 100);
+
+      // -- ASSERT --
+      assertThat(containsAsset(results, restricted.assetId())).isTrue();
+      assertThat(containsAsset(results, unrestricted.assetId())).isTrue();
+    }
+
+    @Test
+    @DisplayName("a non-admin user with no grant only sees unrestricted documents")
+    void given_legacyUserWithoutGrant_should_onlySeeUnrestrictedDocuments() {
+      // -- ARRANGE --
+      Scenario scenario = persistScenario();
+      Grain restricted = newScenarioLinkedGrain(scenario);
+      Grain unrestricted = newGrain();
+      indexAll();
+
+      // -- ACT --
+      List<EsVulnerabilityObservation> results = page(legacyScope(false), null, 100);
+
+      // -- ASSERT --
+      assertThat(containsAsset(results, restricted.assetId())).isFalse();
+      assertThat(containsAsset(results, unrestricted.assetId())).isTrue();
+    }
+
+    @Test
+    @DisplayName("granting the scenario reveals the restricted document")
+    void given_legacyUserGrantedOnScenario_should_revealRestrictedDocument() {
+      // -- ARRANGE --
+      Scenario scenario = persistScenario();
+      Grain restricted = newScenarioLinkedGrain(scenario);
+      indexAll();
+
+      // -- ACT --
+      List<EsVulnerabilityObservation> results =
+          page(legacyScope(false, scenario.getId()), null, 100);
+
+      // -- ASSERT --
       assertThat(containsAsset(results, restricted.assetId())).isTrue();
     }
   }

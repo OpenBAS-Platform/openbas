@@ -16,7 +16,9 @@ import io.openaev.engine.security.EngineReadScope;
 import io.openaev.engine.security.EngineSecurityRegistry;
 import io.openaev.engine.security.EngineSecurityRegistry.EntitySecurity;
 import io.openaev.engine.security.EngineSecurityRegistry.ResourceAccess;
+import io.openaev.rest.settings.PreviewFeature;
 import io.openaev.service.PermissionService;
+import io.openaev.service.PreviewFeatureService;
 import io.openaev.service.UserService;
 import io.openaev.utils.mapper.RawUserAuthMapper;
 import java.sql.Array;
@@ -40,6 +42,9 @@ import org.springframework.stereotype.Service;
  * <p>Resolved per request, never cached: a capability, grant or marking change applies on the next
  * read, and the documents already indexed (the history of past simulations) are covered by the same
  * ids.
+ *
+ * <p>Behind the {@link PreviewFeature#MARKING} preview feature as a whole: with the feature off,
+ * every reader is unrestricted and dashboards keep the tenant filter only, as before.
  */
 @Service
 @AllowRawJdbc(
@@ -68,9 +73,10 @@ public class EngineReadScopeResolver {
   private final MarkingScopeSupplier markingScopeSupplier;
   private final MarkedTables markedTables;
   private final JdbcTemplate jdbcTemplate;
+  private final PreviewFeatureService previewFeatureService;
 
   /**
-   * Explicit constructor for {@code @Lazy}: Lombok does not copy it onto the parameters. Both
+   * Explicit constructor for {@code @Lazy}: Lombok does not copy it onto the parameters. The lazy
    * services sit high in the graph (PermissionService -> InjectService -> ...), which reaches back
    * here through AttackPatternService.
    */
@@ -81,7 +87,8 @@ public class EngineReadScopeResolver {
       RawUserAuthMapper rawUserAuthMapper,
       MarkingScopeSupplier markingScopeSupplier,
       MarkedTables markedTables,
-      JdbcTemplate jdbcTemplate) {
+      JdbcTemplate jdbcTemplate,
+      @Lazy PreviewFeatureService previewFeatureService) {
     this.permissionService = permissionService;
     this.userService = userService;
     this.userRepository = userRepository;
@@ -89,15 +96,20 @@ public class EngineReadScopeResolver {
     this.markingScopeSupplier = markingScopeSupplier;
     this.markedTables = markedTables;
     this.jdbcTemplate = jdbcTemplate;
+    this.previewFeatureService = previewFeatureService;
   }
 
   /**
    * The scope of the current user for the tenants of {@code ctx}.
    *
    * @param ctx the tenant scope of the request
-   * @return what the reader may see
+   * @return what the reader may see; unrestricted for everyone when {@link PreviewFeature#MARKING}
+   *     is off
    */
   public EngineReadScope resolve(TxCtx ctx) {
+    if (!previewFeatureService.isFeatureEnabled(PreviewFeature.MARKING)) {
+      return EngineReadScope.unrestricted(null);
+    }
     User user = userService.currentUser();
     RawUserAuth auth =
         rawUserAuthMapper.toRawUserAuth(userRepository.getUserWithAuth(user.getId()));
