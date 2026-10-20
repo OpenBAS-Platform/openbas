@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * How each indexed document type is secured: the capability needed to read it, how it links to a
@@ -80,6 +81,15 @@ public final class EngineSecurityRegistry {
           new GrantKeyField("base_simulation_side", GRANT_RESOURCE_TYPE.SIMULATION));
 
   private static final Map<String, EntitySecurity> ENTITIES = buildEntities();
+
+  /**
+   * Every field in which an indexed type holds the id of the asset it is about: where the hidden
+   * assets are excluded. Asset ids are unique, so the exclusion can apply to every document.
+   */
+  public static final Set<String> ASSET_FIELDS =
+      ENTITIES.values().stream()
+          .flatMap(security -> security.assetFields().stream())
+          .collect(Collectors.toUnmodifiableSet());
 
   private EngineSecurityRegistry() {}
 

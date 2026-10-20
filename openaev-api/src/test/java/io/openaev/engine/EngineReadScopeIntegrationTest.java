@@ -7,6 +7,7 @@ import io.openaev.IntegrationTest;
 import io.openaev.context.TxCtx;
 import io.openaev.database.model.Filters;
 import io.openaev.database.model.Scenario;
+import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.IndexingStatusRepository;
 import io.openaev.engine.api.ListConfiguration;
 import io.openaev.engine.api.ListRuntime;
@@ -162,12 +163,15 @@ class EngineReadScopeIntegrationTest extends IntegrationTest {
     return result.getFirst().getData().stream().map(EsSeriesData::getKey).toList();
   }
 
+  // The fixtures land in the default tenant: the reader's rules are those of that tenant.
   private static EngineReadScope readable(String... entities) {
-    return new EngineReadScope(false, Set.of(entities), Map.of(), Set.of(), null);
+    return EngineReadScope.forTenant(
+        Tenant.DEFAULT_TENANT_UUID, Set.of(entities), Map.of(), Set.of());
   }
 
   private static EngineReadScope hiding(Set<String> hiddenAssetIds, String... entities) {
-    return new EngineReadScope(false, Set.of(entities), Map.of(), hiddenAssetIds, null);
+    return EngineReadScope.forTenant(
+        Tenant.DEFAULT_TENANT_UUID, Set.of(entities), Map.of(), hiddenAssetIds);
   }
 
   // -- Tests --
@@ -240,16 +244,15 @@ class EngineReadScopeIntegrationTest extends IntegrationTest {
   class Grant {
 
     private EngineReadScope grantedOnScenario1() {
-      return new EngineReadScope(
-          false,
+      return EngineReadScope.forTenant(
+          Tenant.DEFAULT_TENANT_UUID,
           Set.of(SCENARIO, INJECT),
           Map.of(
               SCENARIO,
               List.of(new EngineReadScope.GrantKey("base_id", Set.of(scenario1))),
               INJECT,
               List.of(new EngineReadScope.GrantKey("base_scenario_side", Set.of(scenario1)))),
-          Set.of(),
-          null);
+          Set.of());
     }
 
     @Test

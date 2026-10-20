@@ -12,7 +12,7 @@
 **Status** (2026-10-20):
 - **Steps 1–6:** done on es8. **Step 7** (everything behind `MARKING`): done.
 - **Step 8 (e2e matrix):** API tests partly done.
-- **Steps 9–20:** not started.
+- **Steps 9–21:** not started (21 optional).
 - **es9 and OpenSearch:** they accept the scope but ignore it until steps 11–12 (today's behaviour, unfiltered).
 - **Branch `task4-poc-dashboard`:** rebased on `main` (2026-10-19) and compiles. The dashboard, engine, snapshot and coverage tests pass.
 
@@ -33,6 +33,7 @@
 | 18 | Bug: "Select dashboard" hidden for `MANAGE_ASSESSMENT` without a grant | — |
 | 19 | Bug: asset posture data checked on `ACCESS_DASHBOARDS` | — |
 | 20 | Bug: custom home dashboard needs `ACCESS_TENANT_SETTINGS` | — |
+| 21 | *Optional* refactor: one tenant filter, from the scope | steps 11, 12 |
 
 ---
 
@@ -309,12 +310,12 @@ really deleted.
 - Dashboards: same filters, buckets, labels and stripping in `es9/ElasticService` as in es8 (steps
   4–5).
 - Tests: remove `@DisabledIfEnvironmentVariable(named = "ENGINE_ENGINESELECTOR", ...)` from
-  `EngineReadScopeIntegrationTest` and the flag-on "restrictions" group of `CursorPagedSearchTest`
-  once both engines are ported (they skip es9 and OpenSearch in the nightly until then).
+  `EngineReadScopeIntegrationTest`, `DashboardMultiTenantReaderScopeTest` and the flag-on
+  "restrictions" group of `CursorPagedSearchTest` once both engines are ported (they skip es9 and
+  OpenSearch in the nightly until then).
 - OpenGRC snapshot export: `searchCursorPaged` still applies the former grant-only filter
   (`buildQueryRestrictions(scope.legacyGrantUser())`, no marking). Replace it with the reader filter,
   as es8 does since step 6.
-
 **DoD**: step 1's engine tests, `SnapshotObservationServiceTest` and the §4 matrix pass with
 `engine.engine-selector=elk9`.
 
@@ -499,6 +500,29 @@ checked on `TENANT_SETTING` READ, i.e. `ACCESS_TENANT_SETTINGS`, an administrati
 **Additional information.** `TenantSettingsApi.java` (`@AccessControl(READ, TENANT_SETTING)` on the
 six `home-dashboard/*` data endpoints); same change as [OpenAEV-Platform/openaev#8368](https://github.com/OpenAEV-Platform/openaev/pull/8368). Size XS.
 
+
+#### Step 21 — *Optional* refactor, no behaviour change: one tenant filter, from the scope 🔴 not started
+
+Today `buildQuery` applies `tenantFilter(ctx)` next to `readerFilter(scope)`, whose per-tenant
+clauses already cover the request's tenants: the outer filter is redundant for a restricted reader,
+and the only isolation for an unrestricted one (design §4.2, "Where the tenant filter stands").
+Best done once es9 and OpenSearch are ported (steps 11–12), so the three engines move together.
+
+- The scope always carries the request's tenants: an unrestricted reader (`MARKING` off, admin,
+  sees everything) gets `TenantRules.ALL` for each tenant of the `TxCtx`, instead of
+  `EngineReadScope.unrestricted(...)` without tenants.
+- `readerFilter(scope)` becomes the only tenant filter; `tenantFilter(ctx)` is deleted from
+  `buildQuery` and from `searchCursorPaged`, in the three engines. With `MARKING` off, the query
+  matches the same documents as `tenantFilter` (one `base_tenant_side` clause per tenant instead of
+  one `terms`).
+- The tied per-tenant clauses stay: they are what applies each tenant's rights to its own documents.
+- Once no engine filters on the `TxCtx`, drop the `TxCtx` parameter from the `EngineService` read
+  methods: the scope is the only input.
+
+**DoD**: no behaviour change, proven by tests passing unchanged on the three engines: the flag-off
+tests (`DashboardMarkingFeatureOffTest`, the flag-off groups of `SnapshotObservationServiceTest` and
+`CursorPagedSearchTest`), the engine's tenant isolation tests (`EngineServiceIntegrationTest`
+"Tenant scope") and the §4 matrix; no `tenantFilter(ctx)` left.
 ---
 
 ## 4) End-to-end test matrix

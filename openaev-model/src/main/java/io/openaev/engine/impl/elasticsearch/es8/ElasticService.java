@@ -345,9 +345,13 @@ public class ElasticService implements EngineService {
    * reader see. The decision was taken by the caller from the source of truth (capabilities,
    * grants, clearance); this only turns it into id filters.
    *
-   * <p>A document is kept when its {@code base_entity} is readable, it links to a granted resource
-   * (for a grant-managed type the reader holds no capability for), and none of its asset references
-   * is a hidden asset. A type absent from {@link EngineSecurityRegistry} is never readable.
+   * <p>A request can read several tenants, and the reader's capabilities and grants differ per
+   * tenant, so each tenant's rules only apply to that tenant's documents ({@code
+   * base_tenant_side}). A document without a tenant gets what every tenant of the scope allows.
+   * Within a tenant, a document is kept when its {@code base_entity} is readable, it links to a
+   * granted resource (for a grant-managed type the reader holds no capability for), and it is not
+   * about one of that tenant's hidden assets. A type absent from {@link EngineSecurityRegistry} is
+   * never readable.
    *
    * @return the filter, or {@code null} for an unrestricted reader
    */
@@ -355,27 +359,60 @@ public class ElasticService implements EngineService {
     if (scope.unrestricted()) {
       return null;
     }
+    List<Query> perTenant = new ArrayList<>();
+    scope
+        .tenantRules()
+        .forEach(
+            (tenantId, rules) ->
+                perTenant.add(
+                    tenantClause(
+                        TermQuery.of(
+                                t ->
+                                    t.field("base_tenant_side.keyword")
+                                        .value(FieldValue.of(tenantId)))
+                            ._toQuery(),
+                        rules)));
+    perTenant.add(
+        tenantClause(
+            BoolQuery.of(
+                    b ->
+                        b.mustNot(
+                            ExistsQuery.of(e -> e.field("base_tenant_side.keyword"))._toQuery()))
+                ._toQuery(),
+            scope.sharedRules()));
+    return BoolQuery.of(b -> b.should(perTenant).minimumShouldMatch("1"))._toQuery();
+  }
+
+  /** The documents of one tenant ({@code tenantMatch}) that its {@code rules} let through. */
+  private Query tenantClause(Query tenantMatch, EngineReadScope.TenantRules rules) {
+    BoolQuery.Builder clause = new BoolQuery.Builder().filter(tenantMatch, rulesQuery(rules));
+    if (!rules.hiddenAssetIds().isEmpty()) {
+      for (String assetField : EngineSecurityRegistry.ASSET_FIELDS) {
+        clause.mustNot(keywordTerms(assetField, rules.hiddenAssetIds()));
+      }
+    }
+    return clause.build()._toQuery();
+  }
+
+  /** What one tenant's rules let through: every readable type, each with its grant filter. */
+  private Query rulesQuery(EngineReadScope.TenantRules rules) {
+    if (rules.unrestricted()) {
+      return MatchAllQuery.of(m -> m)._toQuery();
+    }
     List<Query> readableEntities = new ArrayList<>();
-    for (String entity : scope.readableEntities()) {
-      EngineSecurityRegistry.EntitySecurity security = EngineSecurityRegistry.get(entity);
-      if (security == null) {
+    for (String entity : rules.readableEntities()) {
+      if (EngineSecurityRegistry.get(entity) == null) {
         continue;
       }
       List<Query> conditions = new ArrayList<>();
       conditions.add(
           TermQuery.of(t -> t.field("base_entity.keyword").value(FieldValue.of(entity)))
               ._toQuery());
-      List<EngineReadScope.GrantKey> grantKeys = scope.grantFilters().get(entity);
+      List<EngineReadScope.GrantKey> grantKeys = rules.grantFilters().get(entity);
       if (grantKeys != null) {
         conditions.add(grantedQuery(grantKeys));
       }
-      BoolQuery.Builder entityQuery = new BoolQuery.Builder().filter(conditions);
-      if (!scope.hiddenAssetIds().isEmpty()) {
-        for (String assetField : security.assetFields()) {
-          entityQuery.mustNot(keywordTerms(assetField, scope.hiddenAssetIds()));
-        }
-      }
-      readableEntities.add(entityQuery.build()._toQuery());
+      readableEntities.add(BoolQuery.of(b -> b.filter(conditions))._toQuery());
     }
     if (readableEntities.isEmpty()) {
       return MatchNoneQuery.of(m -> m)._toQuery();

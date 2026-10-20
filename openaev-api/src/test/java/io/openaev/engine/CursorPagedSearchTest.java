@@ -124,12 +124,11 @@ class CursorPagedSearchTest extends IntegrationTest {
         List.of(
             new EngineReadScope.GrantKey("base_scenario_side", ids),
             new EngineReadScope.GrantKey("base_simulation_side", ids));
-    return new EngineReadScope(
-        false,
+    return EngineReadScope.forTenant(
+        TENANT_ID,
         Set.of("snapshot-vulnerability-observation", "snapshot-attack-observation"),
         Map.of("snapshot-vulnerability-observation", keys, "snapshot-attack-observation", keys),
-        Set.of(),
-        null);
+        Set.of());
   }
 
   /**

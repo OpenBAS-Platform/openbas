@@ -6,6 +6,7 @@ import io.openaev.engine.model.inject.EsInject;
 import io.openaev.engine.model.scenario.EsScenario;
 import io.openaev.engine.model.simulation.EsSimulation;
 import jakarta.annotation.Nullable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,24 +18,14 @@ import java.util.stream.Collectors;
  * as the SQL rewrite). The engine only applies it as id filters: no security rule is copied into
  * the queries, and nothing security-related is stored in the indexed documents.
  *
- * <p>Three dimensions, applied next to the tenant filter on every read:
- *
- * <ul>
- *   <li>{@code readableEntities}: the {@code base_entity} values the reader may read at all
- *       (capability per document type). An entity absent from the set is excluded.
- *   <li>{@code grantFilters}: for a grant-managed entity the reader holds no capability for, the
- *       fields that link a document to a granted resource and the granted ids. A document is kept
- *       when one of these fields holds one of these ids. An entity absent from the map has no grant
- *       restriction.
- *   <li>{@code hiddenAssetIds}: the assets outside the reader's clearance. Documents about them are
- *       excluded, and their ids are removed from aggregations and from returned documents.
- * </ul>
+ * <p>Four dimensions, all held per tenant in {@code tenantRules}: a request can read several
+ * tenants, and the reader's capabilities, grants and the assets it may not see differ from one
+ * tenant to another, so each tenant's rules only apply to the documents of that tenant ({@code
+ * base_tenant_side}).
  *
  * @param unrestricted the reader sees everything in its tenants (admin, BYPASS, or an engine-wide
  *     system read): no filter at all
- * @param readableEntities {@code base_entity} values the reader may read
- * @param grantFilters per entity, the grant keys a document must match (OR)
- * @param hiddenAssetIds assets outside the reader's clearance
+ * @param tenantRules per tenant id, what the reader may read in that tenant
  * @param legacyGrantUser the reader as {@code RawUserAuth}, for the former grant-only filter of the
  *     snapshot export: applied by every engine on an unrestricted scope (the {@code MARKING}
  *     preview feature is off), and by the engines not ported yet (es9, OpenSearch) on any scope;
@@ -42,10 +33,49 @@ import java.util.stream.Collectors;
  */
 public record EngineReadScope(
     boolean unrestricted,
-    Set<String> readableEntities,
-    Map<String, List<GrantKey>> grantFilters,
-    Set<String> hiddenAssetIds,
+    Map<String, TenantRules> tenantRules,
     @Nullable RawUserAuth legacyGrantUser) {
+
+  /**
+   * What the reader may read in one tenant.
+   *
+   * <ul>
+   *   <li>{@code readableEntities}: the {@code base_entity} values the reader may read at all
+   *       (capability per document type). An entity absent from the set is excluded.
+   *   <li>{@code grantFilters}: for a grant-managed entity the reader holds no capability for, the
+   *       fields that link a document to a granted resource and the granted ids. A document is kept
+   *       when one of these fields holds one of these ids. An entity absent from the map has no
+   *       grant restriction.
+   *   <li>{@code hiddenAssetIds}: the assets of this tenant outside the reader's clearance.
+   *       Documents about them are excluded, and their ids are removed from aggregations and from
+   *       returned documents.
+   * </ul>
+   *
+   * @param unrestricted every type is readable, without grant filter (hidden assets still apply)
+   * @param readableEntities {@code base_entity} values the reader may read
+   * @param grantFilters per entity, the grant keys a document must match (OR)
+   * @param hiddenAssetIds assets of this tenant outside the reader's clearance
+   */
+  public record TenantRules(
+      boolean unrestricted,
+      Set<String> readableEntities,
+      Map<String, List<GrantKey>> grantFilters,
+      Set<String> hiddenAssetIds) {
+
+    /** Every type readable, no grant filter, no hidden asset. */
+    public static final TenantRules ALL = new TenantRules(true, Set.of(), Map.of(), Set.of());
+
+    public TenantRules {
+      readableEntities = Set.copyOf(readableEntities);
+      grantFilters = Map.copyOf(grantFilters);
+      hiddenAssetIds = Set.copyOf(hiddenAssetIds);
+    }
+
+    /** Nothing to filter in this tenant. */
+    public boolean seesEverything() {
+      return unrestricted && hiddenAssetIds.isEmpty();
+    }
+  }
 
   /**
    * One way a document links to a granted resource.
@@ -60,14 +90,58 @@ public record EngineReadScope(
   }
 
   public EngineReadScope {
-    readableEntities = Set.copyOf(readableEntities);
-    grantFilters = Map.copyOf(grantFilters);
-    hiddenAssetIds = Set.copyOf(hiddenAssetIds);
+    tenantRules = Map.copyOf(tenantRules);
   }
 
   /** A reader who sees everything of the tenants in its {@code TxCtx}: no per-user filter. */
   public static EngineReadScope unrestricted(@Nullable RawUserAuth legacyGrantUser) {
-    return new EngineReadScope(true, Set.of(), Map.of(), Set.of(), legacyGrantUser);
+    return new EngineReadScope(true, Map.of(), legacyGrantUser);
+  }
+
+  /** A reader of one tenant, with these rules there. */
+  public static EngineReadScope forTenant(
+      String tenantId,
+      Set<String> readableEntities,
+      Map<String, List<GrantKey>> grantFilters,
+      Set<String> hiddenAssetIds) {
+    return new EngineReadScope(
+        false,
+        Map.of(tenantId, new TenantRules(false, readableEntities, grantFilters, hiddenAssetIds)),
+        null);
+  }
+
+  /**
+   * The hidden assets of every tenant of the scope. For what is not bound to one tenant: the
+   * buckets of an aggregation mix the tenants of the request, and a returned document is stripped
+   * of any hidden asset id (asset ids are unique, so the union cannot hide another tenant's asset).
+   */
+  public Set<String> hiddenAssetIds() {
+    return tenantRules.values().stream()
+        .flatMap(rules -> rules.hiddenAssetIds().stream())
+        .collect(Collectors.toUnmodifiableSet());
+  }
+
+  /**
+   * The rules for documents that carry no tenant ({@code base_tenant_side} absent): only what every
+   * tenant of the scope allows, without grant filter, and without any tenant's hidden assets. A
+   * type grant-filtered in one tenant is excluded, since such a document cannot be tied to a
+   * granted resource of a tenant.
+   */
+  public TenantRules sharedRules() {
+    if (tenantRules.isEmpty()) {
+      return new TenantRules(false, Set.of(), Map.of(), Set.of());
+    }
+    if (tenantRules.values().stream().allMatch(TenantRules::unrestricted)) {
+      return new TenantRules(true, Set.of(), Map.of(), hiddenAssetIds());
+    }
+    Set<String> shared = new HashSet<>(EngineSecurityRegistry.entities().keySet());
+    for (TenantRules rules : tenantRules.values()) {
+      if (!rules.unrestricted()) {
+        shared.retainAll(rules.readableEntities());
+        shared.removeAll(rules.grantFilters().keySet());
+      }
+    }
+    return new TenantRules(false, shared, Map.of(), hiddenAssetIds());
   }
 
   /**
@@ -78,15 +152,17 @@ public record EngineReadScope(
    * @return the same document, for use in a stream
    */
   public <T extends EsBase> T stripHiddenAssets(T document) {
+    Set<String> hiddenAssetIds = hiddenAssetIds();
     if (unrestricted || hiddenAssetIds.isEmpty() || document == null) {
       return document;
     }
     switch (document) {
-      case EsInject inject -> inject.setBase_assets_side(visible(inject.getBase_assets_side()));
+      case EsInject inject ->
+          inject.setBase_assets_side(visible(inject.getBase_assets_side(), hiddenAssetIds));
       case EsScenario scenario ->
-          scenario.setBase_assets_side(visible(scenario.getBase_assets_side()));
+          scenario.setBase_assets_side(visible(scenario.getBase_assets_side(), hiddenAssetIds));
       case EsSimulation simulation ->
-          simulation.setBase_assets_side(visible(simulation.getBase_assets_side()));
+          simulation.setBase_assets_side(visible(simulation.getBase_assets_side(), hiddenAssetIds));
       default -> {
         // no asset reference to strip
       }
@@ -94,7 +170,7 @@ public record EngineReadScope(
     return document;
   }
 
-  private Set<String> visible(Set<String> assetIds) {
+  private static Set<String> visible(Set<String> assetIds, Set<String> hiddenAssetIds) {
     if (assetIds == null) {
       return null;
     }

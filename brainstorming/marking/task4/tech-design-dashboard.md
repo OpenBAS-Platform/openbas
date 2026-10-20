@@ -144,39 +144,7 @@ The capabilities that make grants irrelevant (step 5):
 | `SCENARIO`, `SIMULATION`, `ATOMIC_TESTING`, `AUTONOMOUS_RUN` | `ACCESS_ASSESSMENT` | `MANAGE_ASSESSMENT` | `LAUNCH_ASSESSMENT` | `DELETE_ASSESSMENT` |
 | `THREAT_ARSENAL` | `ACCESS_THREAT_ARSENALS` | `MANAGE_THREAT_ARSENALS` | — | `DELETE_THREAT_ARSENALS` |
 
-## 2.4 How lists are filtered
-
-`SEARCH` is open on grant-managed types (step 4); each search adds
-`SpecificationUtils.hasGrantAccess(userId, isAdminOrBypass, hasCapaForClass, grantType)`:
-
-- admin, `BYPASS` or the capability → no filter;
-- otherwise → `id IN (ids of the resources this user's groups are granted on, with a role ≥ grantType)`;
-- for an **inject**: its own id **or** its scenario id **or** its simulation id. An inject is listed
-  through the grant of its scenario or simulation, an atomic testing through its own.
-
-It only applies to the `GrantableBase` entities: `Scenario`, `Exercise`, `Inject`, `Payload`,
-`AutonomousRun`. Found in the scenario, atomic testing and inject searches and the full-text search
-(`hasGrantAccess`), and in the payload and injector contract searches (`withGrantFilter`,
-`accessibleResourcesSubquery`). *To check: how the simulation list applies grants.*
-
-## 2.5 Frontend
-
-The user's grants come with the user (resource id → role). `parseGrants` turns each role into actions
-on the generic `RESOURCE` subject, keyed by the resource id; capabilities become their own subject
-(`MANAGE_ASSESSMENT` → `MANAGE` on `ASSESSMENT`). Screens are expected to check both, as
-`useScenarioPermissions` / `useSimulationPermissions` do:
-
-```ts
-ability.can(ACTIONS.MANAGE, SUBJECTS.RESOURCE, scenarioId) || ability.can(ACTIONS.MANAGE, SUBJECTS.ASSESSMENT)
-```
-
-> [!WARNING]
-> 🐞 The Statistics tab checks the grant alone: "Select dashboard" is shown with
-> `ability.can(MANAGE, RESOURCE, scenarioId)` (`ScenarioAnalysis.tsx:141,158`,
-> `SimulationAnalysis.tsx:98,115`). A user with `MANAGE_ASSESSMENT` and no grant does not see it,
-> while the backend accepts the save (`PUT /api/scenarios/{id}`, `SCENARIO` WRITE).
-
-## 2.6 What grants do not cover
+## 2.4 What grants do not cover
 
 - **Only five types** are grant-managed. There is no grant on an asset, a finding, a team…: those are
   capability-only.
@@ -298,17 +266,24 @@ supports this reading.
 ## 4.1 Requirements
 
 Part 3 showed that dashboards apply **no per-user filtering at all**: no capability check per document
-type, no grant, no marking. Filtering on markings alone would leave the two other holes open, so
-the dashboard filter has to cover **three dimensions**, the same ones the REST API enforces:
+type, no grant, no marking, only the tenant filter. Filtering on markings alone would leave the other
+holes open, so the dashboard filter has to cover **four dimensions**, the same ones the REST API
+enforces, and `EngineReadScopeResolver` resolves all four:
 
 | Dimension | REST API today | Question for each indexed document |
 |---|---|---|
+| **Tenancy** | the request's `TxCtx` (path tenant, `X-Tenant-Ids`, or every membership), and the user's rights **in that tenant** (`TenantContext` set from the path) | does this document belong to a tenant of the request, and what are the user's rights *in that tenant*? |
 | **Capability** (RBAC) | `@AccessControl` per resource type | may this user read this *type* (asset, finding, scenario…)? |
 | **Grant** | `RESOURCES_MANAGED_BY_GRANTS` (scenario, simulation, atomic testing) | does the user have a grant on the scenario / simulation this document belongs to (unless a capability such as `ACCESS_ASSESSMENT` covers all)? |
 | **Marking** | statement inspector + derived tables | is every asset this document is about within the user's clearance? |
 
-The same three dimensions apply to every dashboard read, including a dashboard shown inside a
-scenario or a simulation (§4.5): there is no context-dependent rule.
+The same dimensions apply to every dashboard read, including a dashboard shown inside a scenario or
+a simulation (§4.5): there is no context-dependent rule.
+
+**Tenancy is not only a filter on `base_tenant_side`.** One request can read several tenants (§4.2,
+"One request, several tenants"), and capabilities, grant bypasses and `BYPASS` are held **per
+tenant**. The three other dimensions are therefore evaluated tenant by tenant, and each tenant's
+result only applies to that tenant's documents.
 
 And three constraints on *how*:
 
@@ -328,8 +303,8 @@ And three constraints on *how*:
 (an expectation's asset, a finding's assets, an inject's simulation). They are already there
 (`base_asset_side`, `base_endpoint_side`, `vulnerable_endpoint_id`, `base_scenario_side`,
 `base_simulation_side`…). At each read, ask **SQL and `PermissionService`** — the single source of
-truth — what the user may not see, and add it to the ES query as plain id filters next to
-`tenantFilter`:
+truth — what the user may see in each tenant of the request, and add it to the ES query as plain id
+filters, bound to each tenant:
 
 ```mermaid
 sequenceDiagram
@@ -339,9 +314,9 @@ sequenceDiagram
     participant ES as ES / OpenSearch
 
     API->>SEC: scope for (user, TxCtx)
-    SEC-->>API: readable types · granted scenario/simulation ids · hidden asset ids
+    SEC-->>API: per tenant: readable types · granted ids<br/>+ hidden asset ids
     API->>ENG: query + scope
-    ENG->>ES: tenantFilter AND base_entity ∈ types<br/>AND grant filter AND must_not hidden asset ids<br/>(+ exclude hidden ids from "by asset" buckets)
+    ENG->>ES: per tenant T: base_tenant_side = T AND base_entity ∈ types(T)<br/>AND grant filter(T)<br/>AND must_not hidden asset ids<br/>(+ exclude hidden ids from "by asset" buckets)
     ES-->>API: only what this user may read
 ```
 
@@ -349,11 +324,64 @@ How each dimension is resolved, reusing what exists:
 
 | Dimension | Resolved in SQL / Java (source of truth) | Applied in ES |
 |---|---|---|
+| **Tenancy** | the tenants of the request's `TxCtx` (already checked against the user's memberships); in each of them, the user's rights through `PermissionService.hasCapabilityPermissionInTenant` (the user's groups in that tenant plus platform groups), never the ambient `TenantContext` | each tenant's rules are bound to `base_tenant_side = T`; a document without a tenant only gets what every tenant of the request allows |
 | **Capability** | for each index, its `ResourceType` (asset → `ASSET`, finding → `FINDING`, security-platform → `SECURITY_PLATFORM`…), checked with `PermissionService` / `Capability` READ | `terms(base_entity, readable types)` |
 | **Grant** | generic, per indexed type (§4.4): for a type managed by grants, `PermissionService` first checks the capability that makes grants irrelevant (e.g. `ACCESS_ASSESSMENT` for scenarios and simulations); without it, the user's grants of the matching `GRANT_RESOURCE_TYPE` (from `RawUserAuth`, already loaded) | on the fields the registry declares as grant keys for that type (today `base_scenario_side`, `base_simulation_side`, `base_id`, `base_inject_side`), within the granted ids; a document with none of these fields set is not grant-filtered. Types not managed by grants (assets, tags, teams…) are only filtered by capability: OpenAEV has no grant on an asset today. Supporting one later is a registry entry, not new code |
-| **Marking** | `SELECT asset_id FROM assets WHERE marking_ids <> '{}' AND NOT is_marking_set_allowed(marking_ids)` under the user's clearance: **the same SQL function** as the REST API, so no copy of the rule | `must_not terms` on the asset reference of each type (asset: `base_id`; expectation, observations: `base_asset_side`; finding: `base_endpoint_side`; vulnerable-endpoint: `vulnerable_endpoint_id`); aggregations on `base_assets_side` & co get `exclude: <hidden ids>`; the same ids are stripped from `*_side` arrays of returned documents |
+| **Marking** | `SELECT asset_id FROM assets WHERE marking_ids <> '{}' AND NOT is_marking_set_allowed(marking_ids)` under the user's clearance, over the tenants of the request, grouped per tenant (`SELECT asset_id, tenant_id`): **the same SQL function** as the REST API, so no copy of the rule | inside each tenant's clause, `must_not terms` on the asset reference of each type (asset: `base_id`; expectation, observations: `base_asset_side`; finding: `base_endpoint_side`; vulnerable-endpoint: `vulnerable_endpoint_id`). Aggregations on `base_assets_side` get `exclude: <hidden ids>` (see below), and the same ids are stripped from the `base_assets_side` of returned documents |
 
-**Against the three constraints**
+### One request, several tenants
+
+**The case** (found in review, missed by the first version of the POC):
+
+- The unprefixed dashboard routes (`/api/dashboards/…`) take their tenants from `X-Tenant-Ids`, or
+  default to **every** tenant the user is a member of. `TxCtxArgumentResolver` only checks
+  **membership**, not rights.
+- `User.getCapabilities()` reads the ambient `TenantContext`. On an unprefixed route nothing sets
+  it, so it falls back to the **default tenant**.
+- A user holding `ACCESS_ASSETS` and `ACCESS_ASSESSMENT` in the default tenant only, and member of
+  tenant B with `ACCESS_DASHBOARDS` alone, would read B's assets and B's ungranted scenarios: the
+  default tenant's rights were applied to every tenant of the request.
+
+**The rule.** The resolver builds the rules **per tenant of the `TxCtx`**, each from the user's
+rights in that tenant, and the engine binds each tenant's rules to `base_tenant_side`:
+
+| Reader | Default tenant | Tenant B |
+|---|---|---|
+| Capabilities held | `ACCESS_DASHBOARDS`, `ACCESS_ASSETS`, `ACCESS_ASSESSMENT` | `ACCESS_DASHBOARDS` |
+| Assets | readable | **not readable** |
+| Scenarios | every scenario | only the granted ones |
+
+- The rights in a tenant come from `PermissionService.hasCapabilityPermissionInTenant(user,
+  tenantId, …)`, backed by `User.getCapabilitiesIn(tenantId)` and `hasTenantBypassIn(tenantId)`: the
+  same rule as `hasCapabilityPermission`, for an explicit tenant. `TenantContext` is never swapped.
+- Markings are per tenant too: each tenant's rules carry the hidden assets of that tenant, and its
+  clause excludes them. Only two uses take the union of every tenant's hidden assets, because they
+  are not bound to one tenant: the `exclude` of an aggregation (its buckets mix the tenants of the
+  request) and the stripping of returned documents.
+- A scope that is not restricted to tenants (`TxCtx.Missing`, `AllTenants`; no HTTP reader has one)
+  gets no tenant rules: it reads nothing.
+- Regression: `DashboardMultiTenantReaderScopeTest` (unprefixed search with `X-Tenant-Ids`,
+  different capabilities in two member tenants).
+
+**Where the tenant filter stands.** es8 still applies `tenantFilter(ctx)` in `buildQuery`, next to
+the reader filter, which now also restricts documents to the tenants of its rules. The target is one
+filter, built from the scope: with `MARKING` off, every tenant of the `TxCtx` gets the rules "read
+everything", which is exactly `tenantFilter`. Then the engine no longer needs the `TxCtx` at all.
+
+> [!WARNING]
+> **Ambient-tenant capability checks elsewhere.** `PermissionService.hasCapabilityPermission`,
+> `User.getCapabilities()` and `isAdminOrBypass()` read the ambient `TenantContext`. They are right
+> when the data read belongs to that single tenant: tenant-prefixed routes (the interceptor sets
+> `TenantContext` from the path), background jobs that set it per tenant, and v1 tables, whose
+> `@Filter` follows the same `TenantContext`. They are **wrong as soon as one request reads several
+> tenants through the `TxCtx`**: the search engine, and the v2-active tables (`assets`,
+> `asset_groups`, `findings`, `payloads`, `reportings`, …) on unprefixed routes with
+> `X-Tenant-Ids`. `@AccessControl` itself checks the endpoint capability in the ambient tenant only,
+> so `ACCESS_ASSETS` in the default tenant may open `POST /api/endpoints/search` over tenant B's
+> assets too. To check and fix platform-wide, outside this POC: for instance, narrow a multi-tenant
+> `TxCtx` to the tenants where the caller holds the endpoint's capability.
+
+**Against the three constraints** (of §4.1)
 
 1. **No lag.** Nothing security-related is in the index. A marking, grant or role change is visible on
    the next dashboard request (or on cache eviction, which already exists for clearance
@@ -395,38 +423,74 @@ already resolved from the source of truth. The engine only turns it into id filt
 
 | | `RawUserAuth` (before) | `EngineReadScope` (now) |
 |---|---|---|
-| What it is | facts about the user: `user_admin`, `user_grants` | what the reader may read, per indexed type |
+| What it is | facts about the user: `user_admin`, `user_grants` | what the reader may read, per tenant and per indexed type |
 | Who interprets it | the engine (`buildQueryRestrictions`, off since 2025) | the resolver, with `PermissionService` and the SQL clearance |
-| Capabilities | not carried | `readableEntities` |
-| Grants | raw, untyped list of resource ids | `grantFilters`: per type, the fields to match and the granted ids |
-| Markings | not carried | `hiddenAssetIds` |
+| Tenancy | not carried (the engine only gets the `TxCtx`) | `tenantRules`: one entry per tenant of the request, from the user's rights in that tenant |
+| Capabilities | not carried | per tenant, `TenantRules.readableEntities` |
+| Grants | raw, untyped list of resource ids | per tenant, `TenantRules.grantFilters`: per type, the fields to match and the granted ids |
+| Markings | not carried | per tenant, `TenantRules.hiddenAssetIds`; their union (`EngineReadScope.hiddenAssetIds()`) for aggregations and returned documents |
 | Still used for | the snapshot export of es9 / OpenSearch until they are ported (`legacyGrantUser`) | every read of es8 |
 
 ### The scope object, on an example
 
-A user with `ACCESS_DASHBOARDS`, `ACCESS_ASSETS` and `ACCESS_FINDINGS`, **without** `ACCESS_ASSESSMENT`,
-whose group is granted on scenario `S1`, cleared `TLP:GREEN`. Asset `A-RED` is marked `TLP:RED`.
+A user member of two tenants, cleared `TLP:GREEN`, reading both on an unprefixed route:
+
+- in tenant `T1`: `ACCESS_DASHBOARDS`, `ACCESS_ASSETS` and `ACCESS_FINDINGS`, **without**
+  `ACCESS_ASSESSMENT`, and a group granted on scenario `S1`;
+- in tenant `T2`: every capability.
+
+Asset `A-RED` (in `T1`) is marked `TLP:RED`.
 
 ```text
 EngineReadScope(
-  unrestricted     = false,
-  readableEntities = [asset, asset-group, tag, team, domain, attack-pattern,
-                      scenario, simulation, inject, expectation-inject, finding, vulnerable-endpoint],
-                     # no security-platform (no ACCESS_SECURITY_PLATFORMS), no snapshot observations
-  grantFilters     = {
-    scenario:           [GrantKey(base_id,              {S1})],
-    simulation:         [GrantKey(base_id,              {S1's simulations created after the grant}),
-                         GrantKey(base_scenario_side, {S1})],   # grants copied at creation, §2.2
-    inject:             [GrantKey(base_scenario_side,   {S1}), GrantKey(base_simulation_side, {}),
-                         GrantKey(base_id,              {})],   # atomic testing
-    expectation-inject: [... same keys, base_inject_side for atomic testing ...],
-    finding:            [... same keys ...],
-    vulnerable-endpoint:[GrantKey(base_scenario_side, {S1}), GrantKey(base_simulation_side, {})]
+  unrestricted   = false,
+  tenantRules    = {
+    T1: TenantRules(
+      unrestricted     = false,
+      readableEntities = [asset, asset-group, tag, team, domain, attack-pattern,
+                          scenario, simulation, inject, expectation-inject, finding,
+                          vulnerable-endpoint],
+                         # no security-platform (no ACCESS_SECURITY_PLATFORMS), no snapshot observations
+      grantFilters     = {
+        scenario:           [GrantKey(base_id,            {S1})],
+        simulation:         [GrantKey(base_id,            {S1's simulations created after the grant}),
+                             GrantKey(base_scenario_side, {S1})],   # grants copied at creation, §2.2
+        inject:             [GrantKey(base_scenario_side, {S1}), GrantKey(base_simulation_side, {}),
+                             GrantKey(base_id,            {})],     # atomic testing
+        expectation-inject: [... same keys, base_inject_side for atomic testing ...],
+        finding:            [... same keys ...],
+        vulnerable-endpoint:[GrantKey(base_scenario_side, {S1}), GrantKey(base_simulation_side, {})]
+      },
+      hiddenAssetIds   = {A-RED}),                 # T1's assets outside the clearance
+    T2: TenantRules.ALL   # every type, no grant filter, no hidden asset
   },
-  hiddenAssetIds   = {A-RED},
-  legacyGrantUser  = <the user's RawUserAuth>   # used by es9 / OpenSearch only
+  legacyGrantUser = <the user's RawUserAuth>     # used by es9 / OpenSearch only
 )
 ```
+
+**When `exclude` is needed.** A document can hold asset information of its own: the ids of the
+assets it depends on (an inject's targets, a finding's endpoints). These are its **dependency
+fields**, declared per index in `EngineSecurityRegistry`, which plays here the role
+`MarkingDerivedTables` plays in SQL: it says where derived asset information sits in each
+document. Two tools filter a hidden asset out of them:
+
+- `must_not` removes the **whole document** when its dependency field holds a hidden asset: the
+  document is about that asset (an expectation, a finding, a vulnerable endpoint);
+- an aggregation's `exclude` removes the hidden asset **from the dependency field of a document that
+  stays visible**, so that it gets no bucket of its own (a scenario targeting GREEN and RED stays,
+  RED gets no bar). Returned documents are stripped the same way (`stripHiddenAssets`).
+
+So `exclude` only matters for a multi-valued dependency field of documents that stay visible:
+
+| Breakdown field | Carried by | Document still returned when it references RED? | `exclude` needed? |
+|---|---|---|---|
+| `base_assets_side` | inject, scenario, simulation (their targets) | **yes**: the parent stays visible | **yes**, otherwise RED gets a bar |
+| `base_asset_side` | expectation, observations | no: dropped by `must_not` | no, redundant |
+| `base_endpoint_side` | finding | no: dropped as soon as one endpoint is hidden (strict) | no today; **yes** if findings become permissive |
+| `vulnerable_endpoint_id`, `base_id` | vulnerable endpoint, asset | no: dropped | no, redundant |
+
+The `exclude` uses the union of every tenant's hidden assets, since one aggregation spans the tenants
+of the request.
 
 An admin gets `EngineReadScope.unrestricted(…)`: no per-user filter at all. A user holding every
 capability, with no hidden asset, gets the same.
@@ -445,19 +509,21 @@ sequenceDiagram
     participant ENG as ElasticService (es8)
     participant ES as Elasticsearch
 
-    B->>API: POST /dashboards/adhoc/entities (TxCtx from the URL tenant)
+    B->>API: POST /dashboards/adhoc/entities (TxCtx: the URL tenant, or X-Tenant-Ids)
     API->>DS: adHocEntities(ctx, configuration, …)
     DS->>R: resolve(ctx)
     R->>DB: getUserWithAuth(userId) → RawUserAuth (grants, typed)
-    loop each type of EngineSecurityRegistry
-        R->>PS: hasCapabilityPermission(user, type's ResourceType, READ)
-        Note right of R: readable? grant-managed without its bypass<br/>capability → GrantKeys from the user's grants
+    loop each tenant T of ctx
+        loop each type of EngineSecurityRegistry
+            R->>PS: hasCapabilityPermissionInTenant(user, T, type's ResourceType, READ)
+            Note right of R: readable in T? grant-managed without its bypass<br/>capability in T → GrantKeys from the user's grants
+        end
     end
     R->>MS: clearanceFor(ctx) → marking ids held (same as the SQL rewrite)
     R->>DB: SELECT asset_id FROM assets WHERE marking not covered → hiddenAssetIds
     R-->>DS: EngineReadScope
     DS->>ENG: entities(ctx, scope, runtime)
-    ENG->>ENG: buildQuery = data query<br/>+ filter tenantFilter(ctx)<br/>+ filter readerFilter(scope)
+    ENG->>ENG: buildQuery = data query<br/>+ filter tenantFilter(ctx)<br/>+ filter readerFilter(scope), per tenant
     ENG->>ES: search (aggregations on asset fields: exclude hiddenAssetIds)
     ES-->>ENG: hits
     ENG->>ENG: stripHiddenAssets on each document
@@ -618,7 +684,7 @@ Java) and **filtering with them** (in Elasticsearch). Neither has been measured 
 | Step | What it costs | What makes it grow |
 |---|---|---|
 | Load the user with roles and grants (`getUserWithAuth`) | 1 SQL query | the number of grants of the user's groups |
-| Capability per indexed type | in memory, about 15 checks | nothing |
+| Capability per indexed type, per tenant | in memory, about 15 checks per tenant of the request | the number of tenants the request reads (unprefixed routes: every membership by default) |
 | Granted ids per type | in memory, from the grants already loaded | the number of grants. Grants are **copied** to every simulation created from a granted scenario (§2.2): a user granted on one scenario run daily for a year holds about 365 simulation grants |
 | Hidden asset ids (markings) | 1 SQL query on the tenant's assets; the user's clearance itself is cached | the number of marked assets the user may not see. The `NOT (marking_ids <@ clearance)` test cannot use the GIN index on `marking_ids`, so it scans the tenant's assets |
 | How often | once per HTTP call, and a dashboard sends one call per widget | the number of widgets: a 10-widget dashboard resolves the same scope 10 times |
@@ -628,7 +694,7 @@ Java) and **filtering with them** (in Elasticsearch). Neither has been measured 
 | Step | What it costs | What makes it grow |
 |---|---|---|
 | `terms` filters on the granted ids and the hidden asset ids | cheap on keyword fields, run in filter context | the size of the lists. Elasticsearch refuses a `terms` query above 65 536 values (`index.max_terms_count`) |
-| One `should` clause per readable type | about 15 clauses per query | nothing |
+| One `should` clause per readable type, per tenant | about 15 clauses per tenant of the request | the number of tenants the request reads |
 | `exclude` of the hidden ids in asset aggregations | per bucket | the number of hidden assets |
 | Filter cache | the lists differ per user, so Elasticsearch reuses cached filters less than with the tenant filter alone | the number of distinct users |
 | Request size | the lists travel in every query | the size of the lists |

@@ -508,8 +508,8 @@ class SnapshotObservationServiceTest {
     void given_search_should_readWithTheScopeOfTheRequestTenant() {
       // -- ARRANGE --
       EngineReadScope scope =
-          new EngineReadScope(
-              false, Set.of("snapshot-attack-observation"), Map.of(), Set.of(), null);
+          EngineReadScope.forTenant(
+              TENANT_ID, Set.of("snapshot-attack-observation"), Map.of(), Set.of());
       when(scopeResolver.resolve(TxCtx.forTenant(TENANT_ID))).thenReturn(scope);
       givenDocuments(List.of());
 

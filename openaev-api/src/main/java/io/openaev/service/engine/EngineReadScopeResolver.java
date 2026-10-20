@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.stereotype.Service;
 
 /**
@@ -59,7 +60,7 @@ public class EngineReadScopeResolver {
    * is_marking_set_allowed}, against the same clearance.
    */
   static final String HIDDEN_ASSETS_SQL =
-      "SELECT a.asset_id FROM assets a"
+      "SELECT a.asset_id, a.tenant_id FROM assets a"
           + " WHERE a.tenant_id = ANY(?)"
           + " AND cardinality(COALESCE(a.marking_ids, '{}'::text[])) > 0"
           + " AND NOT (COALESCE(a.marking_ids, '{}'::text[]) <@ ?::text[])";
@@ -117,18 +118,52 @@ public class EngineReadScopeResolver {
       return EngineReadScope.unrestricted(null);
     }
 
+    // Capabilities are held per tenant, and one request can read several: each tenant's rules come
+    // from the user's rights in that tenant, never from the ambient one. A scope not restricted to
+    // tenants (no HTTP reader has one) gets no tenant rules: it fails closed.
+    if (!(ctx instanceof TxCtx.Restricted restricted)) {
+      return new EngineReadScope(false, Map.of(), auth);
+    }
     Map<Grant.GRANT_RESOURCE_TYPE, Set<String>> grantedIds = grantedIdsByType(auth);
+    Map<String, Set<String>> hiddenAssetIds = hiddenAssetIdsByTenant(restricted);
+    Map<String, EngineReadScope.TenantRules> tenantRules = new HashMap<>();
+    boolean seesEverything = true;
+    boolean seesEverySimulation = true;
+    for (String tenantId : restricted.tenantIds()) {
+      EngineReadScope.TenantRules rules =
+          rulesIn(user, tenantId, grantedIds, hiddenAssetIds.getOrDefault(tenantId, Set.of()));
+      tenantRules.put(tenantId, rules);
+      seesEverything &= rules.seesEverything();
+      seesEverySimulation &=
+          holds(user, tenantId, new ResourceAccess(ResourceType.SIMULATION, Action.READ));
+    }
+
+    // The snapshot export of the engines not ported yet still applies the former grant filter,
+    // skipped when the reader sees every scenario and simulation (same rule as before).
+    RawUserAuth legacyGrantUser = seesEverySimulation ? null : auth;
+    if (seesEverything) {
+      return EngineReadScope.unrestricted(legacyGrantUser);
+    }
+    return new EngineReadScope(false, tenantRules, legacyGrantUser);
+  }
+
+  /** What the user may read in one tenant, from their rights and that tenant's hidden assets. */
+  private EngineReadScope.TenantRules rulesIn(
+      User user,
+      String tenantId,
+      Map<Grant.GRANT_RESOURCE_TYPE, Set<String>> grantedIds,
+      Set<String> hiddenAssetIds) {
     Set<String> readableEntities = new HashSet<>();
     Map<String, List<EngineReadScope.GrantKey>> grantFilters = new HashMap<>();
     boolean everythingReadable = true;
     for (Map.Entry<String, EntitySecurity> entry : EngineSecurityRegistry.entities().entrySet()) {
       EntitySecurity security = entry.getValue();
-      if (!security.requiredAccess().stream().allMatch(access -> holds(user, access))) {
+      if (!security.requiredAccess().stream().allMatch(access -> holds(user, tenantId, access))) {
         everythingReadable = false;
         continue;
       }
       readableEntities.add(entry.getKey());
-      if (security.grantManaged() && !holds(user, security.grantBypass())) {
+      if (security.grantManaged() && !holds(user, tenantId, security.grantBypass())) {
         everythingReadable = false;
         List<EngineReadScope.GrantKey> keys = new ArrayList<>();
         security
@@ -142,48 +177,47 @@ public class EngineReadScopeResolver {
         grantFilters.put(entry.getKey(), keys);
       }
     }
-
-    Set<String> hiddenAssetIds = hiddenAssetIds(ctx);
-    // The snapshot export of the engines not ported yet still applies the former grant filter,
-    // skipped when the reader sees every scenario and simulation (same rule as before).
-    RawUserAuth legacyGrantUser =
-        holds(user, new ResourceAccess(ResourceType.SIMULATION, Action.READ)) ? null : auth;
-    if (everythingReadable && hiddenAssetIds.isEmpty()) {
-      return EngineReadScope.unrestricted(legacyGrantUser);
-    }
-    return new EngineReadScope(
-        false, readableEntities, grantFilters, hiddenAssetIds, legacyGrantUser);
+    return everythingReadable
+        ? new EngineReadScope.TenantRules(true, Set.of(), Map.of(), hiddenAssetIds)
+        : new EngineReadScope.TenantRules(false, readableEntities, grantFilters, hiddenAssetIds);
   }
 
   /**
-   * The marked assets the reader may not see, in the tenants of the request. Empty when markings
-   * are not enforced on {@code assets} (preview feature off, or table not active): dashboards then
-   * show what the REST API shows.
+   * The marked assets the reader may not see, per tenant of the request. Empty when markings are
+   * not enforced on {@code assets} (preview feature off, or table not active): dashboards then show
+   * what the REST API shows. The clearance is the one of the SQL rewrite for the same request; a
+   * marking belongs to one tenant, so a marking held in one tenant never unhides another tenant's
+   * asset.
    */
-  Set<String> hiddenAssetIds(TxCtx ctx) {
-    if (markedTables.get(ASSETS_TABLE) == null || !(ctx instanceof TxCtx.Restricted restricted)) {
-      return Set.of();
+  Map<String, Set<String>> hiddenAssetIdsByTenant(TxCtx.Restricted ctx) {
+    if (markedTables.get(ASSETS_TABLE) == null) {
+      return Map.of();
     }
     MarkingCtx clearance = markingScopeSupplier.clearanceFor(ctx);
     List<String> held =
         clearance instanceof MarkingCtx.Restricted granted ? granted.markingIds() : List.of();
-    String[] tenantIds = restricted.tenantIds().toArray(String[]::new);
+    String[] tenantIds = ctx.tenantIds().toArray(String[]::new);
     String[] markingIds = held.toArray(String[]::new);
-    List<String> hidden =
-        jdbcTemplate.query(
-            HIDDEN_ASSETS_SQL,
-            statement -> {
-              Array tenants = statement.getConnection().createArrayOf("varchar", tenantIds);
-              Array markings = statement.getConnection().createArrayOf("text", markingIds);
-              statement.setArray(1, tenants);
-              statement.setArray(2, markings);
-            },
-            (row, index) -> row.getString(1));
-    return Set.copyOf(hidden);
+    Map<String, Set<String>> hidden = new HashMap<>();
+    jdbcTemplate.query(
+        HIDDEN_ASSETS_SQL,
+        statement -> {
+          Array tenants = statement.getConnection().createArrayOf("varchar", tenantIds);
+          Array markings = statement.getConnection().createArrayOf("text", markingIds);
+          statement.setArray(1, tenants);
+          statement.setArray(2, markings);
+        },
+        (RowCallbackHandler)
+            row ->
+                hidden
+                    .computeIfAbsent(row.getString(2), tenantId -> new HashSet<>())
+                    .add(row.getString(1)));
+    return hidden;
   }
 
-  private boolean holds(User user, ResourceAccess access) {
-    return permissionService.hasCapabilityPermission(user, access.resourceType(), access.action());
+  private boolean holds(User user, String tenantId, ResourceAccess access) {
+    return permissionService.hasCapabilityPermissionInTenant(
+        user, tenantId, access.resourceType(), access.action());
   }
 
   private static Map<Grant.GRANT_RESOURCE_TYPE, Set<String>> grantedIdsByType(RawUserAuth auth) {

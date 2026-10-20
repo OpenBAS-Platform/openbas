@@ -43,7 +43,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @DisplayName("Engine read scope resolution")
 class EngineReadScopeResolverTest {
 
-  private static final TxCtx CTX = TxCtx.forTenant("tenant-a");
+  private static final String TENANT_A = "tenant-a";
+  private static final String TENANT_B = "tenant-b";
+  private static final TxCtx CTX = TxCtx.forTenant(TENANT_A);
 
   @Mock private PermissionService permissionService;
   @Mock private UserService userService;
@@ -79,8 +81,12 @@ class EngineReadScopeResolverTest {
   private void grantCapabilities(ResourceType... granted) {
     Set<ResourceType> held = Set.of(granted);
     lenient()
-        .when(permissionService.hasCapabilityPermission(eq(user), any(), any()))
-        .thenAnswer(invocation -> held.contains(invocation.<ResourceType>getArgument(1)));
+        .when(permissionService.hasCapabilityPermissionInTenant(eq(user), any(), any(), any()))
+        .thenAnswer(invocation -> held.contains(invocation.<ResourceType>getArgument(2)));
+  }
+
+  private EngineReadScope.TenantRules rulesOf(EngineReadScope scope) {
+    return scope.tenantRules().get(TENANT_A);
   }
 
   private static RawGrant grant(String resourceId, Grant.GRANT_RESOURCE_TYPE type) {
@@ -132,8 +138,8 @@ class EngineReadScopeResolverTest {
 
       // -- ASSERT --
       assertThat(scope.unrestricted()).isFalse();
-      assertThat(scope.readableEntities()).doesNotContain("asset", "vulnerable-endpoint");
-      assertThat(scope.readableEntities()).contains("finding", "scenario", "tag");
+      assertThat(rulesOf(scope).readableEntities()).doesNotContain("asset", "vulnerable-endpoint");
+      assertThat(rulesOf(scope).readableEntities()).contains("finding", "scenario", "tag");
     }
 
     @Test
@@ -141,7 +147,7 @@ class EngineReadScopeResolverTest {
     void given_everyCapability_should_beUnrestricted() {
       // -- ARRANGE --
       lenient()
-          .when(permissionService.hasCapabilityPermission(eq(user), any(), any()))
+          .when(permissionService.hasCapabilityPermissionInTenant(eq(user), any(), any(), any()))
           .thenReturn(true);
 
       // -- ACT --
@@ -168,10 +174,10 @@ class EngineReadScopeResolverTest {
       EngineReadScope scope = resolver.resolve(CTX);
 
       // -- ASSERT --
-      List<EngineReadScope.GrantKey> keys = scope.grantFilters().get("scenario");
+      List<EngineReadScope.GrantKey> keys = rulesOf(scope).grantFilters().get("scenario");
       assertThat(keys)
           .containsExactly(new EngineReadScope.GrantKey("base_id", Set.of("scenario-1")));
-      assertThat(scope.grantFilters().get("finding"))
+      assertThat(rulesOf(scope).grantFilters().get("finding"))
           .contains(new EngineReadScope.GrantKey("base_scenario_side", Set.of("scenario-1")));
     }
 
@@ -186,7 +192,8 @@ class EngineReadScopeResolverTest {
       EngineReadScope scope = resolver.resolve(CTX);
 
       // -- ASSERT --
-      assertThat(scope.grantFilters()).doesNotContainKeys("scenario", "simulation", "finding");
+      assertThat(rulesOf(scope).grantFilters())
+          .doesNotContainKeys("scenario", "simulation", "finding");
     }
 
     @Test
@@ -199,8 +206,52 @@ class EngineReadScopeResolverTest {
       EngineReadScope scope = resolver.resolve(CTX);
 
       // -- ASSERT --
-      assertThat(scope.readableEntities()).contains("asset");
-      assertThat(scope.grantFilters()).doesNotContainKey("asset");
+      assertThat(rulesOf(scope).readableEntities()).contains("asset");
+      assertThat(rulesOf(scope).grantFilters()).doesNotContainKey("asset");
+    }
+  }
+
+  @Nested
+  @DisplayName("Several tenants")
+  class SeveralTenants {
+
+    @Test
+    @DisplayName("given different capabilities in two tenants, should resolve each tenant's rules")
+    void given_differentCapabilitiesPerTenant_should_resolveRulesPerTenant() {
+      // -- ARRANGE --
+      // ACCESS_ASSETS and ACCESS_ASSESSMENT in tenant A only; nothing but open types in tenant B.
+      Set<ResourceType> heldInA =
+          Set.of(ResourceType.ASSET, ResourceType.SIMULATION, ResourceType.SCENARIO);
+      when(permissionService.hasCapabilityPermissionInTenant(eq(user), any(), any(), any()))
+          .thenAnswer(
+              invocation ->
+                  TENANT_A.equals(invocation.getArgument(1))
+                      && heldInA.contains(invocation.<ResourceType>getArgument(2)));
+      RawGrant onScenario = grant("scenario-b", Grant.GRANT_RESOURCE_TYPE.SCENARIO);
+      when(auth.getUser_grants()).thenReturn(Set.of(onScenario));
+
+      // -- ACT --
+      EngineReadScope scope = resolver.resolve(TxCtx.forTenants(List.of(TENANT_A, TENANT_B)));
+
+      // -- ASSERT --
+      EngineReadScope.TenantRules inA = scope.tenantRules().get(TENANT_A);
+      EngineReadScope.TenantRules inB = scope.tenantRules().get(TENANT_B);
+      assertThat(inA.readableEntities()).contains("asset", "scenario");
+      assertThat(inA.grantFilters()).doesNotContainKeys("scenario", "simulation");
+      assertThat(inB.readableEntities()).doesNotContain("asset");
+      assertThat(inB.grantFilters().get("scenario"))
+          .containsExactly(new EngineReadScope.GrantKey("base_id", Set.of("scenario-b")));
+    }
+
+    @Test
+    @DisplayName("given a scope not restricted to tenants, should read nothing")
+    void given_unrestrictedTxCtx_should_failClosed() {
+      // -- ACT --
+      EngineReadScope scope = resolver.resolve(TxCtx.allTenants());
+
+      // -- ASSERT --
+      assertThat(scope.unrestricted()).isFalse();
+      assertThat(scope.tenantRules()).isEmpty();
     }
   }
 
