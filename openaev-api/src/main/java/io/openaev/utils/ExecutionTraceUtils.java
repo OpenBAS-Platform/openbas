@@ -24,6 +24,13 @@ import java.util.stream.Collectors;
  */
 public class ExecutionTraceUtils {
 
+  // EnumSet, not Set.of: contains(null) is false instead of throwing on a trace without status
+  private static final Set<ExecutionTraceStatus> PLATFORM_CLOSING_STATUSES =
+      java.util.EnumSet.of(
+          ExecutionTraceStatus.TIMEOUT,
+          ExecutionTraceStatus.INTERRUPTED,
+          ExecutionTraceStatus.LATE);
+
   private ExecutionTraceUtils() {}
 
   // -- CONVERSION --
@@ -73,8 +80,8 @@ public class ExecutionTraceUtils {
 
   /**
    * Finds the COMPLETE trace that already closed the given agent. For an agent-less callback only a
-   * platform-written timeout (TIMEOUT or LATE) counts as closing, since injectors may legitimately
-   * send several agent-less COMPLETE traces.
+   * platform-written closing trace (TIMEOUT, INTERRUPTED or LATE) counts, since injectors may
+   * legitimately send several agent-less COMPLETE traces.
    */
   public static Optional<ExecutionTrace> findClosingCompleteTrace(
       List<ExecutionTrace> traces, @Nullable Agent agent) {
@@ -83,11 +90,17 @@ public class ExecutionTraceUtils {
         .filter(
             t ->
                 agent == null
-                    ? t.getAgent() == null
-                        && (ExecutionTraceStatus.TIMEOUT.equals(t.getStatus())
-                            || ExecutionTraceStatus.LATE.equals(t.getStatus()))
+                    ? t.getAgent() == null && PLATFORM_CLOSING_STATUSES.contains(t.getStatus())
                     : t.getAgent() != null && agent.getId().equals(t.getAgent().getId()))
         .findFirst();
+  }
+
+  /**
+   * Finds the agent-less COMPLETE trace through which the platform closed the whole inject (agent
+   * timeout on an agent-less inject, simulation timeout or interruption).
+   */
+  public static Optional<ExecutionTrace> findPlatformClosingTrace(List<ExecutionTrace> traces) {
+    return findClosingCompleteTrace(traces, null);
   }
 
   // -- TRACE BUILDERS --
@@ -134,6 +147,23 @@ public class ExecutionTraceUtils {
             + delay
             + " after the timeout"
             + reported);
+  }
+
+  /**
+   * Marks the COMPLETE trace of an agent that reports back after the platform already closed the
+   * whole inject (simulation timeout or interruption). The trace is kept as the agent's single
+   * terminal trace, as LATE, with the status it reported folded into the message.
+   *
+   * @param lateTrace the COMPLETE trace received after the inject was closed (about to be stored)
+   */
+  public static void markAsLateAfterPlatformClose(ExecutionTrace lateTrace) {
+    String reported = lateTrace.getMessage() == null ? "" : ": " + lateTrace.getMessage();
+    lateTrace.setMessage(
+        "The agent reported "
+            + lateTrace.getStatus()
+            + " after the inject was closed by the platform"
+            + reported);
+    lateTrace.setStatus(ExecutionTraceStatus.LATE);
   }
 
   public static void addSimulationTimeoutTrace(InjectStatus status) {

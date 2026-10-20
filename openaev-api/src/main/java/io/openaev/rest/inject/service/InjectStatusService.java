@@ -309,7 +309,7 @@ public class InjectStatusService {
     Optional<ExecutionTrace> closingTrace =
         ExecutionTraceUtils.findClosingCompleteTrace(injectStatus.getTraces(), agent);
     if (closingTrace.isEmpty()) {
-      return false;
+      return agent != null && absorbAgentReportAfterPlatformClose(inject, injectStatus, incoming);
     }
     ExecutionTrace closing = closingTrace.get();
     if (ExecutionTraceStatus.TIMEOUT.equals(closing.getStatus())) {
@@ -328,6 +328,38 @@ public class InjectStatusService {
           agent != null ? agent.getId() : "none",
           closing.getStatus());
     }
+    return true;
+  }
+
+  /**
+   * Handles the COMPLETE of an agent that has no terminal trace yet while the whole inject was
+   * already closed by the platform (simulation timeout or interruption, which write an agent-less
+   * closing trace and force the status to a final value). The trace is stored as the agent's single
+   * terminal trace, as LATE, and the inject status is not recomputed: otherwise the agent's success
+   * would be mixed with the platform's error and turn the inject into PARTIAL.
+   *
+   * @return true if the trace was stored as LATE and must not be processed further
+   */
+  private boolean absorbAgentReportAfterPlatformClose(
+      Inject inject, InjectStatus injectStatus, ExecutionTrace incoming) {
+    ExecutionStatus status = injectStatus.getName();
+    boolean closed =
+        status != null && !ExecutionStatus.INJECT_EXECUTION_IN_PROGRESS_STATUSES.contains(status);
+    if (!closed
+        || ExecutionTraceUtils.findPlatformClosingTrace(injectStatus.getTraces()).isEmpty()) {
+      return false;
+    }
+    ExecutionTraceUtils.markAsLateAfterPlatformClose(incoming);
+    injectStatus.addTrace(incoming);
+    incoming.setId(executionTraceRepositoryHelper.saveExecutionTrace(incoming));
+    entityManager.merge(injectStatus);
+    logAgentTraceStep(injectStatus, incoming);
+    publishInjectStatusUpdate(inject);
+    log.info(
+        "Late COMPLETE for inject {} (agent {}): stored as LATE after the platform closed the inject, status kept {}",
+        inject.getId(),
+        incoming.getAgent().getId(),
+        status);
     return true;
   }
 
