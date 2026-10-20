@@ -5,7 +5,6 @@ import static io.openaev.config.TenantUriUtils.TENANT_PREFIX;
 import static io.openaev.database.audit.ModelBaseListener.DATA_DELETE;
 import static java.time.Instant.now;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -14,8 +13,10 @@ import io.openaev.annotation.NoTenantScope;
 import io.openaev.aop.AccessControl;
 import io.openaev.config.OpenAEVPrincipal;
 import io.openaev.context.TenantContext;
+import io.openaev.context.TxCtx;
 import io.openaev.database.audit.BaseEvent;
 import io.openaev.database.model.Action;
+import io.openaev.database.model.Base;
 import io.openaev.database.model.DualScopeBase;
 import io.openaev.database.model.ResourceType;
 import io.openaev.database.model.Tenant;
@@ -34,6 +35,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -120,20 +122,58 @@ public class StreamApi extends RestBehavior {
    * with the consumer's tenant context already set (the underlying check is tenant-aware). Cache
    * misses of the same key may race and both hit the database: bounded and far cheaper than one
    * resolution per event per consumer.
+   *
+   * <p>The check targets the resource captured on the event (the parent simulation, scenario or
+   * atomic testing for child entities, see {@link BaseEvent#getPermissionResourceId()}), so it
+   * needs no reload of the entity and is cached per parent rather than per child.
+   *
+   * <p>Runs in the tenant of the row the event is about, else the consumer's: this thread carries
+   * no request {@code TxCtx}, and resolving a parent permission loads the child row from a table
+   * that may be v2-active. With neither tenant, the check runs unscoped.
+   *
+   * <p>Fails closed: a check that throws counts as denied and is not cached.
    */
   private boolean hasReadPermission(StreamConsumer consumer, User user, BaseEvent event) {
-    return hasReadPermission(
-        consumer,
-        event.getInstance().getId(),
-        event.getInstance().getResourceType(),
-        CHECK_ENTITY_EVENT,
-        () ->
-            permissionService.hasPermission(
-                user,
-                Optional.empty(),
-                event.getInstance().getId(),
-                event.getInstance().getResourceType(),
-                Action.READ));
+    String resourceId = event.getPermissionResourceId();
+    ResourceType resourceType = event.getPermissionResourceType();
+    String checkTenantId =
+        Optional.ofNullable(tenantOf(event.getInstance()))
+            .or(() -> Optional.ofNullable(consumer.tenantId()).filter(id -> !id.isBlank()))
+            .orElse(null);
+    try {
+      return hasReadPermission(
+          consumer,
+          resourceId,
+          resourceType,
+          CHECK_ENTITY_EVENT,
+          () ->
+              checkTenantId != null
+                  ? permissionService.hasPermissionInTenant(
+                      TxCtx.forTenant(checkTenantId), user, resourceId, resourceType, Action.READ)
+                  : permissionService.hasPermission(
+                      user, Optional.empty(), resourceId, resourceType, Action.READ));
+    } catch (Exception e) {
+      log.debug(
+          "Stream permission check failed for {} {}, treated as denied",
+          resourceType,
+          resourceId,
+          e);
+      return false;
+    }
+  }
+
+  /**
+   * Whether a denied event must still reach the consumer, as an id-only tombstone: only the
+   * deletion of a grant-managed root (scenario, simulation, atomic testing). Its grants are deleted
+   * with it, so the check, run after commit, denies everyone who read it through a grant, and the
+   * tombstone is what removes it from their client. Any other denial is a real one: capability
+   * checks still hold once the row is gone, and a child is checked against its parent, which still
+   * exists.
+   */
+  private static boolean isGrantManagedRootDeletion(BaseEvent event) {
+    return DATA_DELETE.equals(event.getType())
+        && Objects.equals(event.getInstance().getId(), event.getPermissionResourceId())
+        && PermissionService.isManagedByGrants(event.getPermissionResourceType());
   }
 
   /**
@@ -194,7 +234,11 @@ public class StreamApi extends RestBehavior {
 
   private void sendStreamEvent(FluxSink<Object> flux, BaseEvent event) {
     // Serialize the instance now for lazy session decoupling
-    event.setInstanceData(mapper.valueToTree(event.getInstance()));
+    sendStreamEvent(flux, event, mapper.valueToTree(event.getInstance()));
+  }
+
+  private void sendStreamEvent(FluxSink<Object> flux, BaseEvent event, JsonNode instanceData) {
+    event.setInstanceData(instanceData);
     ServerSentEvent<BaseEvent> message =
         ServerSentEvent.builder(event).event(EVENT_TYPE_MESSAGE).build();
     flux.next(message);
@@ -228,67 +272,88 @@ public class StreamApi extends RestBehavior {
 
     consumers.forEach(
         (key, consumer) -> {
-          if (!isVisibleForTenant(event, consumer.tenantId())) {
-            return;
-          }
-
-          // User-scoped entities (e.g. notifications) are only delivered to their owner,
-          // bypassing the capability-based masking below.
-          if (event.getInstance() instanceof UserScoped userScoped) {
-            if (consumer.principal().getId().equals(userScoped.getOwnerUserId())) {
-              sendStreamEvent(consumer.fluxSink(), event);
-            }
-            return;
-          }
-
-          // Resolved from a short-lived cache instead of a DB query per event per consumer,
-          // which used to exhaust the connection pool while viewing busy simulations.
-          User user = resolveUser(consumer.principal().getId());
-
-          // Set the tenant context for permission checks on the async thread.
-          // Without this, TenantContext defaults to DEFAULT_TENANT_UUID, causing
-          // tenant-scoped capabilities to be invisible and incorrect DELETE events
-          // to be sent for entities on non-default tenants. Legacy consumers
-          // (blank tenant) are explicitly cleared so a reused @Async pool thread
-          // can never evaluate (and cache) their decisions under a tenant leaked
-          // by a previous task.
-          if (consumer.tenantId() != null && !consumer.tenantId().isBlank()) {
-            TenantContext.setCurrentTenant(consumer.tenantId());
-          } else {
-            TenantContext.clearCurrentTenant();
-          }
-
+          // Isolated per consumer: one failing delivery must not stop the fan-out to the others.
           try {
-            FluxSink<Object> fluxSink = consumer.fluxSink();
-            if (!hasReadPermission(consumer, user, event)) {
-              try {
-                String propertyId =
-                    event
-                        .getInstance()
-                        .getClass()
-                        .getDeclaredField("id")
-                        .getAnnotation(JsonProperty.class)
-                        .value();
-                ObjectNode deleteNode = mapper.createObjectNode();
-                deleteNode.set(
-                    propertyId, mapper.convertValue(event.getInstance().getId(), JsonNode.class));
-                BaseEvent userEvent = event.clone();
-                userEvent.setInstanceData(deleteNode);
-                userEvent.setType(DATA_DELETE);
-                sendStreamEvent(fluxSink, userEvent);
-              } catch (Exception e) {
-                String simpleName = event.getInstance().getClass().getSimpleName();
-                log.warn(String.format("Class %s can't be streamed", simpleName), e);
-              }
-            } else {
-              sendStreamEvent(fluxSink, event);
-            }
-          } finally {
-            // Reset tenant context unconditionally to avoid leaking into other
-            // consumers in the loop or into later tasks on this pooled thread
-            TenantContext.clearCurrentTenant();
+            streamDatabaseEvent(consumer, event);
+          } catch (Exception e) {
+            log.warn(
+                "Failed to stream {} event on {} to user {}",
+                event.getType(),
+                event.getSchema(),
+                consumer.principal().getId(),
+                e);
           }
         });
+  }
+
+  private void streamDatabaseEvent(StreamConsumer consumer, BaseEvent event) {
+    if (!isVisibleForTenant(event, consumer.tenantId())) {
+      return;
+    }
+
+    // User-scoped entities (e.g. notifications) are only delivered to their owner,
+    // bypassing the capability-based masking below.
+    if (event.getInstance() instanceof UserScoped userScoped) {
+      if (consumer.principal().getId().equals(userScoped.getOwnerUserId())) {
+        sendStreamEvent(consumer.fluxSink(), event);
+      }
+      return;
+    }
+
+    // Resolved from a short-lived cache instead of a DB query per event per consumer,
+    // which used to exhaust the connection pool while viewing busy simulations.
+    User user = resolveUser(consumer.principal().getId());
+
+    // Set the tenant context for permission checks on the async thread.
+    // Without this, TenantContext defaults to DEFAULT_TENANT_UUID, causing
+    // tenant-scoped capabilities to be invisible and incorrect DELETE events
+    // to be sent for entities on non-default tenants. Legacy consumers
+    // (blank tenant) are explicitly cleared so a reused @Async pool thread
+    // can never evaluate (and cache) their decisions under a tenant leaked
+    // by a previous task.
+    if (consumer.tenantId() != null && !consumer.tenantId().isBlank()) {
+      TenantContext.setCurrentTenant(consumer.tenantId());
+    } else {
+      TenantContext.clearCurrentTenant();
+    }
+
+    try {
+      FluxSink<Object> fluxSink = consumer.fluxSink();
+      if (!hasReadPermission(consumer, user, event)) {
+        // A consumer that cannot read the entity gets nothing: even an id-only tombstone
+        // discloses the id, schema and timing of an unreadable mutation.
+        if (!isGrantManagedRootDeletion(event)) {
+          return;
+        }
+        try {
+          String propertyId = event.getAttributeId();
+          if (propertyId == null || propertyId.isBlank()) {
+            log.warn(
+                "Class {} can't be streamed without an identifier",
+                event.getInstance().getClass().getSimpleName());
+            return;
+          }
+          ObjectNode deleteNode = mapper.createObjectNode();
+          deleteNode.set(
+              propertyId, mapper.convertValue(event.getInstance().getId(), JsonNode.class));
+          sendStreamEvent(fluxSink, event.clone(), deleteNode);
+        } catch (Exception e) {
+          String simpleName = event.getInstance().getClass().getSimpleName();
+          log.warn(String.format("Class %s can't be streamed", simpleName), e);
+        }
+      } else if (event.getInstance().getResourceType() == ResourceType.NOTIFIER
+          && !permissionService.hasCapabilityPermission(user, ResourceType.NOTIFIER, Action.READ)) {
+        ObjectNode instanceData = mapper.valueToTree(event.getInstance());
+        instanceData.putNull("notifier_configuration");
+        sendStreamEvent(fluxSink, event.clone(), instanceData);
+      } else {
+        sendStreamEvent(fluxSink, event);
+      }
+    } finally {
+      // Reset tenant context unconditionally to avoid leaking into other
+      // consumers in the loop or into later tasks on this pooled thread
+      TenantContext.clearCurrentTenant();
+    }
   }
 
   /**
@@ -379,6 +444,20 @@ public class StreamApi extends RestBehavior {
         });
   }
 
+  /** The tenant of the row, or null for a row outside the tenant model or a platform row. */
+  private static String tenantOf(Base instance) {
+    if (instance instanceof TenantBase tenantScoped) {
+      return tenantScoped.getTenant() != null ? tenantScoped.getTenant().getId() : null;
+    }
+    if (instance instanceof DualScopeBase dualScope) {
+      return dualScope.getTenant() != null ? dualScope.getTenant().getId() : null;
+    }
+    if (instance instanceof TenantIdBase tenantIdScoped) {
+      return tenantIdScoped.getTenantId();
+    }
+    return null;
+  }
+
   private boolean isVisibleForTenant(BaseEvent event, String consumerTenantId) {
     // Keep legacy behavior for /api/stream consumers (no explicit tenant in the URL).
     if (consumerTenantId == null || consumerTenantId.isBlank()) {
@@ -404,8 +483,11 @@ public class StreamApi extends RestBehavior {
   @GetMapping(
       path = {"/api/stream", TENANT_PREFIX + "/stream"},
       produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  @AccessControl(
-      skipRBAC = true) // TODO RBAC check must be done manually for every event in this method
+  // The stream multiplexes every event of the tenant, so no single capability can gate the
+  // subscription: a subscriber legitimately needs it for any resource it is entitled to read.
+  // Authorisation happens per event instead, in listenDatabaseUpdate, which resolves the resource
+  // governing each event and checks it against the consumer before the event is sent.
+  @AccessControl(skipRBAC = true)
   @NoTenantScope
   // No TxCtx here on purpose: propagation = NEVER guarantees no transaction is ever active for
   // this method, so TenantScopeTransactionAspect's set_config(..., true) would have no

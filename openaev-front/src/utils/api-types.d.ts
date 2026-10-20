@@ -3099,10 +3099,7 @@ export interface ConnectorInstanceLog {
 }
 
 export interface ConnectorInstanceLogsInput {
-  /**
-   * The connector instance logs
-   * @uniqueItems true
-   */
+  /** The connector instance logs, oldest first */
   connector_instance_logs?: string[];
 }
 
@@ -5738,6 +5735,7 @@ export interface Exercise {
   exercise_injects?: string[];
   exercise_injects_statistics?: Record<string, number>;
   exercise_kill_chain_phases?: KillChainPhase[];
+  exercise_launched_by?: string;
   exercise_lessons_anonymized?: boolean;
   /** @format int64 */
   exercise_lessons_answers_number?: number;
@@ -6324,6 +6322,7 @@ export interface Grant {
     | "SCENARIO"
     | "SIMULATION"
     | "ATOMIC_TESTING"
+    | "AUTONOMOUS_RUN"
     | "THREAT_ARSENAL"
     | "PAYLOAD"
     | "UNKNOWN";
@@ -6351,6 +6350,7 @@ export interface GroupGrantInput {
     | "SCENARIO"
     | "SIMULATION"
     | "ATOMIC_TESTING"
+    | "AUTONOMOUS_RUN"
     | "THREAT_ARSENAL"
     | "PAYLOAD"
     | "UNKNOWN";
@@ -6548,12 +6548,14 @@ export interface Inject {
   inject_injector?: string;
   inject_injector_contract?: InjectorContract;
   inject_kill_chain_phases?: KillChainPhase[];
+  inject_launched_by?: string;
   inject_recurrence?: string;
   /** @format date-time */
   inject_recurrence_end?: string;
   /** @format date-time */
   inject_recurrence_start?: string;
   inject_scenario?: string;
+  inject_scheduled_by?: string;
   inject_secret_references?: string[];
   /** @format date-time */
   inject_sent_at?: string;
@@ -8406,6 +8408,7 @@ export interface NotificationTriggerInput {
     | "SESSION"
     | "TOKEN"
     | "PLATFORM_SESSION"
+    | "AUTONOMOUS_RUN"
     | "SKIP_RBAC";
   /** Digest firing time (UTC): DAY=HH:mm, WEEK=<1-7>-HH:mm, MONTH=<1-31>-HH:mm */
   notification_trigger_time?: string;
@@ -8518,6 +8521,7 @@ export interface NotificationTriggerOutput {
     | "SESSION"
     | "TOKEN"
     | "PLATFORM_SESSION"
+    | "AUTONOMOUS_RUN"
     | "SKIP_RBAC";
   /** Digest firing time (UTC) */
   notification_trigger_time?: string;
@@ -11182,6 +11186,7 @@ export interface Scenario {
   scenario_recurrence_end?: string;
   /** @format date-time */
   scenario_recurrence_start?: string;
+  scenario_scheduled_by?: string;
   scenario_severity?: "low" | "medium" | "high" | "critical";
   scenario_subtitle?: string;
   scenario_tags?: string[];
