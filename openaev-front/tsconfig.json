@@ -32,7 +32,6 @@
     "packages",
     "public",
     "builder/prod/build",
-    "builder/dev/build",
     "src/static/ext/*",
     "vite.config.ts",
     "__generated__",
