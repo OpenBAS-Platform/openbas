@@ -33,16 +33,17 @@ import org.springframework.stereotype.Component;
  * Asks the search engine what it is, before any engine client is built.
  *
  * <p>The answer of {@code GET /} carries {@code version.number} on every engine, and {@code
- * version.distribution = "opensearch"} on OpenSearch only. The probe uses its own short-lived
- * client, configured like the engine clients (TLS, basic auth, timeouts), since the right engine
- * client cannot be chosen until the answer is known.
+ * version.distribution = "opensearch"} on OpenSearch outside compatibility mode, where the root
+ * {@code tagline} still identifies it. The probe uses its own short-lived client, configured like
+ * the engine clients (TLS, basic auth, timeouts), since the right engine client cannot be chosen
+ * until the answer is known.
  */
 @Component
 @RequiredArgsConstructor
 public class EngineVersionProbe {
 
   /** What the engine reported about itself. */
-  public record ServerInfo(String distribution, String number) {}
+  public record ServerInfo(String distribution, String number, String tagline) {}
 
   private record RawResponse(int status, String body) {}
 
@@ -53,7 +54,7 @@ public class EngineVersionProbe {
   /**
    * Calls {@code GET /} on {@code engine.url}.
    *
-   * @return the distribution and version reported by the engine
+   * @return the distribution, version and tagline reported by the engine
    * @throws StartupException if the engine is unreachable, refuses the call or answers something
    *     that is not an Elasticsearch or OpenSearch root response
    */
@@ -111,20 +112,22 @@ public class EngineVersionProbe {
   }
 
   private ServerInfo parse(String url, String body) {
-    JsonNode version;
+    JsonNode root;
     try {
-      version = mapper.readTree(body).path("version");
+      root = mapper.readTree(body);
     } catch (IOException e) {
       throw new StartupException(
           "The search engine at " + url + " answered a non-JSON body to the version detection", e);
     }
+    JsonNode version = root.path("version");
     if (!version.hasNonNull("number")) {
       throw new StartupException(
           "The server at " + url + " does not look like Elasticsearch or OpenSearch: no version");
     }
     String distribution =
         version.hasNonNull("distribution") ? version.get("distribution").asText() : null;
-    return new ServerInfo(distribution, version.get("number").asText());
+    String tagline = root.hasNonNull("tagline") ? root.get("tagline").asText() : null;
+    return new ServerInfo(distribution, version.get("number").asText(), tagline);
   }
 
   private CloseableHttpClient httpClient() {

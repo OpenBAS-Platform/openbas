@@ -92,7 +92,7 @@ public class EngineComponent {
       return EngineType.OPENSEARCH;
     }
     EngineVersionProbe.ServerInfo info = engineVersionProbe.detect();
-    EngineType type = EngineType.fromServerInfo(info.distribution(), info.number());
+    EngineType type = EngineType.fromServerInfo(info.distribution(), info.number(), info.tagline());
     log.info(
         "Engine auto-detected: {} {} at {} -> {} client",
         type == EngineType.OPENSEARCH ? "OpenSearch" : "Elasticsearch",

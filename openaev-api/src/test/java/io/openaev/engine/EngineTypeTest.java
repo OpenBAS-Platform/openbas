@@ -15,6 +15,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 @DisplayName("Engine type detection from the engine root response")
 class EngineTypeTest {
 
+  private static final String ELASTICSEARCH_TAGLINE = "You Know, for Search";
+  private static final String OPENSEARCH_TAGLINE =
+      "The OpenSearch Project: https://opensearch.org/";
+
   @Nested
   @DisplayName("Elasticsearch")
   class Elasticsearch {
@@ -32,7 +36,7 @@ class EngineTypeTest {
     void given_elasticsearchVersion_should_pickClientOfItsMajor(
         String version, EngineType expected) {
       // Act
-      EngineType type = EngineType.fromServerInfo(null, version);
+      EngineType type = EngineType.fromServerInfo(null, version, ELASTICSEARCH_TAGLINE);
 
       // Assert
       assertEquals(expected, type);
@@ -44,7 +48,9 @@ class EngineTypeTest {
     void given_elasticsearchOlderThan8_should_refuseToStart(String version) {
       // Act
       StartupException exception =
-          assertThrows(StartupException.class, () -> EngineType.fromServerInfo(null, version));
+          assertThrows(
+              StartupException.class,
+              () -> EngineType.fromServerInfo(null, version, ELASTICSEARCH_TAGLINE));
 
       // Assert
       assertEquals(
@@ -64,7 +70,21 @@ class EngineTypeTest {
     @DisplayName("given the opensearch distribution, should pick OpenSearch whatever the version")
     void given_opensearchDistribution_should_pickOpenSearch(String version) {
       // Act
-      EngineType type = EngineType.fromServerInfo(EngineType.OPENSEARCH_DISTRIBUTION, version);
+      EngineType type =
+          EngineType.fromServerInfo(
+              EngineType.OPENSEARCH_DISTRIBUTION, version, OPENSEARCH_TAGLINE);
+
+      // Assert
+      assertEquals(EngineType.OPENSEARCH, type);
+    }
+
+    @Test
+    @DisplayName(
+        "given compatibility mode (no distribution, version 7.10.2), should pick OpenSearch from"
+            + " its tagline")
+    void given_compatibilityMode_should_pickOpenSearchFromTagline() {
+      // Act
+      EngineType type = EngineType.fromServerInfo(null, "7.10.2", OPENSEARCH_TAGLINE);
 
       // Assert
       assertEquals(EngineType.OPENSEARCH, type);
@@ -81,7 +101,7 @@ class EngineTypeTest {
     @DisplayName("given a missing or malformed version, should refuse to start")
     void given_malformedVersion_should_refuseToStart(String version) {
       // Act & Assert
-      assertThrows(StartupException.class, () -> EngineType.fromServerInfo(null, version));
+      assertThrows(StartupException.class, () -> EngineType.fromServerInfo(null, version, null));
     }
 
     @Test
@@ -89,7 +109,8 @@ class EngineTypeTest {
     void given_unknownDistribution_should_refuseToStart() {
       // Act
       StartupException exception =
-          assertThrows(StartupException.class, () -> EngineType.fromServerInfo("solr", "9.0.0"));
+          assertThrows(
+              StartupException.class, () -> EngineType.fromServerInfo("solr", "9.0.0", null));
 
       // Assert
       assertEquals(

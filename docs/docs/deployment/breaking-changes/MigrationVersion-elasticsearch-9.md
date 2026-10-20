@@ -55,5 +55,6 @@ finishes.
 With Elasticsearch 9, a cluster whose certificate is signed by an internal CA is trusted as soon as that
 CA is dropped in `openaev.extra-trusted-certs-dir`, like every other outgoing connection of the platform
 (see [certificate validation](../platform/certificate-validation.md)). The Elasticsearch 8 client reads
-the JVM default trust store only, which leaves `engine.reject-unauthorized=false` — no verification at
-all — as the only way to reach such a cluster on Elasticsearch 8.
+the JVM default trust store only: import the CA into that trust store to reach such a cluster on
+Elasticsearch 8. `engine.reject-unauthorized=false` also works, but it disables certificate and hostname
+verification entirely, so keep it for tests.

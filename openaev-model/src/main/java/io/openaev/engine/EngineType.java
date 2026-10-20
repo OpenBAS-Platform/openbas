@@ -23,6 +23,9 @@ public enum EngineType {
    */
   public static final String OPENSEARCH_DISTRIBUTION = "opensearch";
 
+  /** Start of the root {@code tagline} of OpenSearch, compatibility mode included. */
+  public static final String OPENSEARCH_TAGLINE_PREFIX = "The OpenSearch Project";
+
   /** Oldest Elasticsearch 8 minor the platform supports. */
   private static final int MIN_ELASTICSEARCH_8_MINOR = 19;
 
@@ -35,18 +38,26 @@ public enum EngineType {
   /**
    * Picks the implementation matching the {@code GET /} answer of the engine.
    *
-   * <p>OpenSearch is recognised by its distribution, whatever version number it reports: with
-   * {@code compatibility.override_main_response_version} it announces itself as 7.10.2.
-   * Elasticsearch reports no distribution, and its major version picks the client: the 9.x client
-   * is rejected by an 8.x server, so each major needs its own.
+   * <p>OpenSearch is recognised by its distribution, whatever version number it reports. In
+   * compatibility mode ({@code compatibility.override_main_response_version}, OpenSearch 1.x and
+   * 2.x) it drops the distribution and announces itself as 7.10.2, so its tagline identifies it
+   * instead. Elasticsearch reports no distribution, and its major version picks the client: the 9.x
+   * client is rejected by an 8.x server, so each major needs its own.
    *
    * @param distribution the {@code version.distribution} field, {@code null} when absent
    * @param versionNumber the {@code version.number} field
+   * @param tagline the root {@code tagline} field, {@code null} when absent
    * @return the matching engine type
    * @throws StartupException if the engine is not a supported Elasticsearch or OpenSearch
    */
-  public static EngineType fromServerInfo(String distribution, String versionNumber) {
+  public static EngineType fromServerInfo(
+      String distribution, String versionNumber, String tagline) {
     if (OPENSEARCH_DISTRIBUTION.equalsIgnoreCase(distribution)) {
+      return OPENSEARCH;
+    }
+    if ((distribution == null || distribution.isBlank())
+        && tagline != null
+        && tagline.startsWith(OPENSEARCH_TAGLINE_PREFIX)) {
       return OPENSEARCH;
     }
     if (distribution != null && !distribution.isBlank()) {

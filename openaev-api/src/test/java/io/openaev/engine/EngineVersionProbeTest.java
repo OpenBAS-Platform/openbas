@@ -38,6 +38,17 @@ class EngineVersionProbeTest {
        "version":{"distribution":"opensearch","number":"3.9.0","build_type":"tar"},
        "tagline":"The OpenSearch Project: https://opensearch.org/"}
       """;
+  // OpenSearch 1.x/2.x with compatibility.override_main_response_version=true: no distribution.
+  private static final String OPENSEARCH_COMPATIBILITY_ROOT =
+      """
+      {"name":"node-1","cluster_name":"docker-cluster","cluster_uuid":"Kq3pGx7vR9ytWn2c0mJbLQ",
+       "version":{"number":"7.10.2","build_type":"tar",
+        "build_hash":"6c1a3c5fb5e3ad7ab0aa4b36b9a0ef7d5f5dcc5a","build_date":"2025-02-25T21:58:09Z",
+        "build_snapshot":false,"lucene_version":"9.12.1",
+        "minimum_wire_compatibility_version":"7.10.0",
+        "minimum_index_compatibility_version":"7.0.0"},
+       "tagline":"The OpenSearch Project: https://opensearch.org/"}
+      """;
 
   private HttpServer server;
   private final AtomicReference<String> rootBody = new AtomicReference<>(ELASTICSEARCH_9_ROOT);
@@ -97,6 +108,7 @@ class EngineVersionProbeTest {
       // Assert
       assertNull(info.distribution());
       assertEquals("9.5.1", info.number());
+      assertEquals("You Know, for Search", info.tagline());
     }
 
     @Test
@@ -111,6 +123,26 @@ class EngineVersionProbeTest {
       // Assert
       assertEquals("opensearch", info.distribution());
       assertEquals("3.9.0", info.number());
+    }
+
+    @Test
+    @DisplayName(
+        "given an OpenSearch in compatibility mode, should report its tagline and be detected as"
+            + " OpenSearch")
+    void given_opensearchCompatibilityRoot_should_beDetectedAsOpenSearch() throws Exception {
+      // Arrange
+      rootBody.set(OPENSEARCH_COMPATIBILITY_ROOT);
+
+      // Act
+      EngineVersionProbe.ServerInfo info = probe().detect();
+
+      // Assert
+      assertNull(info.distribution());
+      assertEquals("7.10.2", info.number());
+      assertEquals("The OpenSearch Project: https://opensearch.org/", info.tagline());
+      assertEquals(
+          EngineType.OPENSEARCH,
+          EngineType.fromServerInfo(info.distribution(), info.number(), info.tagline()));
     }
 
     @Test
