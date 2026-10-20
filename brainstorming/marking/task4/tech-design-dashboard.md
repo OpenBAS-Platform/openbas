@@ -270,7 +270,7 @@ RBAC broke its assumptions:
 The snapshot export re-enabled it in 2026 with exactly the missing piece, the capability bypass, which
 supports this reading.
 
-# Part 4 — Exploring one approach: security decided in SQL, the index filtered by ids
+# Part 4 — Exploring one approach: Resolve filtering thro SQL, pass filtered ids to ES
 
 ## 4.1 Requirements
 
