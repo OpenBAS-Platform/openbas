@@ -17,6 +17,9 @@ public enum ExecutionTraceStatus {
   PREREQUISITE_FAILED,
   INVALID_USAGE,
   TIMEOUT,
+  // A TIMEOUT whose agent eventually reported back: still counted as an error so the closed
+  // inject outcome never changes
+  LATE,
   INTERRUPTED,
 
   // -- Not counted (ignored in status computation) --
@@ -43,6 +46,7 @@ public enum ExecutionTraceStatus {
           PREREQUISITE_FAILED,
           INVALID_USAGE,
           TIMEOUT,
+          LATE,
           INTERRUPTED,
           // @deprecated — rerouted to error
           PARTIAL,

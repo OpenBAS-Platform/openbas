@@ -168,9 +168,7 @@ public class InjectStatusService {
     ExecutionStatus previousStatus = injectStatus.getName();
     ExecutionStatus finalStatus =
         InjectStatusUtils.computeStatus(
-            injectStatus.getTraces().stream()
-                .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
-                .toList());
+            ExecutionTraceUtils.getCompleteTracesOnePerAgent(injectStatus.getTraces()));
     injectStatus.setTrackingEndDate(Instant.now());
     injectStatus.setName(finalStatus);
     injectStatus.getInject().setUpdatedAt(Instant.now());
@@ -260,6 +258,9 @@ public class InjectStatusService {
         createExecutionTrace(injectStatus, input, agent, structuredOutput);
     // Resolve the placeholder status of the COMPLETE trace
     resolveCompleteTraceStatus(injectStatus, executionTrace, agent);
+    if (handleLateCompleteTrace(inject, injectStatus, executionTrace, agent)) {
+      return;
+    }
     injectStatus.addTrace(executionTrace);
     // Save the trace using a low level call to the database
     String executionTraceId = executionTraceRepositoryHelper.saveExecutionTrace(executionTrace);
@@ -290,6 +291,44 @@ public class InjectStatusService {
     }
 
     log.debug("Successfully updated inject: {}", inject.getId());
+  }
+
+  /**
+   * Absorbs a COMPLETE trace that reaches an agent already closed (late callback after the
+   * finalization timeout, or retried callback). The incoming trace is not persisted and the inject
+   * status is neither recomputed nor re-finalized: a closed inject keeps its outcome. If the
+   * closing trace is a platform TIMEOUT it becomes LATE, so the agent keeps one terminal trace.
+   *
+   * @return true if the trace was absorbed and must not be processed further
+   */
+  private boolean handleLateCompleteTrace(
+      Inject inject, InjectStatus injectStatus, ExecutionTrace incoming, @Nullable Agent agent) {
+    if (!ExecutionTraceAction.COMPLETE.equals(incoming.getAction())) {
+      return false;
+    }
+    Optional<ExecutionTrace> closingTrace =
+        ExecutionTraceUtils.findClosingCompleteTrace(injectStatus.getTraces(), agent);
+    if (closingTrace.isEmpty()) {
+      return false;
+    }
+    ExecutionTrace closing = closingTrace.get();
+    if (ExecutionTraceStatus.TIMEOUT.equals(closing.getStatus())) {
+      ExecutionTraceUtils.markTimeoutTraceAsLate(closing, incoming, Instant.now());
+      entityManager.merge(injectStatus);
+      publishInjectStatusUpdate(inject);
+      log.info(
+          "Late COMPLETE for inject {} (agent {}): TIMEOUT trace marked LATE, inject status kept {}",
+          inject.getId(),
+          agent != null ? agent.getId() : "none",
+          injectStatus.getName());
+    } else {
+      log.info(
+          "Ignored duplicate COMPLETE for inject {} (agent {}): already closed with {}",
+          inject.getId(),
+          agent != null ? agent.getId() : "none",
+          closing.getStatus());
+    }
+    return true;
   }
 
   /**

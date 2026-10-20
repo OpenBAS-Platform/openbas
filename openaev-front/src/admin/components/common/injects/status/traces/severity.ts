@@ -20,6 +20,7 @@ const SEVERITY_BY_STATUS: Record<string, Severity> = {
   PREREQUISITE_FAILED: 'error',
   INVALID_USAGE: 'error',
   TIMEOUT: 'error',
+  LATE: 'error',
   INTERRUPTED: 'error',
   AGENT_OVERLOADED: 'error',
   INFO: 'info',

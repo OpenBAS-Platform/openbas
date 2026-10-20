@@ -2317,6 +2317,7 @@
   "Last verified": "Última verificación",
   "Last year": "Último año",
   "Last year_progression": "en el último año",
+  "LATE": "Tardío",
   "Lastname": "Apellido",
   "Lateral Movement Sweep": "Barrido de movimiento lateral",
   "Lateral movement via NTLM relay needs a relay injector that is not deployed in this environment.": "El movimiento lateral mediante retransmision NTLM requiere un inyector de retransmision que no esta desplegado en este entorno.",

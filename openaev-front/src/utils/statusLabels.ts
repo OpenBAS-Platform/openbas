@@ -18,6 +18,7 @@ const statusLabelMap: Record<string, string> = {
   PREREQUISITE_FAILED: 'Prerequisite failed',
   INVALID_USAGE: 'Invalid usage',
   TIMEOUT: 'Timeout',
+  LATE: 'Late',
   INTERRUPTED: 'Interrupted',
   AGENT_INACTIVE: 'Agent inactive',
   ASSET_AGENTLESS: 'Asset agentless',
@@ -77,6 +78,7 @@ const agentStatusTooltipMap: Record<string, string> = {
   PREREQUISITE_FAILED: 'A prerequisite check failed before the main command could run. Review prerequisite dependencies and ensure they are met on the target.',
   INVALID_USAGE: 'The command was invoked with incorrect arguments or syntax. Verify the inject parameters and command.',
   TIMEOUT: 'The agent did not complete execution within the allowed time threshold. Consider investigating target performance.',
+  LATE: 'The agent did not respond within the allowed time threshold, so the inject was closed as a timeout. It reported back afterwards: its report is kept but the inject result is unchanged.',
   INTERRUPTED: 'The inject was interrupted before completion. This may be caused by a system signal, user intervention, or resource constraint.',
   AGENT_INACTIVE: 'This agent was not active during the inject execution. Check your asset connectivity.',
 };

@@ -2317,6 +2317,7 @@
   "Last verified": "Последний проверенный",
   "Last year": "Последний год",
   "Last year_progression": "за последний год",
+  "LATE": "С опозданием",
   "Lastname": "Фамилия",
   "Lateral Movement Sweep": "Масштабное горизонтальное перемещение",
   "Lateral movement via NTLM relay needs a relay injector that is not deployed in this environment.": "Латеральное перемещение через ретрансляцию NTLM требует инжектора ретрансляции, который не развернут в этой среде.",

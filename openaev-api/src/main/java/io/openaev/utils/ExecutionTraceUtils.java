@@ -2,7 +2,12 @@ package io.openaev.utils;
 
 import io.openaev.database.model.*;
 import io.openaev.rest.inject.form.InjectExecutionAction;
+import jakarta.annotation.Nullable;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,6 +55,41 @@ public class ExecutionTraceUtils {
         .collect(Collectors.toSet());
   }
 
+  /**
+   * Returns the COMPLETE traces with at most one per agent (the earliest in list order, which is
+   * the one that closed the agent). Agent-less COMPLETE traces are all kept: injectors may
+   * legitimately report several of them.
+   *
+   * <p>Used to compute the inject status, so that a duplicate COMPLETE (late or retried callback)
+   * can never contradict the trace that already closed the agent.
+   */
+  public static List<ExecutionTrace> getCompleteTracesOnePerAgent(List<ExecutionTrace> traces) {
+    Set<String> seenAgentIds = new HashSet<>();
+    return traces.stream()
+        .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
+        .filter(t -> t.getAgent() == null || seenAgentIds.add(t.getAgent().getId()))
+        .toList();
+  }
+
+  /**
+   * Finds the COMPLETE trace that already closed the given agent. For an agent-less callback only a
+   * platform-written timeout (TIMEOUT or LATE) counts as closing, since injectors may legitimately
+   * send several agent-less COMPLETE traces.
+   */
+  public static Optional<ExecutionTrace> findClosingCompleteTrace(
+      List<ExecutionTrace> traces, @Nullable Agent agent) {
+    return traces.stream()
+        .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
+        .filter(
+            t ->
+                agent == null
+                    ? t.getAgent() == null
+                        && (ExecutionTraceStatus.TIMEOUT.equals(t.getStatus())
+                            || ExecutionTraceStatus.LATE.equals(t.getStatus()))
+                    : t.getAgent() != null && agent.getId().equals(t.getAgent().getId()))
+        .findFirst();
+  }
+
   // -- TRACE BUILDERS --
 
   /**
@@ -66,6 +106,34 @@ public class ExecutionTraceUtils {
             + " minutes threshold.",
         ExecutionTraceAction.COMPLETE,
         agent);
+  }
+
+  /**
+   * Turns the TIMEOUT trace that closed an agent into a LATE one when the agent finally reports
+   * back. The reported status and message are folded into the trace message together with the
+   * arrival delay, so the agent keeps a single terminal trace.
+   *
+   * @param timeoutTrace the COMPLETE/TIMEOUT trace written by the platform
+   * @param lateTrace the COMPLETE trace received after the timeout (not persisted)
+   * @param arrival when the late trace reached the platform
+   */
+  public static void markTimeoutTraceAsLate(
+      ExecutionTrace timeoutTrace, ExecutionTrace lateTrace, Instant arrival) {
+    String delay =
+        timeoutTrace.getTime() == null
+            ? ""
+            : " "
+                + Math.max(0, Duration.between(timeoutTrace.getTime(), arrival).toSeconds())
+                + "s";
+    String reported = lateTrace.getMessage() == null ? "" : ": " + lateTrace.getMessage();
+    timeoutTrace.setStatus(ExecutionTraceStatus.LATE);
+    timeoutTrace.setMessage(
+        timeoutTrace.getMessage()
+            + " It finally reported "
+            + lateTrace.getStatus()
+            + delay
+            + " after the timeout"
+            + reported);
   }
 
   public static void addSimulationTimeoutTrace(InjectStatus status) {

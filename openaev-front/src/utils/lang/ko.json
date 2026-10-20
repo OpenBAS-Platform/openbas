@@ -2317,6 +2317,7 @@
   "Last verified": "마지막 확인",
   "Last year": "작년",
   "Last year_progression": "작년 한 해 동안",
+  "LATE": "지연됨",
   "Lastname": "성",
   "Lateral Movement Sweep": "측면 이동 확산",
   "Lateral movement via NTLM relay needs a relay injector that is not deployed in this environment.": "NTLM 릴레이를 통한 측면 이동에는 이 환경에 배포되지 않은 릴레이 인젝터가 필요합니다.",
