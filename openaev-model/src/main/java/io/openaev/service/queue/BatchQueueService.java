@@ -414,57 +414,62 @@ public class BatchQueueService<T extends Queueable> {
         .compareAndSet(false, true)) {
       executor.execute(
           () -> {
-            do {
-              // Draining the queue into the list with a max size
-              List<T> currentBatch = new ArrayList<>();
-              queue.get(workerId).drainTo(currentBatch);
+            // Released in a finally: an exception escaping the loop would otherwise leave this
+            // worker marked as busy forever, and its buffered messages would never be processed
+            try {
+              do {
+                // Draining the queue into the list with a max size
+                List<T> currentBatch = new ArrayList<>();
+                queue.get(workerId).drainTo(currentBatch);
 
-              // If the list is not empty, we process it
-              List<T> processedElement = new ArrayList<>();
-              if (!currentBatch.isEmpty()) {
-                if (queueExecution == null) {
-                  log.warn(
-                      "Batch of {} elements skipped: queueExecution not set yet",
-                      currentBatch.size());
-                } else {
-                  log.info("Processing batch of {}", currentBatch.size());
-                  try {
-                    processedElement.addAll(queueExecution.perform(currentBatch));
-                  } catch (Exception e) {
-                    log.error("Error processing batch - Error during ingestion", e);
-                  }
-                }
-              }
-
-              // Every delivery of the batch is either acked (processed) or rejected (not
-              // processed), matched by instance: two equal elements are two deliveries
-              Set<T> processed = Collections.newSetFromMap(new IdentityHashMap<>());
-              processed.addAll(processedElement);
-              for (T element : currentBatch) {
-                // Null when a purge or a reconnection already dropped the delivery
-                DeliveryContext context = deliveryTable.remove(element);
-                if (context == null) {
-                  continue;
-                }
-                boolean ack = processed.contains(element);
-                try {
-                  if (ack) {
-                    context.ack();
+                // If the list is not empty, we process it
+                List<T> processedElement = new ArrayList<>();
+                if (!currentBatch.isEmpty()) {
+                  if (queueExecution == null) {
+                    log.warn(
+                        "Batch of {} elements skipped: queueExecution not set yet",
+                        currentBatch.size());
                   } else {
-                    // To avoid having elements that are not properly processed but can never be,
-                    // we're not requeueing them.
-                    context.rejectWithoutRequeue();
+                    log.info("Processing batch of {}", currentBatch.size());
+                    try {
+                      processedElement.addAll(queueExecution.perform(currentBatch));
+                    } catch (Exception e) {
+                      log.error("Error processing batch - Error during ingestion", e);
+                    }
                   }
-                } catch (IOException | ShutdownSignalException e) {
-                  log.error(
-                      String.format(
-                          "Error processing batch - Cannot %s the message: %s",
-                          ack ? "Ack" : "Nack", e.getMessage()),
-                      e);
                 }
-              }
-            } while (queue.get(workerId).size() > (queueConfig.getMaxSize() * 0.75));
-            insertInProgress.get(workerId).set(false);
+
+                // Every delivery of the batch is either acked (processed) or rejected (not
+                // processed), matched by instance: two equal elements are two deliveries
+                Set<T> processed = Collections.newSetFromMap(new IdentityHashMap<>());
+                processed.addAll(processedElement);
+                for (T element : currentBatch) {
+                  // Null when a purge or a reconnection already dropped the delivery
+                  DeliveryContext context = deliveryTable.remove(element);
+                  if (context == null) {
+                    continue;
+                  }
+                  boolean ack = processed.contains(element);
+                  try {
+                    if (ack) {
+                      context.ack();
+                    } else {
+                      // To avoid having elements that are not properly processed but can never
+                      // be, we're not requeueing them.
+                      context.rejectWithoutRequeue();
+                    }
+                  } catch (IOException | ShutdownSignalException e) {
+                    log.error(
+                        String.format(
+                            "Error processing batch - Cannot %s the message: %s",
+                            ack ? "Ack" : "Nack", e.getMessage()),
+                        e);
+                  }
+                }
+              } while (queue.get(workerId).size() > (queueConfig.getMaxSize() * 0.75));
+            } finally {
+              insertInProgress.get(workerId).set(false);
+            }
           });
     }
   }
