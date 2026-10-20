@@ -262,7 +262,7 @@ custom dashboard, the Statistics tab and an asset page. The matrix is in §6.
 
 - **RBAC (capabilities)**: rows R1–R7.
 - **Grants**: rows G1–G7.
-- **Markings**: rows M1–M7.
+- **Markings**: rows M1–M13 (M6, M8–M13: findings, including multi-asset ones).
 - **Across the three**: rows X1–X3.
 - Manual two-browser check, as in Chunk 2 of `implementation-plan.md`: an admin and a `TLP:GREEN`
   user side by side. The admin marks an asset RED, then removes the user's grant on S1. Each change
@@ -505,7 +505,8 @@ six `home-dashboard/*` data endpoints); same change as [OpenAEV-Platform/openaev
 
 **Data**: tenant T, scenarios `S1` and `S2` with one simulation each, atomic testing `AT1`, assets
 `A-GREEN` (`TLP:GREEN`), `A-AMBER` (`TLP:AMBER`), `A-RED` (`TLP:RED`). Each scenario targets the three
-assets, with findings and expectations on each asset. One finding is on both `A-GREEN` and `A-RED`.
+assets, with findings and expectations on each asset. One finding is on both `A-GREEN` and `A-RED`,
+another on both `A-GREEN` and `A-AMBER`.
 
 **Users**
 
@@ -552,6 +553,12 @@ assets, with findings and expectations on each asset. One finding is on both `A-
 | M5 | `full-green` | after the admin gives the user's group `TLP:RED` | `A-RED` appears on the next refresh |
 | M6 | `full-green` | the finding on `A-GREEN` and `A-RED` | hidden: the POC is strict, a finding with one hidden asset is excluded (the REST API is permissive) |
 | M7 | `full-green` | OpenGRC snapshot export (`BULK_SNAPSHOT_EXPORT`) | no observation of `A-AMBER` or `A-RED`; only granted scenarios for a caller without `ACCESS_ASSESSMENT` |
+| M8 | `full-green` | findings list widget, finding on `A-GREEN` only | visible |
+| M9 | `full-green` | findings list widget, finding on `A-RED` only | hidden |
+| M10 | `full-green` | findings count widget on `S1` | counts only the findings whose assets are all `TLP:GREEN`: not the `A-AMBER` or `A-RED` ones, nor the two multi-asset findings (strict) |
+| M11 | `full-green` | the `A-GREEN` + `A-RED` finding: REST findings tab of `S1` vs dashboard | REST shows it (permissive), the dashboard hides it (strict): record the difference until the strict/permissive question is settled (§4.3 note of the design) |
+| M12 | `amber` | the `A-GREEN` + `A-AMBER` finding | visible: both assets are within `TLP:AMBER` |
+| M13 | `full-green` | vulnerable endpoints widget on `S1` | `A-GREEN` only: the vulnerable endpoint of `A-RED` is hidden with its copied hostname and platform |
 
 **Across the three**
 

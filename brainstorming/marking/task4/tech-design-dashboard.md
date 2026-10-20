@@ -211,6 +211,29 @@ parent", they are "no RBAC at all". Every `DashboardApi` endpoint only checks `R
 
 **Latency.** Create/update: typically 1-17 s.
 
+**The indexes.** One per `@Indexable` model, named `<prefix>_<index>`:
+
+| Index | Document | Built from (PostgreSQL) | Asset reference | Scenario / simulation / atomic testing reference |
+|---|---|---|---|---|
+| `asset` | `EsAsset` | `assets` (endpoints) | itself (`base_id`) | — |
+| `security-platform` | `EsSecurityPlatform` | `assets` (security platforms) | itself (`base_id`) | — |
+| `asset-group` | `EsAssetGroup` | `asset_groups` | — (members not indexed) | — |
+| `attack-pattern` | `EsAttackPattern` | `attack_patterns` | — | — |
+| `tag` | `EsTag` | `tags` | — | — |
+| `team` | `EsTeam` | `teams` | — | — |
+| `domain` | `EsSecurityDomain` | `domains` | — | — |
+| `scenario` | `EsScenario` | `scenarios` | targets (`base_assets_side`) | itself (`base_id`) |
+| `simulation` | `EsSimulation` | `exercises` | targets (`base_assets_side`) | itself, `base_scenario_side` |
+| `inject` | `EsInject` | `injects` | targets (`base_assets_side`) | `base_scenario_side`, `base_simulation_side`, itself for an atomic testing |
+| `expectation-inject` | `EsInjectExpectation` | `injects_expectations` | `base_asset_side` (and `base_asset_group_side`, `base_security_platforms_side`) | `base_scenario_side`, `base_simulation_side`, `base_inject_side` |
+| `finding` | `EsFinding` | `findings` + `findings_assets` | `base_endpoint_side` (a set: one finding, several assets) | `base_scenario_side`, `base_simulation_side`, `base_inject_side` |
+| `vulnerable-endpoint` | `EsVulnerableEndpoint` | computed per (asset, simulation) from the findings | `vulnerable_endpoint_id`, plus hostname, platform, agents copied in | `base_scenario_side`, `base_simulation_side` |
+| `snapshot-attack-observation` | `EsAttackObservation` | attack observations (dev feature `BULK_SNAPSHOT_EXPORT`) | `base_asset_side`, plus `asset_name`, `asset_hostname` copied in | `base_scenario_side`, `base_simulation_side` |
+| `snapshot-vulnerability-observation` | `EsVulnerabilityObservation` | vulnerability observations (same) | same | same |
+
+`audit-log` (`LogEvent`) is also `@Indexable`, but it is written by the audit log transport, not by
+`EngineSyncExecutionJob`, and no dashboard reads it.
+
 ## 3.3 Data model
 
 Fields shared by every document (`EsBase`, `EsTenantBase`):
@@ -440,6 +463,29 @@ sequenceDiagram
     ENG->>ENG: stripHiddenAssets on each document
     ENG-->>B: only what this reader may see
 ```
+> [!NOTE]
+> **Derived documents: `EngineSecurityRegistry` plays the role of `MarkingDerivedTables`.**
+> In SQL, Task 4 declares in `MarkingDerivedTables` how each child table reaches `assets` (a parent
+> link such as `injects_expectations.asset_id`, or link rows such as `findings_assets`), and
+> `MarkingDimension` filters the child through its asset. The index has no join, so the registry
+> declares, per indexed type, the field that holds the asset id (`assetFields`). The reader filter
+> then adds `must_not terms(<field>, hiddenAssetIds)`: a document goes with its asset.
+>
+> | | SQL (REST API) | Index (dashboards) |
+> |---|---|---|
+> | Where the dependency is declared | `MarkingDerivedTables` | `EngineSecurityRegistry.assetFields` |
+> | Expectation of a RED asset | hidden (parent link) | hidden (`base_asset_side`) |
+> | Finding of a RED asset only | hidden (link rows) | hidden (`base_endpoint_side`) |
+> | Finding on a GREEN **and** a RED asset | **visible**: at least one visible asset (`MarkingDimension.linkRowsPredicate`, permissive) | **hidden**: one hidden asset is enough (strict) |
+> | Inject / scenario / simulation targeting RED | visible, RED not listed | visible, RED stripped from `base_assets_side` and from "by asset" buckets |
+>
+> **Edge case: findings.** A finding can be on several assets (`base_endpoint_side` is a set), and
+> `must_not terms` excludes it as soon as **one** of them is hidden. Making dashboards permissive,
+> like SQL, needs "at least one value outside the list", which a `terms` query cannot express (a
+> script, or a count field at indexing). Not covered either: an asset-group expectation
+> (`base_asset_group_side`, no asset) rolls up every member, RED included; and
+> `base_security_platforms_side` is not in the asset fields, in case a security platform is marked.
+
 ## 4.4 The grant dimension in detail: generic, not scenario-only
 
 The only grant filter that runs today, the snapshot export (`SnapshotObservationService.grantFilter`,
