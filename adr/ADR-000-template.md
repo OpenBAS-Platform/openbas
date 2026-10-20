@@ -6,7 +6,7 @@
 | Related | https://github.com/OpenAEV-Platform/openaev/issues/XXX |
 
 > - **Number**: unique, the next free one on `main`; check again after rebasing, before merging.
-> - **Description**: lowercase kebab-case after the uppercase prefix, e.g. `ADR-009-marking-based-access-control.md`.
+> - **File-name**: lowercase kebab-case after the uppercase prefix, e.g. `ADR-009-marking-based-access-control.md`.
 
 ## 1. Context
 
