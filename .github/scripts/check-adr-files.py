@@ -2,8 +2,7 @@
 """Check that every ADR file has a valid name and its own number.
 
 Two ADRs merged in parallel can pick the same "next free" number, because each branch only sees
-`main` as it was when the branch started. By October 2026 five numbers were each used twice, and
-references in code and tests pointed to the wrong decision. This check stops that from coming back.
+`main` as it was when the branch started.
 
 For every Markdown file in `adr/` it checks three things:
 
