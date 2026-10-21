@@ -127,11 +127,6 @@ public class InjectsFinalizationJob implements Job {
   public void handleAutoClosingSimulations() {
     // Change status of finished simulations.
     List<Exercise> mustBeFinishedSimulations = exerciseRepository.thatMustBeFinished();
-    // Filter out the simulations using the new chaining engine.
-    mustBeFinishedSimulations =
-        mustBeFinishedSimulations.stream()
-            .filter(simulation -> !workflowService.existsBySimulationId(simulation.getId()))
-            .toList();
     if (mustBeFinishedSimulations.isEmpty()) {
       return;
     }
@@ -148,10 +143,20 @@ public class InjectsFinalizationJob implements Job {
             tenantScopedJobRunner.runInTenant(
                 tenantId,
                 () -> {
+                  // Leave the simulations of the chaining engine to it. Their workflow lives in
+                  // the simulation's tenant, and once workflows is tenant-isolated an unscoped
+                  // check finds none, so it runs here, under that tenant's scope.
+                  List<String> notChainedIds =
+                      simulationIds.stream()
+                          .filter(id -> !workflowService.existsBySimulationId(id))
+                          .toList();
+                  if (notChainedIds.isEmpty()) {
+                    return;
+                  }
                   // Refetch in tenant scope so eager securityCoverage is resolved under multitenant
                   // v2.
                   List<Exercise> exercisesToFinish =
-                      new ArrayList<>(exerciseRepository.findAllById(simulationIds));
+                      new ArrayList<>(exerciseRepository.findAllById(notChainedIds));
                   exercisesToFinish.forEach(
                       exercise -> {
                         exercise.setStatus(ExerciseStatus.FINISHED);

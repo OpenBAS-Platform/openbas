@@ -285,6 +285,7 @@ class InjectsFinalizationJobUnitTest {
     @DisplayName("should filter all simulations when all are chaining simulations")
     void shouldFilterAllSimulationsWhenAllAreChaining() {
       // Prepare
+      mockTenantRunnerInline();
       String simulationId1 = UUID.randomUUID().toString();
       String simulationId2 = UUID.randomUUID().toString();
 
@@ -300,9 +301,25 @@ class InjectsFinalizationJobUnitTest {
       finalizationJob.handleAutoClosingSimulations();
 
       // Assert
+      verify(exerciseRepository, never()).findAllById(anyIterable());
       verify(exerciseRepository, never()).saveAll(anyList());
       verify(securityCoverageSendJobService, never())
           .createOrUpdateCoverageSendJobForSimulationsIfReady(anyList());
+    }
+
+    @Test
+    @DisplayName("given candidates, the chaining check should run inside the tenant scope")
+    void given_candidates_should_checkChainingInsideTenantScope() {
+      // Arrange: the tenant runner is a bare mock, so nothing runs inside the scoped block
+      Exercise simulation = createMockSimulation(UUID.randomUUID().toString(), null);
+      when(exerciseRepository.thatMustBeFinished()).thenReturn(List.of(simulation));
+
+      // Act
+      finalizationJob.handleAutoClosingSimulations();
+
+      // Assert
+      verify(tenantScopedJobRunner).runInTenant(eq("tenant-test"), any(Runnable.class));
+      verify(workflowService, never()).existsBySimulationId(anyString());
     }
 
     @Test
