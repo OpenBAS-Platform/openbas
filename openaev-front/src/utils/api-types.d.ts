@@ -993,6 +993,7 @@ export interface AtomicTestingInput {
   inject_documents?: InjectDocumentInput[];
   inject_injector?: string;
   inject_injector_contract?: string;
+  inject_secret_references?: string[];
   inject_tags?: string[];
   inject_teams?: string[];
   /** @minLength 1 */
@@ -6410,6 +6411,7 @@ export interface HealthCheck {
     | "OPTIONAL_ARGS"
     | "MESSAGE"
     | "SCOPE_DEFINITION"
+    | "CREDENTIAL_REFERENCE"
     | "UNKNOWN";
 }
 
@@ -6973,6 +6975,7 @@ export interface InjectInput {
   inject_enabled?: boolean;
   inject_injector?: string;
   inject_injector_contract?: string;
+  inject_secret_references?: string[];
   inject_tags?: string[];
   inject_teams?: string[];
   /** @minLength 1 */
@@ -7036,6 +7039,7 @@ export interface InjectOutput {
   inject_ready?: boolean;
   /** Scenario ID of the inject */
   inject_scenario?: string;
+  inject_secret_references?: string[];
   /**
    * Sent date of the inject
    * @format date-time
