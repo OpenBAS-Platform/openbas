@@ -161,25 +161,15 @@ public interface StepRepository extends JpaRepository<Step, String> {
       @Param("injectId") String injectId, @Param("status") List<StepStatus> status);
 
   /**
-   * Resolves the tenant that owns a step: step -&gt; workflow -&gt; simulation -&gt; tenant. Used
-   * to stamp the tenant on chaining events (#6357). NATIVE on purpose: {@code exercises} is a v1
-   * {@code @Filter} entity ({@code tenantFilter}), so a JPQL path through it would be re-filtered
-   * by the ambient {@code TenantContext} and, on a scheduler/queue producer thread that carries the
-   * default (or wrong) tenant, could silently return empty and stamp the event with null. A native
-   * query bypasses the Hibernate filter, so the stamp is truly context-free. Also no lazy
-   * navigation, so it is safe with no open session. Empty for a workflow with no simulation
-   * (standalone run); the caller falls back to the default tenant.
+   * Reads the tenant a step belongs to from its own {@code tenant_id}, which is set from its
+   * workflow when the row is written. Used to stamp the tenant on chaining update events (#6357). A
+   * scalar projection of the foreign key: no entity or lazy association is loaded, so it needs no
+   * open session, and {@code Step} carries no Hibernate filter, so the ambient {@code
+   * TenantContext} of a producer thread does not change the result. Empty when no such step exists
+   * or, once {@code steps} is tenant-active, when the transaction's scope does not include its
+   * tenant.
    */
-  @Query(
-      value =
-          """
-      SELECT e.tenant_id
-      FROM steps s
-      JOIN workflows w ON w.workflow_id = s.step_workflow_id
-      JOIN exercises e ON e.exercise_id = w.workflow_simulation_id
-      WHERE s.step_id = :stepId
-      """,
-      nativeQuery = true)
+  @Query("SELECT s.tenant.id FROM Step s WHERE s.id = :stepId")
   Optional<String> findTenantIdByStepId(@Param("stepId") String stepId);
 
   /**
@@ -341,11 +331,12 @@ public interface StepRepository extends JpaRepository<Step, String> {
    * <p>Tenant scoping is mandatory here: {@code InjectorContract} has a composite {@code (id,
    * tenant_id)} key and the default contracts are provisioned id-for-id into every tenant, so the
    * same contract id string legitimately exists in several tenants at once. Native SQL bypasses the
-   * Hibernate {@code tenantFilter}, and the {@code steps} table has no {@code tenant_id} of its
-   * own, so the tenant is resolved through the owning workflow's scenario or simulation ({@code
-   * COALESCE} - a workflow is attached to exactly one of the two). A workflow attached to neither
-   * is unreachable from any tenant UI and is deliberately left alone rather than risk sweeping
-   * another tenant's graph.
+   * Hibernate {@code tenantFilter}, so the tenant is matched explicitly. It is resolved through the
+   * owning workflow's scenario or simulation ({@code COALESCE} - a workflow is attached to exactly
+   * one of the two), which gives the same value as the step's own {@code tenant_id}, since that
+   * column is set from the owner when the row is written. A workflow attached to neither is
+   * unreachable from any tenant UI and is deliberately left alone rather than risk sweeping another
+   * tenant's graph.
    *
    * <p>Scoped to TEMPLATE steps on purpose: RUN steps carry immutable execution history and must
    * survive their contract's deletion, mirroring the TEMPLATE-only rule of {@code

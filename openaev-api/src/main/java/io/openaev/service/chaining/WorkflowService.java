@@ -873,7 +873,7 @@ public class WorkflowService {
 
   /**
    * Finds the current execution of a simulation: its latest run, whatever its status (RUN, END or
-   * STOP). Reset deletes every execution (ADR-009), but a database reset before that may still hold
+   * STOP). Reset deletes every execution (ADR-014), but a database reset before that may still hold
    * older runs, so callers must act on this one only.
    *
    * @param simulationId the ID of the simulation

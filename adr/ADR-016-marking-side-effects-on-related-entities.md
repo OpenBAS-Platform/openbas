@@ -1,11 +1,11 @@
-# ADR-011: Marking side effects on related entities — fine granularity and derived tables
+# ADR-016: Marking side effects on related entities — fine granularity and derived tables
 
 |  |  |
 | --- | --- |
 | Status | Proposed |
 | Related | https://github.com/OpenAEV-Platform/openaev/issues/8171 |
 | Design docs | [`brainstorming/marking/task4/tech-design.md`](../brainstorming/marking/task4/tech-design.md) |
-| Builds on | [ADR-009 — Marking-based access control](./ADR-009-Marking-based-access-control.md) |
+| Builds on | [ADR-009 — Marking-based access control](./ADR-009-marking-based-access-control.md) |
 
 ## 1. Context
 

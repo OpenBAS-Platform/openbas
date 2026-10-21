@@ -1,4 +1,4 @@
-# ADR-007: Marking-based access control
+# ADR-009: Marking-based access control
 
 |  |  |
 | --- | --- |
@@ -6,7 +6,7 @@
 | Related | https://github.com/OpenAEV-Platform/openaev/issues/7510 |
 | Epic | https://github.com/OpenAEV-Platform/openaev/issues/7510 |
 | Design docs | [`brainstorming/marking/`](../brainstorming/marking/) |
-| Builds on | [ADR-002 — Multi-tenant data isolation strategy](./ADR-002-Multi-tenant-data-isolation-strategy.md) |
+| Builds on | [ADR-002 — Multi-tenant data isolation strategy](./ADR-002-multi-tenant-data-isolation-strategy.md) |
 
 ## 1. Context
 

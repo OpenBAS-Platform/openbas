@@ -17,7 +17,7 @@ permissions:
 jobs:
   upload:
     name: "📎 Attach Trivy reports to release"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - name: Resolve CI run and artifact ids

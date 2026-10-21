@@ -168,6 +168,13 @@
             commitMessagePrefix: '[DANGER]', // patched dependencies: [DANGER] prefix to flag PRs that need manual patch verification
             commitMessageSuffix: '(react-apexcharts has a yarn patch)',
         },
+        {
+            description: 'selectolax >= 1.0.1 makes mkdocs-glightbox drop every doc image (#8602), until blueswen/mkdocs-glightbox#75 is released',
+            matchDepNames: [
+                'selectolax',
+            ],
+            allowedVersions: '<1.0.1',
+        },
         // group non-major devDependencies once a week to avoid Renovate noise
         {
             groupName: 'devDependencies (non-major)',
