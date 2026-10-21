@@ -169,7 +169,7 @@
             commitMessageSuffix: '(react-apexcharts has a yarn patch)',
         },
         {
-            description: 'selectolax >= 1.0.1 makes mkdocs-glightbox drop every doc image (#8602)',
+            description: 'selectolax >= 1.0.1 makes mkdocs-glightbox drop every doc image (#8602), until blueswen/mkdocs-glightbox#75 is released',
             matchDepNames: [
                 'selectolax',
             ],
