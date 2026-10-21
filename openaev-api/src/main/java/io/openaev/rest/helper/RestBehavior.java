@@ -708,6 +708,12 @@ public class RestBehavior {
     return errorBag;
   }
 
+  @ExceptionHandler(ConflictException.class)
+  public ResponseEntity<ErrorMessage> handleConflictException(ConflictException ex) {
+    log.debug("ConflictException: {}", ex.getReason(), ex);
+    return new ResponseEntity<>(new ErrorMessage(ex.getReason()), HttpStatus.CONFLICT);
+  }
+
   // -- 415 UNSUPPORTED_MEDIA_TYPE --
 
   @ExceptionHandler(UnsupportedMediaTypeException.class)
