@@ -34,8 +34,8 @@ pick one yourself.
 | Implementation plan (EM) | `implementation-plan.md` — optional | An existing task split per user story |
 | Vertical | Named in the request — required | The VERTICALES value of the issues |
 
-- User stories given as a **Notion link**: read the page with the Notion tools, and keep its URL for the
-  epic. Every issue also links to `tech-design.md` on GitHub.
+- User stories given as a **Notion link**: read the page with the Notion tools (no Notion tools → ask for a
+  Markdown export), and keep its URL for the epic. Every issue also links to `tech-design.md` on GitHub.
 - **Images** (png, jpeg) next to the user stories: keep them for the user story tickets (Step 4).
 - **Vertical**: when the request does not name it, ask which one applies. Never pick it yourself, even when
   one looks obvious:
@@ -168,8 +168,26 @@ every issue with `ACTION: create` or `ACTION: update #N`. Check that
 an update only targets issues this feature created before; an unexpected `update` means a title collides
 with an unrelated issue, so rename the task.
 
-Report with the agent's output format and stop there. **Do not run `--execute`** unless the user asks for
-it explicitly in the conversation.
+Report with this format and stop there:
+
+```
+🧩 Task Split
+Feature: <feature title> (<topic>) · Vertical: <vertical>
+Inputs: user-stories ✅ | tech-design ✅ | implementation-plan ✅/➖ (split built from the user stories)
+
+| Issue | Title | Depends on |
+|-------|-------|------------|
+| Epic | feat(<topic>): epic for <feature title> | — |
+| US1 | feat(<topic>): US1 <story> | — |
+| US1.1 | feat(<topic>): US1.1 <task> | — |
+
+Files:
+- brainstorming/<feature>/task-splitting.md (if generated)
+- brainstorming/<feature>/create-issues.sh
+
+Dry run: ./create-issues.sh → <N> to create, <M> to update
+Next: review the dry run, then run ./create-issues.sh --execute
+```
 
 ## Re-running after the inputs change
 
@@ -183,3 +201,11 @@ When the user stories, tech design or plan change, update `task-splitting.md` an
 
 Status and VERTICALES are only set when empty: a re-run fills in a field an interrupted run left blank, and
 never moves an issue back to *Tech refinement*.
+
+## Boundaries
+
+- **Never run `create-issues.sh --execute` yourself** unless the user explicitly asks for it in the
+  conversation: it publishes issues to a public repository. Run the dry run only.
+- Only write in `brainstorming/<feature>/`. Never change production code.
+- Never create, rename or recolour labels: `feature` and `epic` already exist (see `.github/labels.yml`).
+- Keep issue titles stable across re-runs: the title is how the script finds an existing issue.
