@@ -12,7 +12,7 @@
 **Status** (2026-10-20):
 - **Steps 1–6:** done on es8. **Step 7** (everything behind `MARKING`): done.
 - **Step 8 (e2e matrix):** API tests partly done.
-- **Steps 7a, 7b, 9–21:** not started (21 optional).
+- **Steps 7a, 7b:** done; **steps 9–21:** not started (21 optional).
 - **es9 and OpenSearch:** they accept the scope but ignore it until steps 11–12 (today's behaviour, unfiltered).
 - **Branch `task4-poc-dashboard`:** rebased on `main` (2026-10-19) and compiles. The dashboard, engine, snapshot and coverage tests pass.
 
@@ -20,9 +20,7 @@
 
 | Step | What | Blocked by |
 |---|---|---|
-| 7a | Grants: the most specific owner decides, no scenario-to-simulation inheritance (review fix) | — |
-| 7b | Filters on dependency fields evaluated on visible references only (review fix) | — |
-| 8 | End-to-end tests: RBAC, grants, markings (matrix §4) | steps 7a, 7b |
+| 8 | End-to-end tests: RBAC, grants, markings (matrix §4) | — |
 | 9 | Performance measurement on a main dump → SLO | — |
 | 10 | Asset labels in breakdowns ("deleted") | Soumaya: Option 1 or 2 |
 | 11 | Port to es9, dashboards and OpenGRC export | steps 8, 10 |
@@ -258,7 +256,7 @@ context (a minute or two of CI).
 - with the flag **on** (the test default, `openaev.enabled-dev-features=MARKING`), the §4 matrix and
   the POC tests pass.
 
-#### Step 7a — Grants: the most specific owner decides (review fix) 🔴 not started
+#### Step 7a — Grants: the most specific owner decides (review fix) ✅ done (2026-10-21)
 
 **Issue** (review, blocking): a grant on a scenario reveals, in dashboards, the simulations of that
 scenario whose own grant is absent or revoked, and their children. The REST API denies them: a
@@ -285,9 +283,16 @@ most specific owner decides".
 - grant on `X` only: `X` and its children visible, `S1` hidden;
 - an atomic testing inject (no scenario, no simulation): only through its own grant.
 
+**Built**: registry keys in precedence order (simulation, scenario, atomic testing; the `simulation`
+entry has no scenario key), es8 `grantedQuery` decides on the first key set on the document.
+`EngineReadScopeGrantIntegrationTest` (real grant rows, reader without `ACCESS_ASSESSMENT`): scenario
+grant only, simulation grant, simulation grant revoked with the scenario grant kept, atomic testing.
+`CursorPagedSearchTest` flag-on group: a simulation grant reveals its observation, a scenario grant
+alone does not. 334 engine, dashboard, snapshot and attack-pattern tests green.
+
 **DoD**: these tests green on es8; matrix rows G2, G6, G8–G11 green (step 8).
 
-#### Step 7b — Filters on dependency fields: visible references only (review fix) 🔴 not started
+#### Step 7b — Filters on dependency fields: visible references only (review fix) ✅ done (2026-10-21)
 
 **Issue** (review, blocking): with `MARKING` on, a readable scenario targeting GREEN and a hidden RED
 matches a user-supplied filter `base_entity = scenario AND base_assets_side = RED`: the count reveals
@@ -312,6 +317,12 @@ the filter runs on the stored document. Design: §4.3, "Filters on dependency fi
 - `starts_with <first characters of RED's id>` → nothing;
 - a widget whose filter value is a dashboard parameter set to RED → nothing;
 - the same on inject documents; an admin (unrestricted) gets every match, unchanged.
+
+**Built**: es8 passes `scope.hiddenAssetIds()` to the filter builder; on a dependency field, `eq` /
+`not_eq` drop the hidden values, the other operators run `VISIBLE_REFERENCES_SCRIPT` (Painless, values
+not hidden). `starts_with` is not supported by es8 at all (it throws for every field), so it needs no
+case. `EngineReadScopeIntegrationTest`, group "Filters on dependency fields": 10 tests (7 fail with the
+fix disabled). 379 engine, dashboard, snapshot and attack-pattern tests green.
 
 **DoD**: these tests green on es8; the queries of a reader without hidden assets are unchanged
 (existing dashboard tests green); matrix rows M14–M16 green (step 8).

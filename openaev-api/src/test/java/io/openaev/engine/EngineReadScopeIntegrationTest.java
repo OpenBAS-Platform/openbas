@@ -31,6 +31,7 @@ import io.openaev.utils.mockUser.WithMockUser;
 import io.openaev.utils.pagination.Pagination;
 import io.openaev.utilstest.RabbitMQTestListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
  * is covered by {@code EngineReadScopeResolverTest}.
  *
  * <p>Fixture: scenario S1 has an inject targeting {@code GREEN} and {@code RED}; scenario S2 has an
- * inject targeting {@code OTHER}.
+ * inject targeting {@code OTHER}; scenario S3 has an inject targeting {@code RED} only.
  */
 @SpringBootTest
 @Transactional
@@ -83,6 +84,9 @@ class EngineReadScopeIntegrationTest extends IntegrationTest {
   private String other;
   private String scenario1;
   private String scenario2;
+  private String injectGreenRed;
+  private String injectOther;
+  private String injectRedOnly;
 
   @BeforeEach
   void indexFixture() throws IOException, InterruptedException {
@@ -98,25 +102,34 @@ class EngineReadScopeIntegrationTest extends IntegrationTest {
         endpointComposer.forEndpoint(EndpointFixture.createEndpoint("scope-red"));
     EndpointComposer.Composer otherEndpoint =
         endpointComposer.forEndpoint(EndpointFixture.createEndpoint("scope-other"));
+    InjectComposer.Composer greenRedInject =
+        injectComposer
+            .forInject(InjectFixture.getDefaultInject())
+            .withEndpoint(greenEndpoint)
+            .withEndpoint(redEndpoint);
     Scenario s1 =
         scenarioComposer
             .forScenario(ScenarioFixture.createDefaultIncidentResponseScenario())
-            .withInject(
-                injectComposer
-                    .forInject(InjectFixture.getDefaultInject())
-                    .withEndpoint(greenEndpoint)
-                    .withEndpoint(redEndpoint))
+            .withInject(greenRedInject)
             .persist()
             .get();
+    InjectComposer.Composer otherInject =
+        injectComposer.forInject(InjectFixture.getDefaultInject()).withEndpoint(otherEndpoint);
     Scenario s2 =
         scenarioComposer
             .forScenario(ScenarioFixture.createDefaultIncidentResponseScenario())
-            .withInject(
-                injectComposer
-                    .forInject(InjectFixture.getDefaultInject())
-                    .withEndpoint(otherEndpoint))
+            .withInject(otherInject)
             .persist()
             .get();
+    InjectComposer.Composer redOnlyInject =
+        injectComposer.forInject(InjectFixture.getDefaultInject()).withEndpoint(redEndpoint);
+    scenarioComposer
+        .forScenario(ScenarioFixture.createDefaultIncidentResponseScenario())
+        .withInject(redOnlyInject)
+        .persist();
+    injectGreenRed = greenRedInject.get().getId();
+    injectOther = otherInject.get().getId();
+    injectRedOnly = redOnlyInject.get().getId();
     green = greenEndpoint.get().getId();
     red = redEndpoint.get().getId();
     other = otherEndpoint.get().getId();
@@ -236,6 +249,124 @@ class EngineReadScopeIntegrationTest extends IntegrationTest {
 
       // -- ASSERT --
       assertThat(buckets).contains(green, other).doesNotContain(red);
+    }
+  }
+
+  @Nested
+  @DisplayName("Filters on dependency fields: visible references only")
+  class DependencyFieldFilters {
+
+    /**
+     * The reader reads injects; RED is hidden. S1's inject targets GREEN and RED, S3's RED only.
+     */
+    private EngineReadScope hidingRed() {
+      return hiding(Set.of(red), INJECT);
+    }
+
+    private List<String> injectsMatching(
+        EngineReadScope scope, Map<String, String> parameters, Filters.Filter... filters) {
+      ListConfiguration config =
+          engineService.createListConfiguration(
+              INJECT, Map.of("base_id", List.of(injectGreenRed, injectOther, injectRedOnly)));
+      config.setTimeRange(CustomDashboardTimeRange.ALL_TIME);
+      List<Filters.Filter> all = new ArrayList<>(config.getPerspective().getFilter().getFilters());
+      all.addAll(List.of(filters));
+      config.getPerspective().getFilter().setFilters(all);
+      ListRuntime runtime = new ListRuntime(config, parameters, Map.of(), new Pagination(0, 100));
+      return ids(engineService.entities(TxCtx.allTenants(), scope, runtime).getEsDatas());
+    }
+
+    private List<String> injectsMatching(Filters.Filter... filters) {
+      return injectsMatching(hidingRed(), Map.of(), filters);
+    }
+
+    private Filters.Filter targets(Filters.FilterOperator operator, String... values) {
+      Filters.Filter filter = new Filters.Filter();
+      filter.setKey("base_assets_side");
+      filter.setMode(Filters.FilterMode.or);
+      filter.setOperator(operator);
+      filter.setValues(List.of(values));
+      return filter;
+    }
+
+    @Test
+    @DisplayName("given eq RED, should match no inject")
+    void given_eqHidden_should_matchNothing() {
+      assertThat(injectsMatching(targets(Filters.FilterOperator.eq, red))).isEmpty();
+    }
+
+    @Test
+    @DisplayName("given eq GREEN, should match the inject targeting GREEN and RED")
+    void given_eqVisible_should_matchItsInject() {
+      assertThat(injectsMatching(targets(Filters.FilterOperator.eq, green)))
+          .containsExactly(injectGreenRed);
+    }
+
+    @Test
+    @DisplayName("given not_eq RED, should match every inject")
+    void given_notEqHidden_should_matchEverything() {
+      assertThat(injectsMatching(targets(Filters.FilterOperator.not_eq, red)))
+          .containsExactlyInAnyOrder(injectGreenRed, injectOther, injectRedOnly);
+    }
+
+    @Test
+    @DisplayName("given not_eq GREEN, should match the injects not targeting GREEN")
+    void given_notEqVisible_should_excludeItsInject() {
+      assertThat(injectsMatching(targets(Filters.FilterOperator.not_eq, green)))
+          .containsExactlyInAnyOrder(injectOther, injectRedOnly);
+    }
+
+    @Test
+    @DisplayName("given empty, should match the inject whose only target is hidden")
+    void given_empty_should_matchInjectWithOnlyHiddenTargets() {
+      assertThat(injectsMatching(targets(Filters.FilterOperator.empty)))
+          .containsExactly(injectRedOnly);
+    }
+
+    @Test
+    @DisplayName("given not_empty, should match the injects with a visible target")
+    void given_notEmpty_should_matchInjectsWithVisibleTargets() {
+      assertThat(injectsMatching(targets(Filters.FilterOperator.not_empty)))
+          .containsExactlyInAnyOrder(injectGreenRed, injectOther);
+    }
+
+    @Test
+    @DisplayName("given contains a part of RED's id, should match no inject")
+    void given_containsHiddenIdPart_should_matchNothing() {
+      assertThat(injectsMatching(targets(Filters.FilterOperator.contains, red.substring(4, 16))))
+          .isEmpty();
+    }
+
+    @Test
+    @DisplayName("given a range around RED's id, should match no inject")
+    void given_rangeAroundHiddenId_should_matchNothing() {
+      assertThat(
+              injectsMatching(
+                  targets(Filters.FilterOperator.gte, red),
+                  targets(Filters.FilterOperator.lte, red)))
+          .isEmpty();
+    }
+
+    @Test
+    @DisplayName("given RED through a dashboard parameter, should match no inject")
+    void given_hiddenIdThroughParameter_should_matchNothing() {
+      assertThat(
+              injectsMatching(
+                  hidingRed(),
+                  Map.of("target-parameter", red),
+                  targets(Filters.FilterOperator.eq, "target-parameter")))
+          .isEmpty();
+    }
+
+    @Test
+    @DisplayName("given an unrestricted reader, should match on every reference as before")
+    void given_unrestrictedReader_should_matchHiddenReferences() {
+      assertThat(
+              injectsMatching(
+                  EngineReadScope.unrestricted(null),
+                  Map.of(),
+                  targets(Filters.FilterOperator.eq, red)))
+          .containsExactlyInAnyOrder(injectGreenRed, injectRedOnly);
     }
   }
 

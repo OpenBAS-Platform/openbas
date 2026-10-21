@@ -115,7 +115,8 @@ public class ElasticService implements EngineService {
   private Query queryFromBaseFilter(
       Filters.Filter filter,
       Map<String, String> parameters,
-      Map<String, CustomDashboardParameters> definitionParameters) {
+      Map<String, CustomDashboardParameters> definitionParameters,
+      Set<String> hiddenAssetIds) {
     Filters.FilterOperator operator = filter.getOperator();
     BoolQuery.Builder boolQuery = new BoolQuery.Builder();
     Filters.FilterMode filterMode = filter.getMode();
@@ -132,6 +133,11 @@ public class ElasticService implements EngineService {
                       || !parameter.getType().isInstance
                       || hasText(computeValue);
                 });
+    if (!hiddenAssetIds.isEmpty()
+        && EngineSecurityRegistry.ASSET_REFERENCE_FIELDS.contains(field)) {
+      return visibleReferencesQuery(
+          filter, elasticField, parameters, hasFilteringValues, hiddenAssetIds);
+    }
     switch (operator) {
       case eq:
         if (hasFilteringValues) {
@@ -281,16 +287,149 @@ public class ElasticService implements EngineService {
     return BoolQuery.of(b -> b.should(byText, byId).minimumShouldMatch("1"))._toQuery();
   }
 
+  /**
+   * A filter on a dependency field (an asset reference, {@link
+   * EngineSecurityRegistry#ASSET_REFERENCE_FIELDS}) evaluated on the visible references only: the
+   * stored document may still reference a hidden asset (a scenario targeting GREEN and RED stays
+   * readable), and a filter on that reference would reveal the hidden association. Values are
+   * compared after the dashboard parameters are resolved.
+   *
+   * <ul>
+   *   <li>{@code eq} / {@code not_eq}: the hidden ids are removed from the values. On a
+   *       multi-valued field, "a visible value equals v" and "a value equals v" only differ when v
+   *       is hidden. No value left: {@code eq} matches nothing, {@code not_eq} is dropped.
+   *   <li>Other operators: {@link #VISIBLE_REFERENCES_SCRIPT}, over the values that are not hidden.
+   * </ul>
+   */
+  private Query visibleReferencesQuery(
+      Filters.Filter filter,
+      String elasticField,
+      Map<String, String> parameters,
+      boolean hasFilteringValues,
+      Set<String> hiddenAssetIds) {
+    Filters.FilterMode filterMode = filter.getMode();
+    List<String> values =
+        filter.getValues().stream()
+            .map(value -> ofNullable(parameters.getOrDefault(value, value)).orElse(""))
+            .toList();
+    List<String> visibleValues = values.stream().filter(v -> !hiddenAssetIds.contains(v)).toList();
+    BoolQuery.Builder boolQuery = new BoolQuery.Builder();
+    switch (filter.getOperator()) {
+      case eq -> {
+        if (!hasFilteringValues) {
+          break;
+        }
+        if (visibleValues.isEmpty()) {
+          return MatchNoneQuery.of(m -> m)._toQuery();
+        }
+        List<Query> queries =
+            visibleValues.stream()
+                .map(v -> TermQuery.of(t -> t.field(elasticField).value(v))._toQuery())
+                .toList();
+        if (filterMode == Filters.FilterMode.and) {
+          boolQuery.must(queries);
+        } else {
+          boolQuery.should(queries).minimumShouldMatch("1");
+        }
+      }
+      case not_eq -> {
+        if (hasFilteringValues && !visibleValues.isEmpty()) {
+          boolQuery.mustNot(
+              visibleValues.stream()
+                  .map(v -> TermQuery.of(t -> t.field(elasticField).value(v))._toQuery())
+                  .toList());
+        }
+      }
+      case empty ->
+          boolQuery.must(visibleReferencesScript(elasticField, "exists", "", true, hiddenAssetIds));
+      case not_empty ->
+          boolQuery.must(
+              visibleReferencesScript(elasticField, "exists", "", false, hiddenAssetIds));
+      case contains, gt, gte, lt, lte -> {
+        if (filter.getOperator() != Filters.FilterOperator.contains && !hasFilteringValues) {
+          break;
+        }
+        String op = filter.getOperator().name();
+        List<Query> queries =
+            values.stream()
+                .map(v -> visibleReferencesScript(elasticField, op, v, false, hiddenAssetIds))
+                .toList();
+        if (filterMode == Filters.FilterMode.and) {
+          boolQuery.must(queries);
+        } else {
+          boolQuery.should(queries).minimumShouldMatch("1");
+        }
+      }
+      case not_contains ->
+          boolQuery.must(
+              values.stream()
+                  .map(
+                      v ->
+                          visibleReferencesScript(
+                              elasticField, "contains", v, true, hiddenAssetIds))
+                  .toList());
+      default ->
+          throw new UnsupportedOperationException(
+              "Filter operator " + filter.getOperator() + " not supported");
+    }
+    return boolQuery.build()._toQuery();
+  }
+
+  private Query visibleReferencesScript(
+      String elasticField, String op, String value, boolean negate, Set<String> hiddenAssetIds) {
+    return ScriptQuery.of(
+            q ->
+                q.script(
+                    Script.of(
+                        s ->
+                            s.source(VISIBLE_REFERENCES_SCRIPT)
+                                .lang("painless")
+                                .params("field", JsonData.of(elasticField))
+                                .params("op", JsonData.of(op))
+                                .params("value", JsonData.of(value))
+                                .params("negate", JsonData.of(negate))
+                                .params("hidden", JsonData.of(List.copyOf(hiddenAssetIds))))))
+        ._toQuery();
+  }
+
+  /**
+   * Whether one value of {@code params.field} that is not a hidden asset satisfies {@code
+   * params.op} ({@code exists}, {@code contains}, {@code gt}, {@code gte}, {@code lt}, {@code lte}
+   * against {@code params.value}), negated by {@code params.negate}. A document without the field
+   * (another index of the pattern, or no value) has no visible value.
+   */
+  static final String VISIBLE_REFERENCES_SCRIPT =
+      """
+      boolean found = false;
+      if (doc.containsKey(params.field)) {
+        for (def v : doc[params.field]) {
+          if (params.hidden.contains(v)) { continue; }
+          String s = v.toString();
+          if (params.op == 'exists') { found = true; }
+          else if (params.op == 'contains') { found = s.contains(params.value); }
+          else if (params.op == 'gt') { found = s.compareTo(params.value) > 0; }
+          else if (params.op == 'gte') { found = s.compareTo(params.value) >= 0; }
+          else if (params.op == 'lt') { found = s.compareTo(params.value) < 0; }
+          else if (params.op == 'lte') { found = s.compareTo(params.value) <= 0; }
+          if (found) { break; }
+        }
+      }
+      return params.negate ? !found : found;
+      """;
+
   private Query queryFromFilter(
       Filters.FilterGroup groupFilter,
       Map<String, String> parameters,
-      Map<String, CustomDashboardParameters> definitionParameters) {
+      Map<String, CustomDashboardParameters> definitionParameters,
+      Set<String> hiddenAssetIds) {
     Filters.FilterMode filterMode = groupFilter.getMode();
     BoolQuery.Builder filterQuery = new BoolQuery.Builder();
     List<Query> filterQueries = new ArrayList<>();
     List<Filters.Filter> filters = groupFilter.getFilters();
     filters.forEach(
-        f -> filterQueries.add(queryFromBaseFilter(f, parameters, definitionParameters)));
+        f ->
+            filterQueries.add(
+                queryFromBaseFilter(f, parameters, definitionParameters, hiddenAssetIds)));
     if (filterMode == Filters.FilterMode.and) {
       filterQuery.must(filterQueries);
     } else {
@@ -319,7 +458,13 @@ public class ElasticService implements EngineService {
     }
     if (groupFilter != null && groupFilter.getFilters() != null) {
 
-      Query filterQuery = queryFromFilter(groupFilter, parameters, definitionParameters);
+      // The reader's hidden assets: a filter on a dependency field only sees visible references.
+      Query filterQuery =
+          queryFromFilter(
+              groupFilter,
+              parameters,
+              definitionParameters,
+              scope.unrestricted() ? Set.of() : scope.hiddenAssetIds());
       shouldList.add(filterQuery);
     }
     if (shouldList.isEmpty()) {

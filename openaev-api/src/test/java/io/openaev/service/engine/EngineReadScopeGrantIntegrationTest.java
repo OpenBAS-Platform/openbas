@@ -177,8 +177,7 @@ class EngineReadScopeGrantIntegrationTest extends IntegrationTest {
     grant(scenario1, Grant.GRANT_RESOURCE_TYPE.SCENARIO);
     Grant onX = grant(simulationX, Grant.GRANT_RESOURCE_TYPE.SIMULATION);
     assertThat(ids("simulation")).contains(simulationX);
-    grantRepository.delete(onX);
-    entityManager.flush();
+    revoke(onX);
 
     // -- ACT & ASSERT --
     assertThat(ids("simulation")).doesNotContain(simulationX);
@@ -225,6 +224,18 @@ class EngineReadScopeGrantIntegrationTest extends IntegrationTest {
 
   private record InjectWithFinding(
       InjectComposer.Composer inject, FindingComposer.Composer finding) {}
+
+  /**
+   * Revokes a grant the way the product does ({@code TenantGroupService.removeGrant}): out of the
+   * group's collection, deleted by orphan removal. A repository delete would be undone at flush,
+   * the group (loaded by the previous read) still holding the grant in a cascading collection.
+   */
+  private void revoke(Grant grant) {
+    Group group = groupRepository.findById(grantGroup.getId()).orElseThrow();
+    group.getGrants().removeIf(candidate -> candidate.getId().equals(grant.getId()));
+    groupRepository.save(group);
+    entityManager.flush();
+  }
 
   /** An inject that produced a finding on a new endpoint; not persisted yet. */
   private InjectWithFinding injectWithFinding() {
