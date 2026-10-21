@@ -113,7 +113,8 @@ public class ExecutionExecutorServiceTest {
     inject.setStatus(InjectStatusFixture.createPendingInjectStatus());
     when(injectService.getAgentsAndAgentlessAssetsByInject(inject))
         .thenReturn(
-            new AgentsAndAssetsAgentless(new HashSet<>(), new HashSet<>(List.of(endpoint))));
+            new AgentsAndAssetsAgentless(
+                new HashSet<>(), new HashSet<>(List.of(endpoint)), new HashSet<>()));
     // Run method to test
     assertThrows(
         ExecutionExecutorException.class,
@@ -322,7 +323,9 @@ public class ExecutionExecutorServiceTest {
       inject.setStatus(InjectStatusFixture.createPendingInjectStatus());
 
       when(injectService.getAgentsAndAgentlessAssetsByInject(inject))
-          .thenReturn(new AgentsAndAssetsAgentless(new HashSet<>(Set.of(agent)), new HashSet<>()));
+          .thenReturn(
+              new AgentsAndAssetsAgentless(
+                  new HashSet<>(Set.of(agent)), new HashSet<>(), new HashSet<>()));
       return inject;
     }
 
@@ -535,7 +538,8 @@ public class ExecutionExecutorServiceTest {
 
       when(injectService.getAgentsAndAgentlessAssetsByInject(inject))
           .thenReturn(
-              new AgentsAndAssetsAgentless(new HashSet<>(Set.of(agent1, agent2)), new HashSet<>()));
+              new AgentsAndAssetsAgentless(
+                  new HashSet<>(Set.of(agent1, agent2)), new HashSet<>(), new HashSet<>()));
 
       Manager manager = mock(Manager.class);
       when(managerFactory.getManager(anyString())).thenReturn(manager);

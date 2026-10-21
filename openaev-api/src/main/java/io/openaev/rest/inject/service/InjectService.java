@@ -1193,24 +1193,28 @@ public class InjectService {
    */
   public AgentsAndAssetsAgentless getAgentsAndAgentlessAssetsByInject(Inject inject) {
     Set<Agent> agents = new HashSet<>();
+    Set<Agent> agentsWithoutClearance = new HashSet<>();
     Set<Asset> assetsAgentless = new HashSet<>();
     MarkingCtx clearance = resolveLaunchedByClearance(inject);
 
-    for (Asset asset : inject.getAssets()) {
+    List<Asset> targetedAssets =
+        Stream.concat(
+                Optional.ofNullable(inject.getAssets()).orElse(Collections.emptyList()).stream(),
+                inject.getAssetGroups().stream()
+                    .flatMap(
+                        assetGroup ->
+                            assetGroupService.assetsFromAssetGroup(assetGroup.getId()).stream()))
+            .toList();
+
+    for (Asset asset : targetedAssets) {
       if (isVisibleUnderClearance(asset, clearance)) {
         extractAgentsAndAssetsAgentless(agents, assetsAgentless, asset);
+      } else {
+        extractAgentsAndAssetsAgentless(agentsWithoutClearance, assetsAgentless, asset);
       }
     }
 
-    for (AssetGroup assetGroup : inject.getAssetGroups()) {
-      for (Asset asset : assetGroupService.assetsFromAssetGroup(assetGroup.getId())) {
-        if (isVisibleUnderClearance(asset, clearance)) {
-          extractAgentsAndAssetsAgentless(agents, assetsAgentless, asset);
-        }
-      }
-    }
-
-    return new AgentsAndAssetsAgentless(agents, assetsAgentless);
+    return new AgentsAndAssetsAgentless(agents, assetsAgentless, agentsWithoutClearance);
   }
 
   private void extractAgentsAndAssetsAgentless(

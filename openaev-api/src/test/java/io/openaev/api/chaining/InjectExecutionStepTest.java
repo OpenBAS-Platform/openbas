@@ -2042,7 +2042,7 @@ public class InjectExecutionStepTest extends IntegrationTest {
     status.addTrace(secondTrace);
     status.addTrace(thirdTrace);
     inject.setStatus(status);
-    doReturn(new AgentsAndAssetsAgentless(Set.of(agentOne, agentTwo), Set.of()))
+    doReturn(new AgentsAndAssetsAgentless(Set.of(agentOne, agentTwo), Set.of(), new HashSet<>()))
         .when(injectService)
         .getAgentsAndAgentlessAssetsByInject(inject);
 
@@ -2096,7 +2096,7 @@ public class InjectExecutionStepTest extends IntegrationTest {
     status.addTrace(globalTrace);
     status.addTrace(endpointTrace);
     inject.setStatus(status);
-    doReturn(new AgentsAndAssetsAgentless(Set.of(agent), Set.of()))
+    doReturn(new AgentsAndAssetsAgentless(Set.of(agent), Set.of(), new HashSet<>()))
         .when(injectService)
         .getAgentsAndAgentlessAssetsByInject(inject);
 

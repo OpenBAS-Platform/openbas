@@ -6,4 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 
 public record AgentsAndAssetsAgentless(
-    @NotNull Set<Agent> agents, @NotNull Set<Asset> assetsAgentless) {}
+    @NotNull Set<Agent> agents,
+    @NotNull Set<Asset> assetsAgentless,
+    Set<Agent> agentsWithoutClearance) {}
