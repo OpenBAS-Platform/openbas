@@ -30,10 +30,17 @@ holds several candidates (for example `brainstorming/marking/task1/` and `task2/
 | User stories | `user-stories.md` **or** a Notion link to the page listing them | ✅ one of the two | Feature title and the list of user stories with their acceptance criteria (AC). May link Figma or embed images (png, jpeg) for the UX |
 | Tech design | `tech-design.md` | ✅ | How the feature is implemented in the OpenAEV codebase, with Mermaid sequence diagrams |
 | Implementation plan | `implementation-plan.md` | Optional | A proposed task split per user story. When present, **use it as the split** |
-| Vertical | Named in the request | ✅ defaults to `#3 Easy-to-Use & consistent platform` | The **VERTICALES** value set on every issue in the OpenAEV project. When no specific vertical is given for this work, use the default |
+| Vertical | Named in the request | ✅ | The **VERTICALES** value set on every issue in the OpenAEV project, one of the three below |
 
-When the user stories (file or Notion link) or `tech-design.md` are missing, or the Notion page cannot be
-read, ask for them. Never invent user stories or AC.
+The vertical is one of:
+
+1. `#1 Actionable & Proactive platform`
+2. `#2 CTI-driven & Full Security Coverage`
+3. `#3 Easy-to-Use & consistent platform`
+
+When the user stories (file or Notion link), `tech-design.md` or the vertical are missing, or the Notion
+page cannot be read, ask for them. Never invent user stories or AC, and never pick the vertical yourself:
+ask which of the three applies, even when one looks obvious.
 
 ## Outputs
 

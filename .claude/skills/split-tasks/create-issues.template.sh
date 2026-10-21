@@ -35,14 +35,12 @@ TOPIC="<topic>"                        # one word: audit-log, multitenancy, ...
 FEATURE_TITLE="<feature title>"
 TECH_DESIGN_URL="https://github.com/${REPO}/blob/main/brainstorming/<feature>/tech-design.md"
 USER_STORIES_URL="<Notion user stories page, or empty>"
-# VERTICALES option of the project, exactly as named there. Keep the default
-# unless a specific vertical was given for this work.
-PROJECT_VERTICALE="#3 Easy-to-Use & consistent platform"
+VERTICALE="<1, 2 or 3>"                # the vertical the requester chose, see below
 
 # A value still shaped like the template's "<...>" was never filled in.
 PLACEHOLDER_RE='<[^>]*>'
 unfilled=""
-for setting in TOPIC FEATURE_TITLE TECH_DESIGN_URL USER_STORIES_URL PROJECT_VERTICALE; do
+for setting in TOPIC FEATURE_TITLE TECH_DESIGN_URL USER_STORIES_URL VERTICALE; do
   if [[ "${!setting}" =~ $PLACEHOLDER_RE ]]; then
     unfilled+=" $setting"
   fi
@@ -51,6 +49,17 @@ if [[ -n "$unfilled" ]]; then
   echo "Fill in these settings first:$unfilled" >&2
   exit 1
 fi
+
+# VERTICALES options, spelled exactly as in the project (#2 has two spaces).
+case "$VERTICALE" in
+  1) PROJECT_VERTICALE="#1 Actionable & Proactive platform" ;;
+  2) PROJECT_VERTICALE="#2  CTI-driven & Full Security Coverage" ;;
+  3) PROJECT_VERTICALE="#3 Easy-to-Use & consistent platform" ;;
+  *)
+    echo "VERTICALE must be 1, 2 or 3, not '$VERTICALE'" >&2
+    exit 1
+    ;;
+esac
 
 DRY_RUN=true
 if [[ "${1:-}" == "--execute" ]]; then

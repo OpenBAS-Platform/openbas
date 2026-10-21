@@ -32,21 +32,22 @@ pick one yourself.
 | User stories (PM/PO) | `user-stories.md` or Notion link — one is required | Feature title, every user story with its AC, Figma links, images |
 | Tech design (staff/senior dev) | `tech-design.md` — required | Implementation approach, Mermaid sequence and class diagrams |
 | Implementation plan (EM) | `implementation-plan.md` — optional | An existing task split per user story |
-| Vertical | Named in the request — defaults to `#3 Easy-to-Use & consistent platform` | The VERTICALES value of the issues |
+| Vertical | Named in the request — required | The VERTICALES value of the issues |
 
 - User stories given as a **Notion link**: read the page with the Notion tools, and keep its URL for the
   epic. Every issue also links to `tech-design.md` on GitHub.
 - **Images** (png, jpeg) next to the user stories: keep them for the user story tickets (Step 4).
-- **Vertical**: when no specific vertical is given for this work, use the default. The value must be exactly
-  one of the options of the project's VERTICALES field (the script stops otherwise):
+- **Vertical**: when the request does not name it, ask which one applies. Never pick it yourself, even when
+  one looks obvious:
 
-  ```bash
-  gh api graphql -f query='{ organization(login: "OpenAEV-Platform") { projectV2(number: 2) {
-    field(name: "VERTICALES") { ... on ProjectV2SingleSelectField { options { name } } } } } }' \
-    -q '.data.organization.projectV2.field.options[].name'
-  ```
+  | Choice | Vertical |
+  |---|---|
+  | `1` | #1 Actionable & Proactive platform |
+  | `2` | #2 CTI-driven & Full Security Coverage |
+  | `3` | #3 Easy-to-Use & consistent platform |
 
-- No user stories (file or Notion link), no `tech-design.md`, or a Notion page you cannot read → ask for it. Never invent user stories or AC.
+- No user stories (file or Notion link), no `tech-design.md`, no vertical, or a Notion page you cannot read
+  → ask for it. Never invent user stories or AC.
 
 Then read the code and `docs/` areas the tech design refers to, to know how the work spreads across
 `openaev-model`, `openaev-api` and `openaev-front`.
@@ -137,8 +138,8 @@ and make it executable. Then:
 
 1. Fill in `TOPIC`, `FEATURE_TITLE`, `TECH_DESIGN_URL` (the GitHub link to `tech-design.md`: on `main` once
    merged, otherwise on the branch that holds it) and `USER_STORIES_URL` (the Notion page, or empty when the
-   user stories only exist as `user-stories.md`), and `PROJECT_VERTICALE` when the work has a specific
-   vertical (the template holds the default).
+   user stories only exist as `user-stories.md`), and `VERTICALE` (`1`, `2` or `3`, the choice from Step 1:
+   the script maps it to the project's exact option name).
    The script refuses to run while any of these settings, or any issue title, still holds a template `<…>`
    value. `--execute` checks every issue with a silent dry run before writing anything.
 2. Replace the example issues at the bottom with one `epic` call, then for each user story one `task "USn …"`
@@ -154,7 +155,7 @@ Do not touch the helpers: they hold the project, issue type and field settings, 
 | Issue type | `Feature` |
 | Project | #2 *OpenAEV - Product Backlog* |
 | Status | *Tech refinement* |
-| VERTICALES | The vertical input, default *#3 Easy-to-Use & consistent platform* |
+| VERTICALES | The vertical chosen in Step 1, no default |
 
 ## Step 6 — Dry run and hand over
 
