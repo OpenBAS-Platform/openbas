@@ -33,14 +33,14 @@ TASK_LABELS="feature"
 # --- Feature (filled in by the Task Splitter) --------------------------------
 TOPIC="<topic>"                        # one word: audit-log, multitenancy, ...
 FEATURE_TITLE="<feature title>"
-TECH_DESIGN_URL="https://github.com/${REPO}/blob/main/brainstorming/<feature>/tech-design.md"
+TECH_DESIGN_PATH="brainstorming/<feature>/tech-design.md"  # path in the repository
 USER_STORIES_URL="<Notion user stories page, or empty>"
 VERTICALE="<1, 2 or 3>"                # the vertical the requester chose, see below
 
 # A value still shaped like the template's "<...>" was never filled in.
 PLACEHOLDER_RE='<[^>]*>'
 unfilled=""
-for setting in TOPIC FEATURE_TITLE TECH_DESIGN_URL USER_STORIES_URL VERTICALE; do
+for setting in TOPIC FEATURE_TITLE TECH_DESIGN_PATH USER_STORIES_URL VERTICALE; do
   if [[ "${!setting}" =~ $PLACEHOLDER_RE ]]; then
     unfilled+=" $setting"
   fi
@@ -72,6 +72,16 @@ TMPDIR="$(mktemp -d)"
 trap 'rm -rf "$TMPDIR"' EXIT
 CREATED=0
 UPDATED=0
+
+# Permalink to the last commit on main that changed the tech design: unlike a link to
+# main, it survives the brainstorming folder being pruned or moved once the feature ships.
+# A re-run links to the latest version.
+if ! gh api "repos/${REPO}/contents/${TECH_DESIGN_PATH}?ref=main" --silent 2>/dev/null; then
+  echo "${TECH_DESIGN_PATH} is not on main: merge the tech design first" >&2
+  exit 1
+fi
+TECH_DESIGN_SHA="$(gh api "repos/${REPO}/commits?sha=main&path=${TECH_DESIGN_PATH}&per_page=1" -q '.[0].sha')"
+TECH_DESIGN_URL="https://github.com/${REPO}/blob/${TECH_DESIGN_SHA}/${TECH_DESIGN_PATH}"
 
 # First line of every issue body.
 TECH_DESIGN_LINE="📐 **Tech design**: [tech-design.md](${TECH_DESIGN_URL})"

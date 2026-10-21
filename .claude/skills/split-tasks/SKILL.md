@@ -12,7 +12,8 @@ description: >-
 
 ## Prerequisites
 
-- A feature folder `brainstorming/<feature>/` holding `tech-design.md`
+- A feature folder `brainstorming/<feature>/` holding `tech-design.md`, merged on `main` (the issues
+  link to it there)
 - The user stories: `user-stories.md` **or** a Notion link to the page listing them
 - `gh` authenticated with the project scope (`gh auth refresh -s project`) and `jq`, to run the script
 
@@ -136,10 +137,13 @@ link to the user stories in Notion.
 Copy `.claude/skills/split-tasks/create-issues.template.sh` to `brainstorming/<feature>/create-issues.sh`
 and make it executable. Then:
 
-1. Fill in `TOPIC`, `FEATURE_TITLE`, `TECH_DESIGN_URL` (the GitHub link to `tech-design.md`: on `main` once
-   merged, otherwise on the branch that holds it) and `USER_STORIES_URL` (the Notion page, or empty when the
-   user stories only exist as `user-stories.md`), and `VERTICALE` (`1`, `2` or `3`, the choice from Step 1:
-   the script maps it to the project's exact option name).
+1. Fill in `TOPIC`, `FEATURE_TITLE`, `TECH_DESIGN_PATH` (the path of `tech-design.md` in the repository),
+   `USER_STORIES_URL` (the Notion page, or empty when the user stories only exist as `user-stories.md`) and
+   `VERTICALE` (`1`, `2` or `3`, the choice from Step 1: the script maps it to the project's exact option
+   name).
+   The script links every issue to the tech design through a permalink to the last commit on `main` that
+   changed it, so the link survives the folder being pruned once the feature ships. It stops when the file
+   is not on `main` yet: the tech design must be merged before the issues are created.
    The script refuses to run while any of these settings, or any issue title, still holds a template `<…>`
    value. `--execute` checks every issue with a silent dry run before writing anything.
 2. Replace the example issues at the bottom with one `epic` call, then for each user story one `task "USn …"`
