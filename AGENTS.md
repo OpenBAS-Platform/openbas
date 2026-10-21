@@ -135,6 +135,26 @@ These apply to **all agents**. Do not flag these — they are intentional patter
 - Test files using hardcoded credentials for mock setup → test-only context
 - Legacy `io.openaev.rest` controllers passing tenant to services → acceptable (legacy package)
 
+## ADRs (Architecture Decision Records)
+
+ADRs live in `adr/` as `ADR-NNN-<kebab-case-slug>.md`, numbered in sequence. The number is never picked by
+hand:
+
+- **Create** an ADR with `adr/scripts/new-adr.sh "<title>"`, after rebasing on `main`: it takes the number
+  after the highest ADR on disk, copies `adr/ADR-000-template.md` and prints the new file. Never guess, type
+  or "fix up" the number yourself.
+- **Never renumber a merged ADR**: its number is cited in issues, commits and other repositories.
+- **When the 🔢 ADR Numbering CI job fails** because another pull request merged that number first: rebase
+  on `main`, then run `adr/scripts/new-adr.sh --renumber adr/<the-file>.md`. It renames the file and its
+  `# ADR-NNN:` title, and rewrites every reference to the old file name. Update any mention of the bare old
+  number (`git grep -nw ADR-NNN`) by hand, then push: the job turns green.
+- **Before merging** a pull request that adds an ADR, update it with `main` ("Update branch") if `main`
+  moved since its last CI run: a green check from before another ADR merged does not see that ADR.
+- **Before opening or updating a pull request** that touches `adr/` or references an ADR, run
+  `adr/scripts/validate-adrs.sh` and fix every ❌.
+- The scripts run in bash on macOS, Linux and Windows (Git Bash or WSL; from PowerShell, prefix them with
+  `bash`).
+
 ## Opening a Pull Request
 
 > **The PR description MUST follow [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md).**

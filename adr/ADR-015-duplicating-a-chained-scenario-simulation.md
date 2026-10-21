@@ -1,4 +1,4 @@
-# ADR-008: Duplicating a chained scenario / simulation
+# ADR-015: Duplicating a chained scenario / simulation
 
 |         |                                                         |
 |---------|---------------------------------------------------------|

@@ -11,7 +11,7 @@ mkdocs-glightbox==0.5.2
 mkdocs-macros-plugin==1.5.0
 mkdocs-redirects==1.2.3
 lxml==6.1.3
-selectolax==1.0.0  # 1.0.1 makes mkdocs-glightbox drop every image (#8602)
+selectolax==1.0.0  # 1.0.1 makes mkdocs-glightbox drop every image (#8602), until blueswen/mkdocs-glightbox#75 is released
 git+https://github.com/jimporter/mike@7880ee7a42654bf4a9ae751ad097126ca991b40e
 
 # Pulled in by the above
