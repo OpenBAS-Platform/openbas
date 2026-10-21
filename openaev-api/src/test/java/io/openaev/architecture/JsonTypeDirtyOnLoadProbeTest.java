@@ -19,7 +19,10 @@ import io.openaev.database.model.AssetGroup;
 import io.openaev.database.model.BaseInjectExpectation.EXPECTATION_TYPE;
 import io.openaev.database.model.Collector;
 import io.openaev.database.model.Command;
+import io.openaev.database.model.Condition;
+import io.openaev.database.model.ConditionType;
 import io.openaev.database.model.Endpoint;
+import io.openaev.database.model.Exercise;
 import io.openaev.database.model.Filters;
 import io.openaev.database.model.Notification;
 import io.openaev.database.model.NotificationTrigger;
@@ -38,13 +41,21 @@ import io.openaev.database.model.ReportingModule;
 import io.openaev.database.model.ReportingModuleType;
 import io.openaev.database.model.ReportingSchedule;
 import io.openaev.database.model.ReportingSchedulePeriod;
+import io.openaev.database.model.ScopeRuleSelectedMode;
+import io.openaev.database.model.ScopeRuleSnapshot;
+import io.openaev.database.model.ScopeRuleSource;
+import io.openaev.database.model.ScopeRuleValueType;
 import io.openaev.database.model.SecurityCoverage;
 import io.openaev.database.model.SecurityPlatform.SECURITY_PLATFORM_TYPE;
+import io.openaev.database.model.Step;
 import io.openaev.database.model.StixRefToExternalRef;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.model.User;
 import io.openaev.database.model.Widget;
 import io.openaev.database.model.WidgetLayout;
+import io.openaev.database.model.Workflow;
+import io.openaev.database.model.WorkflowScopeRule;
+import io.openaev.database.model.WorkflowStatus;
 import io.openaev.database.model.attackpath.AttackPathExecutionCollector;
 import io.openaev.database.model.autonomous.AutonomousEvent;
 import io.openaev.database.model.autonomous.AutonomousEventType;
@@ -55,6 +66,10 @@ import io.openaev.engine.api.DateHistogramWidget;
 import io.openaev.engine.api.HistogramInterval;
 import io.openaev.engine.api.WidgetType;
 import io.openaev.utils.CustomDashboardTimeRange;
+import io.openaev.utils.fixtures.ExerciseFixture;
+import io.openaev.utils.fixtures.StepFixture;
+import io.openaev.utils.fixtures.WorkflowFixture;
+import io.openaev.utils.fixtures.composers.ExerciseComposer;
 import io.openaev.utils.mockUser.WithMockUser;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -137,13 +152,22 @@ class JsonTypeDirtyOnLoadProbeTest extends IntegrationTest {
           "AutonomousRun.agentModes",
           "AutonomousRun.stepMirror",
           "AutonomousRun.eventMirror",
-          "AutonomousEvent.data");
+          "AutonomousEvent.data",
+          "Step.data",
+          "Step.input",
+          "Step.output",
+          "Step.outputParser",
+          "Step.conditionKeyTypes",
+          "Condition.keyTypes",
+          "WorkflowScopeRule.snapshotStart",
+          "WorkflowScopeRule.snapshotEnd");
 
   private static final Set<String> EXERCISED = ConcurrentHashMap.newKeySet();
   private static final AtomicInteger CASES_RUN = new AtomicInteger();
 
   @Autowired private JsonTypeUpdateOnLoadRecorder recorder;
   @Autowired private ObjectMapper objectMapper;
+  @Autowired private ExerciseComposer exerciseComposer;
 
   // -- payloads: the known-positive control, fixed by #8236 --
 
@@ -360,6 +384,58 @@ class JsonTypeDirtyOnLoadProbeTest extends IntegrationTest {
     assertNoUpdateOnLoad("autonomous_events", event, AutonomousEvent.class);
   }
 
+  @Test
+  @DisplayName("given a step with JSON data, input and output, when loaded, then no update")
+  void given_a_step_with_json_fields_should_not_update_on_load() {
+    Step step = StepFixture.getDefaultStepTemplate();
+    step.setWorkflow(chainingRun());
+    step.setData("{\"inject_title\":\"probe\",\"nested\":{\"b\":1,\"a\":2}}");
+    step.setInput("{\"b\":[1,2],\"a\":\"x\"}");
+    step.setOutput("{\"z\":true,\"y\":null}");
+    step.setOutputParser("[{\"k\":\"v\"}]");
+    step.setConditionKeyTypes(new ArrayList<>(List.of(PrimitiveType.Text, PrimitiveType.IPv4)));
+
+    assertNoUpdateOnLoad("steps", step, Step.class);
+  }
+
+  @Test
+  @DisplayName("given a condition with key types, when loaded, then no update")
+  void given_a_condition_with_json_fields_should_not_update_on_load() {
+    Workflow run = chainingRun();
+    Condition condition = new Condition();
+    condition.setWorkflowId(run.getId());
+    condition.setTenant(run.getTenant());
+    condition.setType(ConditionType.EQ);
+    condition.setKey("probe");
+    condition.setValue("v");
+    condition.setKeyTypes(new ArrayList<>(List.of(PrimitiveType.Text, PrimitiveType.Port)));
+    condition.setCreationDate(Instant.now());
+    condition.setUpdateDate(Instant.now());
+
+    assertNoUpdateOnLoad("conditions", condition, Condition.class);
+  }
+
+  @Test
+  @DisplayName("given a workflow scope rule with snapshots, when loaded, then no update")
+  void given_a_workflow_scope_rule_with_json_fields_should_not_update_on_load() {
+    WorkflowScopeRule rule = new WorkflowScopeRule();
+    rule.setWorkflow(chainingRun());
+    rule.setSelectedMode(ScopeRuleSelectedMode.ALLOWLIST);
+    rule.setRuleSource(ScopeRuleSource.ASSET);
+    rule.setRuleValue(UUID.randomUUID().toString());
+    rule.setValueType(ScopeRuleValueType.ASSET_ID);
+    rule.setSnapshotStart(
+        ScopeRuleSnapshot.builder()
+            .label("probe")
+            .assets(
+                new ArrayList<>(
+                    List.of(ScopeRuleSnapshot.AssetSnapshot.builder().id("a1").build())))
+            .build());
+    rule.setSnapshotEnd(ScopeRuleSnapshot.builder().label("probe-end").deleted(true).build());
+
+    assertNoUpdateOnLoad("workflow_scope_rules", rule, WorkflowScopeRule.class);
+  }
+
   /**
    * On a complete run of this class, every field it declares as probed was actually exercised. A
    * declared field that no case populates would otherwise read as measured while nothing measured
@@ -542,6 +618,16 @@ class JsonTypeDirtyOnLoadProbeTest extends IntegrationTest {
     run.setAgentModes(new LinkedHashMap<>(Map.of("agent-a", "SCOPED", "agent-b", "EXPANSIVE")));
     run.setStepMirror(new LinkedHashMap<>(Map.of("step-sim", "step-scenario")));
     run.setEventMirror(new LinkedHashMap<>(Map.of("event-sim", "event-scenario")));
+    return run;
+  }
+
+  private Workflow chainingRun() {
+    exerciseComposer.reset();
+    Exercise exercise = ExerciseFixture.createDefaultExercise();
+    exerciseComposer.forExercise(exercise).persist();
+    Workflow run = WorkflowFixture.getDefaultWorkflowExecution(WorkflowStatus.RUN);
+    run.setSimulation(exercise);
+    entityManager.persist(run);
     return run;
   }
 
