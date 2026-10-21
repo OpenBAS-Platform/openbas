@@ -71,7 +71,7 @@ const DEDICATED_TYPES = new Set<ContractType>([
   'article',
   'challenge',
   'expectation',
-  'credential-reference'
+  'credential-reference',
 ]);
 // Field types whose value can be fed by a workflow output (the "Link an Output" adornment).
 const LINKABLE_PRIMITIVE_TYPES = new Set<ContractType>(['text', 'number', 'select', 'choice']);
