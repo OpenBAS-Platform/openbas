@@ -36,6 +36,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -q \
     && DEBIAN_FRONTEND=noninteractive apt-get upgrade -qq -y \
     && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y tini \
     && rm -rf /var/lib/apt/lists/*
+RUN set -eux; \
+    keytool -list -v -cacerts -storepass changeit | sed -n 's/^Alias name: //p' | grep -i emsign \
+      | while IFS= read -r alias; do keytool -delete -noprompt -cacerts -storepass changeit -alias "$alias"; done; \
+    [ -z "$(keytool -list -v -cacerts -storepass changeit | grep -iE 'emsign|emudhra')" ]
 COPY --from=api-builder /opt/openaev-build/openaev/openaev-api/target/openaev-api.jar ./
 # Install Chromium and its system libraries for server-side report rendering. The boot jar uses
 # the ZIP layout, so PropertiesLauncher can run the embedded Playwright CLI (Spring Boot 3.x
