@@ -66,7 +66,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
   List<? extends BaseInjectExpectation> getLeaves(BaseInjectExpectation expectation);
 
   /**
-   * Validates that the given expectation can be updated directly; throws otherwise.
+   * Validates that the given expectation can be answered directly by a user; throws otherwise.
    *
    * @param expectation the expectation to validate
    * @throws IllegalArgumentException if direct update is not allowed
@@ -85,7 +85,6 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
     if (verdict.score() == null) {
       throw new IllegalArgumentException("Expectation score cannot be null");
     }
-    throwIfCannotUpdateThisExpectation(expectation);
     List<? extends BaseInjectExpectation> leaves = getLeaves(expectation);
     for (BaseInjectExpectation leaf : leaves) {
       addResultToLeaf(leaf, verdict, resolveResultLabel(leaf, verdict.score()));
