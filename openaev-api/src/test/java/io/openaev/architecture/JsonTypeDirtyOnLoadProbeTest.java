@@ -20,6 +20,7 @@ import io.openaev.database.model.BaseInjectExpectation.EXPECTATION_TYPE;
 import io.openaev.database.model.Collector;
 import io.openaev.database.model.Command;
 import io.openaev.database.model.Endpoint;
+import io.openaev.database.model.Exercise;
 import io.openaev.database.model.Filters;
 import io.openaev.database.model.Notification;
 import io.openaev.database.model.NotificationTrigger;
@@ -38,6 +39,12 @@ import io.openaev.database.model.ReportingModule;
 import io.openaev.database.model.ReportingModuleType;
 import io.openaev.database.model.ReportingSchedule;
 import io.openaev.database.model.ReportingSchedulePeriod;
+import io.openaev.database.model.ScopeRuleSelectedMode;
+import io.openaev.database.model.ScopeRuleSnapshot;
+import io.openaev.database.model.ScopeRuleSnapshot.AssetSnapshot;
+import io.openaev.database.model.ScopeRuleSnapshot.SecurityPlatformSnapshot;
+import io.openaev.database.model.ScopeRuleSource;
+import io.openaev.database.model.ScopeRuleValueType;
 import io.openaev.database.model.SecurityCoverage;
 import io.openaev.database.model.SecurityPlatform.SECURITY_PLATFORM_TYPE;
 import io.openaev.database.model.StixRefToExternalRef;
@@ -45,6 +52,9 @@ import io.openaev.database.model.Tenant;
 import io.openaev.database.model.User;
 import io.openaev.database.model.Widget;
 import io.openaev.database.model.WidgetLayout;
+import io.openaev.database.model.Workflow;
+import io.openaev.database.model.WorkflowScopeRule;
+import io.openaev.database.model.WorkflowStatus;
 import io.openaev.database.model.attackpath.AttackPathExecutionCollector;
 import io.openaev.database.model.autonomous.AutonomousEvent;
 import io.openaev.database.model.autonomous.AutonomousEventType;
@@ -55,6 +65,9 @@ import io.openaev.engine.api.DateHistogramWidget;
 import io.openaev.engine.api.HistogramInterval;
 import io.openaev.engine.api.WidgetType;
 import io.openaev.utils.CustomDashboardTimeRange;
+import io.openaev.utils.fixtures.ExerciseFixture;
+import io.openaev.utils.fixtures.WorkflowFixture;
+import io.openaev.utils.fixtures.composers.ExerciseComposer;
 import io.openaev.utils.mockUser.WithMockUser;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -139,11 +152,21 @@ class JsonTypeDirtyOnLoadProbeTest extends IntegrationTest {
           "AutonomousRun.eventMirror",
           "AutonomousEvent.data");
 
+  /**
+   * Fields measured although their table is not tenant-active yet, because a dirty-on-load defect
+   * on them was fixed ahead of the activation. They stay recorded as latent in {@link
+   * JsonTypeDirtyOnLoadCoverageTest}, which fails once their table activates until they move to
+   * {@link #PROBED_FIELDS}.
+   */
+  static final Set<String> PROBED_AHEAD_OF_ACTIVATION =
+      Set.of("WorkflowScopeRule.snapshotStart", "WorkflowScopeRule.snapshotEnd");
+
   private static final Set<String> EXERCISED = ConcurrentHashMap.newKeySet();
   private static final AtomicInteger CASES_RUN = new AtomicInteger();
 
   @Autowired private JsonTypeUpdateOnLoadRecorder recorder;
   @Autowired private ObjectMapper objectMapper;
+  @Autowired private ExerciseComposer exerciseComposer;
 
   // -- payloads: the known-positive control, fixed by #8236 --
 
@@ -360,6 +383,50 @@ class JsonTypeDirtyOnLoadProbeTest extends IntegrationTest {
     assertNoUpdateOnLoad("autonomous_events", event, AutonomousEvent.class);
   }
 
+  // -- tables not active yet, probed ahead of their activation --
+
+  @Test
+  @DisplayName(
+      "given an asset scope rule with launch and end snapshots, when loaded, then no update")
+  void given_an_asset_scope_rule_with_snapshots_should_not_update_on_load() {
+    WorkflowScopeRule rule = new WorkflowScopeRule();
+    rule.setWorkflow(chainingRun());
+    rule.setSelectedMode(ScopeRuleSelectedMode.ALLOWLIST);
+    rule.setRuleSource(ScopeRuleSource.ASSET_GROUP);
+    rule.setRuleValue(UUID.randomUUID().toString());
+    rule.setValueType(ScopeRuleValueType.ASSET_GROUP_ID);
+    rule.setSnapshotStart(
+        ScopeRuleSnapshot.builder()
+            .label("probe-group")
+            .assets(new ArrayList<>(List.of(assetSnapshot("a1"), assetSnapshot("a2"))))
+            .build());
+    rule.setSnapshotEnd(
+        ScopeRuleSnapshot.builder()
+            .label("probe-group")
+            .assets(new ArrayList<>(List.of(assetSnapshot("a1"))))
+            .deleted(true)
+            .build());
+
+    assertNoUpdateOnLoad("workflow_scope_rules", rule, WorkflowScopeRule.class);
+  }
+
+  @Test
+  @DisplayName(
+      "given a security platform scope rule with launch and end snapshots, when loaded, then no"
+          + " update")
+  void given_a_security_platform_scope_rule_with_snapshots_should_not_update_on_load() {
+    String platformId = UUID.randomUUID().toString();
+    WorkflowScopeRule rule = new WorkflowScopeRule();
+    rule.setWorkflow(chainingRun());
+    rule.setRuleSource(ScopeRuleSource.SECURITY_PLATFORM);
+    rule.setRuleValue(platformId);
+    rule.setValueType(ScopeRuleValueType.SECURITY_PLATFORM_ID);
+    rule.setSnapshotStart(securityPlatformSnapshot(platformId, Instant.now()));
+    rule.setSnapshotEnd(securityPlatformSnapshot(platformId, Instant.now()));
+
+    assertNoUpdateOnLoad("workflow_scope_rules", rule, WorkflowScopeRule.class);
+  }
+
   /**
    * On a complete run of this class, every field it declares as probed was actually exercised. A
    * declared field that no case populates would otherwise read as measured while nothing measured
@@ -374,8 +441,10 @@ class JsonTypeDirtyOnLoadProbeTest extends IntegrationTest {
     if (CASES_RUN.get() != cases) {
       return;
     }
+    Set<String> declared = new TreeSet<>(PROBED_FIELDS);
+    declared.addAll(PROBED_AHEAD_OF_ACTIVATION);
     assertEquals(
-        new TreeSet<>(PROBED_FIELDS),
+        declared,
         new TreeSet<>(EXERCISED),
         "every field declared in PROBED_FIELDS must be populated by a case of this class");
   }
@@ -445,8 +514,11 @@ class JsonTypeDirtyOnLoadProbeTest extends IntegrationTest {
                 field + " must not be empty: an empty map round-trips whatever the mapping");
           }
           assertTrue(
-              PROBED_FIELDS.contains(field.key()),
-              field + " is exercised here but not declared in PROBED_FIELDS");
+              PROBED_FIELDS.contains(field.key())
+                  || PROBED_AHEAD_OF_ACTIVATION.contains(field.key()),
+              field
+                  + " is exercised here but not declared in PROBED_FIELDS or"
+                  + " PROBED_AHEAD_OF_ACTIVATION");
           EXERCISED.add(field.key());
         });
   }
@@ -543,6 +615,37 @@ class JsonTypeDirtyOnLoadProbeTest extends IntegrationTest {
     run.setStepMirror(new LinkedHashMap<>(Map.of("step-sim", "step-scenario")));
     run.setEventMirror(new LinkedHashMap<>(Map.of("event-sim", "event-scenario")));
     return run;
+  }
+
+  private Workflow chainingRun() {
+    exerciseComposer.reset();
+    Exercise exercise = ExerciseFixture.createDefaultExercise();
+    exerciseComposer.forExercise(exercise).persist();
+    Workflow run = WorkflowFixture.getDefaultWorkflowExecution(WorkflowStatus.RUN);
+    run.setSimulation(exercise);
+    entityManager.persist(run);
+    return run;
+  }
+
+  private AssetSnapshot assetSnapshot(String id) {
+    return AssetSnapshot.builder()
+        .id(id)
+        .name("probe-asset-" + id)
+        .agentsCount(2)
+        .executors(new ArrayList<>(List.of("openaev-agent", "caldera")))
+        .build();
+  }
+
+  private ScopeRuleSnapshot securityPlatformSnapshot(String platformId, Instant updatedAt) {
+    return ScopeRuleSnapshot.builder()
+        .label("probe-edr")
+        .securityPlatform(
+            SecurityPlatformSnapshot.builder()
+                .id(platformId)
+                .type(SECURITY_PLATFORM_TYPE.EDR.name())
+                .updatedAt(updatedAt)
+                .build())
+        .build();
   }
 
   private String seedAttackPathExecution() {
