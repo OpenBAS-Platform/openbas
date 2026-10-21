@@ -36,11 +36,12 @@ FEATURE_TITLE="<feature title>"
 TECH_DESIGN_PATH="brainstorming/<feature>/tech-design.md"  # path in the repository
 USER_STORIES_URL="<Notion user stories page, or empty>"
 VERTICALE="<1, 2 or 3>"                # the vertical the requester chose, see below
+FEATURE_FLAG="<true or false>"         # true when the feature ships behind a feature flag
 
 # A value still shaped like the template's "<...>" was never filled in.
 PLACEHOLDER_RE='<[^>]*>'
 unfilled=""
-for setting in TOPIC FEATURE_TITLE TECH_DESIGN_PATH USER_STORIES_URL VERTICALE; do
+for setting in TOPIC FEATURE_TITLE TECH_DESIGN_PATH USER_STORIES_URL VERTICALE FEATURE_FLAG; do
   if [[ "${!setting}" =~ $PLACEHOLDER_RE ]]; then
     unfilled+=" $setting"
   fi
@@ -57,6 +58,19 @@ case "$VERTICALE" in
   3) PROJECT_VERTICALE="#3 Easy-to-Use & consistent platform" ;;
   *)
     echo "VERTICALE must be 1, 2 or 3, not '$VERTICALE'" >&2
+    exit 1
+    ;;
+esac
+
+# The board sync keeps the issues of a feature-flagged feature open on merge.
+case "$FEATURE_FLAG" in
+  true)
+    EPIC_LABELS+=",feature-flag"
+    TASK_LABELS+=",feature-flag"
+    ;;
+  false) ;;
+  *)
+    echo "FEATURE_FLAG must be true or false, not '$FEATURE_FLAG'" >&2
     exit 1
     ;;
 esac

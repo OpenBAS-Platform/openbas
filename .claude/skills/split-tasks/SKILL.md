@@ -34,6 +34,7 @@ pick one yourself.
 | Tech design (staff/senior dev) | `tech-design.md` — required | Implementation approach, Mermaid sequence and class diagrams |
 | Implementation plan (EM) | `implementation-plan.md` — optional | An existing task split per user story |
 | Vertical | Named in the request — required | The VERTICALES value of the issues |
+| Feature flag | Named in the request — optional | Whether the feature ships behind a feature flag |
 
 - User stories given as a **Notion link**: read the page with the Notion tools (no Notion tools → ask for a
   Markdown export), and keep its URL for the epic. Every issue also links to `tech-design.md` on GitHub.
@@ -47,6 +48,11 @@ pick one yourself.
   | `2` | #2 CTI-driven & Full Security Coverage |
   | `3` | #3 Easy-to-Use & consistent platform |
 
+- **Feature flag**: a yes adds the `feature-flag` label to every issue (epic, user stories, sub-tasks): the
+  board sync uses it to keep them open on merge. Take the answer from the request, or from the tech design
+  when it explicitly says the feature ships behind a feature flag (typically naming the flag). Otherwise
+  ask: *is this feature behind a feature flag?* Do not read it into indirect hints, such as a flag check
+  around some other part of the code.
 - No user stories (file or Notion link), no `tech-design.md`, no vertical, or a Notion page you cannot read
   → ask for it. Never invent user stories or AC.
 
@@ -140,7 +146,7 @@ and make it executable. Then:
 1. Fill in `TOPIC`, `FEATURE_TITLE`, `TECH_DESIGN_PATH` (the path of `tech-design.md` in the repository),
    `USER_STORIES_URL` (the Notion page, or empty when the user stories only exist as `user-stories.md`) and
    `VERTICALE` (`1`, `2` or `3`, the choice from Step 1: the script maps it to the project's exact option
-   name).
+   name) and `FEATURE_FLAG` (`true` or `false`, the answer from Step 1).
    The script links every issue to the tech design through a permalink to the last commit on `main` that
    changed it, so the link survives the folder being pruned once the feature ships. It stops when the file
    is not on `main` yet: the tech design must be merged before the issues are created.
@@ -155,7 +161,7 @@ Do not touch the helpers: they hold the project, issue type and field settings, 
 | Setting | Value |
 |---|---|
 | Repository | `OpenAEV-Platform/openaev` |
-| Labels | epic: `feature`, `epic` — others: `feature` (existing labels, never created or recoloured) |
+| Labels | epic: `feature`, `epic` — others: `feature` — plus `feature-flag` on every issue when `FEATURE_FLAG=true` (existing labels, never created or recoloured) |
 | Issue type | `Feature` |
 | Project | #2 *OpenAEV - Product Backlog* |
 | Status | *Tech refinement* |
@@ -177,6 +183,7 @@ Report with this format and stop there:
 ```
 🧩 Task Split
 Feature: <feature title> (<topic>) · Vertical: <vertical>
+Feature flag: yes (<flag>, from <the request | tech-design.md>) / no
 Inputs: user-stories ✅ | tech-design ✅ | implementation-plan ✅/➖ (split built from the user stories)
 
 | Issue | Title | Depends on |
@@ -211,5 +218,6 @@ never moves an issue back to *Tech refinement*.
 - **Never run `create-issues.sh --execute` yourself** unless the user explicitly asks for it in the
   conversation: it publishes issues to a public repository. Run the dry run only.
 - Only write in `brainstorming/<feature>/`. Never change production code.
-- Never create, rename or recolour labels: `feature` and `epic` already exist (see `.github/labels.yml`).
+- Use only the `feature`, `epic` and `feature-flag` labels, and never create, rename or recolour them: they
+  already exist on the repository.
 - Keep issue titles stable across re-runs: the title is how the script finds an existing issue.
