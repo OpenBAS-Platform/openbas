@@ -1,19 +1,25 @@
 package io.openaev.service.expectation;
 
+import static io.openaev.collectors.expectations_expiration_manager.service.ExpectationsExpirationManagerService.EXPIRED;
+import static io.openaev.service.InjectExpectationUtils.FAILED_SCORE_VALUE;
 import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.addResult;
 import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.computeResultsScore;
+import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.expireEmptyResults;
 import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.removeResult;
 
 import io.openaev.database.model.BaseInjectExpectation;
+import io.openaev.database.model.Collector;
 import io.openaev.database.model.Exercise;
 import io.openaev.database.model.Inject;
 import io.openaev.execution.ExecutableInject;
 import io.openaev.model.inject.form.Expectation;
-import io.openaev.rest.exercise.form.ExpectationUpdateInput;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Strategy interface for the inject expectation lifecycle.
@@ -71,34 +77,34 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * Applies a result to every leaf expectation and recomputes their score.
    *
    * @param expectation the expectation that received the update
-   * @param input the update input containing the new score
+   * @param verdict the verdict carrying the source and the new score
    * @return the list of leaf expectations that were modified
    */
   default List<? extends BaseInjectExpectation> applyResultToLeaves(
-      BaseInjectExpectation expectation, ExpectationUpdateInput input) {
-    if (input.getScore() == null) {
+      BaseInjectExpectation expectation, ExpectationVerdict verdict) {
+    if (verdict.score() == null) {
       throw new IllegalArgumentException("Expectation score cannot be null");
     }
     throwIfCannotUpdateThisExpectation(expectation);
     List<? extends BaseInjectExpectation> leaves = getLeaves(expectation);
     for (BaseInjectExpectation leaf : leaves) {
-      addResultToLeaf(leaf, input, resolveResultLabel(leaf, input.getScore()));
+      addResultToLeaf(leaf, verdict, resolveResultLabel(leaf, verdict.score()));
       leaf.setScore(computeResultsScore(leaf.getResults(), leaf));
     }
     return leaves;
   }
 
   /**
-   * Adds the input result to a leaf expectation. Defaults to an upsert on the input source, keeping
+   * Adds the verdict to a leaf expectation. Defaults to an upsert on the verdict source, keeping
    * the results of the other sources (e.g. one result per security platform).
    *
    * @param leaf the leaf expectation receiving the result
-   * @param input the update input carrying the source and the score
+   * @param verdict the verdict carrying the source and the score
    * @param resultLabel the success/failure label of the result
    */
   default void addResultToLeaf(
-      BaseInjectExpectation leaf, ExpectationUpdateInput input, String resultLabel) {
-    addResult(leaf, input, resultLabel);
+      BaseInjectExpectation leaf, ExpectationVerdict verdict, String resultLabel) {
+    addResult(leaf, verdict, resultLabel);
   }
 
   /**
@@ -141,6 +147,52 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
   }
 
   /**
+   * Returns {@code true} if the expectation is a leaf: its score comes from its own results, not
+   * from children expectations.
+   *
+   * @param expectation the expectation to check
+   */
+  default boolean isLeaf(BaseInjectExpectation expectation) {
+    return getLeaves(expectation).contains(expectation);
+  }
+
+  /**
+   * Expires unanswered expectations with the verdict of the expiration collector. Only the leaves
+   * receive the verdict: a parent (team with players, asset with agents, asset group) is derived
+   * from its children by {@link #recomputeParentScores}, so it stays pending until they expire.
+   *
+   * @param expectations the expired expectations
+   * @param collector the collector the verdict is attributed to
+   * @return the leaf expectations that received the verdict
+   */
+  default List<? extends BaseInjectExpectation> expireLeaves(
+      List<? extends BaseInjectExpectation> expectations, Collector collector) {
+    List<? extends BaseInjectExpectation> leaves =
+        expectations.stream().filter(this::isLeaf).toList();
+    for (BaseInjectExpectation leaf : leaves) {
+      ExpectationVerdict verdict = buildExpirationVerdict(leaf, collector);
+      // The per-source rows still pending (e.g. one per security platform) get the verdict too
+      expireEmptyResults(leaf.getResults(), verdict.score(), EXPIRED);
+      addResultToLeaf(leaf, verdict, resolveResultLabel(leaf, verdict.score()));
+      leaf.setScore(computeResultsScore(leaf.getResults(), leaf));
+    }
+    return leaves;
+  }
+
+  /**
+   * Builds the expiration verdict of an unanswered leaf. Defaults to a failure: silence means
+   * nothing was prevented, detected or validated within the window.
+   *
+   * @param leaf the expired, unanswered leaf expectation
+   * @param collector the collector the verdict is attributed to
+   * @return the expiration verdict
+   */
+  default ExpectationVerdict buildExpirationVerdict(
+      BaseInjectExpectation leaf, Collector collector) {
+    return ExpectationVerdict.fromCollector(collector, FAILED_SCORE_VALUE);
+  }
+
+  /**
    * Returns the success/failure label based on whether the actual score meets the expected score.
    *
    * @param expectation the expectation providing the threshold and labels
@@ -161,7 +213,53 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
    * @param expectation the expectation that received the update
    * @return the list of parent expectations that were modified
    */
-  List<? extends BaseInjectExpectation> recomputeParentScores(BaseInjectExpectation expectation);
+  default List<? extends BaseInjectExpectation> recomputeParentScores(
+      BaseInjectExpectation expectation) {
+    return recomputeParentScores(List.of(expectation));
+  }
+
+  /**
+   * Batched variant of {@link #recomputeParentScores(BaseInjectExpectation)}: the expectations are
+   * grouped by inject and type, then the parents of each group are recomputed once by {@link
+   * #recomputeAffectedParents}.
+   *
+   * @param expectations the expectations that received an update
+   * @return the parent expectations that were modified
+   */
+  default List<? extends BaseInjectExpectation> recomputeParentScores(
+      List<? extends BaseInjectExpectation> expectations) {
+    Map<InjectAndType, List<T>> expectationsByInjectAndType =
+        expectations.stream()
+            .filter(this::supports)
+            .map(expectation -> (T) expectation)
+            .collect(
+                Collectors.groupingBy(
+                    e -> new InjectAndType(e.getInject(), e.getType()),
+                    LinkedHashMap::new,
+                    Collectors.toList()));
+    return expectationsByInjectAndType.entrySet().stream()
+        .flatMap(
+            entry ->
+                recomputeAffectedParents(
+                    entry.getKey().inject(), entry.getKey().type(), entry.getValue())
+                    .stream())
+        .toList();
+  }
+
+  record InjectAndType(Inject inject, BaseInjectExpectation.EXPECTATION_TYPE type) {}
+
+  /**
+   * Recomputes only the parents affected by the given expectations, each once. The other parents of
+   * the inject are left untouched.
+   *
+   * @param inject the inject the expectations belong to
+   * @param type the type of the expectations
+   * @param expectations the expectations whose parents are recomputed, all of the given inject and
+   *     type
+   * @return the parent expectations that were modified
+   */
+  List<T> recomputeAffectedParents(
+      Inject inject, BaseInjectExpectation.EXPECTATION_TYPE type, List<T> expectations);
 
   /**
    * Returns {@code true} if this behavior can build a template from a content-form expectation of
