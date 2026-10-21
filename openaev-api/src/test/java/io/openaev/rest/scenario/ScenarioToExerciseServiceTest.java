@@ -305,7 +305,7 @@ class ScenarioToExerciseServiceTest extends IntegrationTest {
     scenarioSaved.setInjects(new HashSet<>(Set.of(inject)));
 
     // Act
-    Exercise exercise = this.scenarioToExerciseService.toExercise(scenarioSaved, null, false);
+    Exercise exercise = this.scenarioToExerciseService.toExercise(scenarioSaved, null, false, null);
     entityManager.flush();
     entityManager.clear();
     Exercise exerciseSaved = this.loadService.exercise(exercise.getId());

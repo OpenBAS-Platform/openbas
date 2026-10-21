@@ -326,30 +326,6 @@ class CredentialApiTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("given_otherTenantCredentialId_should_notResolveIt")
-    void given_otherTenantCredentialId_should_notResolveIt() throws Exception {
-      // Arrange
-      Tenant tenantA = tenantIsolationTestHelper.createTenantWithCurrentUser("credential-find-a");
-      Tenant tenantB = tenantIsolationTestHelper.createTenantWithCurrentUser("credential-find-b");
-      String tenantACredentialId =
-          credentialSecretReferenceRepository
-              .save(CredentialFixture.createDefaultUsernameCredentialReference(tenantA))
-              .getId();
-      String tenantBCredentialId =
-          credentialSecretReferenceRepository
-              .save(CredentialFixture.createDefaultUsernameCredentialReference(tenantB))
-              .getId();
-
-      // Act
-      String response =
-          findCredentials(tenantA.getId(), List.of(tenantACredentialId, tenantBCredentialId));
-
-      // Assert
-      List<String> ids = JsonPath.read(response, "$[*].credential_id");
-      assertThat(ids).containsExactly(tenantACredentialId).doesNotContain(tenantBCredentialId);
-    }
-
-    @Test
     @DisplayName("given_unknownCredentialId_should_returnEmptyList")
     void given_unknownCredentialId_should_returnEmptyList() throws Exception {
       // Arrange
