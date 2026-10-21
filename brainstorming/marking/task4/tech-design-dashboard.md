@@ -813,3 +813,29 @@ medium profile, and no query refused on the large profile.
   becomes inheritance, §2.2), so it is a product decision, not only an optimisation.
 - **Above the `terms` limit**: fail closed (hide the related types for that user), or move the list
   into a small per-user document and use a `terms` lookup instead of sending it with every query.
+
+## 4.8 Alternative approaches
+
+Three reasonable ways to bring the REST API's rights to dashboards. The registry (which field holds
+which asset, scenario or simulation) and the value-level handling (stripping, the bucket `exclude`,
+filters on dependency fields) are needed in all three: a parent document targeting GREEN and RED
+stays visible whatever the approach.
+
+| | 1. Rights resolved per request (current) | 2. Same, optimised | 3. Hybrid: grants in the index |
+|---|---|---|---|
+| **Idea** | Per request, SQL and `PermissionService` compute what the reader may see; Elasticsearch receives id lists: hidden assets, granted ids, readable types | Option 1, plus a scope cache per (user, tenant), and the long lists stored in a small security document read by a `terms` lookup | Each document carries the **groups granted on its parent resource** (the simulation it belongs to, else its scenario, else its atomic testing: the parent the REST API checks); the query only sends the reader's group ids. Markings stay as in option 1 |
+| **Read cost** | grows with the hidden assets and the **granted ids**: grants are copied into every simulation of a granted scenario, so a recurring scenario adds one id per run | smaller requests, cached; Elasticsearch still filters on the full lists | small and stable for grants (a few group ids); markings as in option 1 |
+| **Freshness** | immediate for everything | immediate (cache evicted on change) | markings immediate; a grant added or revoked on a resource applies once that resource's documents are re-indexed (the REST API applies it at once) |
+| **Extra work** | none (built) | cache, security index | a new indexed field, handlers resolving the groups granted on the parent resource, a reindex |
+| **When to choose it** | as long as the lists stay reasonable | when requests get large | when granted-id lists grow without bound (long-running recurring scenarios) |
+
+**Why grants, not markings, are the candidate for the index.** The granted-id list grows with time
+(one id per simulation of a granted recurring scenario), while the hidden-asset list is bounded by
+the asset inventory. Re-indexing is also cheaper for grants: grants are copied, not inherited, so a
+grant change on one resource only touches that resource's documents, while a marking change on one
+asset touches every document derived from it, across its whole history.
+
+**Recommendation.** Keep option 1 and measure the largest granted-id and hidden-asset lists on a
+main-environment dump (§4.7). Move to option 2 if the requests get heavy, and to option 3 if
+granted-id lists grow without bound; option 3's grant-revocation delay is a product decision to take
+first.
