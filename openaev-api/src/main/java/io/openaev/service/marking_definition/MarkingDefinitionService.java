@@ -129,6 +129,38 @@ public class MarkingDefinitionService {
     };
   }
 
+  /**
+   * Tells whether a marking definition is currently assigned, i.e. whether its id appears in the
+   * {@code marking_ids} array of any row of any marked table, or granted to a group through {@code
+   * groups_markings}.
+   *
+   * @param ctx transaction context containing tenant scope
+   * @param markingDefinitionId identifier of the marking definition
+   * @return {@code true} if at least one marked entity carries the definition or at least one group
+   *     is granted it
+   */
+  @Transactional(readOnly = true)
+  public boolean isAssigned(@NotNull TxCtx ctx, @NotBlank String markingDefinitionId) {
+    findByIdOrThrow(ctx, markingDefinitionId);
+    for (String table : allTablesWithMarkingIds.tableNames()) {
+      Boolean assigned =
+          jdbcTemplate.queryForObject(
+              "SELECT EXISTS (SELECT 1 FROM "
+                  + table
+                  + " WHERE COALESCE(marking_ids, '{}'::text[]) @> ARRAY[?]::text[])",
+              Boolean.class,
+              markingDefinitionId);
+      if (Boolean.TRUE.equals(assigned)) {
+        return true;
+      }
+    }
+    return Boolean.TRUE.equals(
+        jdbcTemplate.queryForObject(
+            "SELECT EXISTS (SELECT 1 FROM groups_markings WHERE marking_id = ?)",
+            Boolean.class,
+            markingDefinitionId));
+  }
+
   private MarkingDefinition findByIdOrThrow(
       @NotNull TxCtx ctx, @NotBlank String markingDefinitionId) {
     MarkingDefinition markingDefinition =
@@ -260,7 +292,7 @@ public class MarkingDefinitionService {
       jdbcTemplate.update(
           "UPDATE "
               + table
-              + " SET marking_ids = array_remove(marking_ids, ?) WHERE marking_ids @> ARRAY[?]::text[]",
+              + " SET marking_ids = array_remove(marking_ids, ?) WHERE COALESCE(marking_ids, '{}'::text[]) @> ARRAY[?]::text[]",
           markingDefinitionId,
           markingDefinitionId);
     }

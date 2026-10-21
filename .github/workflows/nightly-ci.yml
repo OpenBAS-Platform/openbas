@@ -98,6 +98,8 @@ jobs:
       # ── E2E: OpenSearch (Chrome/WebKit/Chromium) + ES Firefox/Edge + expanded infra ──
       # artifact_suffix must be unique per cell: the report artifact is named
       # playwright-report-<browser><suffix> and duplicates fail the upload.
+      # The two without_license cells run without the EE licence: the specs that need it skip
+      # themselves, so they cover every spec that must work in the Community Edition.
       e2e-matrix: >
         [
           {"browser":"chrome","project":"chrome","docker_image":"openaev-image-amd64","variant":"std-amd64","runner":"ubuntu-latest","search_engine":"elasticsearch","artifact_suffix":"-std-amd64"},
@@ -124,7 +126,9 @@ jobs:
           {"browser":"edge","project":"infra-edge","docker_image":"openaev-image-amd64","variant":"std-amd64","runner":"ubuntu-latest","search_engine":"elasticsearch","artifact_suffix":"-std-amd64-infra"},
           {"browser":"chromium","project":"infra-chromium","docker_image":"openaev-image-arm64","variant":"std-arm64","runner":"ubuntu-24.04-arm","search_engine":"elasticsearch","artifact_suffix":"-std-arm64-infra"},
           {"browser":"firefox","project":"infra-firefox","docker_image":"openaev-image-arm64","variant":"std-arm64","runner":"ubuntu-24.04-arm","search_engine":"elasticsearch","artifact_suffix":"-std-arm64-infra"},
-          {"browser":"webkit","project":"infra-webkit","docker_image":"openaev-image-arm64","variant":"std-arm64","runner":"ubuntu-24.04-arm","search_engine":"elasticsearch","artifact_suffix":"-std-arm64-infra"}
+          {"browser":"webkit","project":"infra-webkit","docker_image":"openaev-image-arm64","variant":"std-arm64","runner":"ubuntu-24.04-arm","search_engine":"elasticsearch","artifact_suffix":"-std-arm64-infra"},
+          {"browser":"chrome","project":"chrome","docker_image":"openaev-image-amd64","variant":"std-amd64","runner":"ubuntu-latest","search_engine":"elasticsearch","artifact_suffix":"-std-amd64-no-ee","without_license":true},
+          {"browser":"chromium","project":"infra-chromium","docker_image":"openaev-image-amd64","variant":"std-amd64","runner":"ubuntu-latest","search_engine":"elasticsearch","artifact_suffix":"-std-amd64-infra-no-ee","without_license":true}
         ]
       vulnerability-scan-fail-on-error: true
       # Keep Nightly runs out of shared caches used by PR workflows.

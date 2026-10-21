@@ -57,6 +57,20 @@ jobs:
         with:
           last-release-number: ${{ steps.latest-tag.outputs.latest-tag }}
 
+  # Blocking on purpose: a pull request must not merge an ADR number main already has.
+  adr-numbering:
+    name: "🔢 ADR Numbering"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # On a pull request: the merge commit and its first parent, the target branch.
+          fetch-depth: 2
+      - uses: ./.github/actions/adr-numbering
+        with:
+          pull-request: ${{ github.event_name == 'pull_request' }}
+
   ocsf-parser-generation-stability:
     strategy:
       matrix:
@@ -322,7 +336,7 @@ jobs:
   # ════════════════════════════════════════════════════════════════════
 
   e2e-tests:
-    name: "🧪 E2E (${{ matrix.shard_name || 'full' }} · ${{ matrix.project }} · ${{ matrix.variant }}${{ matrix.search_engine == 'opensearch' && ' · OS' || '' }})"
+    name: "🧪 E2E (${{ matrix.shard_name || 'full' }} · ${{ matrix.project }} · ${{ matrix.variant }}${{ matrix.search_engine == 'opensearch' && ' · OS' || '' }}${{ matrix.without_license && ' · no EE' || '' }})"
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 45
     strategy:
@@ -347,7 +361,8 @@ jobs:
       OPENAEV_ADMIN_ENCRYPTION_SALT: ilikesaltyfoodnomnom
       OPENAEV_RATELIMIT_ENABLED: false
       SPRING_PROFILES_ACTIVE: ci
-      OPENAEV_APPLICATION_LICENSE: ${{ secrets.OPENAEV_APPLICATION_LICENSE }}
+      # A cell with without_license runs the Community Edition: the EE specs skip themselves.
+      OPENAEV_APPLICATION_LICENSE: ${{ !matrix.without_license && secrets.OPENAEV_APPLICATION_LICENSE || '' }}
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v7
@@ -696,6 +711,7 @@ jobs:
   pipeline-gate:
     name: "✅ Pipeline Gate"
     needs:
+      - adr-numbering
       - ocsf-parser-generation-stability
       - migrations-guard
       - backend-compile

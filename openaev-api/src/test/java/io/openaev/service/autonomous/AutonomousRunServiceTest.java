@@ -903,7 +903,7 @@ class AutonomousRunServiceTest {
     assertThat(result).isSameAs(duplicate);
     // The copy's chaining workflow is cloned with keep-alive forced off.
     verify(workflowService).copyScenarioChainingWorkflowAsManual("scenario-1", duplicate);
-    // ADR-007: exactly ONE workflow copy. getDuplicateScenario stays metadata-only, so this caller
+    // ADR-015: exactly ONE workflow copy. getDuplicateScenario stays metadata-only, so this caller
     // - which copies the workflow itself - can never end up with two TEMPLATE workflows on the
     // duplicate.
     verify(workflowService, never()).duplicateScenarioWorkflow(anyString(), any(Scenario.class));

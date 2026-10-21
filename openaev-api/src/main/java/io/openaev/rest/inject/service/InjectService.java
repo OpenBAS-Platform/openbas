@@ -63,6 +63,7 @@ import io.openaev.rest.kill_chain_phase.KillChainPhaseInitializer;
 import io.openaev.rest.security.SecurityExpression;
 import io.openaev.rest.security.SecurityExpressionHandler;
 import io.openaev.rest.tag.TagService;
+import io.openaev.secrets.service.SecretReferenceService;
 import io.openaev.service.*;
 import io.openaev.service.threat_arsenal.ThreatArsenalService;
 import io.openaev.service.utils.BulkOperationMonitor;
@@ -111,6 +112,7 @@ public class InjectService {
   static final String AGENT_ACCESS_DENIED = "Agent is not allowed to act on this inject";
 
   private final TeamRepository teamRepository;
+  private final SecretReferenceService secretReferenceService;
   private final ExecutionTraceRepository executionTraceRepository;
   private final AssetService assetService;
   private final AssetGroupService assetGroupService;
@@ -199,6 +201,8 @@ public class InjectService {
     inject.setUser(this.userService.currentUser());
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
+    inject.setSecretReferences(
+        secretReferenceService.secretReferences(input.getSecretReferences()));
     inject.setTags(tagService.tagSet(input.getTagIds()));
     List<InjectDocument> injectDocuments =
         input.getDocuments().stream()
@@ -998,6 +1002,8 @@ public class InjectService {
       inject.setAssets(fromIterable(this.assetService.assets(input.getAssets())));
     }
     inject.setAssetGroups(fromIterable(this.assetGroupService.assetGroups(input.getAssetGroups())));
+    inject.setSecretReferences(
+        secretReferenceService.secretReferences(input.getSecretReferences()));
     inject.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
 
     // Set documents

@@ -199,6 +199,7 @@ class TenantScopedEntrypointsTxCtxArchTest {
           "io.openaev.api.marking_definition.MarkingDefinitionApi#create",
           "io.openaev.api.marking_definition.MarkingDefinitionApi#update",
           "io.openaev.api.marking_definition.MarkingDefinitionApi#delete",
+          "io.openaev.api.marking_definition.MarkingDefinitionApi#assigned",
           "io.openaev.api.attackpath.AttackPathApi#relations",
           "io.openaev.api.attackpath.AttackPathApi#findings",
           "io.openaev.api.attackpath.AttackPathApi#executionDetail",
