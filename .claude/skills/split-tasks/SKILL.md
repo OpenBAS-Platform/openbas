@@ -180,5 +180,5 @@ When the user stories, tech design or plan change, update `task-splitting.md` an
 - renamed task → a **new** issue; rename the existing one on GitHub first so the script finds it
 - removed task → nothing happens; close the issue by hand
 
-Project fields are only set when an issue enters the project, so a re-run never moves an issue back to
-*Tech refinement*.
+Status and VERTICALES are only set when empty: a re-run fills in a field an interrupted run left blank, and
+never moves an issue back to *Tech refinement*.

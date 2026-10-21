@@ -11,7 +11,7 @@
 #
 # Re-runnable: an issue is matched by its exact title and updated in place.
 # Sub-issue links are only added when missing, and project fields are only set
-# when the issue first enters the project, so a re-run never resets a status
+# when empty: a re-run completes an interrupted run, and never resets a status
 # the team has moved since.
 #
 # Prerequisites:
@@ -129,23 +129,48 @@ set_project_field() {
     }' >/dev/null
 }
 
-# Adds the issue to the project and sets its fields, only when it is not there yet.
+# Adds the issue to the project, then sets Status and VERTICALES only where they are empty:
+# a re-run repairs a run interrupted before the fields were set, and never overwrites a value
+# the team has changed since.
 add_to_project() {
-  local issue_node_id="$1" in_project item_id
-  in_project="$(gh api graphql -f issueId="$issue_node_id" -f query='
+  local issue_node_id="$1" item item_id
+  item="$(gh api graphql -f issueId="$issue_node_id" -f query='
     query($issueId: ID!) {
-      node(id: $issueId) { ... on Issue { projectItems(first: 20) { nodes { project { id } } } } }
-    }' | jq -r --arg p "$PROJECT_ID" '.data.node.projectItems.nodes[] | select(.project.id == $p) | .project.id')"
-  if [[ -n "$in_project" ]]; then
-    return
+      node(id: $issueId) {
+        ... on Issue {
+          projectItems(first: 20) {
+            nodes {
+              id
+              project { id }
+              status: fieldValueByName(name: "Status") {
+                ... on ProjectV2ItemFieldSingleSelectValue { optionId }
+              }
+              verticale: fieldValueByName(name: "VERTICALES") {
+                ... on ProjectV2ItemFieldSingleSelectValue { optionId }
+              }
+            }
+          }
+        }
+      }
+    }' | jq -c --arg p "$PROJECT_ID" '[.data.node.projectItems.nodes[] | select(.project.id == $p)] | first // empty')"
+
+  if [[ -n "$item" ]]; then
+    item_id="$(jq -r '.id' <<<"$item")"
+  else
+    item='{}'
+    item_id="$(gh api graphql -f projectId="$PROJECT_ID" -f contentId="$issue_node_id" \
+      -q '.data.addProjectV2ItemById.item.id' -f query='
+      mutation($projectId: ID!, $contentId: ID!) {
+        addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) { item { id } }
+      }')"
   fi
-  item_id="$(gh api graphql -f projectId="$PROJECT_ID" -f contentId="$issue_node_id" \
-    -q '.data.addProjectV2ItemById.item.id' -f query='
-    mutation($projectId: ID!, $contentId: ID!) {
-      addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) { item { id } }
-    }')"
-  set_project_field "$item_id" "$STATUS_FIELD_ID" "$STATUS_OPTION_ID"
-  set_project_field "$item_id" "$VERTICALE_FIELD_ID" "$VERTICALE_OPTION_ID"
+
+  if [[ -z "$(jq -r '.status.optionId // empty' <<<"$item")" ]]; then
+    set_project_field "$item_id" "$STATUS_FIELD_ID" "$STATUS_OPTION_ID"
+  fi
+  if [[ -z "$(jq -r '.verticale.optionId // empty' <<<"$item")" ]]; then
+    set_project_field "$item_id" "$VERTICALE_FIELD_ID" "$VERTICALE_OPTION_ID"
+  fi
 }
 
 # Makes the issue a sub-issue of the epic, unless it already has a parent.
