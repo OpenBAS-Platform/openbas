@@ -57,6 +57,20 @@ jobs:
         with:
           last-release-number: ${{ steps.latest-tag.outputs.latest-tag }}
 
+  # Blocking on purpose: a pull request must not merge an ADR number main already has.
+  adr-numbering:
+    name: "🔢 ADR Numbering"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # On a pull request: the merge commit and its first parent, the target branch.
+          fetch-depth: 2
+      - uses: ./.github/actions/adr-numbering
+        with:
+          pull-request: ${{ github.event_name == 'pull_request' }}
+
   ocsf-parser-generation-stability:
     strategy:
       matrix:
@@ -697,6 +711,7 @@ jobs:
   pipeline-gate:
     name: "✅ Pipeline Gate"
     needs:
+      - adr-numbering
       - ocsf-parser-generation-stability
       - migrations-guard
       - backend-compile

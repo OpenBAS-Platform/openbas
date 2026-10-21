@@ -5,8 +5,9 @@
 | Status | Draft / Proposed / Accepted / Superseded by ADR-XXX / Deprecated                                               |
 | Related | https://github.com/OpenAEV-Platform/openaev/issues/XXX |
 
-> - **Number**: unique, the next free one on `main`; check again after rebasing, before merging.
+> - **Number**: never by hand. Rebase on `main`, then create the ADR with `adr/scripts/new-adr.sh "<title>"`. If the ADR Numbering CI job fails because another pull request merged that number first, rebase and run `adr/scripts/new-adr.sh --renumber <file>`; update the branch with `main` before merging. A merged ADR is never renumbered.
 > - **File-name**: lowercase kebab-case after the uppercase prefix, e.g. `ADR-009-marking-based-access-control.md`.
+> - **Check**: `adr/scripts/validate-adrs.sh`, also run by the blocking ADR Numbering CI job.
 
 ## 1. Context
 
