@@ -125,8 +125,8 @@ public class InjectHelper {
    * <p>Finds injects that are pending execution and scheduled within the specified number of
    * minutes from now. Used for pre-loading upcoming injects.
    *
-   * <p>Cross-tenant: its caller, {@code InjectsFinalizationJob}, runs with no transaction open, so
-   * no v1 filter narrows this read. Once {@code injects} is activated it needs the primitive.
+   * <p>Cross-tenant, and unscoped on its own: its caller, {@code InjectsFinalizationJob}, runs it
+   * under {@code TxCtx.allTenants()}, which also scopes the sub-query on {@code workflows}.
    *
    * @param thresholdMinutes the time window in minutes to look ahead
    * @return list of pending injects scheduled within the threshold
