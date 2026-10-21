@@ -421,19 +421,29 @@ public class ElasticService implements EngineService {
   }
 
   /**
-   * The document links to a resource the reader is granted on, or links to no grant-managed
-   * resource at all (none of the grant-key fields is set): like a row with no parent in SQL, a
-   * document attached to nothing grantable has no grant to check.
+   * The document's most specific owner is a resource the reader is granted on, or the document
+   * links to no grant-managed resource at all (none of the grant-key fields is set): like a row
+   * with no parent in SQL, a document attached to nothing grantable has no grant to check.
+   *
+   * <p>The keys come in precedence order ({@link EngineSecurityRegistry.EntitySecurity#grantKeys}):
+   * the first one set on the document names its owner, and only that owner's grant counts. A
+   * simulation's documents are therefore checked on the simulation, never on its scenario, as in
+   * the REST API.
    */
   private Query grantedQuery(List<EngineReadScope.GrantKey> grantKeys) {
     List<Query> granted = new ArrayList<>();
-    grantKeys.stream()
-        .filter(key -> !key.ids().isEmpty())
-        .forEach(key -> granted.add(keywordTerms(key.field(), key.ids())));
-    BoolQuery.Builder unlinked = new BoolQuery.Builder();
-    grantKeys.forEach(
-        key -> unlinked.mustNot(ExistsQuery.of(e -> e.field(key.field() + ".keyword"))._toQuery()));
-    granted.add(unlinked.build()._toQuery());
+    List<Query> morePreciseKeysUnset = new ArrayList<>();
+    for (EngineReadScope.GrantKey key : grantKeys) {
+      Query keySet = ExistsQuery.of(e -> e.field(key.field() + ".keyword"))._toQuery();
+      if (!key.ids().isEmpty()) {
+        List<Query> unset = List.copyOf(morePreciseKeysUnset);
+        Query ownerGranted = keywordTerms(key.field(), key.ids());
+        granted.add(BoolQuery.of(b -> b.filter(ownerGranted).mustNot(unset))._toQuery());
+      }
+      morePreciseKeysUnset.add(keySet);
+    }
+    List<Query> noKeySet = List.copyOf(morePreciseKeysUnset);
+    granted.add(BoolQuery.of(b -> b.mustNot(noKeySet))._toQuery());
     return BoolQuery.of(b -> b.should(granted).minimumShouldMatch("1"))._toQuery();
   }
 

@@ -95,7 +95,7 @@ class CursorPagedSearchTest extends IntegrationTest {
   private static final String TENANT_ID = Tenant.DEFAULT_TENANT_UUID;
 
   /** A (assetId, findingId) pair identifying one vulnerability-observation grain. */
-  private record Grain(String assetId, String findingId) {}
+  private record Grain(String assetId, String findingId, String simulationId) {}
 
   @BeforeEach
   void resetIndex() throws IOException {
@@ -115,15 +115,16 @@ class CursorPagedSearchTest extends IntegrationTest {
   // ---------------------------------------------------------------------------
 
   /**
-   * A non-admin reader granted on the given scenario / simulation ids: the observation types are
-   * readable, filtered on the scenario and simulation they belong to.
+   * A non-admin reader granted on the given simulations and scenarios: the observation types are
+   * readable, filtered on their most specific owner (the simulation, else the scenario), with the
+   * keys in the registry's precedence order.
    */
-  private static EngineReadScope nonAdminScope(String... grantedResourceIds) {
-    Set<String> ids = Set.of(grantedResourceIds);
+  private static EngineReadScope nonAdminScope(
+      Set<String> grantedSimulations, Set<String> grantedScenarios) {
     List<EngineReadScope.GrantKey> keys =
         List.of(
-            new EngineReadScope.GrantKey("base_scenario_side", ids),
-            new EngineReadScope.GrantKey("base_simulation_side", ids));
+            new EngineReadScope.GrantKey("base_simulation_side", grantedSimulations),
+            new EngineReadScope.GrantKey("base_scenario_side", grantedScenarios));
     return EngineReadScope.forTenant(
         TENANT_ID,
         Set.of("snapshot-vulnerability-observation", "snapshot-attack-observation"),
@@ -200,7 +201,7 @@ class CursorPagedSearchTest extends IntegrationTest {
         .forInject(InjectFixture.getDefaultInject())
         .withFinding(findingWrapper)
         .persist();
-    return new Grain(endpointWrapper.get().getId(), findingWrapper.get().getId());
+    return new Grain(endpointWrapper.get().getId(), findingWrapper.get().getId(), null);
   }
 
   /** Persists an endpoint + CVE finding through an inject wired to a scenario-linked simulation. */
@@ -215,8 +216,9 @@ class CursorPagedSearchTest extends IntegrationTest {
         injectComposer.forInject(InjectFixture.getDefaultInject()).withFinding(findingWrapper);
     Exercise exercise = ExerciseFixture.createDefaultIncidentResponseExercise(Instant.now());
     exercise.setScenario(scenario);
-    exerciseComposer.forExercise(exercise).withInject(injectWrapper).persist();
-    return new Grain(endpointWrapper.get().getId(), findingWrapper.get().getId());
+    String simulationId =
+        exerciseComposer.forExercise(exercise).withInject(injectWrapper).persist().get().getId();
+    return new Grain(endpointWrapper.get().getId(), findingWrapper.get().getId(), simulationId);
   }
 
   private Scenario persistScenario() {
@@ -717,22 +719,37 @@ class CursorPagedSearchTest extends IntegrationTest {
       Grain unrestricted = newGrain();
       indexAll();
 
-      List<EsVulnerabilityObservation> results = page(nonAdminScope(), null, 100);
+      List<EsVulnerabilityObservation> results = page(nonAdminScope(Set.of(), Set.of()), null, 100);
 
       assertThat(containsAsset(results, restricted.assetId())).isFalse();
       assertThat(containsAsset(results, unrestricted.assetId())).isTrue();
     }
 
     @Test
-    @DisplayName("granting the scenario reveals the restricted document")
-    void given_grantOnScenario_should_revealRestrictedDocument() {
+    @DisplayName("granting the simulation reveals its document")
+    void given_grantOnSimulation_should_revealItsDocument() {
       Scenario scenario = persistScenario();
       Grain restricted = newScenarioLinkedGrain(scenario);
       indexAll();
 
-      List<EsVulnerabilityObservation> results = page(nonAdminScope(scenario.getId()), null, 100);
+      List<EsVulnerabilityObservation> results =
+          page(nonAdminScope(Set.of(restricted.simulationId()), Set.of()), null, 100);
 
       assertThat(containsAsset(results, restricted.assetId())).isTrue();
+    }
+
+    @Test
+    @DisplayName("granting only the scenario does not reveal its simulation's document")
+    void given_grantOnScenarioOnly_should_notRevealItsSimulationDocument() {
+      // As in the REST API: a simulation is read through its own grant, never its scenario's.
+      Scenario scenario = persistScenario();
+      Grain restricted = newScenarioLinkedGrain(scenario);
+      indexAll();
+
+      List<EsVulnerabilityObservation> results =
+          page(nonAdminScope(Set.of(), Set.of(scenario.getId())), null, 100);
+
+      assertThat(containsAsset(results, restricted.assetId())).isFalse();
     }
   }
 

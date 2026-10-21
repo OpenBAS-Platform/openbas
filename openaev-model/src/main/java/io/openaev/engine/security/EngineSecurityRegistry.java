@@ -51,8 +51,10 @@ public final class EngineSecurityRegistry {
    * @param grantBypass the capability that makes grants irrelevant for this type (e.g. {@code
    *     ACCESS_ASSESSMENT} through SIMULATION READ); {@code null} when the type is not
    *     grant-managed
-   * @param grantKeys the fields linking a document to a granted resource; empty when the type is
-   *     not grant-managed
+   * @param grantKeys the fields linking a document to a granted resource, in precedence order: the
+   *     first one set on a document names its most specific owner, and only that owner's grant
+   *     counts (a simulation's documents follow the simulation, never its scenario, as in the REST
+   *     API); empty when the type is not grant-managed
    * @param assetFields the fields holding the id of the asset(s) the document is about
    */
   public record EntitySecurity(
@@ -75,10 +77,15 @@ public final class EngineSecurityRegistry {
 
   private static final ResourceAccess ASSESSMENT = access(ResourceType.SIMULATION, Action.READ);
 
+  /**
+   * The owner of an assessment document, most specific first: its simulation, else its scenario. A
+   * scenario grant never opens a simulation: the REST API only reads a simulation through a grant
+   * on that simulation (copied from the scenario at creation, not inherited).
+   */
   private static final List<GrantKeyField> ASSESSMENT_KEYS =
       List.of(
-          new GrantKeyField("base_scenario_side", GRANT_RESOURCE_TYPE.SCENARIO),
-          new GrantKeyField("base_simulation_side", GRANT_RESOURCE_TYPE.SIMULATION));
+          new GrantKeyField("base_simulation_side", GRANT_RESOURCE_TYPE.SIMULATION),
+          new GrantKeyField("base_scenario_side", GRANT_RESOURCE_TYPE.SCENARIO));
 
   private static final Map<String, EntitySecurity> ENTITIES = buildEntities();
 
@@ -123,9 +130,7 @@ public final class EngineSecurityRegistry {
         new EntitySecurity(
             List.of(),
             ASSESSMENT,
-            List.of(
-                new GrantKeyField("base_id", GRANT_RESOURCE_TYPE.SIMULATION),
-                new GrantKeyField("base_scenario_side", GRANT_RESOURCE_TYPE.SCENARIO)),
+            List.of(new GrantKeyField("base_id", GRANT_RESOURCE_TYPE.SIMULATION)),
             List.of()));
     entities.put(
         index(EsInject.class),
