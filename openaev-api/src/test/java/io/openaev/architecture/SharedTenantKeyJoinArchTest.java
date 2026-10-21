@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -94,8 +95,15 @@ class SharedTenantKeyJoinArchTest {
               + " s.scenario_id=i.inject_scenario , ta.asset_id=a.asset_id , xa.asset_id=a.asset_id",
           "ag.agent_asset=e.asset_id , e.asset_id=ia.asset_id");
 
+  private static final String GRANT_READER = "grant-reader";
+
   private static final List<String> CLASSIFICATIONS =
-      List.of("reaches-active-table:", "dead-code", "not-established", "fixed-pending:");
+      List.of(
+          "reaches-active-table:", "dead-code", "not-established", "fixed-pending:", GRANT_READER);
+
+  /** {@code grants gr} or {@code grants AS gr}: the alias a statement gives the grants table. */
+  private static final Pattern GRANTS_ALIAS =
+      Pattern.compile("\\bgrants\\s+(?:AS\\s+)?([A-Za-z_][A-Za-z_0-9]*)", Pattern.CASE_INSENSITIVE);
 
   /** {@code alias.column = alias.column}. The only shape this guard judges. */
   private static final Pattern ALIAS_EQUALITY =
@@ -187,7 +195,7 @@ class SharedTenantKeyJoinArchTest {
       Pattern.compile("\\b(FROM|JOIN|WHERE|USING)\\b", Pattern.CASE_INSENSITIVE);
 
   /** One run of concatenated string literals, with where it starts. */
-  private record SqlRun(String file, String className, String method, int line, String sql) {
+  record SqlRun(String file, String className, String method, int line, String sql) {
     String origin() {
       return className + "#" + method;
     }
@@ -578,6 +586,14 @@ class SharedTenantKeyJoinArchTest {
    * expire mechanically rather than when someone remembers them.
    */
   static List<String> waiverViolations(String key, String reason, Set<String> activeTables) {
+    return waiverViolations(key, reason, activeTables, Map.of());
+  }
+
+  static List<String> waiverViolations(
+      String key,
+      String reason,
+      Set<String> activeTables,
+      Map<String, Set<String>> groupTenantGrantAliases) {
     List<String> malformed = new ArrayList<>();
     if (reason.isBlank()) {
       malformed.add(key + " :: no reason at all");
@@ -630,6 +646,31 @@ class SharedTenantKeyJoinArchTest {
                 + " claims does not hold, so the join is unprotected");
       }
     }
+    // grants has no tenant column, so this analyser can never place a grant in a tenant class. The
+    // grant reader guard checks the one rule that makes such a join correct, the grant's group
+    // restricted to the row's tenant or to the platform, so this waiver is only as good as that
+    // listing, and only for the join that reaches grants.
+    if (reason.startsWith(GRANT_READER)) {
+      String origin = key.split(" ")[0];
+      Set<String> grantAliases = groupTenantGrantAliases.get(origin);
+      if (grantAliases == null) {
+        malformed.add(
+            key
+                + " :: grant-reader, but "
+                + origin
+                + " is not listed as group-tenant in grant-readers.txt, so nothing checks that the"
+                + " grant's group is restricted to the tenant");
+      } else {
+        String[] aliases = key.substring(key.lastIndexOf(' ') + 1).split("=");
+        if (Arrays.stream(aliases).noneMatch(grantAliases::contains)) {
+          malformed.add(
+              key
+                  + " :: grant-reader, but the waived join does not join the grants alias "
+                  + grantAliases
+                  + " of that statement");
+        }
+      }
+    }
     Matcher untilActive = UNTIL_ACTIVE.matcher(reason);
     if (untilActive.find()) {
       String named = untilActive.group(1).toLowerCase(Locale.ROOT);
@@ -650,8 +691,11 @@ class SharedTenantKeyJoinArchTest {
   void everyWaiverCarriesAClassificationAndAReason() throws IOException {
     List<String> malformed = new ArrayList<>();
     Set<String> activeTables = ProductionActiveTables.names();
+    Map<String, Set<String>> groupTenantGrantAliases = groupTenantGrantAliases();
     for (Map.Entry<String, String> waiver : waivers().entrySet()) {
-      malformed.addAll(waiverViolations(waiver.getKey(), waiver.getValue(), activeTables));
+      malformed.addAll(
+          waiverViolations(
+              waiver.getKey(), waiver.getValue(), activeTables, groupTenantGrantAliases));
     }
     assertTrue(
         malformed.isEmpty(),
@@ -854,7 +898,7 @@ class SharedTenantKeyJoinArchTest {
   // ---------------------------------------------------------------------------------------------
 
   /** Every production module's sources, derived so a new module cannot silently escape the scan. */
-  private static List<Path> productionRoots() throws IOException {
+  static List<Path> productionRoots() throws IOException {
     try (Stream<Path> modules = Files.list(Path.of("..").toAbsolutePath().normalize())) {
       return modules
           .filter(module -> module.getFileName().toString().startsWith("openaev-"))
@@ -871,7 +915,7 @@ class SharedTenantKeyJoinArchTest {
    */
   private static int skippedMigrations;
 
-  private static List<SqlRun> sqlCorpus() throws IOException {
+  static List<SqlRun> sqlCorpus() throws IOException {
     List<SqlRun> runs = new ArrayList<>();
     skippedMigrations = 0;
     for (Path root : productionRoots()) {
@@ -1051,7 +1095,7 @@ class SharedTenantKeyJoinArchTest {
    * <p>An annotation value is followed by its method, and SQL built in a body is preceded by the
    * method that builds it, so the direction is chosen by looking at what sits before the run.
    */
-  private static String owningMethod(String text, int start, int end) {
+  static String owningMethod(String text, int start, int end) {
     String before = text.substring(Math.max(0, start - 200), start);
     boolean annotationValue = ANNOTATION_VALUE.matcher(before.stripTrailing()).find();
     String method = nearestMember(METHOD_DECLARATION, text, start, end, annotationValue, true);
@@ -1103,7 +1147,7 @@ class SharedTenantKeyJoinArchTest {
     };
   }
 
-  private static String relative(Path source) {
+  static String relative(Path source) {
     String full = source.toAbsolutePath().normalize().toString();
     int module = full.indexOf("openaev-");
     return module < 0 ? full : full.substring(module);
@@ -1150,6 +1194,24 @@ class SharedTenantKeyJoinArchTest {
   }
 
   /** waiver key to reason. */
+  /**
+   * The aliases of grants in each statement the grant reader allowlist lists as group-tenant, keyed
+   * by the statement's owner.
+   */
+  private static Map<String, Set<String>> groupTenantGrantAliases() throws IOException {
+    Set<String> groupTenant = GrantReaderAllowlistArchTest.groupTenantReaders();
+    Map<String, Set<String>> aliases = new HashMap<>();
+    for (SqlRun run : sqlCorpus()) {
+      if (groupTenant.contains(run.origin())) {
+        Matcher alias = GRANTS_ALIAS.matcher(run.sql());
+        while (alias.find()) {
+          aliases.computeIfAbsent(run.origin(), origin -> new HashSet<>()).add(alias.group(1));
+        }
+      }
+    }
+    return aliases;
+  }
+
   private static Map<String, String> waivers() throws IOException {
     Map<String, String> waivers = new LinkedHashMap<>();
     Set<String> duplicates = new LinkedHashSet<>();
@@ -1237,6 +1299,62 @@ class SharedTenantKeyJoinArchTest {
               ACTIVE);
       assertTrue(
           found.isEmpty(), "a deferral on a table still inactive is legitimate. Got: " + found);
+    }
+  }
+
+  @Nested
+  @DisplayName("A waiver on a grants join defers to the grant reader allowlist")
+  class GrantReaderWaiver {
+
+    private static final String KEY =
+        "SomeRepository#someGrantedQuery injector_contract_id gr=injcon";
+    private static final String REASON =
+        "grant-reader : grants has no tenant column; the statement restricts the grant's group to"
+            + " the contract's tenant or to a platform group";
+
+    @Test
+    @DisplayName("given a statement listed group-tenant and its grants alias, then it is accepted")
+    void given_groupTenantReaderOnItsGrantsAlias_should_beAccepted() {
+      // Arrange
+      Map<String, Set<String>> listed = Map.of("SomeRepository#someGrantedQuery", Set.of("gr"));
+
+      // Act
+      List<String> found = waiverViolations(KEY, REASON, Set.of(), listed);
+
+      // Assert
+      assertTrue(found.isEmpty(), "a listed group-tenant reader is excused. Got: " + found);
+    }
+
+    @Test
+    @DisplayName("given a statement not listed group-tenant, then it is flagged")
+    void given_statementNotListedGroupTenant_should_beFlagged() {
+      // Arrange
+      Map<String, Set<String>> listed = Map.of("OtherRepository#otherQuery", Set.of("gr"));
+
+      // Act
+      List<String> found = waiverViolations(KEY, REASON, Set.of(), listed);
+
+      // Assert
+      assertTrue(
+          found.stream().anyMatch(v -> v.contains("not listed as group-tenant")),
+          "a grant-reader waiver needs the grant guard to vouch for it. Got: " + found);
+    }
+
+    @Test
+    @DisplayName("given a join that does not reach the grants alias, then it is flagged")
+    void given_joinNotOnTheGrantsAlias_should_beFlagged() {
+      // Arrange
+      Map<String, Set<String>> listed = Map.of("SomeRepository#someGrantedQuery", Set.of("g2"));
+
+      // Act
+      List<String> found = waiverViolations(KEY, REASON, Set.of(), listed);
+
+      // Assert
+      assertTrue(
+          found.stream().anyMatch(v -> v.contains("does not join the grants alias")),
+          "grant-reader excuses the grants join only, never another join of the same statement."
+              + " Got: "
+              + found);
     }
   }
 }
