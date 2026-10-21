@@ -20,8 +20,11 @@ import io.openaev.database.model.BaseInjectExpectation.EXPECTATION_TYPE;
 import io.openaev.database.model.Collector;
 import io.openaev.database.model.Command;
 import io.openaev.database.model.Endpoint;
+import io.openaev.database.model.ExecutionStatus;
 import io.openaev.database.model.Exercise;
 import io.openaev.database.model.Filters;
+import io.openaev.database.model.Inject;
+import io.openaev.database.model.InjectStatus;
 import io.openaev.database.model.Notification;
 import io.openaev.database.model.NotificationTrigger;
 import io.openaev.database.model.NotificationTriggerEventType;
@@ -30,6 +33,7 @@ import io.openaev.database.model.Notifier;
 import io.openaev.database.model.NotifierType;
 import io.openaev.database.model.Payload;
 import io.openaev.database.model.PayloadArgument;
+import io.openaev.database.model.PayloadCommandBlock;
 import io.openaev.database.model.PayloadPrerequisite;
 import io.openaev.database.model.PrimitiveType;
 import io.openaev.database.model.Reporting;
@@ -47,6 +51,8 @@ import io.openaev.database.model.ScopeRuleSource;
 import io.openaev.database.model.ScopeRuleValueType;
 import io.openaev.database.model.SecurityCoverage;
 import io.openaev.database.model.SecurityPlatform.SECURITY_PLATFORM_TYPE;
+import io.openaev.database.model.StatusPayload;
+import io.openaev.database.model.StatusPayloadDocument;
 import io.openaev.database.model.StixRefToExternalRef;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.model.User;
@@ -66,8 +72,10 @@ import io.openaev.engine.api.HistogramInterval;
 import io.openaev.engine.api.WidgetType;
 import io.openaev.utils.CustomDashboardTimeRange;
 import io.openaev.utils.fixtures.ExerciseFixture;
+import io.openaev.utils.fixtures.InjectFixture;
 import io.openaev.utils.fixtures.WorkflowFixture;
 import io.openaev.utils.fixtures.composers.ExerciseComposer;
+import io.openaev.utils.fixtures.composers.InjectComposer;
 import io.openaev.utils.mockUser.WithMockUser;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -102,11 +110,12 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * <p>The verdict is data-dependent, not structural: an empty collection, a {@code String} payload
  * or a value type with its own {@code equals} compares equal whatever the mapping, so no static
- * rule decides it. This probe is therefore the standing test, one case per entity that stores a
- * {@link JsonType} field in a tenant-active table, and a case only counts when every such field of
- * the entity it loads carries non-empty data. {@link JsonTypeDirtyOnLoadCoverageTest} is what makes
- * a newly declared field or a newly activated table reach this class instead of shipping
- * unmeasured.
+ * rule decides the effect. {@link JsonValueEqualityArchTest} checks the shape that prevents it,
+ * value equality at every level of a stored type; this probe is the standing test of the effect,
+ * one case per entity that stores a {@link JsonType} field in a tenant-active table, and a case
+ * only counts when every such field of the entity it loads carries non-empty data. {@link
+ * JsonTypeDirtyOnLoadCoverageTest} is what makes a newly declared field or a newly activated table
+ * reach this class instead of shipping unmeasured.
  */
 @Transactional
 @WithMockUser(isAdmin = true)
@@ -159,7 +168,10 @@ class JsonTypeDirtyOnLoadProbeTest extends IntegrationTest {
    * {@link #PROBED_FIELDS}.
    */
   static final Set<String> PROBED_AHEAD_OF_ACTIVATION =
-      Set.of("WorkflowScopeRule.snapshotStart", "WorkflowScopeRule.snapshotEnd");
+      Set.of(
+          "WorkflowScopeRule.snapshotStart",
+          "WorkflowScopeRule.snapshotEnd",
+          "InjectStatus.payloadOutput");
 
   private static final Set<String> EXERCISED = ConcurrentHashMap.newKeySet();
   private static final AtomicInteger CASES_RUN = new AtomicInteger();
@@ -167,6 +179,7 @@ class JsonTypeDirtyOnLoadProbeTest extends IntegrationTest {
   @Autowired private JsonTypeUpdateOnLoadRecorder recorder;
   @Autowired private ObjectMapper objectMapper;
   @Autowired private ExerciseComposer exerciseComposer;
+  @Autowired private InjectComposer injectComposer;
 
   // -- payloads: the known-positive control, fixed by #8236 --
 
@@ -427,6 +440,20 @@ class JsonTypeDirtyOnLoadProbeTest extends IntegrationTest {
     assertNoUpdateOnLoad("workflow_scope_rules", rule, WorkflowScopeRule.class);
   }
 
+  @Test
+  @DisplayName("given an inject status with a payload output, when loaded, then no update")
+  void given_an_inject_status_with_a_payload_output_should_not_update_on_load() {
+    injectComposer.reset();
+    Inject inject = injectComposer.forInject(InjectFixture.getDefaultInject()).persist().get();
+    InjectStatus status = new InjectStatus();
+    status.setInject(inject);
+    status.setName(ExecutionStatus.EXECUTED);
+    status.setTrackingSentDate(Instant.now());
+    status.setPayloadOutput(statusPayload());
+
+    assertNoUpdateOnLoad("injects_statuses", status, InjectStatus.class);
+  }
+
   /**
    * On a complete run of this class, every field it declares as probed was actually exercised. A
    * declared field that no case populates would otherwise read as measured while nothing measured
@@ -486,8 +513,8 @@ class JsonTypeDirtyOnLoadProbeTest extends IntegrationTest {
             + updates
             + ". A JSON-mapped field of "
             + type.getSimpleName()
-            + " does not compare equal to its own snapshot; map it natively with"
-            + " @JdbcTypeCode(SqlTypes.JSON) or give the stored value type equals and hashCode.");
+            + " does not compare equal to its own snapshot; give the stored value type, and every"
+            + " type it nests, equals and hashCode.");
     CASES_RUN.incrementAndGet();
   }
 
@@ -646,6 +673,41 @@ class JsonTypeDirtyOnLoadProbeTest extends IntegrationTest {
                 .updatedAt(updatedAt)
                 .build())
         .build();
+  }
+
+  /** Every field of the payload output set, nested blocks and documents included. */
+  private StatusPayload statusPayload() {
+    PayloadArgument argument = new PayloadArgument();
+    argument.setType(PrimitiveType.Text);
+    argument.setKey("target");
+    argument.setDefaultValue("localhost");
+    PayloadPrerequisite prerequisite = new PayloadPrerequisite();
+    prerequisite.setExecutor("PowerShell");
+    prerequisite.setGetCommand("install");
+    StatusPayload payload = new StatusPayload();
+    payload.setName("probe-payload");
+    payload.setDescription("probe description");
+    payload.setType(Command.COMMAND_TYPE);
+    payload.setCleanupExecutor("PowerShell");
+    payload.setPayloadCommandBlocks(
+        new ArrayList<>(
+            List.of(
+                new PayloadCommandBlock(
+                    "PowerShell", "echo one", new ArrayList<>(List.of("rm one", "rm two"))),
+                new PayloadCommandBlock(
+                    "bash", "echo two", new ArrayList<>(List.of("rm three"))))));
+    payload.setArguments(new ArrayList<>(List.of(argument)));
+    payload.setPrerequisites(new ArrayList<>(List.of(prerequisite)));
+    payload.setExternalId("probe-external-id");
+    payload.setExecutableFile(new StatusPayloadDocument(UUID.randomUUID().toString(), "a.exe"));
+    payload.setFileDropFile(new StatusPayloadDocument(UUID.randomUUID().toString(), "b.txt"));
+    payload.setHostname("probe.test");
+    payload.setIpSrc("10.0.0.1");
+    payload.setIpDst("10.0.0.2");
+    payload.setPortSrc(1234);
+    payload.setPortDst(443);
+    payload.setProtocol("TCP");
+    return payload;
   }
 
   private String seedAttackPathExecution() {
