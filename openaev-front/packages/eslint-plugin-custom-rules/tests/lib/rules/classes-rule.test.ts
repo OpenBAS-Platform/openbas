@@ -196,6 +196,37 @@ const A = () => { const { classes } = useStyles(); return classes.a; };
 const B = () => { const { classes } = useStyles(); return classes.a; };`),
     },
     {
+      // a shorthand property is an API: renaming the value would change its key
+      code: tss(`
+const useRowStyles = makeStyles()(() => ({ a: {} }));
+const hooks = { useRowStyles };
+const C = () => hooks.useRowStyles().classes;`),
+      errors: [{ messageId: 'name' }],
+    },
+    {
+      // an exported object carries the hook name to other modules
+      code: tss(`
+const useRowStyles = makeStyles()(() => ({ a: {} }));
+const C = () => useRowStyles().classes.a;
+export default { useRowStyles };`),
+      errors: [{ messageId: 'name' }],
+    },
+    {
+      code: tss(`
+const useRowStyles = makeStyles()(() => ({ a: {} }));
+const C = () => useRowStyles().classes.a;
+export const hooks = { useRowStyles };`),
+      errors: [{ messageId: 'name' }],
+    },
+    {
+      // not only called: `useRowStyles` is passed along
+      code: tss(`
+const useRowStyles = makeStyles()(() => ({ a: {} }));
+const C = () => useRowStyles().classes.a;
+register(useRowStyles);`),
+      errors: [{ messageId: 'name' }],
+    },
+    {
       // renaming would clash with an existing useStyles
       code: tss(`
 const useStyles = () => null;

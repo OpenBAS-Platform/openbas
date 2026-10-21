@@ -208,12 +208,16 @@ export default ESLintUtils.RuleCreator.withoutDocs({
         return;
       }
       const identifiers = variable.references.map(reference => reference.identifier);
+      // Renaming a reference that is not a call (`{ useRowStyles }`, `hooks.useRowStyles`) would change
+      // a property key or an exported name, so only a hook that is solely called is renamed.
+      const onlyCalled = identifiers.every(identifier => identifier === id
+        || (identifier.parent.type === AST_NODE_TYPES.CallExpression && identifier.parent.callee === identifier));
       const free = identifiers.every(identifier => !ASTUtils.findVariable(sourceCode.getScope(identifier), HOOK_NAME));
       context.report({
         node: id,
         messageId: 'name',
         data: { expected: HOOK_NAME },
-        fix: free ? fixer => identifiers.map(identifier => fixer.replaceText(identifier, HOOK_NAME)) : null,
+        fix: onlyCalled && free ? fixer => identifiers.map(identifier => fixer.replaceText(identifier, HOOK_NAME)) : null,
       });
     };
 
