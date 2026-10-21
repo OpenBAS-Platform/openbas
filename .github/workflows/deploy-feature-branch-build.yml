@@ -47,7 +47,7 @@ permissions:
 jobs:
   docker-build:
     name: "🐳 Docker Build (amd64)"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       # Trusted: the main commit this run was dispatched on
@@ -125,7 +125,7 @@ jobs:
     if: always() && needs.docker-build.result != 'success'
     permissions:
       deployments: write # to update the deployment status
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Update deployment status
         uses: actions/github-script@v9

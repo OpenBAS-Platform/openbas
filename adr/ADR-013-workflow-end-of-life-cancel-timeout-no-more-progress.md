@@ -1,4 +1,4 @@
-# ADR-007: Workflow end-of-life on CANCELED / TIMEOUT / NO_MORE_PROGRESS
+# ADR-013: Workflow end-of-life on CANCELED / TIMEOUT / NO_MORE_PROGRESS
 
 |         |                                                         |
 |---------|---------------------------------------------------------|

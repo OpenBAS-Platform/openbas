@@ -1,4 +1,4 @@
-# ADR-009: Workflow end-of-life on simulation DELETE and RESET
+# ADR-014: Workflow end-of-life on simulation DELETE and RESET
 
 |         |                                                               |
 |---------|---------------------------------------------------------------|
@@ -8,7 +8,7 @@
 
 ## 1. Context
 
-ADR-007 introduced a single, cause-aware pipeline (`WorkflowEndService.manageWorkflowEnd`) for
+ADR-013 introduced a single, cause-aware pipeline (`WorkflowEndService.manageWorkflowEnd`) for
 ending a chaining workflow on `TIMEOUT`, `CANCELED` and `NO_MORE_PROGRESS`, but explicitly left the
 `DELETED` cause out of scope: deleting or resetting a simulation only cleared its
 `workflow_states`, while the workflow row itself, its steps/conditions, and the attack-path
@@ -32,10 +32,10 @@ deleted or reset:
 The first case simply has nothing to do for the "required clean end" / "delete workflow execution"
 steps below (`findAllWorkflowExecutionBySimulationId` returns an empty list). Both remaining flows
 first make sure the workflow is properly ended (running the same shared cleanup as
-ADR-007: end active steps, stop active injects, clear the delay queue, delete asset agent jobs,
+ADR-013: end active steps, stop active injects, clear the delay queue, delete asset agent jobs,
 delete workflow states) before doing anything destructive. This is the **"required clean end"**
 step in the diagrams below — it only does something when the workflow was still active; it is a
-no-op (idempotency guard from ADR-007) when the workflow is already `END`.
+no-op (idempotency guard from ADR-013) when the workflow is already `END`.
 
 Two new causes drive the destructive part:
 
@@ -72,7 +72,7 @@ Three actions, gated by the simulation/workflow-execution status on the left:
 
 1. **Required clean end** — only relevant when the simulation is still `RUNNING` / workflow is
    `RUN`: ends the simulation, ends active steps/injects, deletes workflow state, step delay and
-   asset agent jobs (the ADR-007 shared cleanup).
+   asset agent jobs (the ADR-013 shared cleanup).
 2. **Delete workflow execution** — deletes the attack path explicitly, then cascade-deletes the
    workflow execution row and everything under it (scope rules, steps, conditions execution) by
    simulation id.
@@ -115,4 +115,4 @@ drop stale allow/deny entries before the next run.
 ### Neutral
 
 - No change to the public API surface (`ExerciseController` / DTOs).
-- No change to the ADR-007 pipeline for `TIMEOUT` / `CANCELED` / `NO_MORE_PROGRESS`.
+- No change to the ADR-013 pipeline for `TIMEOUT` / `CANCELED` / `NO_MORE_PROGRESS`.
