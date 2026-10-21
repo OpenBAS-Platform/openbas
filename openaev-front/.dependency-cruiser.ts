@@ -15,6 +15,7 @@ const DEV_FILES = [
   '^vitest\\.config\\.ts$',
   '^playwright\\.config\\.ts$',
   '^eslint\\.config\\.js$',
+  '^knip\\.ts$',
   '^\\.dependency-cruiser\\.ts$',
   '^scripts/',
 ];
