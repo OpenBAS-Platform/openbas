@@ -1,0 +1,369 @@
+package io.openaev.service.engine;
+
+import static io.openaev.utils.fixtures.MarkingDefinitionFixture.createMarkingDefinition;
+import static io.openaev.utils.fixtures.MarkingDefinitionFixture.uniqueDefinition;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import io.openaev.IntegrationTest;
+import io.openaev.config.cache.MarkingClearanceCacheManager;
+import io.openaev.context.TxCtx;
+import io.openaev.database.model.Capability;
+import io.openaev.database.model.Endpoint;
+import io.openaev.database.model.Filters;
+import io.openaev.database.model.Group;
+import io.openaev.database.model.MarkingDefinition;
+import io.openaev.database.model.Tenant;
+import io.openaev.database.model.User;
+import io.openaev.database.repository.GroupRepository;
+import io.openaev.database.repository.IndexingStatusRepository;
+import io.openaev.engine.EngineContext;
+import io.openaev.engine.EsModel;
+import io.openaev.engine.api.CountRuntime;
+import io.openaev.engine.api.FlatConfiguration;
+import io.openaev.engine.api.ListConfiguration;
+import io.openaev.engine.api.ListRuntime;
+import io.openaev.engine.api.WidgetConfigurationWithSeries;
+import io.openaev.engine.facade.EngineService;
+import io.openaev.engine.model.EsBase;
+import io.openaev.engine.security.EngineReadScope;
+import io.openaev.utils.CustomDashboardTimeRange;
+import io.openaev.utils.TenantIsolationTestHelper;
+import io.openaev.utils.fixtures.EndpointFixture;
+import io.openaev.utils.fixtures.FindingFixture;
+import io.openaev.utils.fixtures.InjectFixture;
+import io.openaev.utils.fixtures.TenantGroupFixture;
+import io.openaev.utils.fixtures.composers.EndpointComposer;
+import io.openaev.utils.fixtures.composers.FindingComposer;
+import io.openaev.utils.fixtures.composers.InjectComposer;
+import io.openaev.utils.fixtures.composers.MarkingDefinitionComposer;
+import io.openaev.utils.fixtures.composers.TenantGroupComposer;
+import io.openaev.utils.mockUser.WithMockUser;
+import io.openaev.utils.pagination.Pagination;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.sql.DataSource;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * The marking dimension of {@link EngineReadScopeResolver} against PostgreSQL: real marking
+ * definitions, real asset {@code marking_ids}, a non-admin reader whose clearance comes from its
+ * group's markings, with {@code MARKING} on and {@code assets} active (the test configuration). The
+ * resolved scope is then applied by the engine, so the assertions cover both the hidden-assets
+ * query (PostgreSQL arrays, the caller's clearance, per tenant) and what the reader gets back:
+ * asset lists, derived finding lists and counts.
+ *
+ * <p>Order matters in the fixture: documents are indexed <b>before</b> the markings are written, so
+ * every row is in the index and a hidden one is hidden by the reader scope, not by an indexing pass
+ * that could not see it. Markings are written with raw JDBC on purpose (see {@code
+ * AssetMarkingIsolationTest}): an ORM write of {@code TLP:RED} would itself be refused to a reader
+ * not cleared for it.
+ */
+@Transactional
+@WithMockUser(isAdmin = false)
+@DisplayName("Engine read scope: markings resolved from the database")
+// es8 only until the reader filter is ported to es9 and OpenSearch (implementation-plan-dashboard
+// steps 11-12): those engines ignore the scope, so the nightly would fail on them.
+@DisabledIfEnvironmentVariable(named = "ENGINE_ENGINESELECTOR", matches = "elk9|opensearch")
+class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
+
+  private static final String DEFAULT_TENANT = Tenant.DEFAULT_TENANT_UUID;
+  private static final TxCtx DEFAULT_CTX = TxCtx.forTenant(DEFAULT_TENANT);
+
+  @Autowired private EngineReadScopeResolver resolver;
+  @Autowired private EngineService engineService;
+  @Autowired private EngineContext engineContext;
+  @Autowired private IndexingStatusRepository indexingStatusRepository;
+  @Autowired private TenantIsolationTestHelper tenantHelper;
+  @Autowired private TenantGroupComposer tenantGroupComposer;
+  @Autowired private GroupRepository groupRepository;
+  @Autowired private MarkingDefinitionComposer markingDefinitionComposer;
+  @Autowired private MarkingClearanceCacheManager clearanceCache;
+  @Autowired private EndpointComposer endpointComposer;
+  @Autowired private FindingComposer findingComposer;
+  @Autowired private InjectComposer injectComposer;
+  @Autowired private DataSource dataSource;
+
+  private JdbcTemplate jdbc;
+  private String userId;
+  private String tenantB;
+  private Group markingGroup;
+
+  private MarkingDefinition tlpGreen;
+  private MarkingDefinition tlpRed;
+  private MarkingDefinition tenantBTlpGreen;
+
+  private String unmarked;
+  private String green;
+  private String red;
+  private String tenantBGreen;
+  private String findingOnGreen;
+  private String findingOnRed;
+
+  @BeforeEach
+  void seed() throws Exception {
+    jdbc = new JdbcTemplate(dataSource);
+    tenantGroupComposer.reset();
+    markingDefinitionComposer.reset();
+    endpointComposer.reset();
+    findingComposer.reset();
+    injectComposer.reset();
+    for (EsModel<?> model : engineContext.getModels()) {
+      engineService.cleanUpIndex(model.getName());
+    }
+
+    // A non-admin reader of assets, findings and every scenario in the default tenant, and of
+    // assets only in tenant B.
+    tenantHelper.grantCapabilitiesInTenant(
+        DEFAULT_TENANT,
+        Set.of(
+            Capability.ACCESS_DASHBOARDS,
+            Capability.ACCESS_ASSETS,
+            Capability.ACCESS_FINDINGS,
+            Capability.ACCESS_ASSESSMENT));
+    tenantB =
+        tenantHelper
+            .createTenantWithCapabilities(
+                "engine-scope-markings-b",
+                Set.of(Capability.ACCESS_DASHBOARDS, Capability.ACCESS_ASSETS))
+            .getId();
+    User user = testUserHolder.get();
+    userId = user.getId();
+
+    // Orders above the seeded 10..50 band so a fixture never ties with a default.
+    tlpGreen = marking(DEFAULT_TENANT, 60);
+    tlpRed = marking(DEFAULT_TENANT, 70);
+    tenantBTlpGreen = marking(tenantB, 60);
+
+    // The reader's clearance in the default tenant comes from this group's markings.
+    markingGroup =
+        tenantGroupComposer
+            .forGroup(TenantGroupFixture.getGroup("engine-scope-markings-" + uniqueDefinition()))
+            .persist()
+            .get();
+    markingGroup.setUsers(new ArrayList<>(List.of(user)));
+    groupRepository.save(markingGroup);
+
+    EndpointComposer.Composer unmarkedEndpoint = endpoint(DEFAULT_TENANT, "unmarked").persist();
+    EndpointComposer.Composer tenantBGreenEndpoint = endpoint(tenantB, "tenant-b-green").persist();
+    // Persisted with their finding (inject -> finding -> endpoint).
+    EndpointComposer.Composer greenEndpoint = endpoint(DEFAULT_TENANT, "green");
+    EndpointComposer.Composer redEndpoint = endpoint(DEFAULT_TENANT, "red");
+    findingOnGreen = finding(greenEndpoint);
+    findingOnRed = finding(redEndpoint);
+    unmarked = unmarkedEndpoint.get().getId();
+    green = greenEndpoint.get().getId();
+    red = redEndpoint.get().getId();
+    tenantBGreen = tenantBGreenEndpoint.get().getId();
+
+    // Index everything first, unmarked: see the class javadoc.
+    entityManager.flush();
+    entityManager.clear();
+    indexingStatusRepository.deleteAll();
+    engineService.bulkProcessing(engineContext.getModels().stream());
+    // ES processes indexing asynchronously — give it time
+    Thread.sleep(1_000);
+
+    mark(green, tlpGreen);
+    mark(red, tlpRed);
+    mark(tenantBGreen, tenantBTlpGreen);
+    grant(tlpGreen);
+  }
+
+  // -- Tests --
+
+  @Nested
+  @DisplayName("Hidden assets, from real markings and the reader's clearance")
+  class HiddenAssets {
+
+    @Test
+    @DisplayName("given a TLP:GREEN clearance, should hide only the TLP:RED asset")
+    void given_greenClearance_should_hideOnlyRed() {
+      // -- ACT --
+      EngineReadScope scope = resolver.resolve(DEFAULT_CTX);
+
+      // -- ASSERT --
+      assertThat(scope.unrestricted()).isFalse();
+      assertThat(scope.tenantRules().get(DEFAULT_TENANT).hiddenAssetIds())
+          .contains(red)
+          .doesNotContain(green, unmarked);
+    }
+
+    @Test
+    @DisplayName("given a TLP:GREEN clearance, should list the unmarked and GREEN assets, not RED")
+    void given_greenClearance_should_listAssetsWithoutRed() {
+      // -- ACT --
+      List<String> assets = ids(list(DEFAULT_CTX, "asset"));
+
+      // -- ASSERT --
+      assertThat(assets).contains(unmarked, green).doesNotContain(red);
+    }
+
+    @Test
+    @DisplayName("given a TLP:GREEN clearance, should hide the finding derived from the RED asset")
+    void given_greenClearance_should_hideDerivedFindingOfRed() {
+      // -- ACT --
+      List<String> findings = ids(list(DEFAULT_CTX, "finding"));
+      long count = countFindings(DEFAULT_CTX);
+
+      // -- ASSERT --
+      assertThat(findings).contains(findingOnGreen).doesNotContain(findingOnRed);
+      assertThat(count).isEqualTo(1);
+    }
+  }
+
+  @Nested
+  @DisplayName("A marking or clearance change applies on the next request")
+  class NextRequest {
+
+    @Test
+    @DisplayName("given the clearance raised to TLP:RED, should reveal the RED asset and finding")
+    void given_clearanceRaisedToRed_should_revealRed() {
+      // -- ARRANGE --
+      assertThat(ids(list(DEFAULT_CTX, "asset"))).doesNotContain(red);
+      grant(tlpRed);
+
+      // -- ACT --
+      EngineReadScope scope = resolver.resolve(DEFAULT_CTX);
+      List<String> assets = ids(list(DEFAULT_CTX, "asset"));
+
+      // -- ASSERT --
+      assertThat(scope.hiddenAssetIds()).doesNotContain(red);
+      assertThat(assets).contains(red, green, unmarked);
+      assertThat(countFindings(DEFAULT_CTX)).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("given the GREEN asset re-marked TLP:RED, should hide it and its finding")
+    void given_assetRemarkedRed_should_hideItAndItsFinding() {
+      // -- ARRANGE --
+      assertThat(ids(list(DEFAULT_CTX, "asset"))).contains(green);
+      mark(green, tlpRed);
+
+      // -- ACT --
+      EngineReadScope scope = resolver.resolve(DEFAULT_CTX);
+
+      // -- ASSERT --
+      assertThat(scope.tenantRules().get(DEFAULT_TENANT).hiddenAssetIds()).contains(green, red);
+      assertThat(ids(list(DEFAULT_CTX, "asset"))).doesNotContain(green, red).contains(unmarked);
+      assertThat(ids(list(DEFAULT_CTX, "finding"))).doesNotContain(findingOnGreen);
+      assertThat(countFindings(DEFAULT_CTX)).isZero();
+    }
+  }
+
+  @Nested
+  @DisplayName("Tenant isolation")
+  class TenantIsolation {
+
+    @Test
+    @DisplayName(
+        "given TLP:GREEN held in the default tenant only, should hide tenant B's TLP:GREEN asset")
+    void given_clearanceInOneTenant_should_notApplyToTheOther() {
+      // -- ARRANGE --
+      // Tenant B has its own TLP:GREEN definition: holding the default tenant's one clears nothing
+      // in tenant B.
+      TxCtx bothTenants = TxCtx.forTenants(List.of(DEFAULT_TENANT, tenantB));
+
+      // -- ACT --
+      EngineReadScope scope = resolver.resolve(bothTenants);
+      List<String> assets = ids(list(bothTenants, "asset"));
+
+      // -- ASSERT --
+      assertThat(scope.tenantRules().get(DEFAULT_TENANT).hiddenAssetIds())
+          .contains(red)
+          .doesNotContain(green, tenantBGreen);
+      assertThat(scope.tenantRules().get(tenantB).hiddenAssetIds())
+          .contains(tenantBGreen)
+          .doesNotContain(red);
+      assertThat(assets).contains(unmarked, green).doesNotContain(red, tenantBGreen);
+    }
+  }
+
+  // -- Helpers --
+
+  private List<EsBase> list(TxCtx ctx, String entity) {
+    ListConfiguration config = engineService.createListConfiguration(entity, Map.of());
+    config.setTimeRange(CustomDashboardTimeRange.ALL_TIME);
+    ListRuntime runtime = new ListRuntime(config, Map.of(), Map.of(), new Pagination(0, 100));
+    return engineService.entities(ctx, resolver.resolve(ctx), runtime).getEsDatas();
+  }
+
+  /** Counts this fixture's two findings, as a count widget would, with the reader's scope. */
+  private long countFindings(TxCtx ctx) {
+    Filters.FilterGroup filter = Filters.FilterGroup.defaultFilterGroup();
+    filter.setFilters(
+        List.of(
+            Filters.Filter.getNewDefaultEqualFilter("base_entity", List.of("finding")),
+            Filters.Filter.getNewDefaultEqualFilter(
+                "base_id", List.of(findingOnGreen, findingOnRed))));
+    WidgetConfigurationWithSeries.Series series = new WidgetConfigurationWithSeries.Series();
+    series.setName("findings");
+    series.setFilter(filter);
+    FlatConfiguration config = new FlatConfiguration();
+    config.setTimeRange(CustomDashboardTimeRange.ALL_TIME);
+    config.setSeries(List.of(series));
+    return engineService
+        .count(ctx, resolver.resolve(ctx), new CountRuntime(config, Map.of(), Map.of()))
+        .getIntervalCount();
+  }
+
+  private static List<String> ids(List<EsBase> documents) {
+    return documents.stream().map(EsBase::getBase_id).toList();
+  }
+
+  private MarkingDefinition marking(String tenantId, int order) {
+    return markingDefinitionComposer
+        .forMarkingDefinition(
+            createMarkingDefinition(
+                MarkingDefinition.TYPE_TLP, uniqueDefinition(), order, "#c62828"))
+        .withTenantId(tenantId)
+        .persist()
+        .get();
+  }
+
+  private EndpointComposer.Composer endpoint(String tenantId, String name) {
+    Endpoint endpoint =
+        EndpointFixture.createEndpoint("engine-scope-" + name + "-" + uniqueDefinition());
+    endpoint.setTenant(new Tenant(tenantId));
+    return endpointComposer.forEndpoint(endpoint);
+  }
+
+  /** A finding on {@code endpoint}, through a bare (atomic testing) inject. */
+  private String finding(EndpointComposer.Composer endpoint) {
+    FindingComposer.Composer finding =
+        findingComposer
+            .forFinding(FindingFixture.createDefaultCveFindingWithRandomTitle())
+            .withEndpoint(endpoint);
+    injectComposer.forInject(InjectFixture.getDefaultInject()).withFinding(finding).persist();
+    return finding.get().getId();
+  }
+
+  /** Grants markings to the reader's group, and drops the cached clearance. */
+  private void grant(MarkingDefinition... markings) {
+    for (MarkingDefinition marking : markings) {
+      jdbc.update(
+          "INSERT INTO groups_markings (group_id, marking_id) VALUES (?, ?)"
+              + " ON CONFLICT DO NOTHING",
+          markingGroup.getId(),
+          marking.getId());
+    }
+    clearanceCache.evictForUser(userId);
+  }
+
+  /** Out-of-band write: see the class javadoc for why this is not an ORM save. */
+  private void mark(String assetId, MarkingDefinition... markings) {
+    jdbc.update(
+        "UPDATE assets SET marking_ids = ? WHERE asset_id = ?",
+        (Object) Arrays.stream(markings).map(MarkingDefinition::getId).toArray(String[]::new),
+        assetId);
+  }
+}

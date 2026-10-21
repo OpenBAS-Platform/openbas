@@ -35,9 +35,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * How the reader scope is resolved from the source of truth. The marking lookup itself is covered
- * against real rows by the dashboard API tests; here markings are off ({@code assets} not active).
- * The {@code MARKING} preview feature is on unless a test says otherwise.
+ * How the reader scope is resolved from the source of truth. Here markings are off ({@code assets}
+ * not active); the marking lookup against real rows, clearances and tenants is covered by {@link
+ * EngineReadScopeResolverIntegrationTest}. The {@code MARKING} preview feature is on unless a test
+ * says otherwise.
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Engine read scope resolution")
