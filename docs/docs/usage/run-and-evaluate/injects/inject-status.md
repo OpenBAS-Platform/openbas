@@ -65,7 +65,6 @@ Every execution step reports a **trace status**. Below is the complete list of a
 | `PREREQUISITE FAILED`        | A prerequisite check failed before the main command | Review prerequisite dependencies and ensure they are met on the target |
 | `INVALID USAGE`              | Incorrect arguments or syntax | The command was invoked with incorrect arguments or syntax Verify the inject parameters and command |
 | `TIMEOUT`                    | No result received within the execution threshold | The Agent never reported back to OpenAEV. See [Execution time limits](#execution-time-limits) |
-| `LATE`                       | A `TIMEOUT` whose Agent reported back afterwards | The Inject was already closed, so its status is unchanged. See [Late reports](#late-reports-after-a-timeout) |
 | `INTERRUPTED`                | Inject interrupted before completion | This may be caused by a system signal, user intervention, or resource constraint |
 
 ### Informational statuses (excluded from status computation)
@@ -109,9 +108,9 @@ The OpenAEV implant started on the endpoint is also stopped after this delay.
 ### Late reports after a timeout
 
 An Agent can report back after its `TIMEOUT` trace was written, for example when the endpoint was slow or offline.
-OpenAEV keeps the Inject status it already computed and does not recompute it. The `TIMEOUT` trace becomes `LATE` and
-its message gives the reported status and how long after the timeout the report arrived. The Agent keeps a single
-final trace, and its other late traces are still added to the execution details.
+OpenAEV keeps the Inject status it already computed and does not recompute it. The `TIMEOUT` trace keeps its status and
+its message is completed with the status the Agent reported and how long after the timeout the report arrived. The
+traces sent by the implant, including its final one, are then added to the execution details.
 
 ### `TIMEOUT` on an Asset shown as active
 

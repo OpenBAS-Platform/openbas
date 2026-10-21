@@ -294,12 +294,13 @@ public class InjectStatusService {
   }
 
   /**
-   * Absorbs a COMPLETE trace that reaches an agent already closed (late callback after the
-   * finalization timeout, or retried callback). The incoming trace is not persisted and the inject
-   * status is neither recomputed nor re-finalized: a closed inject keeps its outcome. If the
-   * closing trace is a platform TIMEOUT it becomes LATE, so the agent keeps one terminal trace.
+   * Handles a COMPLETE trace that reaches an agent already closed (late callback after the
+   * finalization timeout, or retried callback). The inject status is neither recomputed nor
+   * re-finalized: a closed inject keeps its outcome. If the closing trace is a platform TIMEOUT,
+   * its message is rewritten with the late report and the implant's trace is added after it. Any
+   * other COMPLETE for a closed agent is a duplicate and is dropped.
    *
-   * @return true if the trace was absorbed and must not be processed further
+   * @return true if the trace was handled here and must not be processed further
    */
   private boolean handleLateCompleteTrace(
       Inject inject, InjectStatus injectStatus, ExecutionTrace incoming, @Nullable Agent agent) {
@@ -312,12 +313,12 @@ public class InjectStatusService {
       return agent != null && absorbAgentReportAfterPlatformClose(inject, injectStatus, incoming);
     }
     ExecutionTrace closing = closingTrace.get();
-    if (ExecutionTraceStatus.TIMEOUT.equals(closing.getStatus())) {
-      ExecutionTraceUtils.markTimeoutTraceAsLate(closing, incoming, Instant.now());
-      entityManager.merge(injectStatus);
-      publishInjectStatusUpdate(inject);
+    if (ExecutionTraceStatus.TIMEOUT.equals(closing.getStatus())
+        && !ExecutionTraceUtils.hasCompleteTraceAfter(injectStatus.getTraces(), closing)) {
+      ExecutionTraceUtils.appendLateReportToTimeoutTrace(closing, incoming, Instant.now());
+      storeLateTrace(inject, injectStatus, incoming);
       log.info(
-          "Late COMPLETE for inject {} (agent {}): TIMEOUT trace marked LATE, inject status kept {}",
+          "Late COMPLETE for inject {} (agent {}): TIMEOUT trace rewritten, inject status kept {}",
           inject.getId(),
           agent != null ? agent.getId() : "none",
           injectStatus.getName());
@@ -334,11 +335,11 @@ public class InjectStatusService {
   /**
    * Handles the COMPLETE of an agent that has no terminal trace yet while the whole inject was
    * already closed by the platform (simulation timeout or interruption, which write an agent-less
-   * closing trace and force the status to a final value). The trace is stored as the agent's single
-   * terminal trace, as LATE, and the inject status is not recomputed: otherwise the agent's success
-   * would be mixed with the platform's error and turn the inject into PARTIAL.
+   * closing trace and force the status to a final value). The trace is stored as received and the
+   * inject status is not recomputed: otherwise the agent's success would be mixed with the
+   * platform's error and turn the inject into PARTIAL.
    *
-   * @return true if the trace was stored as LATE and must not be processed further
+   * @return true if the trace was stored and must not be processed further
    */
   private boolean absorbAgentReportAfterPlatformClose(
       Inject inject, InjectStatus injectStatus, ExecutionTrace incoming) {
@@ -349,18 +350,21 @@ public class InjectStatusService {
         || ExecutionTraceUtils.findPlatformClosingTrace(injectStatus.getTraces()).isEmpty()) {
       return false;
     }
-    ExecutionTraceUtils.markAsLateAfterPlatformClose(incoming);
+    storeLateTrace(inject, injectStatus, incoming);
+    log.info(
+        "Late COMPLETE for inject {} (agent {}): stored after the platform closed the inject, status kept {}",
+        inject.getId(),
+        incoming.getAgent().getId(),
+        status);
+    return true;
+  }
+
+  private void storeLateTrace(Inject inject, InjectStatus injectStatus, ExecutionTrace incoming) {
     injectStatus.addTrace(incoming);
     incoming.setId(executionTraceRepositoryHelper.saveExecutionTrace(incoming));
     entityManager.merge(injectStatus);
     logAgentTraceStep(injectStatus, incoming);
     publishInjectStatusUpdate(inject);
-    log.info(
-        "Late COMPLETE for inject {} (agent {}): stored as LATE after the platform closed the inject, status kept {}",
-        inject.getId(),
-        incoming.getAgent().getId(),
-        status);
-    return true;
   }
 
   /**

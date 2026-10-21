@@ -1,5 +1,4 @@
 import {
-  AccessTimeOutlined,
   BlockOutlined,
   CancelOutlined,
   CheckCircleOutlined,
@@ -63,7 +62,6 @@ const STATUS_ICON: Record<string, ComponentType<SvgIconProps>> = {
 
   // -- Distinct operational statuses --
   'timeout': TimerOffOutlined,
-  'late': AccessTimeOutlined,
   'interrupted': BlockOutlined,
   'queuing': HourglassEmptyOutlined,
   'pending': ScheduleOutlined,
