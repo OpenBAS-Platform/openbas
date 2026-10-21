@@ -12,7 +12,7 @@
 **Status** (2026-10-20):
 - **Steps 1–6:** done on es8. **Step 7** (everything behind `MARKING`): done.
 - **Step 8 (e2e matrix):** API tests partly done.
-- **Steps 9–21:** not started (21 optional).
+- **Steps 7a, 7b, 9–21:** not started (21 optional).
 - **es9 and OpenSearch:** they accept the scope but ignore it until steps 11–12 (today's behaviour, unfiltered).
 - **Branch `task4-poc-dashboard`:** rebased on `main` (2026-10-19) and compiles. The dashboard, engine, snapshot and coverage tests pass.
 
@@ -20,7 +20,9 @@
 
 | Step | What | Blocked by |
 |---|---|---|
-| 8 | End-to-end tests: RBAC, grants, markings (matrix §4) | — |
+| 7a | Grants: the most specific owner decides, no scenario-to-simulation inheritance (review fix) | — |
+| 7b | Filters on dependency fields evaluated on visible references only (review fix) | — |
+| 8 | End-to-end tests: RBAC, grants, markings (matrix §4) | steps 7a, 7b |
 | 9 | Performance measurement on a main dump → SLO | — |
 | 10 | Asset labels in breakdowns ("deleted") | Soumaya: Option 1 or 2 |
 | 11 | Port to es9, dashboards and OpenGRC export | steps 8, 10 |
@@ -256,14 +258,72 @@ context (a minute or two of CI).
 - with the flag **on** (the test default, `openaev.enabled-dev-features=MARKING`), the §4 matrix and
   the POC tests pass.
 
+#### Step 7a — Grants: the most specific owner decides (review fix) 🔴 not started
+
+**Issue** (review, blocking): a grant on a scenario reveals, in dashboards, the simulations of that
+scenario whose own grant is absent or revoked, and their children. The REST API denies them: a
+simulation is only readable through a grant **on that simulation** (`grantService.hasGrant`,
+`ExerciseSpecification.findGrantedFor`, `ExerciseRepository.rawAllGranted`); a scenario's grants
+only reach it by being copied at creation (`ScenarioToExerciseService.java:106`). The POC registry
+OR-ed `base_scenario_side` → SCENARIO with the simulation keys, i.e. inheritance. Design: §4.4, "The
+most specific owner decides".
+
+- `EngineSecurityRegistry`: grant keys declared **in precedence order**; the `simulation` entry loses
+  its `base_scenario_side` key; `ASSESSMENT_KEYS` and `withAtomicTesting` put `base_simulation_side`
+  first, then `base_scenario_side`, then the atomic testing key.
+- es8 `grantedQuery`: the first key **set on the document** decides, instead of any key matching:
+  `simulation ∈ granted` OR (no simulation AND scenario ∈ granted) OR (neither AND atomic testing ∈
+  granted) OR (none of the fields set).
+- `EngineReadScopeResolver`: unchanged (it already lists the granted ids per resource type).
+- With `MARKING` off: unchanged (the OpenGRC export keeps `main`'s `base_restrictions` filter).
+
+**Tests** (engine integration and API), reader without `ACCESS_ASSESSMENT`:
+- grant on `S1`, simulation `X` of `S1` created **before** the grant: `X` and its injects,
+  expectations and findings hidden; `S1`'s own documents visible;
+- `X` created after the grant (grant copied): visible;
+- `X`'s grant revoked, `S1`'s kept: `X` and its children hidden on the next request;
+- grant on `X` only: `X` and its children visible, `S1` hidden;
+- an atomic testing inject (no scenario, no simulation): only through its own grant.
+
+**DoD**: these tests green on es8; matrix rows G2, G6, G8–G11 green (step 8).
+
+#### Step 7b — Filters on dependency fields: visible references only (review fix) 🔴 not started
+
+**Issue** (review, blocking): with `MARKING` on, a readable scenario targeting GREEN and a hidden RED
+matches a user-supplied filter `base_entity = scenario AND base_assets_side = RED`: the count reveals
+the hidden association. Stripping returned targets and excluding buckets cannot prevent it, since
+the filter runs on the stored document. Design: §4.3, "Filters on dependency fields".
+
+- es8: pass the reader's hidden asset ids (`scope.hiddenAssetIds()`) down to the filter builder
+  (`buildQuery` → `queryFromFilter` → `queryFromBaseFilter`).
+- For a key in `EngineSecurityRegistry.ASSET_REFERENCE_FIELDS`, **after** parameter resolution:
+  - `eq`: remove the hidden ids from the values; no value left → match nothing;
+  - `not_eq`: remove the hidden ids from the values; no value left → drop the filter;
+  - `contains`, `not_contains`, `starts_with`, `not_starts_with`, `empty`, `not_empty`, ranges:
+    **option (a)**, a Painless script query over the field's values that skips the hidden ids
+    (`params.hidden`, `params.value`).
+- Only when the reader has hidden assets: every other query is built as today.
+
+**Tests** (engine integration and API), GREEN reader, scenario `SG` targeting GREEN + RED, scenario
+`SR` targeting RED only:
+- count and list `base_assets_side eq RED` → nothing;
+- `eq GREEN` → `SG`; `not_eq RED` → `SG` and `SR`; `not_eq GREEN` → `SR`;
+- `empty` → `SR`; `not_empty` → `SG` only;
+- `starts_with <first characters of RED's id>` → nothing;
+- a widget whose filter value is a dashboard parameter set to RED → nothing;
+- the same on inject documents; an admin (unrestricted) gets every match, unchanged.
+
+**DoD**: these tests green on es8; the queries of a reader without hidden assets are unchanged
+(existing dashboard tests green); matrix rows M14–M16 green (step 8).
+
 #### Step 8 — End-to-end tests: RBAC, grants, markings 🟡 API tests partly done
 
 Through the real endpoints (API integration tests), plus a Playwright pass in `tests_e2e/` on the
 custom dashboard, the Statistics tab and an asset page. The matrix is in §6.
 
 - **RBAC (capabilities)**: rows R1–R7.
-- **Grants**: rows G1–G7.
-- **Markings**: rows M1–M13 (M6, M8–M13: findings, including multi-asset ones).
+- **Grants**: rows G1–G11 (G8–G11: no scenario-to-simulation inheritance, step 7a).
+- **Markings**: rows M1–M16 (M6, M8–M13: findings, including multi-asset ones; M14–M16: filters on dependency fields, step 7b).
 - **Across the three**: rows X1–X3.
 - Manual two-browser check, as in Chunk 2 of `implementation-plan.md`: an admin and a `TLP:GREEN`
   user side by side. The admin marks an asset RED, then removes the user's grant on S1. Each change
@@ -559,12 +619,16 @@ another on both `A-GREEN` and `A-AMBER`.
 | # | User | Where | Expected |
 |---|---|---|---|
 | G1 | `granted` | scenarios widget | `S1` only |
-| G2 | `granted` | simulations, injects, expectations, findings widgets | `S1`'s data only |
+| G2 | `granted` | simulations, injects, expectations, findings widgets | `S1`'s own documents, and those of `S1`'s simulations created after the grant only |
 | G3 | `granted` | `S1` Statistics tab, `simulation` parameter changed to `S2`'s simulation | nothing of `S2` |
 | G4 | `granted` | atomic testings widget | nothing (no grant on `AT1`); `AT1` appears once granted |
 | G5 | `granted` | after the admin removes the grant on `S1` | `S1` gone on the next refresh |
 | G6 | `granted` | a new simulation of `S1`, created after the grant | visible (grant copied at creation, Part 2) |
 | G7 | `amber` | scenarios widget | `S1` and `S2` (`ACCESS_ASSESSMENT`, no grant needed) |
+| G8 | `granted` | a simulation of `S1` created **before** the grant on `S1` | hidden, with its injects, expectations and findings (no inheritance, as in the REST API) |
+| G9 | `granted` | after the admin revokes the grant on a simulation of `S1`, keeping `S1`'s | that simulation and its children gone on the next refresh |
+| G10 | user granted on a simulation `X` of `S1` only | scenarios and simulations widgets | `X` and its children visible, `S1` hidden |
+| G11 | `granted` | same simulation: REST simulations list vs dashboard simulations widget | same answer |
 
 **Markings**
 
@@ -583,6 +647,9 @@ another on both `A-GREEN` and `A-AMBER`.
 | M11 | `full-green` | the `A-GREEN` + `A-RED` finding: REST findings tab of `S1` vs dashboard | REST shows it (permissive), the dashboard hides it (strict): record the difference until the strict/permissive question is settled (§4.3 note of the design) |
 | M12 | `amber` | the `A-GREEN` + `A-AMBER` finding | visible: both assets are within `TLP:AMBER` |
 | M13 | `full-green` | vulnerable endpoints widget on `S1` | `A-GREEN` only: the vulnerable endpoint of `A-RED` is hidden with its copied hostname and platform |
+| M14 | `full-green` | admin-authored widget: count of scenarios filtered on `base_assets_side = A-RED` | 0, while the admin sees the real count |
+| M15 | `full-green` | scenarios widget filtered `base_assets_side` empty / not empty, a scenario targeting `A-RED` only | counted as empty, like its visible (stripped) targets |
+| M16 | `full-green` | widget filtered on `base_assets_side` through a dashboard parameter set to `A-RED` | nothing |
 
 **Across the three**
 
