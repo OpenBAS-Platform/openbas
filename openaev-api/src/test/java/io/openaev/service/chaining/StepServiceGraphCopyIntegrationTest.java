@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Graph-copy correctness of {@link StepService#copyStepTemplate(Workflow, Workflow)}, the single
  * cloning primitive shared by launch, autonomous plan provisioning, convert-to-manual and
- * duplication (ADR-007).
+ * duplication (ADR-015).
  */
 @SpringBootTest
 @Transactional
