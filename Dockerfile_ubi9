@@ -63,9 +63,11 @@ RUN set -eux; \
     microdnf clean all
 
 RUN set -eux; \
-    trust extract --format=pem-directory --filter=ca-anchors /tmp/ca-anchors; \
-    find /tmp/ca-anchors -iname '*emsign*' -exec cp {} /etc/pki/ca-trust/source/blocklist/ \; ; \
-    rm -rf /tmp/ca-anchors; \
+    for purpose in server-auth client-auth email code-signing; do \
+      trust extract --format=pem-directory --filter=ca-anchors --purpose="$purpose" "/tmp/ca-anchors-$purpose"; \
+    done; \
+    find /tmp/ca-anchors-* -iname '*emsign*' -exec cp {} /etc/pki/ca-trust/source/blocklist/ \; ; \
+    rm -rf /tmp/ca-anchors-*; \
     update-ca-trust; \
     trust list --filter=ca-anchors > /tmp/anchors.txt; \
     keytool -list -v -cacerts -storepass changeit >> /tmp/anchors.txt; \

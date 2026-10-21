@@ -36,10 +36,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -q \
     && DEBIAN_FRONTEND=noninteractive apt-get upgrade -qq -y \
     && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y tini \
     && rm -rf /var/lib/apt/lists/*
-RUN set -eux; \
-    keytool -list -v -cacerts -storepass changeit | sed -n 's/^Alias name: //p' | grep -i emsign \
-      | while IFS= read -r alias; do keytool -delete -noprompt -cacerts -storepass changeit -alias "$alias"; done; \
-    [ -z "$(keytool -list -v -cacerts -storepass changeit | grep -iE 'emsign|emudhra')" ]
 COPY --from=api-builder /opt/openaev-build/openaev/openaev-api/target/openaev-api.jar ./
 # Install Chromium and its system libraries for server-side report rendering. The boot jar uses
 # the ZIP layout, so PropertiesLauncher can run the embedded Playwright CLI (Spring Boot 3.x
@@ -47,6 +43,16 @@ COPY --from=api-builder /opt/openaev-build/openaev/openaev-api/target/openaev-ap
 RUN DEBIAN_FRONTEND=noninteractive java -Dloader.main=com.microsoft.playwright.CLI -jar openaev-api.jar install --with-deps chromium \
     && rm -rf /var/lib/apt/lists/* \
     && chmod -R a+rX /ms-playwright
+RUN set -eux; \
+    sed -i -E 's|^(mozilla/emSign_.*\.crt)$|!\1|' /etc/ca-certificates.conf; \
+    update-ca-certificates --fresh; \
+    keytool -list -v -cacerts -storepass changeit > /tmp/cacerts.txt; \
+    sed -n 's/^Alias name: //p' /tmp/cacerts.txt | grep -i emsign > /tmp/emsign.txt || true; \
+    while IFS= read -r alias; do keytool -delete -noprompt -cacerts -storepass changeit -alias "$alias"; done < /tmp/emsign.txt; \
+    keytool -list -v -cacerts -storepass changeit > /tmp/cacerts.txt; \
+    grep -q '^Alias name: ' /tmp/cacerts.txt; \
+    if ls /etc/ssl/certs | grep -i emsign || grep -iE 'emsign|emudhra' /tmp/cacerts.txt; then exit 1; fi; \
+    rm /tmp/cacerts.txt /tmp/emsign.txt
 
 # Set by CI to the built commit, exposed in the platform settings
 ARG OPENAEV_COMMIT
