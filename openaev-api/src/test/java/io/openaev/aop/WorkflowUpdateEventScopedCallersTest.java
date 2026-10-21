@@ -22,7 +22,7 @@ import io.openaev.database.model.StepStatus;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.model.Workflow;
 import io.openaev.database.model.WorkflowStatus;
-import io.openaev.rest.inject.form.InjectExpectationUpdateInput;
+import io.openaev.rest.inject.form.InjectExpectationUpdateFromCollectorInput;
 import io.openaev.service.chaining.QueueChainingService;
 import io.openaev.utils.TenantIsolationTestHelper;
 import io.openaev.utils.fixtures.AgentFixture;
@@ -193,7 +193,7 @@ class WorkflowUpdateEventScopedCallersTest extends IntegrationTest {
       verify(queueChainingService).updateStep(seeded.stepId());
     }
 
-    private InjectExpectationUpdateInput collectorVerdict() {
+    private InjectExpectationUpdateFromCollectorInput collectorVerdict() {
       return InjectExpectationFixture.getInjectExpectationUpdateInput(
           COLLECTOR_ID, "Detected", true);
     }
