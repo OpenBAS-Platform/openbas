@@ -50,6 +50,17 @@ class EngineVersionProbeTest {
        "tagline":"The OpenSearch Project: https://opensearch.org/"}
       """;
 
+  // Elasticsearch Serverless: a version kept for legacy clients, the flavor identifies it.
+  private static final String ELASTICSEARCH_SERVERLESS_ROOT =
+      """
+      {"name":"serverless","cluster_name":"my-project","cluster_uuid":"pZ3pD5YxQnWmF8kq7T2bRg",
+       "version":{"number":"8.11.0","build_flavor":"serverless","build_type":"docker",
+        "build_hash":"00000000","build_date":"2023-10-31","build_snapshot":false,
+        "lucene_version":"9.7.0","minimum_wire_compatibility_version":"8.11.0",
+        "minimum_index_compatibility_version":"8.11.0"},
+       "tagline":"You Know, for Search"}
+      """;
+
   private HttpServer server;
   private final AtomicReference<String> rootBody = new AtomicReference<>(ELASTICSEARCH_9_ROOT);
   private final AtomicReference<Integer> rootStatus = new AtomicReference<>(200);
@@ -109,6 +120,7 @@ class EngineVersionProbeTest {
       assertNull(info.distribution());
       assertEquals("9.5.1", info.number());
       assertEquals("You Know, for Search", info.tagline());
+      assertEquals("default", info.buildFlavor());
     }
 
     @Test
@@ -140,9 +152,24 @@ class EngineVersionProbeTest {
       assertNull(info.distribution());
       assertEquals("7.10.2", info.number());
       assertEquals("The OpenSearch Project: https://opensearch.org/", info.tagline());
-      assertEquals(
-          EngineType.OPENSEARCH,
-          EngineType.fromServerInfo(info.distribution(), info.number(), info.tagline()));
+      assertEquals(EngineType.OPENSEARCH, EngineType.fromServerInfo(info));
+    }
+
+    @Test
+    @DisplayName(
+        "given an Elasticsearch Serverless root response, should report its build flavor and get"
+            + " the latest client")
+    void given_serverlessRoot_should_getLatestClient() throws Exception {
+      // Arrange
+      rootBody.set(ELASTICSEARCH_SERVERLESS_ROOT);
+
+      // Act
+      EngineVersionProbe.ServerInfo info = probe().detect();
+
+      // Assert
+      assertEquals("8.11.0", info.number());
+      assertEquals("serverless", info.buildFlavor());
+      assertEquals(EngineType.ELASTICSEARCH_9, EngineType.fromServerInfo(info));
     }
 
     @Test

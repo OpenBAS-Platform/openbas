@@ -219,7 +219,9 @@ OpenAEV and XTM One sign their requests to each other with short-lived tokens:
 OpenAEV stores and searches data in Elasticsearch (8.19 or later, or 9) or OpenSearch. There is no engine to choose: at
 startup the platform calls `GET /` on `engine.url`, reads the version the server reports and uses the matching client.
 It refuses to start with an explicit message if the server is unreachable, rejects the credentials or is older than
-Elasticsearch 8. With AWS SigV4 authentication, the OpenSearch client is used without probing.
+Elasticsearch 8. Elasticsearch Serverless always reports the same version for legacy clients: the platform recognises
+it by its `serverless` build flavor and uses the most recent Elasticsearch client. With AWS SigV4 authentication, the
+OpenSearch client is used without probing.
 
 With classic authentication, use Elasticsearch or OpenSearch:
 

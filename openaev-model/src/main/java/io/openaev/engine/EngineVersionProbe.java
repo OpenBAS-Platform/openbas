@@ -43,7 +43,8 @@ import org.springframework.stereotype.Component;
 public class EngineVersionProbe {
 
   /** What the engine reported about itself. */
-  public record ServerInfo(String distribution, String number, String tagline) {}
+  public record ServerInfo(
+      String distribution, String number, String tagline, String buildFlavor) {}
 
   private record RawResponse(int status, String body) {}
 
@@ -54,7 +55,7 @@ public class EngineVersionProbe {
   /**
    * Calls {@code GET /} on {@code engine.url}.
    *
-   * @return the distribution, version and tagline reported by the engine
+   * @return the distribution, version, tagline and build flavor reported by the engine
    * @throws StartupException if the engine is unreachable, refuses the call or answers something
    *     that is not an Elasticsearch or OpenSearch root response
    */
@@ -127,7 +128,9 @@ public class EngineVersionProbe {
     String distribution =
         version.hasNonNull("distribution") ? version.get("distribution").asText() : null;
     String tagline = root.hasNonNull("tagline") ? root.get("tagline").asText() : null;
-    return new ServerInfo(distribution, version.get("number").asText(), tagline);
+    String buildFlavor =
+        version.hasNonNull("build_flavor") ? version.get("build_flavor").asText() : null;
+    return new ServerInfo(distribution, version.get("number").asText(), tagline, buildFlavor);
   }
 
   private CloseableHttpClient httpClient() {

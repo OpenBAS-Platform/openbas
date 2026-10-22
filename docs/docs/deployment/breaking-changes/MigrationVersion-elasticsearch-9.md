@@ -14,6 +14,7 @@ instantiates the matching client:
 |:------------------------|:---------------------|
 | Elasticsearch 8.19+     | Elasticsearch 8.x    |
 | Elasticsearch 9         | Elasticsearch 9.x    |
+| Elasticsearch Serverless | Elasticsearch 9.x (most recent client), recognised by its `serverless` build flavor |
 | OpenSearch              | OpenSearch           |
 
 Each Elasticsearch major needs its own client: the 9.x client stamps every request with an

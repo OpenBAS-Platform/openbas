@@ -63,7 +63,9 @@ class EngineComponentTest {
     void given_elasticsearch8Server_should_pickElasticsearch8Client() {
       // Arrange
       when(engineVersionProbe.detect())
-          .thenReturn(new EngineVersionProbe.ServerInfo(null, "8.19.15", "You Know, for Search"));
+          .thenReturn(
+              new EngineVersionProbe.ServerInfo(
+                  null, "8.19.15", "You Know, for Search", "default"));
 
       // Act
       EngineType type = engineComponent.detectEngineType();
@@ -77,7 +79,8 @@ class EngineComponentTest {
     void given_elasticsearch9Server_should_pickElasticsearch9Client() {
       // Arrange
       when(engineVersionProbe.detect())
-          .thenReturn(new EngineVersionProbe.ServerInfo(null, "9.5.1", "You Know, for Search"));
+          .thenReturn(
+              new EngineVersionProbe.ServerInfo(null, "9.5.1", "You Know, for Search", "default"));
 
       // Act
       EngineType type = engineComponent.detectEngineType();
@@ -93,7 +96,7 @@ class EngineComponentTest {
       when(engineVersionProbe.detect())
           .thenReturn(
               new EngineVersionProbe.ServerInfo(
-                  "opensearch", "3.9.0", "The OpenSearch Project: https://opensearch.org/"));
+                  "opensearch", "3.9.0", "The OpenSearch Project: https://opensearch.org/", null));
 
       // Act
       EngineType type = engineComponent.detectEngineType();
@@ -109,7 +112,7 @@ class EngineComponentTest {
       when(engineVersionProbe.detect())
           .thenReturn(
               new EngineVersionProbe.ServerInfo(
-                  null, "7.10.2", "The OpenSearch Project: https://opensearch.org/"));
+                  null, "7.10.2", "The OpenSearch Project: https://opensearch.org/", null));
 
       // Act
       EngineType type = engineComponent.detectEngineType();
@@ -124,7 +127,8 @@ class EngineComponentTest {
       // Arrange
       when(environment.containsProperty(EngineComponent.LEGACY_SELECTOR_PROPERTY)).thenReturn(true);
       when(engineVersionProbe.detect())
-          .thenReturn(new EngineVersionProbe.ServerInfo(null, "9.5.1", "You Know, for Search"));
+          .thenReturn(
+              new EngineVersionProbe.ServerInfo(null, "9.5.1", "You Know, for Search", "default"));
 
       // Act
       EngineType type = engineComponent.detectEngineType();

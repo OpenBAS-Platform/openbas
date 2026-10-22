@@ -26,8 +26,17 @@ public enum EngineType {
   /** Start of the root {@code tagline} of OpenSearch, compatibility mode included. */
   public static final String OPENSEARCH_TAGLINE_PREFIX = "The OpenSearch Project";
 
+  /**
+   * Build flavor reported by Elasticsearch Serverless in {@code version.build_flavor}, the way
+   * Elastic documents to recognise it.
+   */
+  public static final String SERVERLESS_BUILD_FLAVOR = "serverless";
+
   /** Oldest Elasticsearch 8 minor the platform supports. */
   private static final int MIN_ELASTICSEARCH_8_MINOR = 19;
+
+  /** Most recent Elasticsearch client the platform ships. */
+  private static final EngineType LATEST_ELASTICSEARCH = ELASTICSEARCH_9;
 
   private final String key;
 
@@ -44,14 +53,18 @@ public enum EngineType {
    * instead. Elasticsearch reports no distribution, and its major version picks the client: the 9.x
    * client is rejected by an 8.x server, so each major needs its own.
    *
-   * @param distribution the {@code version.distribution} field, {@code null} when absent
-   * @param versionNumber the {@code version.number} field
-   * @param tagline the root {@code tagline} field, {@code null} when absent
+   * <p>Elasticsearch Serverless is the exception: its version number is only kept for legacy
+   * clients and does not follow the service, which tracks the latest Elasticsearch. It is
+   * recognised by its build flavor and gets the most recent client.
+   *
+   * @param info what the engine reported about itself
    * @return the matching engine type
    * @throws StartupException if the engine is not a supported Elasticsearch or OpenSearch
    */
-  public static EngineType fromServerInfo(
-      String distribution, String versionNumber, String tagline) {
+  public static EngineType fromServerInfo(EngineVersionProbe.ServerInfo info) {
+    String distribution = info.distribution();
+    String versionNumber = info.number();
+    String tagline = info.tagline();
     if (OPENSEARCH_DISTRIBUTION.equalsIgnoreCase(distribution)) {
       return OPENSEARCH;
     }
@@ -65,6 +78,13 @@ public enum EngineType {
           "Unsupported search engine distribution '"
               + distribution
               + "': only Elasticsearch and OpenSearch are supported");
+    }
+    if (SERVERLESS_BUILD_FLAVOR.equalsIgnoreCase(info.buildFlavor())) {
+      log.info(
+          "Elasticsearch Serverless detected (reported version {}): using the {} client",
+          versionNumber,
+          LATEST_ELASTICSEARCH);
+      return LATEST_ELASTICSEARCH;
     }
     int[] version = parseVersion(versionNumber);
     int major = version[0];
@@ -85,10 +105,11 @@ public enum EngineType {
     }
     if (major > 9) {
       log.warn(
-          "Elasticsearch {} has not been tested with the platform, using the 9.x client",
-          versionNumber);
+          "Elasticsearch {} has not been tested with the platform, using the {} client",
+          versionNumber,
+          LATEST_ELASTICSEARCH);
     }
-    return ELASTICSEARCH_9;
+    return LATEST_ELASTICSEARCH;
   }
 
   /** Major and minor of a version such as {@code 9.5.1} or {@code 8.19.0-SNAPSHOT}. */

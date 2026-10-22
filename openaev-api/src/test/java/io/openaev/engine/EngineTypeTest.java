@@ -3,6 +3,7 @@ package io.openaev.engine;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import io.openaev.engine.EngineVersionProbe.ServerInfo;
 import io.openaev.exception.StartupException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,6 +19,11 @@ class EngineTypeTest {
   private static final String ELASTICSEARCH_TAGLINE = "You Know, for Search";
   private static final String OPENSEARCH_TAGLINE =
       "The OpenSearch Project: https://opensearch.org/";
+
+  /** Root answer of a self-managed Elasticsearch. */
+  private static ServerInfo elasticsearch(String version) {
+    return new ServerInfo(null, version, ELASTICSEARCH_TAGLINE, "default");
+  }
 
   @Nested
   @DisplayName("Elasticsearch")
@@ -36,7 +42,7 @@ class EngineTypeTest {
     void given_elasticsearchVersion_should_pickClientOfItsMajor(
         String version, EngineType expected) {
       // Act
-      EngineType type = EngineType.fromServerInfo(null, version, ELASTICSEARCH_TAGLINE);
+      EngineType type = EngineType.fromServerInfo(elasticsearch(version));
 
       // Assert
       assertEquals(expected, type);
@@ -49,8 +55,7 @@ class EngineTypeTest {
       // Act
       StartupException exception =
           assertThrows(
-              StartupException.class,
-              () -> EngineType.fromServerInfo(null, version, ELASTICSEARCH_TAGLINE));
+              StartupException.class, () -> EngineType.fromServerInfo(elasticsearch(version)));
 
       // Assert
       assertEquals(
@@ -58,6 +63,27 @@ class EngineTypeTest {
               + version
               + ": Elasticsearch 8.19 or later is required",
           exception.getMessage());
+    }
+  }
+
+  @Nested
+  @DisplayName("Elasticsearch Serverless")
+  class Serverless {
+
+    @ParameterizedTest
+    @ValueSource(strings = {"8.11.0", "9.4.0"})
+    @DisplayName(
+        "given the serverless build flavor, should pick the latest client whatever the version")
+    void given_serverlessBuildFlavor_should_pickLatestClient(String version) {
+      // Arrange
+      ServerInfo serverless =
+          new ServerInfo(null, version, ELASTICSEARCH_TAGLINE, EngineType.SERVERLESS_BUILD_FLAVOR);
+
+      // Act
+      EngineType type = EngineType.fromServerInfo(serverless);
+
+      // Assert
+      assertEquals(EngineType.ELASTICSEARCH_9, type);
     }
   }
 
@@ -72,7 +98,8 @@ class EngineTypeTest {
       // Act
       EngineType type =
           EngineType.fromServerInfo(
-              EngineType.OPENSEARCH_DISTRIBUTION, version, OPENSEARCH_TAGLINE);
+              new ServerInfo(
+                  EngineType.OPENSEARCH_DISTRIBUTION, version, OPENSEARCH_TAGLINE, null));
 
       // Assert
       assertEquals(EngineType.OPENSEARCH, type);
@@ -84,7 +111,8 @@ class EngineTypeTest {
             + " its tagline")
     void given_compatibilityMode_should_pickOpenSearchFromTagline() {
       // Act
-      EngineType type = EngineType.fromServerInfo(null, "7.10.2", OPENSEARCH_TAGLINE);
+      EngineType type =
+          EngineType.fromServerInfo(new ServerInfo(null, "7.10.2", OPENSEARCH_TAGLINE, null));
 
       // Assert
       assertEquals(EngineType.OPENSEARCH, type);
@@ -101,7 +129,9 @@ class EngineTypeTest {
     @DisplayName("given a missing or malformed version, should refuse to start")
     void given_malformedVersion_should_refuseToStart(String version) {
       // Act & Assert
-      assertThrows(StartupException.class, () -> EngineType.fromServerInfo(null, version, null));
+      assertThrows(
+          StartupException.class,
+          () -> EngineType.fromServerInfo(new ServerInfo(null, version, null, null)));
     }
 
     @Test
@@ -110,7 +140,8 @@ class EngineTypeTest {
       // Act
       StartupException exception =
           assertThrows(
-              StartupException.class, () -> EngineType.fromServerInfo("solr", "9.0.0", null));
+              StartupException.class,
+              () -> EngineType.fromServerInfo(new ServerInfo("solr", "9.0.0", null, null)));
 
       // Assert
       assertEquals(
