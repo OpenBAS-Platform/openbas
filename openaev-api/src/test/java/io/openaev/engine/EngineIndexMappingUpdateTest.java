@@ -114,6 +114,9 @@ class EngineIndexMappingUpdateTest extends IntegrationTest {
       case ELASTICSEARCH_8 -> es8Driver.elasticClient()._transport().close();
       case ELASTICSEARCH_9 -> es9Driver.elasticClient()._transport().close();
       case OPENSEARCH -> openSearchDriver.opensearchClient()._transport().close();
+      default ->
+          throw new IllegalStateException(
+              "Unsupported engine type: " + engineService.getEngineType());
     }
   }
 
