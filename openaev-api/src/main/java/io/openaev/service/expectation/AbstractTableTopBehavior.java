@@ -47,9 +47,13 @@ public abstract class AbstractTableTopBehavior
     if (!shouldInitializeExpectation(executableInject)) {
       return;
     }
-    boolean isAtomicTesting = executableInject.getInjection().getInject().isAtomicTesting();
+    Inject inject = executableInject.getInjection().getInject();
+    boolean isAtomicTesting = inject.isAtomicTesting();
+    // Without a simulation the chaining step resolves no recipients: it behaves as an atomic
+    // testing
+    boolean isChaining = executableInject.isChainingExecution() && inject.getExercise() != null;
 
-    List<Team> teams = executableInject.getTeams();
+    List<Team> teams = resolveTargetTeams(executableInject, inject, isChaining);
     if (teams.isEmpty()) {
       return;
     }
@@ -60,7 +64,9 @@ public abstract class AbstractTableTopBehavior
     List<TableTopInjectExpectation> allExpectations = new ArrayList<>();
 
     for (TableTopInjectExpectation template : templates) {
-      if (isAtomicTesting) {
+      if (isChaining) {
+        buildExpectationsForChaining(executableInject, template, teams, allExpectations);
+      } else if (isAtomicTesting) {
         buildExpectationsForAtomicTesting(template, teams, allExpectations);
       } else {
         buildExpectationsForExerciseInject(executableInject, template, teams, allExpectations);
@@ -157,6 +163,50 @@ public abstract class AbstractTableTopBehavior
     }
 
     allExpectations.addAll(playerExpectations);
+  }
+
+  /**
+   * Resolves the teams targeted by the inject. A chaining inject targeting all teams carries none
+   * of its own: they are the simulation's teams, as for the recipients resolved by the chaining
+   * step.
+   */
+  private static List<Team> resolveTargetTeams(
+      ExecutableInject executableInject, Inject inject, boolean isChaining) {
+    if (isChaining && inject.isAllTeams()) {
+      return inject.getExercise().getTeams();
+    }
+    return executableInject.getTeams();
+  }
+
+  /**
+   * Builds expectations for chaining executions: the audience is not read from the simulation
+   * enabled players but from the recipients the chaining step resolved (targeted teams' members,
+   * minus the players denylisted in the workflow scope). A team gets an expectation only when at
+   * least one of its members is a recipient. Players placed directly in the workflow scope have no
+   * team and get none: every table-top expectation is anchored on a team.
+   */
+  private void buildExpectationsForChaining(
+      ExecutableInject executableInject,
+      TableTopInjectExpectation template,
+      List<Team> teams,
+      List<TableTopInjectExpectation> allExpectations) {
+    Set<String> recipientIds =
+        executableInject.getUsers().stream()
+            .map(context -> context.getUser().getId())
+            .collect(Collectors.toSet());
+
+    for (Team team : teams) {
+      List<TableTopInjectExpectation> playerExpectations =
+          team.getUsers().stream()
+              .filter(user -> recipientIds.contains(user.getId()))
+              .map(user -> buildExpectationForTarget(template, team, user))
+              .toList();
+      if (playerExpectations.isEmpty()) {
+        continue;
+      }
+      allExpectations.add(buildExpectationForTarget(template, team, null));
+      allExpectations.addAll(playerExpectations);
+    }
   }
 
   /**
