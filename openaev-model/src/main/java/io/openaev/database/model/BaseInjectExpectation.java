@@ -138,10 +138,11 @@ public class BaseInjectExpectation implements Base, Cloneable {
   public void addResult(InjectExpectationResult result) {
     result.setInjectExpectation(this);
     this.results.add(result);
+    this.setUpdatedAt(now());
   }
 
   public void setResults(List<InjectExpectationResult> results) {
-    this.results.clear();
+    this.clearResults();
     if (results == null) {
       return;
     }
@@ -154,6 +155,7 @@ public class BaseInjectExpectation implements Base, Cloneable {
   public List<InjectExpectationResult> clearResults() {
     List<InjectExpectationResult> toRemove = new ArrayList<>(this.results);
     this.results.clear();
+    this.setUpdatedAt(now());
     return toRemove;
   }
 
@@ -161,6 +163,7 @@ public class BaseInjectExpectation implements Base, Cloneable {
     List<InjectExpectationResult> toRemove =
         this.results.stream().filter(result -> sourceId.equals(result.getSourceId())).toList();
     this.results.removeAll(toRemove);
+    this.setUpdatedAt(now());
     return toRemove;
   }
 

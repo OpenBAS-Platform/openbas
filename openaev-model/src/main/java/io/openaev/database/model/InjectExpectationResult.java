@@ -62,15 +62,27 @@ public class InjectExpectationResult implements Base, Cloneable {
   @JsonProperty("inject_expectation_result_date")
   private Instant date;
 
-  @Setter
   @Column(name = "inject_expectation_result_score")
   @JsonProperty("inject_expectation_result_score")
   private Double score;
 
-  @Setter
+  public void setScore(Double newScore) {
+    if (this.injectExpectation != null) {
+      this.injectExpectation.setUpdatedAt(Instant.now());
+    }
+    this.score = newScore;
+  }
+
   @Column(name = "inject_expectation_result_result")
   @JsonProperty("inject_expectation_result_result")
   private String result;
+
+  public void setResult(String newResult) {
+    if (this.injectExpectation != null) {
+      this.injectExpectation.setUpdatedAt(Instant.now());
+    }
+    this.result = newResult;
+  }
 
   @Setter
   @Type(JsonType.class)
@@ -78,12 +90,25 @@ public class InjectExpectationResult implements Base, Cloneable {
   @JsonProperty("inject_expectation_result_metadata")
   private Map<String, String> metadata;
 
+  public void setMetadata(Map<String, String> newMetadata) {
+    if (this.injectExpectation != null) {
+      this.injectExpectation.setUpdatedAt(Instant.now());
+    }
+    this.metadata = newMetadata;
+  }
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "inject_expectation_result_inject_expectation_id")
   @Setter
   @JsonIgnore
   private BaseInjectExpectation injectExpectation;
 
+  /**
+   * Compares two results by their values rather than by hash or ID
+   *
+   * @param other
+   * @return
+   */
   public boolean valueEquals(InjectExpectationResult other) {
     return Optional.ofNullable(sourceId)
             .map(sourceId -> sourceId.equals(other.getSourceId()))
