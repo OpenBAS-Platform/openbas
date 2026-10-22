@@ -53,14 +53,7 @@ runs:
         # (info.app.version = project.version). The latest git tag is not a safe
         # source: it falls back to an older release when a release tag is removed.
         # Parsed without Maven because the checkout may hold untrusted code.
-        LOCAL_VERSION="$(python3 -I - pom.xml <<'PY'
-        import sys
-        import xml.etree.ElementTree as ET
-
-        ns = {"m": "http://maven.apache.org/POM/4.0.0"}
-        print(ET.parse(sys.argv[1]).getroot().findtext("m:version", namespaces=ns) or "")
-        PY
-        )"
+        LOCAL_VERSION="$(yq -p xml -oy '.project.version // ""' pom.xml)"
         # The version ends up in file paths, so reject anything but a plain version
         if [[ ! "$LOCAL_VERSION" =~ ^[0-9A-Za-z][0-9A-Za-z._+-]*$ ]]; then
           echo "❌ Could not read a valid project version from pom.xml: '${LOCAL_VERSION}'"
