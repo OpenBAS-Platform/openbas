@@ -125,7 +125,6 @@ export default [
               group: [
                 '@mui/material/*', '!@mui/material/locale', '!@mui/material/styles', '!@mui/material/colors', '!@mui/material/transitions',
                 '@mui/icons-material/*',
-                '@mui/lab/*',
               ],
               message: 'Please use named import from @mui/* instead.',
             },
