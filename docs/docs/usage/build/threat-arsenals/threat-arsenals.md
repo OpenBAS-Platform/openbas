@@ -52,7 +52,7 @@ Payload-based Actions carry an **approval status** that tells whether their cont
 | Approval     | Meaning                                                                                              |
 |--------------|------------------------------------------------------------------------------------------------------|
 | **Pending**  | A payload that was never approved: created or changed by someone who cannot approve it, it waits for an approver. |
-| **Approved** | The content is trusted. An approved payload can also show **New version pending**: see [Versions of an approved payload](#versions-of-an-approved-payload). |
+| **Approved** | The content is trusted. While a new version waits for approval, the Action shows **Pending approval** and keeps running its approved version: see [Versions of an approved payload](#versions-of-an-approved-payload). |
 | **Rejected** | An approver refused a payload that was never approved, with a reason. It stays rejected until it is edited and approved. |
 
 How the status is set:
@@ -67,7 +67,7 @@ How the status is set:
 
 **Who approves by default.** When payload approval is introduced, every tenant role that can manage threat arsenal actions also receives *Approve content*, and so does the default *Manager* role of new tenants. Their authors' payloads stay approved, so nothing changes for them. Maker-checker is **opt-in**: remove *Approve content* from the roles of the authors who must be checked, and their new or edited payloads become **Pending** until someone else approves them.
 
-To approve or reject, open the Action, then use **Approve** or **Reject** in its *Approval* section. A rejection requires a reason. If the payload changed while you were reviewing it, the approval is refused and you review the new content first. The *Approval* section also shows the latest decision, the approval history and, as information, where the payload is used (*Used in*: Atomic Tests, Scenarios and Simulations still to run, with links for users who can open them). The list can be filtered by approval status.
+To approve or reject, open the Action, then use **Approve** or **Reject** in its *Approval* section. A rejection requires a reason. If the payload changed while you were reviewing it, the approval is refused and you review the new content first. The *Approval* section also shows the latest decision (who approved or rejected it, when, with the comment) and, as information, where the payload is used (*Used in*: Atomic Tests, Scenarios and Simulations still to run, with links for users who can open them). The list can be filtered by approval status.
 
 ### Notifications
 
@@ -84,10 +84,10 @@ Editing an approved payload never stops what already uses it. The payload keeps 
 
 * **A change that needs approval becomes a pending version.** When a user without *Approve content* changes what an approved payload runs, the change is saved as a **pending version** and the Action keeps running its active version. In the same edit, the other changes (name, description, tags…) apply directly. Launches, recurring schedules and planned Simulations are not affected.
 * **One pending version at a time.** Anyone who can manage the Action can edit the pending version: the edit form shows it, and saving replaces it with a new pending version. Each version records its author.
-* **Approve or reject the pending version.** In the *Approval* section, an approver sees the active and pending versions, what the pending version changes (the command as a line diff, then the executor, platforms, architecture, arguments, prerequisites, cleanup and files; **Show unchanged fields** lists both versions in full) and the version history. **Approve** applies the pending version: the next runs use it. **Reject** keeps the active version; a reason is required. The approval is refused if the pending version changed while you were reviewing it.
+* **Approve or reject the pending version.** In the *Approval* section, an approver sees the active and pending versions, what the pending version changes (the command as a line diff, then the executor, platforms, architecture, arguments, prerequisites, cleanup and files; **Show unchanged fields** lists both versions in full). **Approve** applies the pending version everywhere the Action is used: the next runs use it, and Atomic Tests that already ran show the new content. **Reject** keeps the active version; a reason is required. The approval is refused if the pending version changed while you were reviewing it.
 * **Approvers edit directly.** When a user with *Approve content* changes what an approved payload runs, the change applies directly as a new approved version, and replaces a pending version if there is one.
 * **Collectors.** A collector update of an approved payload creates a pending version (origin *Collector*). The same update sent again changes nothing; a different one replaces the pending version.
-* **In the list**, an approved Action with a pending version shows **New version pending**, and the *New version pending* filter finds them.
+* **Status shown**: an approved Action with a pending version shows **Pending approval** in the list, the cards and the drawer (with "Active version: vN (approved, still in use)"), and the *Pending* approval filter includes it; the *New version pending* filter finds only these. Injects that use it, in Scenarios, Simulations and Atomic Tests, show a **Pending** chip next to their usual status: they are not blocked and keep running the approved version.
 * **Version numbers.** Each approved content is a new version: the first approved content is v1, and every later approval of a different content (a pending version, or a pending payload approved again) gets the next number. Rejected or replaced versions keep the number they were given.
 * **Duplicate** copies the active version.
 * **Argument values.** Injects keep the argument values they already store: when a new version changes the default value of an argument, existing injects keep their value; only new injects get the new default.

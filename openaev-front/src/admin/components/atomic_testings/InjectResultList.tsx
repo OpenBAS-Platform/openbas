@@ -245,7 +245,13 @@ const InjectResultList: FunctionComponent<Props> = ({
           }}
           >
             <InjectStatus status={displayStatus as InjectStatusType['status_name']} />
-            <PayloadApprovalWarningChip approvalStatus={approvalStatus} payloadName={actionName} variant="icon" />
+            {/* A new version pending approval does not block the inject: a "Pending" chip next to its status. */}
+            <PayloadApprovalWarningChip
+              approvalStatus={approvalStatus}
+              pendingVersion={injectResultOutput.inject_injector_contract?.injector_contract_payload?.payload_pending_version}
+              payloadName={actionName}
+              variant={payloadApprovalDisplay(approvalStatus) ? 'icon' : 'chip'}
+            />
           </span>
         );
       },

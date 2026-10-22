@@ -9,6 +9,8 @@ import { payloadApprovalDisplay } from './payloadApprovalDisplay';
 
 interface Props {
   approvalStatus?: PayloadSimple['payload_approval_status'];
+  /** The payload is approved and a new version of it waits for approval (informative, never blocks). */
+  pendingVersion?: boolean;
   /** Name of the action, appended to the tooltip title. */
   payloadName?: string;
   /**
@@ -19,15 +21,16 @@ interface Props {
 }
 
 /**
- * Approval state of the payload of an inject that is not approved (pending or rejected), with the
- * full text in a tooltip. Renders nothing for an approved payload or an inject without payload, so
- * callers can pass the status unconditionally.
+ * Approval state of the payload of an inject that is not approved (pending or rejected), or approved
+ * with a new version pending approval, with the full text in a tooltip. Renders nothing for an
+ * approved payload with nothing pending or an inject without payload, so callers can pass the status
+ * unconditionally.
  */
-const PayloadApprovalWarningChip = ({ approvalStatus, payloadName, variant = 'chip' }: Props) => {
+const PayloadApprovalWarningChip = ({ approvalStatus, pendingVersion, payloadName, variant = 'chip' }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
 
-  const display = payloadApprovalDisplay(approvalStatus);
+  const display = payloadApprovalDisplay(approvalStatus, pendingVersion);
   if (!display) {
     return null;
   }

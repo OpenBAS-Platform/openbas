@@ -246,7 +246,14 @@ const Injects: FunctionComponent<Props> = ({
               tooltip={injectTooltip}
             />
             {inject.inject_enabled && (
-              <PayloadApprovalWarningChip approvalStatus={approvalStatus} payloadName={payload?.payload_name} variant="icon" />
+              // Not approved: an icon next to the status. A new version pending approval does not
+              // block the inject: a "Pending" chip next to its usual status.
+              <PayloadApprovalWarningChip
+                approvalStatus={approvalStatus}
+                pendingVersion={payload?.payload_pending_version}
+                payloadName={payload?.payload_name}
+                variant={payloadApprovalDisplay(approvalStatus) ? 'icon' : 'chip'}
+              />
             )}
           </span>
         );
