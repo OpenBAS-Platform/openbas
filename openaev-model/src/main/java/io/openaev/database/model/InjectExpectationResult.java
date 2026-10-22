@@ -1,5 +1,7 @@
 package io.openaev.database.model;
 
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -11,7 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Getter
@@ -84,7 +88,6 @@ public class InjectExpectationResult implements Base, Cloneable {
     this.result = newResult;
   }
 
-  @Setter
   @Type(JsonType.class)
   @Column(name = "inject_expectation_result_metadata")
   @JsonProperty("inject_expectation_result_metadata")
@@ -102,6 +105,18 @@ public class InjectExpectationResult implements Base, Cloneable {
   @Setter
   @JsonIgnore
   private BaseInjectExpectation injectExpectation;
+
+  @Setter
+  @Column(name = "inject_expectation_result_created_at")
+  @JsonProperty("inject_expectation_result_created_at")
+  @CreationTimestamp
+  private Instant createdAt = now();
+
+  @Setter
+  @Column(name = "inject_expectation_result_updated_at")
+  @JsonProperty("inject_expectation_result_updated_at")
+  @UpdateTimestamp
+  private Instant updatedAt = now();
 
   /**
    * Compares two results by their values rather than by hash or ID

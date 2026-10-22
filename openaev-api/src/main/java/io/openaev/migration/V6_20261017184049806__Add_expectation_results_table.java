@@ -24,12 +24,12 @@ public class V6_20261017184049806__Add_expectation_results_table extends BaseJav
             inject_expectation_result_source_name VARCHAR(255) NULL,
             inject_expectation_result_source_asset_id VARCHAR(255) NULL,
             inject_expectation_result_source_platform VARCHAR(255) NULL,
-            inject_expectation_result_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+            inject_expectation_result_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()::timestamptz,
             inject_expectation_result_result TEXT NULL, -- support provisional results
             inject_expectation_result_score NUMERIC NULL, -- support provisional results
             inject_expectation_result_metadata JSONB,
-            inject_expectation_result_created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-            inject_expectation_result_updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+            inject_expectation_result_created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()::timestamptz,
+            inject_expectation_result_updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()::timestamptz,
             inject_expectation_result_inject_expectation_id VARCHAR(255) NOT NULL REFERENCES injects_expectations(inject_expectation_id) ON DELETE CASCADE
         );
         """);
@@ -58,6 +58,8 @@ public class V6_20261017184049806__Add_expectation_results_table extends BaseJav
           res->>'result',
           (res->>'score')::numeric,
           res->'metadata',
+          NOW(),
+          NOW(),
           inject_expectation_id
         FROM results;
         """);
