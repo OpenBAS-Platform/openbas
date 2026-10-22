@@ -1,5 +1,6 @@
 package io.openaev.service.expectation;
 
+import static io.openaev.collectors.expectations_expiration_manager.config.ExpectationsExpirationManagerConfig.COLLECTOR_ID;
 import static io.openaev.service.InjectExpectationUtils.FAILED_SCORE_VALUE;
 import static io.openaev.utils.ExpectationSignatureUtils.EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME;
 import static io.openaev.utils.ExpectationSignatureUtils.EXPECTATION_SIGNATURE_TYPE_SOURCE_IPV4_ADDRESS;
@@ -8,9 +9,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import io.openaev.IntegrationTest;
+import io.openaev.collectors.expectations_expiration_manager.ExpectationsExpirationManagerJob;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.InjectExpectationRepository;
 import io.openaev.execution.ExecutableInject;
+import io.openaev.rest.collector.service.CollectorService;
 import io.openaev.rest.inject.form.InjectExpectationUpdateFromCollectorInput;
 import io.openaev.service.InjectExpectationService;
 import io.openaev.utils.fixtures.*;
@@ -44,6 +47,8 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
   @Autowired private InjectorContractComposer injectorContractComposer;
   @Autowired private CollectorComposer collectorComposer;
   @Autowired private SecurityPlatformComposer securityPlatformComposer;
+  @Autowired private CollectorService collectorService;
+  @Autowired private ExpectationsExpirationManagerJob expectationsExpirationManagerJob;
 
   @BeforeEach
   void setUp() {
@@ -1722,25 +1727,38 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
 
       private static final String SCAN_RESULT = "Scan finished";
 
+      private record AssetWithAgents(
+          Inject inject,
+          VulnerabilityInjectExpectation agentOne,
+          VulnerabilityInjectExpectation agentTwo,
+          VulnerabilityInjectExpectation asset) {}
+
       private VulnerabilityInjectExpectation buildVulnerabilityExpectation(
-          Inject inject, Agent agent, Endpoint asset, Collector collector) {
+          Inject inject, Agent agent, Endpoint asset, Collector... sources) {
         VulnerabilityInjectExpectation expectation =
             InjectExpectationFixture.createVulnerabilityInjectExpectation(inject, agent);
         expectation.setAsset(asset);
         if (agent != null) {
-          // Pending row of the answering source, as seeded on the agent leaves at initialization
+          // Pending row of each answering source, as seeded on the agent leaves at initialization
           expectation.setResults(
               new java.util.ArrayList<>(
-                  List.of(InjectExpectationResult.builder().sourceId(collector.getId()).build())));
+                  Stream.of(sources)
+                      .map(
+                          source ->
+                              InjectExpectationResult.builder().sourceId(source.getId()).build())
+                      .toList()));
         }
         return expectation;
       }
 
-      @ParameterizedTest(name = "vulnerable: {0}")
-      @ValueSource(booleans = {true, false})
-      void given_verdict_on_asset_with_agents_should_score_agents_and_derive_asset(
-          boolean isVulnerable) {
-        // Arrange
+      private Collector persistVulnerabilityCollector(String name) {
+        return collectorComposer
+            .forCollector(CollectorFixture.createDefaultCollector(name))
+            .persist()
+            .get();
+      }
+
+      private AssetWithAgents persistAssetWithAgents(Collector... sources) {
         Endpoint endpoint =
             endpointComposer
                 .forEndpoint(EndpointFixture.createEndpoint())
@@ -1754,20 +1772,40 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
                 .withExercise(exerciseComposer.forExercise(persistDefaultExercise()))
                 .persist()
                 .get();
-        Collector collector =
-            collectorComposer
-                .forCollector(CollectorFixture.createDefaultCollector("collector-vulnerability"))
-                .persist()
-                .get();
         VulnerabilityInjectExpectation agentOne =
-            buildVulnerabilityExpectation(inject, endpoint.getAgents().get(0), endpoint, collector);
+            buildVulnerabilityExpectation(inject, endpoint.getAgents().get(0), endpoint, sources);
         VulnerabilityInjectExpectation agentTwo =
-            buildVulnerabilityExpectation(inject, endpoint.getAgents().get(1), endpoint, collector);
+            buildVulnerabilityExpectation(inject, endpoint.getAgents().get(1), endpoint, sources);
         VulnerabilityInjectExpectation asset =
-            buildVulnerabilityExpectation(inject, null, endpoint, collector);
+            buildVulnerabilityExpectation(inject, null, endpoint, sources);
         injectExpectationRepository.saveAll(List.of(agentOne, agentTwo, asset));
         entityManager.flush();
         entityManager.refresh(inject);
+        return new AssetWithAgents(inject, agentOne, agentTwo, asset);
+      }
+
+      /** Expires the agents with the expiration collector: silence means "Not vulnerable" */
+      private void expireAgents(AssetWithAgents target) throws Exception {
+        String tenantId = target.inject().getTenant().getId();
+        expectationsExpirationManagerJob.registerForTenant(tenantId);
+        Collector expirationCollector = collectorService.collector(COLLECTOR_ID, tenantId);
+        injectExpectationService.expireExpectations(
+            List.of(target.agentOne(), target.agentTwo(), target.asset()), expirationCollector);
+        entityManager.flush();
+        entityManager.clear();
+      }
+
+      @ParameterizedTest(name = "vulnerable: {0}")
+      @ValueSource(booleans = {true, false})
+      void given_verdict_on_asset_with_agents_should_score_agents_and_derive_asset(
+          boolean isVulnerable) {
+        // Arrange
+        Collector collector = persistVulnerabilityCollector("collector-vulnerability");
+        AssetWithAgents target = persistAssetWithAgents(collector);
+        Inject inject = target.inject();
+        VulnerabilityInjectExpectation agentOne = target.agentOne();
+        VulnerabilityInjectExpectation agentTwo = target.agentTwo();
+        VulnerabilityInjectExpectation asset = target.asset();
 
         // Act
         injectExpectationService.updateInjectExpectation(
@@ -1802,6 +1840,86 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
         assertThat(savedAsset.getResults())
             .noneMatch(result -> collector.getId().equals(result.getSourceId()));
         assertThat(savedAsset.getScore()).isEqualTo(expectedScore);
+      }
+
+      @ParameterizedTest(name = "vulnerable: {0}")
+      @ValueSource(booleans = {true, false})
+      void given_verdict_after_agents_expiration_should_score_agents_and_derive_asset(
+          boolean isVulnerable) throws Exception {
+        // Arrange
+        Collector collector = persistVulnerabilityCollector("collector-vulnerability");
+        AssetWithAgents target = persistAssetWithAgents(collector);
+        expireAgents(target);
+
+        // Act
+        injectExpectationService.updateInjectExpectation(
+            target.asset().getId(),
+            InjectExpectationFixture.getInjectExpectationUpdateInput(
+                collector.getId(), SCAN_RESULT, !isVulnerable));
+        entityManager.flush();
+        entityManager.clear();
+
+        // Assert — the expiration defaults to "Not vulnerable", a later finding still wins
+        List<BaseInjectExpectation> saved =
+            injectExpectationRepository.findAllByInjectId(target.inject().getId());
+        Double expectedScore =
+            isVulnerable ? FAILED_SCORE_VALUE : target.asset().getExpectedScore();
+        for (VulnerabilityInjectExpectation agent : List.of(target.agentOne(), target.agentTwo())) {
+          TechnicalInjectExpectation savedAgent = findById(saved, agent.getId());
+          assertThat(savedAgent.getResults())
+              .anyMatch(result -> COLLECTOR_ID.equals(result.getSourceId()));
+          assertThat(savedAgent.getScore()).isEqualTo(expectedScore);
+        }
+        assertThat(findById(saved, target.asset().getId()).getScore()).isEqualTo(expectedScore);
+      }
+
+      @Test
+      @DisplayName("given one source vulnerable and another pending should keep the agent pending")
+      void given_one_source_vulnerable_and_another_pending_should_keep_the_agent_pending() {
+        // Arrange
+        Collector vulnerableSource = persistVulnerabilityCollector("collector-vulnerable");
+        Collector pendingSource = persistVulnerabilityCollector("collector-pending");
+        AssetWithAgents target = persistAssetWithAgents(vulnerableSource, pendingSource);
+
+        // Act
+        injectExpectationService.updateInjectExpectation(
+            target.agentOne().getId(),
+            InjectExpectationFixture.getInjectExpectationUpdateInput(
+                vulnerableSource.getId(), SCAN_RESULT, false));
+        entityManager.flush();
+        entityManager.clear();
+
+        // Assert — every expected source answers before the leaf is settled
+        List<BaseInjectExpectation> saved =
+            injectExpectationRepository.findAllByInjectId(target.inject().getId());
+        assertThat(findById(saved, target.agentOne().getId()).getScore()).isNull();
+      }
+
+      @Test
+      @DisplayName("given one source vulnerable and another not vulnerable should be vulnerable")
+      void given_one_source_vulnerable_and_another_not_vulnerable_should_be_vulnerable() {
+        // Arrange
+        Collector vulnerableSource = persistVulnerabilityCollector("collector-vulnerable");
+        Collector cleanSource = persistVulnerabilityCollector("collector-clean");
+        AssetWithAgents target = persistAssetWithAgents(vulnerableSource, cleanSource);
+        injectExpectationService.updateInjectExpectation(
+            target.agentOne().getId(),
+            InjectExpectationFixture.getInjectExpectationUpdateInput(
+                vulnerableSource.getId(), SCAN_RESULT, false));
+
+        // Act
+        injectExpectationService.updateInjectExpectation(
+            target.agentOne().getId(),
+            InjectExpectationFixture.getInjectExpectationUpdateInput(
+                cleanSource.getId(), SCAN_RESULT, true));
+        entityManager.flush();
+        entityManager.clear();
+
+        // Assert — "Not vulnerable" is only the absence of a finding: the finding wins
+        List<BaseInjectExpectation> saved =
+            injectExpectationRepository.findAllByInjectId(target.inject().getId());
+        assertThat(findById(saved, target.agentOne().getId()).getScore())
+            .isEqualTo(FAILED_SCORE_VALUE);
       }
     }
 

@@ -88,9 +88,21 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
     List<? extends BaseInjectExpectation> leaves = getLeaves(expectation);
     for (BaseInjectExpectation leaf : leaves) {
       addResultToLeaf(leaf, verdict, resolveResultLabel(leaf, verdict.score()));
-      leaf.setScore(computeResultsScore(leaf.getResults(), leaf));
+      leaf.setScore(computeLeafScore(leaf));
     }
     return leaves;
+  }
+
+  /**
+   * Computes the score of a leaf expectation from its results. Defaults to the highest score once
+   * every source answered (see {@link
+   * io.openaev.utils.inject_expectation_result.ExpectationResultBuilder#computeResultsScore}).
+   *
+   * @param leaf the leaf expectation whose score is computed
+   * @return the score of the leaf, or {@code null} while it is still pending
+   */
+  default Double computeLeafScore(BaseInjectExpectation leaf) {
+    return computeResultsScore(leaf.getResults(), leaf);
   }
 
   /**
@@ -119,7 +131,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
     List<? extends BaseInjectExpectation> leaves = getLeaves(expectation);
     for (BaseInjectExpectation leaf : leaves) {
       removeResultFromLeaf(leaf, sourceId);
-      leaf.setScore(computeResultsScore(leaf.getResults(), leaf));
+      leaf.setScore(computeLeafScore(leaf));
     }
     // The expectation is a leaf itself: the loop above already cleaned it
     if (leaves.contains(expectation)) {
@@ -173,7 +185,7 @@ public interface ExpectationBehavior<T extends BaseInjectExpectation> {
       // The per-source rows still pending (e.g. one per security platform) get the verdict too
       expireEmptyResults(leaf.getResults(), verdict.score(), EXPIRED);
       addResultToLeaf(leaf, verdict, resolveResultLabel(leaf, verdict.score()));
-      leaf.setScore(computeResultsScore(leaf.getResults(), leaf));
+      leaf.setScore(computeLeafScore(leaf));
     }
     return leaves;
   }
