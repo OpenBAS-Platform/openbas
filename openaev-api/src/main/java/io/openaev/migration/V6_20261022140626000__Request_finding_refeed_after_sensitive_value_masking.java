@@ -60,7 +60,7 @@ import org.springframework.stereotype.Component;
  * <p>Idempotent and lock-light: a single row of a bookkeeping table.
  */
 @Component
-public class V6_20261015163917000__Request_finding_refeed_after_sensitive_value_masking
+public class V6_20261022140626000__Request_finding_refeed_after_sensitive_value_masking
     extends BaseJavaMigration {
 
   private static final String FINDING_MODEL = "finding";

@@ -49,7 +49,7 @@ class FindingRefeedMigrationTest extends IntegrationTest {
   private static final String FICTITIOUS_MODEL = "finding-refeed-test-model";
 
   @Autowired
-  private V6_20261015163917000__Request_finding_refeed_after_sensitive_value_masking migration;
+  private V6_20261022140626000__Request_finding_refeed_after_sensitive_value_masking migration;
 
   @Autowired private IndexResetEpochReassertion epochReassertion;
   @Autowired private IndexingStatusRepository indexingStatusRepository;

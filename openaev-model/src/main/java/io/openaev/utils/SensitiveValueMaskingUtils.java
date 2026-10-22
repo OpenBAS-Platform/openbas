@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
  * <ul>
  *   <li>bump {@link #MASKING_VERSION};
  *   <li>AND ship a migration requesting an in-place re-feed of the {@code finding} model, following
- *       {@code V6_20261015163917000__Request_finding_refeed_after_sensitive_value_masking}.
+ *       {@code V6_20261022140626000__Request_finding_refeed_after_sensitive_value_masking}.
  * </ul>
  *
  * <p>Nothing re-masks an indexed document on its own: the incremental indexing only revisits a

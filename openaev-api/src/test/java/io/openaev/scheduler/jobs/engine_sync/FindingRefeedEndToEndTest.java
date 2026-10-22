@@ -22,7 +22,7 @@ import io.openaev.engine.api.CursorPageQuery;
 import io.openaev.engine.facade.EngineService;
 import io.openaev.engine.model.finding.EsFinding;
 import io.openaev.engine.model.finding.FindingHandler;
-import io.openaev.migration.V6_20261015163917000__Request_finding_refeed_after_sensitive_value_masking;
+import io.openaev.migration.V6_20261022140626000__Request_finding_refeed_after_sensitive_value_masking;
 import io.openaev.service.EsIndexingUtils;
 import io.openaev.utils.fixtures.FindingFixture;
 import io.openaev.utils.fixtures.InjectFixture;
@@ -85,7 +85,7 @@ class FindingRefeedEndToEndTest extends IntegrationTest {
   private static final String HARMLESS_VALUE = "not a secret";
 
   @Autowired
-  private V6_20261015163917000__Request_finding_refeed_after_sensitive_value_masking migration;
+  private V6_20261022140626000__Request_finding_refeed_after_sensitive_value_masking migration;
 
   @Autowired private EngineService engineService;
   @Autowired private EngineContext engineContext;
