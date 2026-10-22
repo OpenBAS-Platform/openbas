@@ -2,15 +2,13 @@ package io.openaev.engine;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openaev.authorisation.HttpClientFactory;
 import io.openaev.config.EngineConfig;
 import io.openaev.exception.StartupException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.config.ConnectionConfig;
@@ -21,7 +19,6 @@ import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuil
 import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
 import org.apache.hc.client5.http.ssl.HostnameVerificationPolicy;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
-import org.apache.hc.client5.http.ssl.TlsSocketStrategy;
 import org.apache.hc.client5.http.ssl.TrustAllStrategy;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
@@ -34,9 +31,9 @@ import org.springframework.stereotype.Component;
  *
  * <p>The answer of {@code GET /} carries {@code version.number} on every engine, and {@code
  * version.distribution = "opensearch"} on OpenSearch outside compatibility mode, where the root
- * {@code tagline} still identifies it. The probe uses its own short-lived client, configured like
- * the engine clients (TLS, basic auth, timeouts), since the right engine client cannot be chosen
- * until the answer is known.
+ * {@code tagline} still identifies it. The probe uses a short-lived client from {@link
+ * HttpClientFactory}, which trusts the platform chain like every other outgoing connection, since
+ * the right engine client cannot be chosen until the answer is known.
  */
 @Component
 @RequiredArgsConstructor
@@ -49,7 +46,7 @@ public class EngineVersionProbe {
   private record RawResponse(int status, String body) {}
 
   private final EngineConfig config;
-  private final X509TrustManager trustManager;
+  private final HttpClientFactory httpClientFactory;
   private final ObjectMapper mapper = new ObjectMapper();
 
   /**
@@ -68,6 +65,10 @@ public class EngineVersionProbe {
       throw new StartupException("Invalid search engine url '" + url + "'", e);
     }
     request.setHeader(HttpHeaders.ACCEPT, "application/json");
+    request.setConfig(
+        RequestConfig.custom()
+            .setResponseTimeout(Timeout.ofMilliseconds(config.getSocketTimeoutMs()))
+            .build());
     if (config.getUsername() != null) {
       String password = config.getPassword() == null ? "" : config.getPassword();
       String credentials =
@@ -135,36 +136,29 @@ public class EngineVersionProbe {
 
   private CloseableHttpClient httpClient() {
     Timeout connectTimeout = Timeout.ofMilliseconds(config.getConnectTimeoutMs());
-    Timeout socketTimeout = Timeout.ofMilliseconds(config.getSocketTimeoutMs());
-    return HttpClients.custom()
-        .disableAutomaticRetries()
-        .setConnectionManager(
-            PoolingHttpClientConnectionManagerBuilder.create()
-                .setTlsSocketStrategy(tlsStrategy())
-                .setDefaultConnectionConfig(
-                    ConnectionConfig.custom()
-                        .setConnectTimeout(connectTimeout)
-                        .setSocketTimeout(socketTimeout)
-                        .build())
-                .build())
-        .setDefaultRequestConfig(RequestConfig.custom().setResponseTimeout(socketTimeout).build())
-        .build();
-  }
-
-  /** Same trust rules as the engine clients: the platform chain, or nothing at all. */
-  private TlsSocketStrategy tlsStrategy() {
+    if (config.isRejectUnauthorized()) {
+      return httpClientFactory.httpClientNoRetry(connectTimeout);
+    }
+    // engine.reject-unauthorized=false: no certificate nor hostname check, like the engine
+    // clients. The platform factory deliberately offers no such client.
     try {
-      if (!config.isRejectUnauthorized()) {
-        return ClientTlsStrategyBuilder.create()
-            .setSslContext(
-                SSLContextBuilder.create().loadTrustMaterial(TrustAllStrategy.INSTANCE).build())
-            .setHostVerificationPolicy(HostnameVerificationPolicy.CLIENT)
-            .setHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-            .buildClassic();
-      }
-      SSLContext sslContext = SSLContext.getInstance("TLS");
-      sslContext.init(null, new TrustManager[] {trustManager}, null);
-      return ClientTlsStrategyBuilder.create().setSslContext(sslContext).buildClassic();
+      return HttpClients.custom()
+          .disableAutomaticRetries()
+          .setConnectionManager(
+              PoolingHttpClientConnectionManagerBuilder.create()
+                  .setTlsSocketStrategy(
+                      ClientTlsStrategyBuilder.create()
+                          .setSslContext(
+                              SSLContextBuilder.create()
+                                  .loadTrustMaterial(TrustAllStrategy.INSTANCE)
+                                  .build())
+                          .setHostVerificationPolicy(HostnameVerificationPolicy.CLIENT)
+                          .setHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                          .buildClassic())
+                  .setDefaultConnectionConfig(
+                      ConnectionConfig.custom().setConnectTimeout(connectTimeout).build())
+                  .build())
+          .build();
     } catch (GeneralSecurityException e) {
       throw new StartupException("Unable to build the engine TLS context", e);
     }

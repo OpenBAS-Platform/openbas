@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sun.net.httpserver.HttpServer;
+import io.openaev.authorisation.HttpClientFactory;
 import io.openaev.config.EngineConfig;
 import io.openaev.exception.StartupException;
 import java.io.IOException;
@@ -102,7 +103,7 @@ class EngineVersionProbeTest {
             .map(X509TrustManager.class::cast)
             .findFirst()
             .orElseThrow();
-    return new EngineVersionProbe(this.config, trustManager);
+    return new EngineVersionProbe(this.config, new HttpClientFactory(trustManager));
   }
 
   @Nested
