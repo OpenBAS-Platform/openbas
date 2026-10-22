@@ -1,6 +1,6 @@
 import { type Dispatch } from 'redux';
 
-import { delReferential, getReferential, postReferential, putReferential, simpleCall, simpleDelCall, simplePostCall } from '../../utils/Action';
+import { delReferential, getReferential, postReferential, putReferential, simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
 import { type AssetBulkProcessingInput, type AssetUpdateMarkingsInput, type Endpoint, type EndpointInput, type EndpointOutput, type SearchPaginationInput } from '../../utils/api-types';
 import { arrayOfEndpoints, endpoint } from './asset-schema';
 
@@ -9,6 +9,26 @@ const ENDPOINT_URI = '/api/endpoints';
 export const addEndpointAgentless = (data: EndpointInput) => (dispatch: Dispatch) => {
   const uri = `${ENDPOINT_URI}/agentless`;
   return postReferential(endpoint, uri, data)(dispatch);
+};
+
+// Store-free flavours used by the query-driven pages: they only talk to the API and let the live
+// layer refresh whatever shows the entity.
+export const createEndpointAgentlessCall = (data: EndpointInput) => {
+  return simplePostCall(`${ENDPOINT_URI}/agentless`, data, undefined, true, true);
+};
+
+export const updateEndpointCall = (assetId: EndpointOutput['asset_id'], data: EndpointInput) => {
+  return simplePutCall(`${ENDPOINT_URI}/${assetId}`, data);
+};
+
+// Replaces the whole set of markings of an asset (any category). `notifySuccess` is false when the
+// caller saves the rest of the asset in the same click and shows a single confirmation.
+export const updateAssetMarkingsCall = (assetId: string, data: AssetUpdateMarkingsInput, notifySuccess: boolean = true) => {
+  return simplePutCall(`/api/assets/${assetId}/markings`, data, undefined, true, notifySuccess);
+};
+
+export const fetchEndpointById = (endpointId: string, notifyError = true) => {
+  return simpleCall(`${ENDPOINT_URI}/${endpointId}`, undefined, notifyError);
 };
 
 export const updateEndpoint = (
@@ -37,8 +57,8 @@ export const searchEndpoints = (searchPaginationInput: SearchPaginationInput) =>
 // Unified asset inventory: returns EVERY asset type (endpoints, AI targets, identities, cloud /
 // web / network / generic). Endpoints keep their agents/platform; other types list with those
 // empty. Filters/sorts must reference base asset fields (no endpoint-only platform/arch facets).
-export const searchAssets = (searchPaginationInput: SearchPaginationInput) => {
-  return simplePostCall('/api/assets/search', searchPaginationInput);
+export const searchAssets = (searchPaginationInput: SearchPaginationInput, notifyError = true) => {
+  return simplePostCall('/api/assets/search', searchPaginationInput, undefined, notifyError);
 };
 
 // Generic delete for the unified inventory: removes any asset type (endpoint, AI target, or any
@@ -73,8 +93,8 @@ export const bulkDeleteAssets = (input: AssetBulkProcessingInput) => {
 
 // Generic asset overview for the unified detail page: returns any asset type with its
 // category-relevant fields (endpoints keep agents/platform; AI targets expose connection metadata).
-export const fetchAssetOverview = (assetId: string) => {
-  return simpleCall(`/api/assets/${assetId}`);
+export const fetchAssetOverview = (assetId: string, notifyError = true) => {
+  return simpleCall(`/api/assets/${assetId}`, undefined, notifyError);
 };
 
 // "Injects played" for the asset detail page: every inject (atomic testing or simulation inject)

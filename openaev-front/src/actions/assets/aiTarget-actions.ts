@@ -7,6 +7,7 @@ import {
   putReferential,
   simpleCall,
   simplePostCall,
+  simplePutCall,
 } from '../../utils/Action';
 import { type AiTargetInput, type Asset, type AssetUpdateMarkingsInput, type SearchPaginationInput } from '../../utils/api-types';
 import { aiTarget, arrayOfAiTargets } from './asset-schema';
@@ -15,6 +16,19 @@ const AI_TARGET_URI = '/api/ai_targets';
 
 export const addAiTarget = (data: AiTargetInput) => (dispatch: Dispatch) => {
   return postReferential(aiTarget, AI_TARGET_URI, data)(dispatch);
+};
+
+// Store-free flavours used by the query-driven pages.
+export const createAiTargetCall = (data: AiTargetInput) => {
+  return simplePostCall(AI_TARGET_URI, data, undefined, true, true);
+};
+
+export const updateAiTargetCall = (assetId: Asset['asset_id'], data: AiTargetInput) => {
+  return simplePutCall(`${AI_TARGET_URI}/${assetId}`, data);
+};
+
+export const updateAiTargetMarkingsCall = (assetId: string, data: AssetUpdateMarkingsInput, notifySuccess: boolean = true) => {
+  return simplePutCall(`/api/assets/${assetId}/markings`, data, undefined, true, notifySuccess);
 };
 
 export const updateAiTarget = (

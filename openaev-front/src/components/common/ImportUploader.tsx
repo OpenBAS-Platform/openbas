@@ -10,7 +10,8 @@ const useStyles = makeStyles()(theme => ({ buttonImport: { borderColor: theme.pa
 
 interface Props {
   title: string;
-  handleUpload: (formData: FormData, file: File) => void;
+  // May return a promise: the spinner stays until it settles.
+  handleUpload: (formData: FormData, file: File) => void | Promise<void>;
   color?: CircularProgressProps['color'];
   isIconButton?: boolean;
   fileAccepted?: string;
@@ -38,8 +39,11 @@ const ImportUploader: FunctionComponent<Props> = ({
     setUpload(true);
     const formData = new FormData();
     formData.append('file', file);
-    handleUpload(formData, file);
-    setUpload(false);
+    try {
+      await handleUpload(formData, file);
+    } finally {
+      setUpload(false);
+    }
   };
 
   if (upload) {

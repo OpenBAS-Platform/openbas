@@ -1,68 +1,55 @@
 import { Step, StepButton, Stepper } from '@mui/material';
 import { type FunctionComponent, useState } from 'react';
 
-import { addAiTarget } from '../../../../actions/assets/aiTarget-actions';
-import { addEndpointAgentless } from '../../../../actions/assets/endpoint-actions';
+import { createAiTargetCall } from '../../../../actions/assets/aiTarget-actions';
+import { ASSET_TYPE } from '../../../../actions/assets/asset-queries';
+import { createEndpointAgentlessCall } from '../../../../actions/assets/endpoint-actions';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { AiTargetInput, Endpoint, EndpointInput } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
+import type { AiTargetInput, EndpointInput } from '../../../../utils/api-types';
+import { useLiveMutation } from '../../../../utils/query/live';
 import AiTargetForm from '../ai_targets/AiTargetForm';
 import { type AssetCategory, getCategoryDef } from '../asset-categories';
 import AssetCategoryPicker from '../AssetCategoryPicker';
 import AssetForm from '../AssetForm';
 
-interface Props {
-  agentless?: boolean;
-  onCreate?: (result: Endpoint) => void;
-  onAiTargetCreate?: () => void;
-}
+interface Props { agentless?: boolean }
 
-const EndpointCreation: FunctionComponent<Props> = ({
-  agentless = true,
-  onCreate,
-  onAiTargetCreate,
-}) => {
+const EndpointCreation: FunctionComponent<Props> = ({ agentless = true }) => {
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState<AssetCategory | null>(null);
   const { t } = useFormatter();
-
-  const dispatch = useAppDispatch();
 
   const handleClose = () => {
     setOpen(false);
     setCategory(null);
   };
 
+  const createEndpointMutation = useLiveMutation({
+    mutationFn: createEndpointAgentlessCall,
+    changes: result => [{
+      type: ASSET_TYPE,
+      id: result.data.asset_id,
+      action: 'create',
+    }],
+  });
+  const createAiTargetMutation = useLiveMutation({
+    mutationFn: createAiTargetCall,
+    changes: result => [{
+      type: ASSET_TYPE,
+      id: result.data.asset_id,
+      action: 'create',
+    }],
+  });
+
+  // The drawer stays open on failure: the API layer already told the user why.
   const onSubmit = (data: EndpointInput) => {
-    dispatch(addEndpointAgentless(data)).then(
-      (result: {
-        result: string;
-        entities: { endpoints: Record<string, Endpoint> };
-      }) => {
-        if (result.entities) {
-          if (onCreate) {
-            const endpointCreated = result.entities.endpoints[result.result];
-            onCreate(endpointCreated);
-          }
-          handleClose();
-        }
-        return result;
-      },
-    );
+    createEndpointMutation.mutate(data, { onSuccess: handleClose });
   };
 
   const onSubmitAiTarget = (data: AiTargetInput) => {
-    // AI targets are base Assets, not Endpoints, so they are not prepended to the
-    // (endpoint-shaped) onCreate list: the caller refetches the inventory instead.
-    dispatch(addAiTarget(data)).then((result: { entities?: unknown }) => {
-      if (result.entities) {
-        onAiTargetCreate?.();
-        handleClose();
-      }
-      return result;
-    });
+    createAiTargetMutation.mutate(data, { onSuccess: handleClose });
   };
 
   const renderStepContent = () => {

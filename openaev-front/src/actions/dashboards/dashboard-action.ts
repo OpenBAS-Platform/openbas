@@ -7,11 +7,11 @@ export const DASHBOARD_URI = '/api/dashboards';
 // Used by hardcoded platform dashboards: the full widget configuration is sent
 // to the backend instead of referencing a stored widget.
 
-export const adHocSeries = (widgetConfig: Widget['widget_config'], parameters?: Record<string, string | undefined>) => {
+export const adHocSeries = (widgetConfig: Widget['widget_config'], parameters?: Record<string, string | undefined>, notifyError = true) => {
   return simplePostCall(`${DASHBOARD_URI}/adhoc/series`, {
     widget_config: widgetConfig,
     parameters,
-  });
+  }, undefined, notifyError);
 };
 
 export const adHocCount = (widgetConfig: Widget['widget_config'], parameters?: Record<string, string | undefined>) => {

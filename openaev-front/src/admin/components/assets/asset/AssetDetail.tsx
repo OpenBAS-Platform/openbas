@@ -1,15 +1,16 @@
-import { Chip } from '@filigran/design-system';
+import { Alert, Button, Chip } from '@filigran/design-system';
 import { DevicesOtherOutlined, TrackChangesOutlined } from '@mui/icons-material';
-import { Alert, AlertTitle, Box, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { skipToken, useQuery } from '@tanstack/react-query';
 import { Binoculars, SelectGroup } from 'mdi-material-ui';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
-import { fetchAssetOverview, searchInjectsForAsset } from '../../../../actions/assets/endpoint-actions';
+import { assetQueries } from '../../../../actions/assets/asset-queries';
+import { searchInjectsForAsset } from '../../../../actions/assets/endpoint-actions';
 import { searchDistinctFindingsOnEndpoint } from '../../../../actions/findings/finding-actions';
-import { type UserHelper } from '../../../../actions/helper';
-import { fetchPlayers } from '../../../../actions/users/User';
+import { userQueries } from '../../../../actions/users/user-queries';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import chipLinkClassName from '../../../../components/common/chips/chipLink';
 import { DetailHero, DetailSections, Field, HeroStat, InformationGrid, SectionBlock } from '../../../../components/common/detail/EntityDetailCommon';
@@ -26,16 +27,13 @@ import ItemMarkings from '../../../../components/ItemMarkings';
 import ItemTags from '../../../../components/ItemTags';
 import Loader from '../../../../components/Loader';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import { useHelper } from '../../../../store';
 import {
-  type EndpointOverviewOutput,
   type InjectResultOutput,
   type SearchPaginationInput,
 } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useMarkingDefinitions from '../../../../utils/hooks/useMarkingDefinitions';
 import useSearchTotal from '../../../../utils/hooks/useSearchTotal';
+import { isNotFoundError } from '../../../../utils/query/live';
 import { emptyFilled, formatIp, formatMacAddress } from '../../../../utils/String';
 import { isFeatureEnabled } from '../../../../utils/utils';
 import InjectResultList from '../../atomic_testings/InjectResultList';
@@ -52,24 +50,10 @@ import InjectsPlayedOverTimeChart from '../statistics/InjectsPlayedOverTimeChart
 import PostureScoreOverTimeChart from '../statistics/PostureScoreOverTimeChart';
 import useExpectationPosture from '../useExpectationPosture';
 
-// The backend's EndpointOverviewOutput now also carries the AI target connection metadata and the
-// asset's markings; until the API types are regenerated (needs a backend restart) they are
-// declared here so the page can render them. Regenerating later makes these redundant but
-// harmless.
-type AssetOverview = EndpointOverviewOutput & {
-  ai_target_provider?: string;
-  ai_target_modality?: string;
-  ai_target_endpoint?: string;
-  ai_target_model?: string;
-  ai_target_system_prompt?: string;
-  asset_markings?: string[];
-};
-
 const AssetDetail = () => {
   const theme = useTheme();
   const { t } = useFormatter();
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   // The generic detail page is mounted on two routes for back-compatibility (details/:assetId and
   // the legacy endpoints/:endpointId), so resolve the id from whichever param is present.
   const { assetId, endpointId } = useParams() as {
@@ -78,20 +62,9 @@ const AssetDetail = () => {
   };
   const id = assetId ?? endpointId ?? '';
 
-  const [asset, setAsset] = useState<AssetOverview | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const loadAsset = useCallback(() => {
-    setLoading(true);
-    fetchAssetOverview(id)
-      .then((result: { data: AssetOverview }) => setAsset(result.data))
-      .catch(() => setAsset(null))
-      .finally(() => setLoading(false));
-  }, [id]);
-
-  useEffect(() => {
-    loadAsset();
-  }, [loadAsset]);
+  // Live query: edits, agent changes and deletions of this asset (from this page or elsewhere)
+  // refresh it. A deletion shows up as a 404, which is an expected state rather than a failure.
+  const { data: asset, error, isPending } = useQuery(assetQueries.detail(id));
 
   // Gates the Markings field (and its data fetch below) so the flag-off platform looks exactly as
   // it does today - mirrors the Endpoints list convention.
@@ -102,16 +75,13 @@ const AssetDetail = () => {
   });
 
   // Resolve the linked person (identity assets) to a readable name.
-  const { usersMap } = useHelper((helper: UserHelper) => ({ usersMap: helper.getUsersMap() }));
-  useDataLoader(() => {
-    if (asset?.asset_linked_person) {
-      dispatch(fetchPlayers());
-    }
-  }, [asset?.asset_linked_person]);
-  const linkedPerson = asset?.asset_linked_person ? usersMap?.[asset.asset_linked_person] : undefined;
-  const linkedPersonName = linkedPerson
-    ? ([linkedPerson.user_firstname, linkedPerson.user_lastname].filter(Boolean).join(' ').trim() || linkedPerson.user_email)
-    : asset?.asset_linked_person;
+  const linkedPersonId = asset?.asset_linked_person;
+  const linkedPersonQuery = userQueries.playerLabel(linkedPersonId ?? '');
+  const { data: linkedPersonLabel } = useQuery({
+    ...linkedPersonQuery,
+    queryFn: linkedPersonId ? linkedPersonQuery.queryFn : skipToken,
+  });
+  const linkedPersonName = linkedPersonLabel || linkedPersonId;
 
   // Injects played: every inject that concerned this asset (atomic testings and simulation
   // injects; targeted directly, through an asset group - static or dynamic - or evidenced by the
@@ -127,10 +97,7 @@ const AssetDetail = () => {
 
   // Headline hero counts: size-1 probes of the same searches feeding the lists
   // below, plus the expectation posture aggregated by the dashboard engine.
-  const findingsTotal = useSearchTotal(useCallback(
-    (input: SearchPaginationInput) => searchDistinctFindingsOnEndpoint(id, input),
-    [id],
-  ));
+  const { data: findingsTotal } = useQuery(assetQueries.findingsTotal(id));
   const injectsTotal = useSearchTotal(fetchInjectsPlayed);
   const posture = useExpectationPosture('base_asset_side', id);
 
@@ -140,15 +107,52 @@ const AssetDetail = () => {
   // atomic testing and scenario tabs.
   const { currentTab, handleChangeTab } = useRoutedTabs(['overview', 'statistics'], 'overview');
 
-  if (loading && !asset) {
+  if (isNotFoundError(error)) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 16,
+      }}
+      >
+        <Breadcrumbs
+          variant="object"
+          elements={[
+            {
+              label: t('Assets'),
+              link: '/admin/assets',
+            },
+            {
+              label: t('Asset not found'),
+              current: true,
+            },
+          ]}
+        />
+        <Alert
+          severity="info"
+          title={t('Asset not found')}
+          description={t('This asset does not exist or has been deleted.')}
+          action={(
+            <Button asChild priority="secondary" size="sm">
+              <Link to="/admin/assets">{t('Back to assets')}</Link>
+            </Button>
+          )}
+        />
+      </div>
+    );
+  }
+  if (isPending) {
     return <Loader />;
   }
-  if (!asset) {
+  // Any other error (403, network, server) shows the warning even when an earlier response is
+  // still cached: the asset can no longer be trusted to be readable.
+  if (error || !asset) {
     return (
-      <Alert severity="warning">
-        <AlertTitle>{t('Warning')}</AlertTitle>
-        {t('Asset is currently unavailable or you do not have sufficient permissions to access it.')}
-      </Alert>
+      <Alert
+        severity="warning"
+        title={t('Warning')}
+        description={t('Asset is currently unavailable or you do not have sufficient permissions to access it.')}
+      />
     );
   }
 
@@ -211,7 +215,7 @@ const AssetDetail = () => {
             <AssetPopover
               endpoint={asset as AssetPopoverProps['endpoint']}
               agentless={!hasAgents}
-              onUpdate={() => loadAsset()}
+              updatable
               onDelete={() => navigate('/admin/assets')}
             />
           </>
