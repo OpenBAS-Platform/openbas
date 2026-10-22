@@ -31,6 +31,16 @@ public final class EsIndexingUtils {
           "illegal_argument_exception");
 
   /**
+   * Error types the engine answers a mapping update with when the existing index cannot take the
+   * new mapping - a field whose type changed, for instance. Elasticsearch and OpenSearch both use
+   * them, with a 400 status.
+   */
+  private static final Set<String> INCOMPATIBLE_MAPPING_ERROR_TYPES =
+      Set.of("illegal_argument_exception", "mapper_parsing_exception");
+
+  private static final int BAD_REQUEST = 400;
+
+  /**
    * Sentinel cursor that requests a full reset of a model's index at the next startup: the engine
    * drivers wipe and recreate the index, then re-feed it from epoch (see {@link
    * #isReindexRequested(String, Optional)}).
@@ -86,6 +96,22 @@ public final class EsIndexingUtils {
    */
   public static boolean isPoisonError(String errorType) {
     return errorType != null && POISON_ERROR_TYPES.contains(errorType);
+  }
+
+  /**
+   * Whether the engine refused a mapping update because the existing index cannot take that
+   * mapping: only then may the index be reset to rebuild it with the current mapping. Every other
+   * failure - timeout, lost response, refused authorization, unavailable engine - says nothing
+   * about the mapping, and must never lead to deleting a populated index.
+   *
+   * @param status the HTTP status of the engine's answer
+   * @param errorType the error type of the engine's answer, when it has one
+   * @return true when the refusal is a confirmed mapping incompatibility
+   */
+  public static boolean isIncompatibleMappingError(int status, String errorType) {
+    return status == BAD_REQUEST
+        && errorType != null
+        && INCOMPATIBLE_MAPPING_ERROR_TYPES.contains(errorType);
   }
 
   /**

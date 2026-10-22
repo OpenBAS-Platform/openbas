@@ -266,7 +266,6 @@ public class ElasticDriver {
     // Create the index, or bring the existing one up to date
     try {
       client.indices().get(new GetIndexRequest.Builder().index(indexName).build());
-      return addNewFieldsToExistingIndex(client, indexName, mappings);
     } catch (ElasticsearchException e) {
       try {
         log.info("Creating index {}", indexName);
@@ -286,8 +285,10 @@ public class ElasticDriver {
       } catch (ElasticsearchException e2) {
         log.error("cannot create index", e2);
       }
+      return true;
     }
-    return true;
+    // Outside the try: a refused mapping update must not be taken for a missing index
+    return addNewFieldsToExistingIndex(client, indexName, mappings);
   }
 
   /**
@@ -298,22 +299,32 @@ public class ElasticDriver {
    * wiped and rebuilt, and dashboards stay incomplete for the whole rebuild. Adding a field to a
    * live index keeps its documents in place, and a re-put of an unchanged mapping is a no-op.
    *
-   * <p>When the engine refuses the update - a field whose type changed, missing privileges - the
-   * index cannot take the current mapping, and must be reset: every document carrying a new field
-   * would otherwise be rejected by the strict mapping, a rejection the indexer treats as a poison
-   * document and skips for good, so the documents in place would never be rewritten.
+   * <p>When the engine answers that the index cannot take the current mapping - a field whose type
+   * changed - the index must be reset: every document carrying a new field would otherwise be
+   * rejected by the strict mapping, a rejection the indexer treats as a poison document and skips
+   * for good, so the documents in place would never be rewritten. Any other failure (timeout, lost
+   * response, refused authorization, unavailable engine) says nothing about the mapping: it is
+   * propagated and fails the boot, which retries the update, without deleting anything. This runs
+   * for every model at every boot, so a transient error must never cost a populated index.
    *
    * @return true when the index now carries the model's mapping, false when it must be reset
+   * @throws IOException when the engine could not be reached
    */
   private boolean addNewFieldsToExistingIndex(
-      ElasticsearchClient client, String indexName, Map<String, Property> mappings) {
+      ElasticsearchClient client, String indexName, Map<String, Property> mappings)
+      throws IOException {
     try {
       client.indices().putMapping(p -> p.index(indexName).properties(mappings));
       return true;
-    } catch (Exception e) {
+    } catch (ElasticsearchException e) {
+      if (!EsIndexingUtils.isIncompatibleMappingError(
+          e.status(), e.error() != null ? e.error().type() : null)) {
+        // Says nothing about the mapping: fail the boot, which retries it, and delete nothing
+        throw e;
+      }
       log.error(
-          "Cannot add the new fields of index {} to its mapping: resetting the index to rebuild it"
-              + " with the current mapping",
+          "Index {} cannot take the current mapping in place: resetting it to rebuild it with the"
+              + " current mapping",
           indexName,
           e);
       return false;
