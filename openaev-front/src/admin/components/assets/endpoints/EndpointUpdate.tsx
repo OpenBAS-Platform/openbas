@@ -1,14 +1,13 @@
-import { type FunctionComponent, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { type FunctionComponent } from 'react';
 
-import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
-import { fetchEndpoint, updateAssetMarkings, updateEndpoint } from '../../../../actions/assets/endpoint-actions';
+import { ASSET_TYPE, assetQueries } from '../../../../actions/assets/asset-queries';
+import { updateAssetMarkingsCall, updateEndpointCall } from '../../../../actions/assets/endpoint-actions';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
-import { useHelper } from '../../../../store';
 import type { Endpoint, EndpointInput } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { useLiveMutation } from '../../../../utils/query/live';
 import { type AssetCategory } from '../asset-categories';
 import AssetForm from '../AssetForm';
 
@@ -30,48 +29,52 @@ const EndpointUpdate: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
 
-  const [loading, setLoading] = useState(true);
-  const dispatch = useAppDispatch();
+  const { data: endpoint, isPending } = useQuery(assetQueries.editable(endpointId));
 
-  const { endpoint } = useHelper((helper: EndpointHelper) => ({ endpoint: helper.getEndpoint(endpointId) }));
-  useDataLoader(() => {
-    setLoading(true);
-    dispatch(fetchEndpoint(endpointId)).finally(() => setLoading(false));
+  const updateMutation = useLiveMutation({
+    mutationFn: (data: EndpointInput) => updateEndpointCall(endpointId, data),
+    changes: () => [{
+      type: ASSET_TYPE,
+      id: endpointId,
+      action: 'update',
+    }],
+  });
+  const markingsMutation = useLiveMutation({
+    mutationFn: (markingIds: string[]) => updateAssetMarkingsCall(endpointId, { asset_markings: markingIds }, false),
+    changes: () => [{
+      type: ASSET_TYPE,
+      id: endpointId,
+      action: 'update',
+    }],
   });
 
   // Returns whether the update actually succeeded - AssetForm awaits this (SubmitHandler's own
   // return type, `unknown`, already permits it) to decide whether to revert a markings change that
   // committed earlier in the same submit. See AssetForm's `onSubmit` doc.
-  const onSubmit = (data: EndpointInput) => {
-    return dispatch(updateEndpoint(endpointId, data)).then(
-      (result: {
-        result: string;
-        entities?: { endpoints: Record<string, Endpoint> };
-      }) => {
-        if (result.entities) {
-          if (onUpdate) {
-            const endpointUpdated = result.entities.endpoints[result.result];
-            onUpdate(endpointUpdated);
-          }
-          handleClose();
-        }
-        return !!result.entities;
-      },
-    );
+  const onSubmit = async (data: EndpointInput) => {
+    try {
+      const result = await updateMutation.mutateAsync(data);
+      onUpdate?.(result.data);
+      handleClose();
+      return true;
+    } catch {
+      // The API layer already notified the user.
+      return false;
+    }
   };
 
   // Runs (and is awaited by AssetForm) before the main endpoint update - see AssetForm's
   // `onMarkingsChange` doc for why the two can't fire concurrently, and for why returning `false`
-  // here cancels the endpoint update too. Suppressed success toast (false) since the endpoint
-  // update below already confirms the save to the user; a failure still notifies (putReferential
-  // always does), so the user sees why nothing happened.
+  // here cancels the endpoint update too. Success toast suppressed since the endpoint update
+  // already confirms the save to the user; a failure still notifies, so the user sees why nothing
+  // happened.
   const onMarkingsChange = async (markingIds: string[]): Promise<boolean> => {
-    const result = await dispatch(updateAssetMarkings(endpointId, { asset_markings: markingIds }, false));
-    // Same "does it have entities" success check used for the endpoint update's own response
-    // below: putReferential resolves either the normalized {entities, result} on success, or a
-    // buildError(...) object on failure - it never rejects, so this is the only way to tell them
-    // apart.
-    return !!(result as { entities?: unknown } | undefined)?.entities;
+    try {
+      await markingsMutation.mutateAsync(markingIds);
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   const category = (endpoint?.asset_category as AssetCategory) ?? 'HOST';
@@ -84,7 +87,7 @@ const EndpointUpdate: FunctionComponent<Props> = ({
       handleClose={handleClose}
       title={t('Update an asset')}
     >
-      {loading || !endpoint
+      {isPending || !endpoint
         ? <Loader variant="inElement" />
         : (
             <AssetForm

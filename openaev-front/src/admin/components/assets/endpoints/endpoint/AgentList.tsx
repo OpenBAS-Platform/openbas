@@ -4,14 +4,11 @@ import { Box, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import { type FunctionComponent, type ReactNode } from 'react';
 
-import { fetchExecutors } from '../../../../../actions/executors/executor-action';
-import { type ExecutorHelper } from '../../../../../actions/executors/executor-helper';
+import { useExecutorsMap } from '../../../../../actions/executors/executor-queries';
 import type { LoggedHelper } from '../../../../../actions/helper';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import { type AgentOutput } from '../../../../../utils/api-types';
-import { useAppDispatch } from '../../../../../utils/hooks';
-import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { buildTenantApiPath } from '../../../../../utils/url-helper';
 import EEChip from '../../../common/entreprise_edition/EEChip';
 import AssetStatus from '../../AssetStatus';
@@ -60,14 +57,8 @@ interface Props { agents: AgentOutput[] }
 const AgentList: FunctionComponent<Props> = ({ agents }) => {
   const theme = useTheme();
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
-  const { settings, executorsMap } = useHelper((helper: ExecutorHelper & LoggedHelper) => ({
-    settings: helper.getPlatformSettings(),
-    executorsMap: helper.getExecutorsMap(),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchExecutors());
-  });
+  const { settings } = useHelper((helper: LoggedHelper) => ({ settings: helper.getPlatformSettings() }));
+  const executorsMap = useExecutorsMap();
 
   return (
     <Box sx={{

@@ -1,18 +1,19 @@
 import { Checkbox } from '@filigran/design-system';
 import { HelpOutlineOutlined } from '@mui/icons-material';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { type CSSProperties, useState } from 'react';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { bulkDeleteAssets, searchAssets } from '../../../../actions/assets/endpoint-actions';
-import { fetchExecutors } from '../../../../actions/executors/executor-action';
+import { ASSET_TYPE, assetQueries } from '../../../../actions/assets/asset-queries';
+import { bulkDeleteAssets } from '../../../../actions/assets/endpoint-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ExportButton from '../../../../components/common/ExportButton';
 import AssetPlatformFragment from '../../../../components/common/list/fragments/AssetPlatformFragment';
 import EndpointActiveFragment from '../../../../components/common/list/fragments/EndpointActiveFragment';
 import { initSorting } from '../../../../components/common/queryable/Page';
-import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
+import PaginationToolbar from '../../../../components/common/queryable/pagination/PaginationToolbar';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
 import useBodyItemsStyles from '../../../../components/common/queryable/style/style';
@@ -23,13 +24,12 @@ import ItemMarkings from '../../../../components/ItemMarkings';
 import ItemTags from '../../../../components/ItemTags';
 import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { ASSET_BASE_URL } from '../../../../constants/BaseUrls';
-import { type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { type EndpointOutput } from '../../../../utils/api-types';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
 import useMarkingDefinitions from '../../../../utils/hooks/useMarkingDefinitions';
 import { Can, useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, SUBJECTS } from '../../../../utils/permissions/types';
+import { useLiveMutation } from '../../../../utils/query/live';
 import { isFeatureEnabled } from '../../../../utils/utils';
 import EndpointListItemFragments from '../../common/endpoints/EndpointListItemFragments';
 import EndpointAgentsExecutorsFragment from '../../common/endpoints/fragments/EndpointAgentsExecutorsFragment';
@@ -37,7 +37,8 @@ import ToolBar from '../../common/ToolBar';
 import { humanizeEnum } from '../asset-categories';
 import AssetCategoryIcon from '../AssetCategoryIcon';
 import PostureScoreCell from '../PostureScoreCell';
-import usePostureScores from '../usePostureScores';
+import { usePostureScoresQuery } from '../usePostureScores';
+import AssetActionDialogs, { type EditableAsset } from './AssetActionDialogs';
 import AssetPopover from './AssetPopover';
 import EndpointCreation from './EndpointCreation';
 import ImportUploaderEndpoints from './ImportUploaderEndpoints';
@@ -59,12 +60,17 @@ const inlineStyles: Record<string, CSSProperties> = {
   asset_markings: { width: '9%' },
 };
 
+// Rows of the previous page shown while the next one loads: dimmed and inert to the pointer.
+const stalePageSx = {
+  opacity: 0.5,
+  pointerEvents: 'none',
+} as const;
+
 const Endpoints = () => {
   // Standard hooks
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   // Gates the Markings column/filter (and the data fetch below) so a flag-off or unauthorized
   // platform looks exactly as it did before this feature — mirrors the settings.config.tsx pattern
   // used for the Marking Definitions menu.
@@ -76,13 +82,6 @@ const Endpoints = () => {
   const markingDefinitions = useMarkingDefinitions({
     skip: !canAccessMarkings,
     assignableOnly: true,
-  });
-
-  // Load the executors once for the whole page; the per-row Executors column
-  // reads them from the store (previously each row fetched them, firing
-  // GET /api/executors once per endpoint).
-  useDataLoader(() => {
-    dispatch(fetchExecutors());
   });
 
   // Query param
@@ -102,12 +101,20 @@ const Endpoints = () => {
     ...(canAccessMarkings ? ['asset_markings'] : []),
   ];
 
-  const [endpoints, setEndpoints] = useState<EndpointOutput[]>([]);
-  const [reloadCount, setReloadCount] = useState<number>(0);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('asset', buildSearchPagination({
     sorts: initSorting('asset_name'),
     textSearch: search,
   }));
+
+  // The rows are a live query: creations, edits, deletions and agent changes (here or elsewhere)
+  // refresh it. The previous page stays on screen, dimmed and not selectable, while a new page,
+  // sort or filter loads (placeholder data).
+  const { data: page, isPending, isPlaceholderData } = useQuery({
+    ...assetQueries.list(searchPaginationInput),
+    placeholderData: keepPreviousData,
+  });
+  const endpoints = page?.content ?? [];
+  const totalElements = page?.totalElements ?? 0;
 
   // Export
   const exportProps = {
@@ -116,13 +123,6 @@ const Endpoints = () => {
     exportData: endpoints,
     exportFileName: `${t('Endpoints')}.csv`,
     searchPaginationInput: searchPaginationInput,
-  };
-
-  const [loading, setLoading] = useState<boolean>(true);
-
-  const searchEndpointsToLoad = (input: SearchPaginationInput) => {
-    setLoading(true);
-    return searchAssets(input).finally(() => setLoading(false));
   };
 
   // Bulk selection
@@ -134,28 +134,72 @@ const Endpoints = () => {
     handleClearSelectedElements,
     handleToggleSelectAll,
     onToggleEntity,
+    setSelectedElements,
     numberOfSelectedElements,
-  } = useEntityToggle<EndpointOutput>('asset', endpoints, queryableHelpers.paginationHelpers.getTotalElements());
+  } = useEntityToggle<EndpointOutput>('asset', endpoints, totalElements);
 
   // Per-row posture score, batched in a single dashboard-engine query per page.
-  const { loading: postureLoading, scores: postureScores } = usePostureScores(
+  const { loading: postureLoading, scores: postureScores } = usePostureScoresQuery(
     'base_asset_side',
     endpoints.map(endpoint => endpoint.asset_id),
   );
 
+  const bulkDeleteMutation = useLiveMutation({
+    mutationFn: bulkDeleteAssets,
+    changes: result => (result.data ?? []).map((id: string) => ({
+      type: ASSET_TYPE,
+      id,
+      action: 'delete' as const,
+    })),
+  });
+
+  // The ids to delete are explicit (or a search input), so the delete is valid whichever page is on
+  // screen, including while the placeholder rows of the previous page are shown.
   const bulkDelete = () => {
-    bulkDeleteAssets({
+    bulkDeleteMutation.mutate({
       search_pagination_input: selectAll ? searchPaginationInput : undefined,
       asset_ids_to_process: selectAll ? undefined : Object.keys(selectedElements),
       asset_ids_to_ignore: Object.keys(deSelectedElements),
-    }).then((result) => {
-      const deletedIds: string[] = result.data ?? [];
-      const newTotal = Math.max(0, queryableHelpers.paginationHelpers.getTotalElements() - deletedIds.length);
-      setEndpoints(endpoints.filter(e => !deletedIds.includes(e.asset_id)));
-      queryableHelpers.paginationHelpers.handleChangeTotalElements(newTotal);
-      handleClearSelectedElements();
-    });
+    }, { onSuccess: handleClearSelectedElements });
   };
+
+  // Selection drift: a live refetch of the same search can drop a row the user had selected (deleted
+  // elsewhere, or moved to a neighbouring page). Drop the selected ids that were on the previous
+  // settled page and are gone from the new one, so a later bulk delete never targets a stale id.
+  // Ids selected on other pages, and select-all mode, are left alone.
+  const settledPage = useRef<{
+    input: string;
+    ids: string[];
+  } | null>(null);
+  useEffect(() => {
+    if (!page || isPlaceholderData) return;
+    const previous = settledPage.current;
+    const input = JSON.stringify(searchPaginationInput);
+    const ids = page.content.map((endpoint: EndpointOutput) => endpoint.asset_id);
+    settledPage.current = {
+      input,
+      ids,
+    };
+    if (selectAll || previous?.input !== input) return;
+    const gone = previous.ids.filter(id => !ids.includes(id) && id in selectedElements);
+    if (gone.length > 0) {
+      setSelectedElements(Object.fromEntries(Object.entries(selectedElements).filter(([id]) => !gone.includes(id))));
+    }
+  }, [page, isPlaceholderData]);
+
+  // Update drawer and delete dialog of one row, hosted here rather than in the row's popover: a
+  // refetch can move that row to another page and unmount its popover, which would close the
+  // drawer and lose the unsaved edits. The asset is kept as it was when the action was chosen.
+  const [actionTarget, setActionTarget] = useState<{
+    asset: EditableAsset;
+    action: 'update' | 'delete' | null;
+  } | null>(null);
+  const closeAction = () => setActionTarget(target => (target
+    ? {
+        ...target,
+        action: null,
+      }
+    : null));
 
   // Headers
   const headers = [
@@ -259,11 +303,9 @@ const Endpoints = () => {
           current: true,
         }]}
       />
-      <PaginationComponentV2
-        fetch={searchEndpointsToLoad}
+      <PaginationToolbar
         searchPaginationInput={searchPaginationInput}
-        setContent={setEndpoints}
-        reloadContentCount={reloadCount}
+        data={page}
         entityPrefix="asset"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
@@ -282,25 +324,18 @@ const Endpoints = () => {
               gap: 1,
             }}
             >
-              <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
+              <ExportButton totalElements={totalElements} exportProps={exportProps} />
               <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
                 <ImportUploaderEndpoints />
               </Can>
             </Box>
             <Can I={ACTIONS.MANAGE} a={SUBJECTS.ASSETS}>
-              <EndpointCreation
-                onCreate={(result) => {
-                  setEndpoints([result as EndpointOutput, ...endpoints]);
-                  queryableHelpers.paginationHelpers.incrementTotalElements(1);
-                }}
-                onAiTargetCreate={() => setReloadCount(count => count + 1)}
-                agentless={true}
-              />
+              <EndpointCreation agentless={true} />
             </Can>
           </Box>
         )}
       />
-      <List>
+      <List aria-busy={isPlaceholderData}>
         <ListItem
           classes={{ root: classes.itemHead }}
           sx={numberOfSelectedElements > 0
@@ -318,6 +353,7 @@ const Endpoints = () => {
               <Checkbox
                 aria-label={t('Select all')}
                 checked={selectAll}
+                disabled={isPlaceholderData}
                 onCheckedChange={handleToggleSelectAll}
               />
             </ListItemIcon>
@@ -351,7 +387,7 @@ const Endpoints = () => {
           )}
         </ListItem>
         {
-          loading
+          isPending
             ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} withCheckbox={canManage} />
             : endpoints.map((endpoint: EndpointOutput) => {
                 // Every asset type now has a generic detail page, and the popover renders on every
@@ -360,16 +396,22 @@ const Endpoints = () => {
                   <ListItem
                     key={endpoint.asset_id}
                     divider
+                    sx={isPlaceholderData ? stalePageSx : undefined}
                     secondaryAction={(
                       <AssetPopover
                         inline
                         endpoint={{ ...endpoint }}
                         agentless={endpoint.asset_agents?.length === 0}
-                        onUpdate={result => setEndpoints(endpoints.map(e => (e.asset_id !== result.asset_id ? e : result as EndpointOutput)))}
-                        onDelete={(result) => {
-                          setEndpoints(endpoints.filter(e => (e.asset_id !== result)));
-                          queryableHelpers.paginationHelpers.incrementTotalElements(-1);
-                        }}
+                        updatable
+                        deletable
+                        onRequestUpdate={asset => setActionTarget({
+                          asset,
+                          action: 'update',
+                        })}
+                        onRequestDelete={asset => setActionTarget({
+                          asset,
+                          action: 'delete',
+                        })}
                       />
                     )}
                     disablePadding
@@ -378,10 +420,11 @@ const Endpoints = () => {
                       {canManage && (
                         <ListItemIcon
                           style={{ minWidth: 40 }}
-                          onClick={event => onToggleEntity(endpoint, event)}
+                          onClick={event => (isPlaceholderData ? event.preventDefault() : onToggleEntity(endpoint, event))}
                         >
                           <Checkbox
                             aria-label={endpoint.asset_name}
+                            disabled={isPlaceholderData}
                             checked={
                               (selectAll && !(endpoint.asset_id in (deSelectedElements || {})))
                               || endpoint.asset_id in (selectedElements || {})
@@ -415,6 +458,16 @@ const Endpoints = () => {
               })
         }
       </List>
+      {actionTarget && (
+        <AssetActionDialogs
+          endpoint={actionTarget.asset}
+          agentless={actionTarget.asset.asset_agents?.length === 0}
+          editing={actionTarget.action === 'update'}
+          deleting={actionTarget.action === 'delete'}
+          onCloseEdit={closeAction}
+          onCloseDelete={closeAction}
+        />
+      )}
     </>
   );
 };

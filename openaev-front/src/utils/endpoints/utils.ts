@@ -1,4 +1,3 @@
-import type { ExecutorHelper } from '../../actions/executors/executor-helper';
 import { type AgentExecutorOutput, type EndpointOutput } from '../api-types';
 
 export const getActiveMsgTooltip = (activity_map: boolean[], activeMessage: string, inactiveMessage: string, agentlessMessage: string): {
@@ -28,7 +27,7 @@ export const getActiveMsgTooltip = (activity_map: boolean[], activeMessage: stri
   }
 };
 
-export const getExecutorsCount = (endpoint: EndpointOutput, executorsMap: ReturnType<ExecutorHelper['getExecutorsMap']>) => {
+export const getExecutorsCount = (endpoint: EndpointOutput, executorsMap: Record<string, { executor_type?: string }>) => {
   const executors = endpoint.asset_agents.map(agent => agent.agent_executor);
   return executors?.reduce((acc, executor) => {
     const type = executor?.executor_id ? executorsMap[executor.executor_id]?.executor_type : undefined;

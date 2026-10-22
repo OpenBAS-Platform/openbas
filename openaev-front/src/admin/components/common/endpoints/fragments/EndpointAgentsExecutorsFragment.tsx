@@ -1,8 +1,7 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from '@filigran/design-system';
 
-import type { ExecutorHelper } from '../../../../../actions/executors/executor-helper';
+import { useExecutorsMap } from '../../../../../actions/executors/executor-queries';
 import { useFormatter } from '../../../../../components/i18n';
-import { useHelper } from '../../../../../store';
 import { type EndpointOutput } from '../../../../../utils/api-types';
 import { getExecutorsCount } from '../../../../../utils/endpoints/utils';
 import { buildTenantApiPath } from '../../../../../utils/url-helper';
@@ -10,11 +9,9 @@ import { buildTenantApiPath } from '../../../../../utils/url-helper';
 type Props = { endpoint: EndpointOutput };
 
 const EndpointActiveFragment = (props: Props) => {
-  // Executors are loaded once by the parent list/detail page and read from the
-  // store here - this fragment renders per row, so it must not fetch them itself
-  // (that fired GET /api/executors once per endpoint, and again on every SSE
-  // reconnect).
-  const { executorsMap } = useHelper((helper: ExecutorHelper) => ({ executorsMap: helper.getExecutorsMap() }));
+  // One shared query: this fragment renders per row, and every row reads the same cached
+  // executors (it must never fetch them per endpoint).
+  const executorsMap = useExecutorsMap();
   const { t } = useFormatter();
   if ((props.endpoint.asset_agents ?? []).length <= 0) {
     return <span>-</span>;

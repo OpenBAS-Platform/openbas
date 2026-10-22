@@ -1,10 +1,9 @@
 import { Chip, Tooltip, TooltipContent, TooltipTrigger } from '@filigran/design-system';
-import { isImmutable } from 'immutable';
 import * as PropTypes from 'prop-types';
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { useHelper } from '../store';
+import { useTagsMap } from '../actions/tags/tag-queries';
 import { truncate } from '../utils/String';
 
 const GAP = 6;
@@ -33,13 +32,11 @@ const ItemTags = (props) => {
     truncateLimit = 6;
   }
 
-  // Only this row's tags: subscribing to the whole store meant one toJS per row, per dispatch.
-  const { resolvedTags } = useHelper(helper => ({
-    resolvedTags: (tags ?? [])
-      .map(tagId => helper.getTag(tagId))
-      .filter(tag => !!tag)
-      .map(tag => (isImmutable(tag) ? tag.toJS() : tag)),
-  }));
+  const tagsMap = useTagsMap();
+  const resolvedTags = useMemo(
+    () => (tags ?? []).map(tagId => tagsMap[tagId]).filter(tag => !!tag),
+    [tags, tagsMap],
+  );
 
   const orderedTags = useMemo(
     () =>

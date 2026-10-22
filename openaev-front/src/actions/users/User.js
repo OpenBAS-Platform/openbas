@@ -32,8 +32,8 @@ export const searchPlayersAsOption = (searchText = '') => {
   return simpleCall('/api/players/options', { params });
 };
 
-export const searchPlayerByIdAsOption = (ids) => {
-  return simplePostCall('/api/players/options', ids);
+export const searchPlayerByIdAsOption = (ids, notifyError = true) => {
+  return simplePostCall('/api/players/options', ids, undefined, notifyError);
 };
 
 export const addUser = data => dispatch => postReferential(schema.user, '/api/users', data)(dispatch);

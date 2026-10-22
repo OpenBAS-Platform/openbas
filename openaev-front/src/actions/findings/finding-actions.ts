@@ -57,10 +57,10 @@ export const searchDistinctFindingsForInjects = (injectId: string, searchPaginat
   return simplePostCall(uri, data);
 };
 
-export const searchDistinctFindingsOnEndpoint = (endpointId: string, searchPaginationInput: SearchPaginationInput) => {
+export const searchDistinctFindingsOnEndpoint = (endpointId: string, searchPaginationInput: SearchPaginationInput, notifyError = true) => {
   const data = searchPaginationInput;
   const uri = `${FINDING_URI}/endpoints/${endpointId}/search?distinct=true`;
-  return simplePostCall(uri, data);
+  return simplePostCall(uri, data, undefined, notifyError);
 };
 
 export const searchDistinctFindingsForSimulations = (simulationId: string, searchPaginationInput: SearchPaginationInput) => {

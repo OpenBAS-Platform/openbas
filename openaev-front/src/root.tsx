@@ -1,12 +1,14 @@
 import { CssBaseline } from '@mui/material';
 import { StyledEngineProvider } from '@mui/material/styles';
-import { lazy, Suspense, useEffect, useMemo } from 'react';
-import { Navigate, Route, Routes } from 'react-router';
+import { usePrefetchQuery } from '@tanstack/react-query';
+import { lazy, Suspense, useEffect, useLayoutEffect, useMemo } from 'react';
+import { Navigate, Route, Routes, useLocation } from 'react-router';
 
 import { fetchMe, fetchPlatformParameters } from './actions/Application';
 import { type LoggedHelper } from './actions/helper';
 import fetchPublicPlatformParameters from './actions/settings/platform-settings-action';
 import { fetchTenantSettings } from './actions/settings/tenant-settings-action';
+import { tagQueries } from './actions/tags/tag-queries';
 import EnterpriseEditionAgreementDialog from './admin/components/common/entreprise_edition/EnterpriseEditionAgreementDialog';
 import ConnectedIntlProvider from './components/AppIntlProvider';
 import ConnectedThemeProvider from './components/AppThemeProvider';
@@ -30,6 +32,9 @@ import useNetworkCheck from './utils/hooks/useCheckNetwork';
 import useRefreshMe from './utils/hooks/useRefreshMe';
 import useTenant, { pickDefaultTenantId } from './utils/hooks/useTenant';
 import PermissionsProvider from './utils/permissions/PermissionsProvider';
+import AppQueryProvider from './utils/query/AppQueryProvider';
+import PublicQueryProvider from './utils/query/PublicQueryProvider';
+import { startStream, stopStream } from './utils/stream/streamClient';
 import { buildTenantUrl, DEFAULT_TENANT_UUID, extractTenantFromUrl } from './utils/url-helper';
 
 const RootPublic = lazy(() => import('./public/Root'));
@@ -46,6 +51,31 @@ const PhishingPage = lazy(() => import('./public/components/phishing/PhishingPag
 const SimulationChallengesPreview = lazy(() => import('./admin/components/simulations/simulation/challenges/SimulationChallengesPreview'));
 const ScenarioChallengesPreview = lazy(() => import('./admin/components/scenarios/scenario/challenges/ScenarioChallengesPreview'));
 const ReportingRender = lazy(() => import('./admin/components/reporting/render/ReportingRender'));
+
+// Tags are shown on most pages: loading them with the session keeps rows from painting without them.
+const SessionReferenceData = () => {
+  usePrefetchQuery(tagQueries.list());
+  return null;
+};
+
+// Only the application layouts are live. Standalone pages (report rendering, comcheck, channels,
+// challenges, lessons...) stay without a stream: an open connection keeps the network busy, and the
+// headless report renderer waits for an idle network before capturing.
+const LIVE_ROUTES = /^\/(admin|private)(\/|$)/;
+
+// The cache belongs to one user with one set of rights in one tenant: any change drops it.
+const sessionCacheKey = (me: {
+  user_id: string;
+  user_admin?: boolean;
+  user_capabilities?: string[];
+  user_grants?: unknown;
+}) => [
+  me.user_id,
+  extractTenantFromUrl() ?? '',
+  me.user_admin ? 'admin' : '',
+  [...(me.user_capabilities ?? [])].sort().join(','),
+  JSON.stringify(me.user_grants ?? null),
+].join('|');
 
 const Root = () => {
   const { logged, me, settings, tenantAccessDenied } = useHelper((helper: LoggedHelper) => {
@@ -91,6 +121,21 @@ const Root = () => {
     reloadUserTenants,
   }), [me, settings, isReachable, userTenants, currentUserTenant, switchUserTenant, reloadUserTenants]);
 
+  // The live stream follows the session: open while the private routes render, closed on logout.
+  const hasNoTenant = userTenants !== undefined && userTenants.length === 0 && !me?.user_admin;
+  const { pathname } = useLocation();
+  const streamEnabled = Boolean(logged && me && settings && isReachable !== undefined
+    && !tenantAccessDenied && !hasNoTenant && extractTenantFromUrl() && LIVE_ROUTES.test(pathname));
+  // The server binds a stream to the user and tenant it was opened with: restart it when they change.
+  const streamIdentity = `${me?.user_id ?? ''}|${extractTenantFromUrl() ?? ''}`;
+  // A layout effect: it runs before the passive effects of the whole tree, so the data loaders
+  // mounting with the session already see the stream started (see useDataLoader).
+  useLayoutEffect(() => {
+    if (!streamEnabled) return undefined;
+    startStream();
+    return stopStream;
+  }, [streamEnabled, streamIdentity]);
+
   // The tenant referenced by the URL is not one the current user belongs to: '/me' never
   // resolves in that case, so this must be checked before the 'logged' placeholder guard
   // below, which would otherwise leave the app on a permanent blank screen.
@@ -114,14 +159,15 @@ const Root = () => {
   if (!logged || !me || !settings || isReachable === undefined) {
     return (
       <Suspense fallback={<Loader />}>
-        <RootPublic />
+        <PublicQueryProvider>
+          <RootPublic />
+        </PublicQueryProvider>
       </Suspense>
     );
   }
 
   // When the user is authenticated but has no tenant assigned,
   // show a blocking message asking them to contact their administrator.
-  const hasNoTenant = userTenants !== undefined && userTenants.length === 0 && !me.user_admin;
   if (hasNoTenant) {
     return (
       <StyledEngineProvider injectFirst>
@@ -155,56 +201,58 @@ const Root = () => {
   }
 
   return (
-    <PermissionsProvider capabilities={me.user_capabilities} grants={me.user_grants} isAdmin={me.user_admin}>
-      <UserContext.Provider value={userContextValue}>
-        <StyledEngineProvider injectFirst>
-          <ConnectedIntlProvider>
-            <ConnectedThemeProvider>
-              <EnterpriseEditionProvider>
-                <CssBaseline />
-                <Message />
-                <ErrorHandler />
-                <EnterpriseEditionAgreementDialog />
-                {(settings.platform_session_idle_timeout ?? 0) > 0 && <TimeoutLock />}
-                <SystemBanners settings={settings} />
-                <LicenseBanner settings={settings} />
-                <StartTrialBanner settings={settings} />
-                <Suspense fallback={<Loader />}>
-                  <Routes>
-                    <Route
-                      path=""
-                      element={logged.isOnlyPlayer ? <Navigate to="private" replace={true} />
-                        : <Navigate to="admin" replace={true} />}
-                    />
-                    <Route path="private/*" element={errorWrapper(IndexPrivate)()} />
-                    {/* Add challenge preview routes here to ensure they are rendered without the top & left bar */}
-                    <Route path="admin/simulations/:exerciseId/challenges" element={errorWrapper(SimulationChallengesPreview)()} />
-                    <Route path="admin/scenarios/:scenarioId/challenges" element={errorWrapper(ScenarioChallengesPreview)()} />
-                    {/* Standalone print-ready report render (headless PDF capture + in-app preview) */}
-                    <Route path="reporting/:reportingId/render" element={errorWrapper(ReportingRender)()} />
-                    <Route path="redirect/*" element={errorWrapper(XtmHubRedirect)()} />
-                    <Route path="admin/*" element={errorWrapper(IndexAdmin)()} />
-                    {/* Routes from /public/Index that need to be accessible for logged user are duplicated here */}
-                    <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()} />
-                    <Route path="channels/:exerciseId/:channelId" element={errorWrapper(Channel)()} />
-                    <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
-                    <Route path="lessons/simulation/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
-                    <Route path="lessons/scenario/:scenarioId" element={errorWrapper(ScenarioViewLessons)()} />
-                    <Route path="url/access" element={errorWrapper(UrlAccess)()} />
-                    {/* Benign, tenant-less phishing landing route (tenant resolved server-side from token) */}
-                    <Route path="auth/:token" element={errorWrapper(PhishingPage)()} />
-                    <Route path="phishing/:tenantId/:token" element={errorWrapper(PhishingPage)()} />
-                    {/* Not found */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Suspense>
-              </EnterpriseEditionProvider>
-            </ConnectedThemeProvider>
-          </ConnectedIntlProvider>
-        </StyledEngineProvider>
-      </UserContext.Provider>
-    </PermissionsProvider>
-
+    <AppQueryProvider key={sessionCacheKey(me)}>
+      <SessionReferenceData />
+      <PermissionsProvider capabilities={me.user_capabilities} grants={me.user_grants} isAdmin={me.user_admin}>
+        <UserContext.Provider value={userContextValue}>
+          <StyledEngineProvider injectFirst>
+            <ConnectedIntlProvider>
+              <ConnectedThemeProvider>
+                <EnterpriseEditionProvider>
+                  <CssBaseline />
+                  <Message />
+                  <ErrorHandler />
+                  <EnterpriseEditionAgreementDialog />
+                  {(settings.platform_session_idle_timeout ?? 0) > 0 && <TimeoutLock />}
+                  <SystemBanners settings={settings} />
+                  <LicenseBanner settings={settings} />
+                  <StartTrialBanner settings={settings} />
+                  <Suspense fallback={<Loader />}>
+                    <Routes>
+                      <Route
+                        path=""
+                        element={logged.isOnlyPlayer ? <Navigate to="private" replace={true} />
+                          : <Navigate to="admin" replace={true} />}
+                      />
+                      <Route path="private/*" element={errorWrapper(IndexPrivate)()} />
+                      {/* Add challenge preview routes here to ensure they are rendered without the top & left bar */}
+                      <Route path="admin/simulations/:exerciseId/challenges" element={errorWrapper(SimulationChallengesPreview)()} />
+                      <Route path="admin/scenarios/:scenarioId/challenges" element={errorWrapper(ScenarioChallengesPreview)()} />
+                      {/* Standalone print-ready report render (headless PDF capture + in-app preview) */}
+                      <Route path="reporting/:reportingId/render" element={errorWrapper(ReportingRender)()} />
+                      <Route path="redirect/*" element={errorWrapper(XtmHubRedirect)()} />
+                      <Route path="admin/*" element={errorWrapper(IndexAdmin)()} />
+                      {/* Routes from /public/Index that need to be accessible for logged user are duplicated here */}
+                      <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()} />
+                      <Route path="channels/:exerciseId/:channelId" element={errorWrapper(Channel)()} />
+                      <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
+                      <Route path="lessons/simulation/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
+                      <Route path="lessons/scenario/:scenarioId" element={errorWrapper(ScenarioViewLessons)()} />
+                      <Route path="url/access" element={errorWrapper(UrlAccess)()} />
+                      {/* Benign, tenant-less phishing landing route (tenant resolved server-side from token) */}
+                      <Route path="auth/:token" element={errorWrapper(PhishingPage)()} />
+                      <Route path="phishing/:tenantId/:token" element={errorWrapper(PhishingPage)()} />
+                      {/* Not found */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </Suspense>
+                </EnterpriseEditionProvider>
+              </ConnectedThemeProvider>
+            </ConnectedIntlProvider>
+          </StyledEngineProvider>
+        </UserContext.Provider>
+      </PermissionsProvider>
+    </AppQueryProvider>
   );
 };
 
