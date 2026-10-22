@@ -7,10 +7,12 @@ import io.openaev.IntegrationTest;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.InjectExpectationRepository;
 import io.openaev.execution.ExecutableInject;
+import io.openaev.injectors.phishing.PhishingContract;
 import io.openaev.utils.fixtures.*;
 import io.openaev.utils.fixtures.composers.*;
 import io.openaev.utils.mockUser.WithMockUser;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,12 +80,17 @@ class PhishingBehaviorTest extends IntegrationTest {
       assertThat(teamExpectation.getResults()).isEmpty();
     }
 
+    /** The behavior only handles the expectations of a phishing inject */
     private Inject persistInjectForTeam(Team team) {
+      Injector phishingInjector =
+          InjectorFixture.createInjector(
+              UUID.randomUUID().toString(), "Phishing", PhishingContract.TYPE);
       return injectComposer
           .forInject(InjectFixture.getDefaultInject())
           .withInjectorContract(
-              injectorContractComposer.forInjectorContract(
-                  InjectorContractFixture.createDefaultInjectorContract()))
+              injectorContractComposer
+                  .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
+                  .withInjector(phishingInjector))
           .withTeam(teamComposer.forTeam(team))
           .persist()
           .get();

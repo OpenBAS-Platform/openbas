@@ -23,6 +23,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -1710,6 +1711,97 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
         // A group is derived from its assets, never answered directly
         assertThat(savedGroup.getResults())
             .noneMatch(result -> collector.getId().equals(result.getSourceId()));
+      }
+    }
+
+    // -- Vulnerability verdict of an asset with agents (injector scan without security platform) --
+
+    @Nested
+    @DisplayName("Vulnerability verdict of an asset with agents")
+    class VulnerabilityAssetWithAgentsVerdict {
+
+      private static final String SCAN_RESULT = "Scan finished";
+
+      private VulnerabilityInjectExpectation buildVulnerabilityExpectation(
+          Inject inject, Agent agent, Endpoint asset, Collector collector) {
+        VulnerabilityInjectExpectation expectation =
+            InjectExpectationFixture.createVulnerabilityInjectExpectation(inject, agent);
+        expectation.setAsset(asset);
+        if (agent != null) {
+          // Pending row of the answering source, as seeded on the agent leaves at initialization
+          expectation.setResults(
+              new java.util.ArrayList<>(
+                  List.of(InjectExpectationResult.builder().sourceId(collector.getId()).build())));
+        }
+        return expectation;
+      }
+
+      @ParameterizedTest(name = "vulnerable: {0}")
+      @ValueSource(booleans = {true, false})
+      void given_verdict_on_asset_with_agents_should_score_agents_and_derive_asset(
+          boolean isVulnerable) {
+        // Arrange
+        Endpoint endpoint =
+            endpointComposer
+                .forEndpoint(EndpointFixture.createEndpoint())
+                .withAgent(agentComposer.forAgent(AgentFixture.createDefaultAgentService()))
+                .withAgent(agentComposer.forAgent(AgentFixture.createDefaultAgentSession()))
+                .persist()
+                .get();
+        Inject inject =
+            injectComposer
+                .forInject(InjectFixture.getDefaultInject())
+                .withExercise(exerciseComposer.forExercise(persistDefaultExercise()))
+                .persist()
+                .get();
+        Collector collector =
+            collectorComposer
+                .forCollector(CollectorFixture.createDefaultCollector("collector-vulnerability"))
+                .persist()
+                .get();
+        VulnerabilityInjectExpectation agentOne =
+            buildVulnerabilityExpectation(inject, endpoint.getAgents().get(0), endpoint, collector);
+        VulnerabilityInjectExpectation agentTwo =
+            buildVulnerabilityExpectation(inject, endpoint.getAgents().get(1), endpoint, collector);
+        VulnerabilityInjectExpectation asset =
+            buildVulnerabilityExpectation(inject, null, endpoint, collector);
+        injectExpectationRepository.saveAll(List.of(agentOne, agentTwo, asset));
+        entityManager.flush();
+        entityManager.refresh(inject);
+
+        // Act
+        injectExpectationService.updateInjectExpectation(
+            asset.getId(),
+            InjectExpectationFixture.getInjectExpectationUpdateInput(
+                collector.getId(), SCAN_RESULT, !isVulnerable));
+        entityManager.flush();
+        entityManager.clear();
+
+        // Assert
+        List<BaseInjectExpectation> saved =
+            injectExpectationRepository.findAllByInjectId(inject.getId());
+        Double expectedScore = isVulnerable ? FAILED_SCORE_VALUE : asset.getExpectedScore();
+        for (VulnerabilityInjectExpectation agent : List.of(agentOne, agentTwo)) {
+          TechnicalInjectExpectation savedAgent = findById(saved, agent.getId());
+          assertThat(savedAgent.getResults())
+              .singleElement()
+              .satisfies(
+                  result -> {
+                    assertThat(result.getSourceId()).isEqualTo(collector.getId());
+                    assertThat(result.getScore()).isEqualTo(expectedScore);
+                    assertThat(result.getResult())
+                        .isEqualTo(
+                            isVulnerable
+                                ? savedAgent.getFailureLabel()
+                                : savedAgent.getSuccessLabel());
+                  });
+          assertThat(savedAgent.getScore()).isEqualTo(expectedScore);
+        }
+        // The verdict lands on the agents: the asset is derived from them, not answered directly
+        TechnicalInjectExpectation savedAsset = findById(saved, asset.getId());
+        assertThat(savedAsset.getResults())
+            .noneMatch(result -> collector.getId().equals(result.getSourceId()));
+        assertThat(savedAsset.getScore()).isEqualTo(expectedScore);
       }
     }
 
