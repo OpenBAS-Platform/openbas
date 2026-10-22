@@ -2,6 +2,7 @@ package io.openaev.engine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.openaev.engine.EngineVersionProbe.ServerInfo;
 import io.openaev.exception.StartupException;
@@ -148,6 +149,20 @@ class EngineTypeTest {
           "Unsupported search engine distribution 'solr': only Elasticsearch and OpenSearch are"
               + " supported",
           exception.getMessage());
+    }
+  }
+
+  @Nested
+  @DisplayName("engine.client setting")
+  class ClientSetting {
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"auto", "AUTO", " auto "})
+    @DisplayName("given auto or no value, should leave the choice to the detection")
+    void given_autoOrNoValue_should_leaveChoiceToDetection(String client) {
+      // Act & Assert
+      assertTrue(EngineType.fromClient(client).isEmpty());
     }
   }
 }

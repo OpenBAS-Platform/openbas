@@ -228,6 +228,7 @@ With classic authentication, use Elasticsearch or OpenSearch:
 | Parameter              | Environment variable   | Default value         | Description                                                                                                                            |
 |:--------------------------|:--------------------------|:--------------------------|:---------------------------------------------------------------------------------------------------------------------------------------|
 | engine.engine-aws-mode | ENGINE_ENGINE_AWS_MODE | no                    | Classic authentication (no)                                                                                                            |
+| engine.client          | ENGINE_CLIENT          | auto                  | Engine client: `auto` detects it from the server. `elasticsearch8`, `elasticsearch9` or `opensearch` forces it and skips the detection, for a server that cannot be probed or misreports its version |
 | engine.url             | ENGINE_URL             | http://localhost:9200 | URL of the engine                                                                                                                      |
 | engine.username        | ENGINE_USERNAME        |                       | Optional. Login for the engine                                                                                                         |
 | engine.password        | ENGINE_PASSWORD        |                       | Optional. Password for the engine                                                                                                      |
@@ -238,6 +239,7 @@ With AWS SigV4 authentication, use Amazon OpenSearch or Amazon OpenSearch Server
 | Parameter                    | Environment variable     | Default value         | Description                                                                                                |
 |:-----------------------------|:-------------------------|:--------------------------|:-----------------------------------------------------------------------------------------------------------|
 | engine.engine-aws-mode       | ENGINE_ENGINE_AWS_MODE   |                       | Whether to use AWS SigV4 authentication Amazon OpenSearch or Amazon OpenSearch Serverless (`es` or `aoss`) |
+| engine.client                | ENGINE_CLIENT            | auto                  | Leave to `auto` or set `opensearch`: AWS SigV4 authentication only works with the OpenSearch client         |
 | engine.engine-aws-host       | ENGINE_ENGINE_AWS_HOST   |                       | URL of the OpenSearch database, no http(s) prefix                                                          |
 | engine.engine-aws-region     | ENGINE_ENGINE_AWS_REGION |                       | Example: eu-west-3                                                                                         |
 

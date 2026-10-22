@@ -33,6 +33,9 @@ public class EngineConfig {
 
   /** Default configuration values for the search engine. */
   public static class Defaults {
+    /** Default engine client: detected from the server behind {@code url}. */
+    public static final String CLIENT = "auto";
+
     /** Default AWS mode (disabled). */
     public static final String ENGINE_AWS_MODE = "no";
 
@@ -145,6 +148,12 @@ public class EngineConfig {
      */
     public static final long INDEXING_REFEED_REASSERT_DELAY_SECONDS = 1800;
   }
+
+  /**
+   * Engine client to use: {@code auto} detects it from the server, {@code elasticsearch8}, {@code
+   * elasticsearch9} or {@code opensearch} forces it when the detection cannot decide.
+   */
+  private String client = Defaults.CLIENT;
 
   private String engineAwsMode = Defaults.ENGINE_AWS_MODE;
 

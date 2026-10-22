@@ -22,7 +22,9 @@ Each Elasticsearch major needs its own client: the 9.x client stamps every reque
 outright.
 
 The `engine.engine-selector` parameter (`ENGINE_ENGINE_SELECTOR`) is **removed**. A value still set is
-ignored, and the platform logs a warning at startup. With AWS SigV4 authentication
+ignored, and the platform logs a warning at startup. When the detection cannot decide, for example behind a
+proxy that blocks `GET /`, set `engine.client` (`ENGINE_CLIENT`) to `elasticsearch8`, `elasticsearch9` or
+`opensearch`: the platform then uses that client without probing. Its default, `auto`, keeps the detection. With AWS SigV4 authentication
 (`engine.engine-aws-mode` set to `es` or `aoss`), the platform uses the OpenSearch client without
 probing, as before.
 
@@ -32,6 +34,8 @@ credentials, or is older than Elasticsearch 8.
 ## Migration
 
 Nothing to do: remove `engine.engine-selector` from your configuration to get rid of the startup warning.
+Do not copy its value to `engine.client`: leave `engine.client` unset unless the detection fails, otherwise
+the client stays pinned when the cluster is upgraded.
 
 To move from Elasticsearch 8 to Elasticsearch 9, upgrade the cluster following
 [Elastic's upgrade documentation](https://www.elastic.co/docs/deploy-manage/upgrade), then restart

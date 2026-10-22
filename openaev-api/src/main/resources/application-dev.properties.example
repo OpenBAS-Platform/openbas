@@ -301,6 +301,8 @@ engine.index-suffix=-000001
 engine.url=http://localhost:9200
 # For OpenSearch, point engine.url at it: the engine is detected automatically.
 #engine.url=http://localhost:9202
+# To skip the detection and force a client: elasticsearch8, elasticsearch9 or opensearch.
+#engine.client=auto
 
 #############
 # COLLECTORS #

@@ -1,6 +1,9 @@
 package io.openaev.engine;
 
 import io.openaev.exception.StartupException;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -9,14 +12,18 @@ import lombok.extern.slf4j.Slf4j;
  * (see {@link EngineVersionProbe}).
  *
  * <p>The {@link #getKey() key} is what the platform settings expose to the frontend, which uses it
- * as a translation key.
+ * as a translation key. The {@link #getClient() client} is the {@code engine.client} value that
+ * forces this implementation.
  */
 @Getter
 @Slf4j
 public enum EngineType {
-  ELASTICSEARCH_8("elk"),
-  ELASTICSEARCH_9("elk9"),
-  OPENSEARCH("opensearch");
+  ELASTICSEARCH_8("elk", "elasticsearch8"),
+  ELASTICSEARCH_9("elk9", "elasticsearch9"),
+  OPENSEARCH("opensearch", "opensearch");
+
+  /** {@code engine.client} value that leaves the choice to the detection. */
+  public static final String AUTO_CLIENT = "auto";
 
   /**
    * Distribution reported by OpenSearch in {@code version.distribution}; absent on Elasticsearch.
@@ -40,8 +47,40 @@ public enum EngineType {
 
   private final String key;
 
-  EngineType(String key) {
+  private final String client;
+
+  EngineType(String key, String client) {
     this.key = key;
+    this.client = client;
+  }
+
+  /**
+   * Reads the {@code engine.client} setting.
+   *
+   * @param client the configured value
+   * @return the forced implementation, or empty for {@code auto} (or no value)
+   * @throws StartupException if the value names no known client
+   */
+  public static Optional<EngineType> fromClient(String client) {
+    if (client == null || client.isBlank() || AUTO_CLIENT.equalsIgnoreCase(client.trim())) {
+      return Optional.empty();
+    }
+    Optional<EngineType> forced =
+        Arrays.stream(values())
+            .filter(type -> type.client.equalsIgnoreCase(client.trim()))
+            .findFirst();
+    if (forced.isEmpty()) {
+      throw new StartupException(
+          "Unknown engine.client '"
+              + client
+              + "': use "
+              + AUTO_CLIENT
+              + ", "
+              + Arrays.stream(values())
+                  .map(EngineType::getClient)
+                  .collect(Collectors.joining(", ")));
+    }
+    return forced;
   }
 
   /**

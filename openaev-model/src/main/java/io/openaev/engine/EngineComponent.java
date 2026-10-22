@@ -7,7 +7,9 @@ import io.openaev.engine.impl.elasticsearch.es8.ElasticDriver;
 import io.openaev.engine.impl.elasticsearch.es8.ElasticService;
 import io.openaev.engine.impl.opensearch.os3.OpenSearchDriver;
 import io.openaev.engine.impl.opensearch.os3.OpenSearchService;
+import io.openaev.exception.StartupException;
 import io.openaev.service.CommonSearchService;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -73,18 +75,38 @@ public class EngineComponent {
   /**
    * Detects which engine the platform talks to.
    *
-   * <p>AWS SigV4 modes are not probed: requests need signing, {@code engine.url} is not used there,
-   * and the only engine the platform drives on AWS is OpenSearch.
+   * <p>{@code engine.client} forces the client and skips the detection, for the cases the server
+   * cannot be probed or misreports itself. AWS SigV4 modes are not probed either: requests need
+   * signing, {@code engine.url} is not used there, and the only engine the platform drives on AWS
+   * is OpenSearch.
    *
    * @return the detected engine type
    */
   EngineType detectEngineType() {
     if (environment.containsProperty(LEGACY_SELECTOR_PROPERTY)) {
       log.warn(
-          "{} is deprecated and ignored: the search engine is now detected automatically",
+          "{} is deprecated and ignored: the search engine is now detected automatically, set"
+              + " engine.client to force a client",
           LEGACY_SELECTOR_PROPERTY);
     }
-    if (!"no".equalsIgnoreCase(config.getEngineAwsMode())) {
+    boolean awsMode = !"no".equalsIgnoreCase(config.getEngineAwsMode());
+    Optional<EngineType> forced = EngineType.fromClient(config.getClient());
+    if (forced.isPresent()) {
+      if (awsMode && forced.get() != EngineType.OPENSEARCH) {
+        throw new StartupException(
+            "engine.client="
+                + config.getClient()
+                + " cannot be used with engine.engine-aws-mode="
+                + config.getEngineAwsMode()
+                + ": AWS SigV4 authentication is only supported by the OpenSearch client");
+      }
+      log.info(
+          "Engine client forced by engine.client={}: using the {} client without detection",
+          config.getClient(),
+          forced.get());
+      return forced.get();
+    }
+    if (awsMode) {
       log.info(
           "Engine AWS mode '{}': using the OpenSearch client for {}",
           config.getEngineAwsMode(),
