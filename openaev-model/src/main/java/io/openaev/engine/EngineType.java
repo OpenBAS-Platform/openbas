@@ -13,14 +13,14 @@ import lombok.extern.slf4j.Slf4j;
  *
  * <p>The {@link #getKey() key} is what the platform settings expose to the frontend, which uses it
  * as a translation key. The {@link #getClient() client} is the {@code engine.client} value that
- * forces this implementation.
+ * forces this implementation, and the {@link #getDisplayName() display name} labels it in logs.
  */
 @Getter
 @Slf4j
 public enum EngineType {
-  ELASTICSEARCH_8("elk", "elasticsearch8"),
-  ELASTICSEARCH_9("elk9", "elasticsearch9"),
-  OPENSEARCH("opensearch", "opensearch");
+  ELASTICSEARCH_8("elk", "elasticsearch8", "Elasticsearch 8"),
+  ELASTICSEARCH_9("elk9", "elasticsearch9", "Elasticsearch 9"),
+  OPENSEARCH("opensearch", "opensearch", "OpenSearch");
 
   /** {@code engine.client} value that leaves the choice to the detection. */
   public static final String AUTO_CLIENT = "auto";
@@ -49,9 +49,12 @@ public enum EngineType {
 
   private final String client;
 
-  EngineType(String key, String client) {
+  private final String displayName;
+
+  EngineType(String key, String client, String displayName) {
     this.key = key;
     this.client = client;
+    this.displayName = displayName;
   }
 
   /**
@@ -122,7 +125,7 @@ public enum EngineType {
       log.info(
           "Elasticsearch Serverless detected (reported version {}): using the {} client",
           versionNumber,
-          LATEST_ELASTICSEARCH);
+          LATEST_ELASTICSEARCH.getDisplayName());
       return LATEST_ELASTICSEARCH;
     }
     int[] version = parseVersion(versionNumber);
@@ -146,7 +149,7 @@ public enum EngineType {
       log.warn(
           "Elasticsearch {} has not been tested with the platform, using the {} client",
           versionNumber,
-          LATEST_ELASTICSEARCH);
+          LATEST_ELASTICSEARCH.getDisplayName());
     }
     return LATEST_ELASTICSEARCH;
   }

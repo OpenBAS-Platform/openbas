@@ -103,7 +103,7 @@ public class EngineComponent {
       log.info(
           "Engine client forced by engine.client={}: using the {} client without detection",
           config.getClient(),
-          forced.get());
+          forced.get().getDisplayName());
       return forced.get();
     }
     if (awsMode) {
@@ -116,11 +116,10 @@ public class EngineComponent {
     EngineVersionProbe.ServerInfo info = engineVersionProbe.detect();
     EngineType type = EngineType.fromServerInfo(info);
     log.info(
-        "Engine auto-detected: {} {} at {} -> {} client",
-        type == EngineType.OPENSEARCH ? "OpenSearch" : "Elasticsearch",
+        "Engine auto-detected: server {} at {} -> {} client",
         info.number(),
         config.getUrl(),
-        type);
+        type.getDisplayName());
     return type;
   }
 }
