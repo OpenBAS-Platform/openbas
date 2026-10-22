@@ -59,13 +59,22 @@ const useAgentStatus = (traces: ExecutionTraceOutput[]): AgentStatus => {
       ?? lastExecutionTrace?.execution_status
       ?? 'Unknown';
 
+    // A closed agent can still receive traces (a late report rewrites its TIMEOUT), so the end is
+    // the last trace of the agent, not its COMPLETE trace
+    const lastTraceTime = sorted
+      .map(t => t.execution_time)
+      .reduce<string | undefined>(
+        (latest, time) => (!latest || new Date(time).getTime() > new Date(latest).getTime() ? time : latest),
+        undefined,
+      );
+
     return {
       agentName: agent?.agent_executed_by_user,
       executorName: agent?.agent_executor?.executor_name,
       executorType: agent?.agent_executor?.executor_type,
       statusName,
       trackingStart: startTrace?.execution_time,
-      trackingEnd: finalTrace?.execution_time,
+      trackingEnd: finalTrace ? lastTraceTime : undefined,
       traces: sorted,
       tracesByAction: grouped,
     };

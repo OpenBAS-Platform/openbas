@@ -527,14 +527,17 @@ class InjectStatusServiceTest {
       return input;
     }
 
-    private void verifyStatusNotRecomputed() {
-      verify(executionTraceRepositoryHelper, never()).updateInjectStatus(any(), any(), any());
+    // A late trace only moves the end date: the status name written back is the one already kept
+    private void verifyStatusNotRecomputed(ExecutionStatus keptStatus) {
+      verify(executionTraceRepositoryHelper, never())
+          .updateInjectStatus(any(), argThat(name -> !keptStatus.name().equals(name)), any());
       verify(injectRepository, never()).updateUpdatedAt(any(), any());
     }
 
     private void verifyNothingSaved() {
       verify(executionTraceRepositoryHelper, never()).saveExecutionTrace(any());
-      verifyStatusNotRecomputed();
+      verify(executionTraceRepositoryHelper, never()).updateInjectStatus(any(), any(), any());
+      verify(injectRepository, never()).updateUpdatedAt(any(), any());
     }
 
     @Test
@@ -564,7 +567,10 @@ class InjectStatusServiceTest {
       assertThat(implantTrace.getStatus()).isEqualTo(ExecutionTraceStatus.EXECUTED);
       assertThat(implantTrace.getMessage()).isEqualTo("late report");
       verify(executionTraceRepositoryHelper).saveExecutionTrace(implantTrace);
-      verifyStatusNotRecomputed();
+      assertThat(injectStatus.getTrackingEndDate()).isEqualTo(implantTrace.getTime());
+      verify(executionTraceRepositoryHelper)
+          .updateInjectStatus("status-late", "ERROR", implantTrace.getTime());
+      verifyStatusNotRecomputed(ExecutionStatus.ERROR);
     }
 
     @Test
@@ -590,7 +596,7 @@ class InjectStatusServiceTest {
               ExecutionTraceStatus.EXECUTED,
               ExecutionTraceStatus.TIMEOUT,
               ExecutionTraceStatus.EXECUTED);
-      verifyStatusNotRecomputed();
+      verifyStatusNotRecomputed(ExecutionStatus.PARTIAL);
     }
 
     @Test
@@ -654,7 +660,7 @@ class InjectStatusServiceTest {
       assertThat(timeout.getMessage()).contains("Inject timed out.").contains("late report");
       assertThat(injectStatus.getTraces().getLast().getStatus())
           .isEqualTo(ExecutionTraceStatus.EXECUTED);
-      verifyStatusNotRecomputed();
+      verifyStatusNotRecomputed(ExecutionStatus.ERROR);
     }
 
     @Test
@@ -695,6 +701,10 @@ class InjectStatusServiceTest {
       assertThat(injectStatus.getTraces()).hasSize(2);
       assertThat(injectStatus.getTraces().getFirst().getStatus())
           .isEqualTo(ExecutionTraceStatus.TIMEOUT);
+      Instant lastTraceTime = injectStatus.getTraces().getLast().getTime();
+      assertThat(injectStatus.getTrackingEndDate()).isEqualTo(lastTraceTime);
+      verify(executionTraceRepositoryHelper)
+          .updateInjectStatus("status-late", "ERROR", lastTraceTime);
     }
 
     @Test
@@ -724,7 +734,7 @@ class InjectStatusServiceTest {
       assertThat(implantTrace.getAgent()).isSameAs(agent);
       assertThat(implantTrace.getMessage()).isEqualTo("late report");
       verify(executionTraceRepositoryHelper).saveExecutionTrace(implantTrace);
-      verifyStatusNotRecomputed();
+      verifyStatusNotRecomputed(ExecutionStatus.ERROR);
     }
 
     @Test
@@ -749,7 +759,7 @@ class InjectStatusServiceTest {
       assertThat(injectStatus.getTraces()).hasSize(2);
       assertThat(injectStatus.getTraces().getLast().getStatus())
           .isEqualTo(ExecutionTraceStatus.EXECUTED);
-      verifyStatusNotRecomputed();
+      verifyStatusNotRecomputed(ExecutionStatus.ERROR);
     }
 
     @Test

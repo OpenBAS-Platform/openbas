@@ -32,9 +32,11 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -265,6 +267,13 @@ public class InjectStatusService {
     // Save the trace using a low level call to the database
     String executionTraceId = executionTraceRepositoryHelper.saveExecutionTrace(executionTrace);
     executionTrace.setId(executionTraceId);
+    // A late agent trace (attack traces, executions) reaching a closed inject extends its
+    // execution: the end date follows it, the status stays
+    if (!ExecutionTraceAction.COMPLETE.equals(executionTrace.getAction())
+        && previousStatus != null
+        && !ExecutionStatus.INJECT_EXECUTION_IN_PROGRESS_STATUSES.contains(previousStatus)) {
+      refreshTrackingEndDate(injectStatus);
+    }
     entityManager.merge(injectStatus);
     logAgentTraceStep(injectStatus, executionTrace);
 
@@ -362,9 +371,28 @@ public class InjectStatusService {
   private void storeLateTrace(Inject inject, InjectStatus injectStatus, ExecutionTrace incoming) {
     injectStatus.addTrace(incoming);
     incoming.setId(executionTraceRepositoryHelper.saveExecutionTrace(incoming));
+    refreshTrackingEndDate(injectStatus);
     entityManager.merge(injectStatus);
     logAgentTraceStep(injectStatus, incoming);
     publishInjectStatusUpdate(inject);
+  }
+
+  /**
+   * Moves the end date of a closed inject to its last trace: a late report is part of the
+   * execution, so the end date must not stay on the timeout or interruption that closed it. The
+   * status name is kept.
+   */
+  private void refreshTrackingEndDate(InjectStatus injectStatus) {
+    injectStatus.getTraces().stream()
+        .map(ExecutionTrace::getTime)
+        .filter(Objects::nonNull)
+        .max(Comparator.naturalOrder())
+        .ifPresent(
+            lastTraceTime -> {
+              injectStatus.setTrackingEndDate(lastTraceTime);
+              executionTraceRepositoryHelper.updateInjectStatus(
+                  injectStatus.getId(), injectStatus.getName().name(), lastTraceTime);
+            });
   }
 
   /**
