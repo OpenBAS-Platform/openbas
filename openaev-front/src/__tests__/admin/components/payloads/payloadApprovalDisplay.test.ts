@@ -15,6 +15,15 @@ describe('payloadApprovalDisplay', () => {
     });
   });
 
+  it('informs, without blocking, about a new version pending approval of an approved payload', () => {
+    expect(payloadApprovalDisplay('APPROVED', true)).toMatchObject({
+      status: 'PAYLOAD_PENDING_APPROVAL',
+      label: 'New version pending approval',
+    });
+    // A never-approved payload keeps its blocking display, whatever the flag.
+    expect(payloadApprovalDisplay('PENDING', true)?.label).toBe('Payload pending approval');
+  });
+
   it('shows nothing for an approved payload or an inject without payload', () => {
     expect(payloadApprovalDisplay('APPROVED')).toBeUndefined();
     expect(payloadApprovalDisplay(undefined)).toBeUndefined();

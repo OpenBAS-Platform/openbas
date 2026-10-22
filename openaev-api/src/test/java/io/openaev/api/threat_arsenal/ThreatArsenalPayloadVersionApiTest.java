@@ -941,6 +941,82 @@ class ThreatArsenalPayloadVersionApiTest extends IntegrationTest {
   }
 
   @Nested
+  @DisplayName("Atomic testings show the approved version (#8414 fixes)")
+  class AtomicTestings {
+
+    private String atomicTestingThatRan(String actionId) {
+      return injectUsing(actionId, "Atomic that ran")
+          .withInjectStatus(
+              injectStatusComposer.forInjectStatus(InjectStatusFixture.createSuccessStatus()))
+          .persist()
+          .get()
+          .getId();
+    }
+
+    private List<String> payloadCommands(String atomicId) throws Exception {
+      return JsonPath.read(
+          getJson(ATOMIC_TESTING_URI + "/" + atomicId + "/payload"),
+          "$.payload_command_blocks[*].command_content");
+    }
+
+    @Test
+    @DisplayName(
+        "Given an atomic testing that already ran, once a new version is approved its payload should show the new content")
+    void given_approvedVersion_should_showNewContentInAtomicTestingThatRan() throws Exception {
+      // Arrange
+      String actionId = approvedAction();
+      String atomicId = atomicTestingThatRan(actionId);
+      flushAndClear();
+      assertThat(payloadCommands(atomicId)).doesNotContain("echo changed");
+      updateAs(author, actionId, update("echo changed", "Description"))
+          .andExpect(status().is2xxSuccessful());
+      flushAndClear();
+      assertThat(payloadCommands(atomicId)).doesNotContain("echo changed");
+
+      // Act
+      approveAs(approver, actionId, pendingFingerprint(actionId))
+          .andExpect(status().is2xxSuccessful());
+      flushAndClear();
+
+      // Assert
+      assertThat(payloadCommands(atomicId)).containsExactly("echo changed");
+    }
+
+    @Test
+    @DisplayName(
+        "Given an action with a pending version, the atomic testings list should flag its payload as having a pending version")
+    void given_pendingVersion_should_beFlaggedInAtomicTestingsList() throws Exception {
+      // Arrange
+      String actionId = approvedAction();
+      String atomicId = injectUsing(actionId, "Atomic whoami").persist().get().getId();
+      updateAs(author, actionId, update("echo changed", "Description"))
+          .andExpect(status().is2xxSuccessful());
+      flushAndClear();
+
+      // Act
+      String page =
+          mvc.perform(
+                  post(ATOMIC_TESTING_URI + "/search")
+                      .with(csrf())
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(asJsonString(PaginationFixture.getDefault().size(1000).build())))
+              .andExpect(status().isOk())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      // Assert
+      List<Boolean> flags =
+          JsonPath.read(
+              page,
+              "$.content[?(@.inject_id == '"
+                  + atomicId
+                  + "')].inject_injector_contract.injector_contract_payload.payload_pending_version");
+      assertThat(flags).containsExactly(true);
+    }
+  }
+
+  @Nested
   @DisplayName("Launch state while a version is pending (US5.1, US5.5)")
   class LaunchState {
 

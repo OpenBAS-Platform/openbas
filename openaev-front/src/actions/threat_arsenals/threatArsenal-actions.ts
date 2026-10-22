@@ -44,16 +44,8 @@ export const rejectThreatArsenalAction = (actionId: string, data: ThreatArsenalR
   return simplePostCall(`${THREAT_ARSENAL_URI}/${actionId}/reject`, data, undefined, notifyError);
 };
 
-export const fetchThreatArsenalActionApprovals = (actionId: string) => {
-  return simpleCall(`${THREAT_ARSENAL_URI}/${actionId}/approvals`);
-};
-
 export const fetchThreatArsenalActionUsage = (actionId: string) => {
   return simpleCall(`${THREAT_ARSENAL_URI}/${actionId}/usage`);
-};
-
-export const fetchThreatArsenalActionVersions = (actionId: string) => {
-  return simpleCall(`${THREAT_ARSENAL_URI}/${actionId}/versions`);
 };
 
 export const duplicateThreatArsenalAction = (actionId: string) => {

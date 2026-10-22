@@ -6,9 +6,7 @@ import { type FunctionComponent, type ReactElement, useEffect, useState } from '
 import { fetchMe } from '../../../../actions/Application';
 import {
   approveThreatArsenalAction,
-  fetchThreatArsenalActionApprovals,
   fetchThreatArsenalActionUsage,
-  fetchThreatArsenalActionVersions,
   rejectThreatArsenalAction,
 } from '../../../../actions/threat_arsenals/threatArsenal-actions';
 import DialogConfirmation from '../../../../components/common/DialogConfirmation';
@@ -28,7 +26,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { useAbility } from '../../../../utils/permissions/permissionsContext';
 import { ACTIONS, PERMISSION_REQUIRED, SUBJECTS } from '../../../../utils/permissions/types';
 import ApprovalStatusChip from './ApprovalStatusChip';
-import { APPROVAL_COMMENT_MAX_LENGTH, approvalOriginLabel, approvalStatusLabel, displayedApprovalStatus, isPayloadUsed, versionStatusLabel } from './approvalStatusUtils';
+import { APPROVAL_COMMENT_MAX_LENGTH, approvalOriginLabel, displayedApprovalStatus, isPayloadUsed } from './approvalStatusUtils';
 import PayloadUsage from './PayloadUsage';
 import PayloadVersionComparison from './PayloadVersionComparison';
 
@@ -39,11 +37,12 @@ interface Props {
 }
 
 /**
- * Approval block of an action drawer: the status, the latest decision, the Approve / Reject
- * actions for holders of "Approve content" and the approval history. When an approved action has
- * a pending version, the decision acts on that version: the block shows the active and pending
- * versions, what the pending one changes, and the version history. "Used in" is information only:
- * a pending version never blocks what uses the action.
+ * Approval block of an action drawer: the status, the latest decision (who approved or rejected,
+ * with the comment) and the Approve / Reject actions for holders of "Approve content". When an
+ * approved action has a pending version, the decision acts on that version: the block shows the
+ * active and pending versions and what the pending one changes. No history list: the full history
+ * stays available through the API. "Used in" is information only: a pending version never blocks
+ * what uses the action.
  */
 const ThreatArsenalApprovalSection: FunctionComponent<Props> = ({ action, onDecided }) => {
   const { t, nsdt } = useFormatter();
@@ -57,9 +56,7 @@ const ThreatArsenalApprovalSection: FunctionComponent<Props> = ({ action, onDeci
   const [comment, setComment] = useState('');
   const [reason, setReason] = useState('');
   const [reasonError, setReasonError] = useState<string | undefined>(undefined);
-  const [history, setHistory] = useState<PayloadApprovalOutput[]>([]);
   const [usage, setUsage] = useState<ThreatArsenalActionUsageOutput | undefined>(undefined);
-  const [versions, setVersions] = useState<PayloadVersionOutput[]>([]);
 
   const status = action.action_approval_status;
   const latest = action.action_approval_latest;
@@ -85,20 +82,6 @@ const ThreatArsenalApprovalSection: FunctionComponent<Props> = ({ action, onDeci
     notifyErrorHandler(error);
   };
 
-  useEffect(() => {
-    let cancelled = false;
-    fetchThreatArsenalActionApprovals(action.action_id)
-      .then((response) => {
-        if (!cancelled) setHistory((response.data ?? []) as PayloadApprovalOutput[]);
-      })
-      .catch(() => {
-        if (!cancelled) setHistory([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [action.action_id, status, latest?.approval_id]);
-
   // Where the payload is used: information only (an approval change never blocks it anymore).
   useEffect(() => {
     let cancelled = false;
@@ -113,20 +96,6 @@ const ThreatArsenalApprovalSection: FunctionComponent<Props> = ({ action, onDeci
       cancelled = true;
     };
   }, [action.action_id]);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetchThreatArsenalActionVersions(action.action_id)
-      .then((response) => {
-        if (!cancelled) setVersions((response.data ?? []) as PayloadVersionOutput[]);
-      })
-      .catch(() => {
-        if (!cancelled) setVersions([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [action.action_id, status, latest?.approval_id, pendingVersion?.version_id]);
 
   const closeApprove = () => {
     setApproveOpen(false);
@@ -276,58 +245,10 @@ const ThreatArsenalApprovalSection: FunctionComponent<Props> = ({ action, onDeci
           </Field>
         </div>
       )}
-      {versions.length > 0 && (
-        <div style={{ marginTop: theme.spacing(1.5) }}>
-          <Field label="Version history">
-            <ul style={{
-              margin: 0,
-              paddingLeft: theme.spacing(2),
-            }}
-            >
-              {versions.map(version => (
-                <li key={version.version_id}>
-                  <Text variant="content-caption">
-                    {`v${version.version_number} · ${t(versionStatusLabel(version.version_status))} · ${describeVersion(version)}${version.version_decider_name && version.version_status !== 'PENDING' ? ` · ${t('Decided by {name}', { name: version.version_decider_name })}` : ''}`}
-                  </Text>
-                  {version.version_comment && (
-                    <Text variant="content-caption" className="text-default-secondary" style={{ display: 'block' }}>
-                      {version.version_comment}
-                    </Text>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </Field>
-        </div>
-      )}
       {isPayloadUsed(usage) && (
         <div style={{ marginTop: theme.spacing(1.5) }}>
           <Field label="Used in">
             <PayloadUsage usage={usage} />
-          </Field>
-        </div>
-      )}
-      {history.length > 1 && (
-        <div style={{ marginTop: theme.spacing(1.5) }}>
-          <Field label="Approval history">
-            <ul style={{
-              margin: 0,
-              paddingLeft: theme.spacing(2),
-            }}
-            >
-              {history.map(entry => (
-                <li key={entry.approval_id}>
-                  <Text variant="content-caption">
-                    {`${t(approvalStatusLabel(entry.approval_status))} · ${describe(entry)}`}
-                  </Text>
-                  {entry.approval_comment && entry.approval_id !== latest?.approval_id && (
-                    <Text variant="content-caption" className="text-default-secondary" style={{ display: 'block' }}>
-                      {entry.approval_comment}
-                    </Text>
-                  )}
-                </li>
-              ))}
-            </ul>
           </Field>
         </div>
       )}

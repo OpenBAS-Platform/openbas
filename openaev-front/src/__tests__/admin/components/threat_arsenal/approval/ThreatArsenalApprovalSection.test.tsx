@@ -11,7 +11,6 @@ const mockCan = vi.fn();
 const mockApprove = vi.fn();
 const mockReject = vi.fn();
 const mockUsage = vi.fn();
-const mockVersions = vi.fn();
 const { mockDispatch, mockNotifyError } = vi.hoisted(() => ({
   mockDispatch: vi.fn(),
   mockNotifyError: vi.fn(),
@@ -45,9 +44,7 @@ vi.mock('../../../../../utils/Environment', async (importOriginal) => {
 vi.mock('../../../../../actions/threat_arsenals/threatArsenal-actions', () => ({
   approveThreatArsenalAction: (...args: unknown[]) => mockApprove(...args),
   rejectThreatArsenalAction: (...args: unknown[]) => mockReject(...args),
-  fetchThreatArsenalActionApprovals: () => Promise.resolve({ data: [] }),
   fetchThreatArsenalActionUsage: (...args: unknown[]) => mockUsage(...args),
-  fetchThreatArsenalActionVersions: (...args: unknown[]) => mockVersions(...args),
 }));
 
 const pendingAction = {
@@ -104,8 +101,6 @@ describe('ThreatArsenalApprovalSection', () => {
     mockReject.mockReset();
     mockUsage.mockReset();
     mockUsage.mockResolvedValue({ data: {} });
-    mockVersions.mockReset();
-    mockVersions.mockResolvedValue({ data: [] });
     mockDispatch.mockReset();
     mockNotifyError.mockReset();
   });
@@ -272,34 +267,17 @@ describe('ThreatArsenalApprovalSection', () => {
       expect(await screen.findByText('Reject version {number}? The active version stays in use.')).toBeTruthy();
     });
 
-    it('lists the version history', async () => {
+    it('shows the latest decision but no history list', async () => {
       // Arrange
       mockCan.mockReturnValue(true);
-      mockVersions.mockResolvedValue({
-        data: [{
-          version_id: 'version-2',
-          version_number: 2,
-          version_status: 'REJECTED',
-          version_origin: 'UPDATE',
-          version_fingerprint: 'fingerprint-2',
-          version_author_name: 'Author User',
-          version_decider_name: 'Approver User',
-          version_comment: 'Too broad',
-          version_created_at: '2026-10-09T10:00:00Z',
-          version_content: {},
-        }],
-      });
 
       // Act
-      renderSection({
-        ...pendingAction,
-        action_approval_status: 'APPROVED',
-      } as ThreatArsenalActionFullOutput);
+      renderSection(actionWithPendingVersion);
 
       // Assert
-      expect(await screen.findByText('Version history')).toBeTruthy();
-      expect(screen.getByText(/^v2 · Rejected · Author User/)).toBeTruthy();
-      expect(screen.getByText('Too broad')).toBeTruthy();
+      expect(screen.getByText('Last decision')).toBeTruthy();
+      expect(screen.queryByText('Version history')).toBeNull();
+      expect(screen.queryByText('Approval history')).toBeNull();
     });
   });
 

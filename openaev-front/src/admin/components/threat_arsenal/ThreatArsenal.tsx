@@ -100,6 +100,13 @@ const ThreatArsenal = () => {
   const [threatArsenalActions, setThreatArsenalActions] = useState<ThreatArsenalAction[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>(readViewMode);
 
+  // After a save from a row or a card, replace the row and refresh the open drawer of that action
+  // (its status may now be Pending approval, and its content changed).
+  const handleActionUpdated = (actionId: string) => (result: ThreatArsenalAction) => {
+    setThreatArsenalActions(prev => prev.map(a => (a.injector_contract_id === actionId ? result : a)));
+    setSelectedThreatArsenalAction(prev => (prev?.injector_contract_id === actionId ? result : prev));
+  };
+
   const handleViewModeChange = (next: string) => {
     const value = next as ViewMode;
     setViewMode(value);
@@ -350,8 +357,7 @@ const ThreatArsenal = () => {
               anySelected={numberOfSelectedElements > 0}
               onSelect={() => setSelectedThreatArsenalAction(action)}
               onToggleEntity={event => onToggleEntity(action, event)}
-              onUpdate={(result: ThreatArsenalAction) =>
-                setThreatArsenalActions(prev => prev.map(a => (a.injector_contract_id === action.injector_contract_id ? result : a)))}
+              onUpdate={handleActionUpdated(action.injector_contract_id)}
               onDuplicate={(result: ThreatArsenalAction) => setThreatArsenalActions(prev => [result, ...prev])}
               onDelete={() => setThreatArsenalActions(prev => prev.filter(a => a.injector_contract_id !== action.injector_contract_id))}
               disableUpdate={flags.disableUpdate}
@@ -437,8 +443,7 @@ const ThreatArsenal = () => {
               checked={isSelectedAction(action)}
               onSelect={() => setSelectedThreatArsenalAction(action)}
               onToggleEntity={event => onToggleEntity(action, event)}
-              onUpdate={(result: ThreatArsenalAction) =>
-                setThreatArsenalActions(prev => prev.map(a => (a.injector_contract_id === action.injector_contract_id ? result : a)))}
+              onUpdate={handleActionUpdated(action.injector_contract_id)}
               onDuplicate={(result: ThreatArsenalAction) => setThreatArsenalActions(prev => [result, ...prev])}
               onDelete={() => setThreatArsenalActions(prev => prev.filter(a => a.injector_contract_id !== action.injector_contract_id))}
               disableUpdate={flags.disableUpdate}

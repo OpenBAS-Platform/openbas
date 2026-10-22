@@ -11,10 +11,11 @@ vi.mock('../../../../components/i18n', () => ({ useFormatter: () => ({ t: (value
 const renderChip = (
   approvalStatus?: PayloadSimple['payload_approval_status'],
   variant: 'chip' | 'icon' = 'chip',
+  pendingVersion = false,
 ) => render(
   <ThemeProvider theme={createTheme()}>
     <TooltipProvider>
-      <PayloadApprovalWarningChip approvalStatus={approvalStatus} payloadName="TEST-A" variant={variant} />
+      <PayloadApprovalWarningChip approvalStatus={approvalStatus} pendingVersion={pendingVersion} payloadName="TEST-A" variant={variant} />
     </TooltipProvider>
   </ThemeProvider>,
 );
@@ -50,6 +51,15 @@ describe('PayloadApprovalWarningChip', () => {
     // Assert
     expect(screen.getByRole('img', { name: 'Payload pending approval – TEST-A' })).toBeTruthy();
     expect(screen.queryByText('Pending')).toBeNull();
+  });
+
+  it('shows a "Pending" chip for an approved payload whose new version waits for approval', () => {
+    // Arrange / Act
+    renderChip('APPROVED', 'chip', true);
+
+    // Assert
+    expect(screen.getByText('Pending')).toBeTruthy();
+    expect(screen.getByLabelText('New version pending approval – TEST-A')).toBeTruthy();
   });
 
   it('renders nothing for an approved payload or an inject without payload', () => {

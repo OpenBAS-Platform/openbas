@@ -685,6 +685,7 @@ public class InjectSearchService {
         payloadJoin.get("type").alias("payload_type"),
         payloadJoin.get("status").alias("payload_status"),
         payloadJoin.get("approvalStatus").alias("payload_approval_status"),
+        payloadJoin.get("pendingVersion").alias("payload_pending_version"),
         collectorTypeJoin.get("name").alias("payload_collector_type"),
         statusJoin.get("id").alias("status_id"),
         statusJoin.get("name").alias("status_name"),
@@ -706,6 +707,7 @@ public class InjectSearchService {
             payloadJoin.get("type"),
             payloadJoin.get("status"),
             payloadJoin.get("approvalStatus"),
+            payloadJoin.get("pendingVersion"),
             collectorTypeJoin.get("name"),
             statusJoin.get("id"),
             exerciseJoin.get("id")));
@@ -740,6 +742,9 @@ public class InjectSearchService {
                         .approvalStatus(
                             tuple.get(
                                 "payload_approval_status", Payload.PAYLOAD_APPROVAL_STATUS.class))
+                        .pendingVersion(
+                            Boolean.TRUE.equals(
+                                tuple.get("payload_pending_version", Boolean.class)))
                         .build();
               }
 
