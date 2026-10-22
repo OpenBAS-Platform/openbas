@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import lombok.*;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UuidGenerator;
@@ -83,6 +84,36 @@ public class InjectExpectationResult implements Base, Cloneable {
   @JsonIgnore
   private BaseInjectExpectation injectExpectation;
 
+  public boolean valueEquals(InjectExpectationResult other) {
+    return Optional.ofNullable(sourceId)
+            .map(sourceId -> sourceId.equals(other.getSourceId()))
+            .orElse(other.getSourceId() == null)
+        && Optional.ofNullable(sourceType)
+            .map(sourceType -> sourceType.equals(other.getSourceType()))
+            .orElse(other.getSourceType() == null)
+        && Optional.ofNullable(sourceName)
+            .map(sourceName -> sourceName.equals(other.getSourceName()))
+            .orElse(other.getSourceName() == null)
+        && Optional.ofNullable(sourcePlatform)
+            .map(sourcePlatform -> sourcePlatform.equals(other.getSourcePlatform()))
+            .orElse(other.getSourcePlatform() == null)
+        && Optional.ofNullable(sourceAssetId)
+            .map(sourceAssetId -> sourceAssetId.equals(other.getSourceAssetId()))
+            .orElse(other.getSourceAssetId() == null)
+        && Optional.ofNullable(date)
+            .map(date -> date.equals(other.getDate()))
+            .orElse(other.getDate() == null)
+        && Optional.ofNullable(score)
+            .map(score -> score.equals(other.getScore()))
+            .orElse(other.getScore() == null)
+        && Optional.ofNullable(result)
+            .map(result -> result.equals(other.getResult()))
+            .orElse(other.getResult() == null)
+        && Optional.ofNullable(metadata)
+            .map(metadata -> metadata.equals(other.getMetadata()))
+            .orElse(other.getMetadata() == null);
+  }
+
   @Override
   public InjectExpectationResult clone() {
     try {
@@ -90,7 +121,7 @@ public class InjectExpectationResult implements Base, Cloneable {
       clone.setId(
           null); // computed at persist time anyway, but let's avoid mistaking the clone for the
       // original
-      clone.setMetadata(this.metadata == null ? new HashMap<>() : new HashMap<>(this.metadata));
+      clone.setMetadata(this.metadata == null ? null : new HashMap<>(this.metadata));
       return clone;
     } catch (CloneNotSupportedException e) {
       throw new AssertionError(e);

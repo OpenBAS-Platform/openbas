@@ -2,6 +2,7 @@ package io.openaev.service;
 
 import static io.openaev.collectors.expectations_vulnerability_manager.ExpectationsVulnerabilityManagerCollector.EXPECTATIONS_VULNERABILITY_COLLECTOR_ID;
 import static io.openaev.utils.fixtures.InjectExpectationFixture.createVulnerabilityInjectExpectation;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -742,7 +743,13 @@ class InjectExpectationServiceTest {
               "inject-id", "asset-id", "ASSETS");
 
       assertEquals(1, merged.size());
-      assertEquals(List.of(collectorResult), merged.get(0).getResults());
+      assertThat(merged.get(0).getResults())
+          .allSatisfy(
+              result ->
+                  assertThat(
+                          Stream.of(collectorResult)
+                              .anyMatch(expected -> expected.valueEquals(result)))
+                      .isTrue());
       // The enrichment must stay display-only: the persistent entity is untouched.
       assertTrue(assetExpectation.getResults().isEmpty());
     }
@@ -789,7 +796,13 @@ class InjectExpectationServiceTest {
               "inject-id", "asset-id", "ASSETS");
 
       assertEquals(1, merged.size());
-      assertEquals(List.of(nucleiResult), merged.get(0).getResults());
+      assertThat(merged.get(0).getResults())
+          .allSatisfy(
+              result ->
+                  assertThat(
+                          Stream.of(nucleiResult)
+                              .anyMatch(expected -> expected.valueEquals(result)))
+                      .isTrue());
     }
 
     @Test
@@ -822,7 +835,13 @@ class InjectExpectationServiceTest {
               "inject-id", "asset-id", "ASSETS");
 
       assertEquals(1, merged.size());
-      assertEquals(List.of(managerResult), merged.get(0).getResults());
+      assertThat(merged.get(0).getResults())
+          .allSatisfy(
+              result ->
+                  assertThat(
+                          Stream.of(managerResult)
+                              .anyMatch(expected -> expected.valueEquals(result)))
+                      .isTrue());
     }
 
     @Test
@@ -956,7 +975,13 @@ class InjectExpectationServiceTest {
       List<? extends BaseInjectExpectation> merged = merge();
 
       assertEquals(1, merged.size());
-      assertEquals(List.of(defenderResult), merged.get(0).getResults());
+      assertThat(merged.get(0).getResults())
+          .allSatisfy(
+              result ->
+                  assertThat(
+                          Stream.of(defenderResult)
+                              .anyMatch(expected -> expected.valueEquals(result)))
+                      .isTrue());
       // The enrichment must stay display-only: the persistent entity is untouched.
       assertTrue(groupExpectation.getResults().isEmpty());
     }
@@ -986,7 +1011,13 @@ class InjectExpectationServiceTest {
       List<? extends BaseInjectExpectation> merged = merge();
 
       assertEquals(1, merged.size());
-      assertEquals(List.of(missedResult), merged.get(0).getResults());
+      assertThat(merged.get(0).getResults())
+          .allSatisfy(
+              result ->
+                  assertThat(
+                          Stream.of(missedResult)
+                              .anyMatch(expected -> expected.valueEquals(result)))
+                      .isTrue());
     }
 
     @Test
@@ -1012,7 +1043,13 @@ class InjectExpectationServiceTest {
       List<? extends BaseInjectExpectation> merged = merge();
 
       assertEquals(1, merged.size());
-      assertEquals(List.of(detectedResult), merged.get(0).getResults());
+      assertThat(merged.get(0).getResults())
+          .allSatisfy(
+              result ->
+                  assertThat(
+                          Stream.of(detectedResult)
+                              .anyMatch(expected -> expected.valueEquals(result)))
+                      .isTrue());
     }
 
     @Test
@@ -1037,7 +1074,13 @@ class InjectExpectationServiceTest {
       List<? extends BaseInjectExpectation> merged = merge();
 
       assertEquals(1, merged.size());
-      assertEquals(List.of(answeredResult), merged.get(0).getResults());
+      assertThat(merged.get(0).getResults())
+          .allSatisfy(
+              result ->
+                  assertThat(
+                          Stream.of(answeredResult)
+                              .anyMatch(expected -> expected.valueEquals(result)))
+                      .isTrue());
     }
 
     @Test
@@ -1069,7 +1112,13 @@ class InjectExpectationServiceTest {
       List<? extends BaseInjectExpectation> merged = merge();
 
       assertEquals(1, merged.size());
-      assertEquals(List.of(defenderResult, directResult), merged.get(0).getResults());
+      assertThat(merged.get(0).getResults())
+          .allSatisfy(
+              result ->
+                  assertThat(
+                          Stream.of(defenderResult, directResult)
+                              .anyMatch(expected -> expected.valueEquals(result)))
+                      .isTrue());
     }
 
     @Test

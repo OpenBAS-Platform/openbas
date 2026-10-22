@@ -13,21 +13,31 @@ public class V6_20261017184049806__Add_expectation_results_table extends BaseJav
   @Override
   public void migrate(Context context) throws Exception {
     try (Statement statement = context.getConnection().createStatement()) {
+
+      // some columns are null to support historical results
       statement.execute(
           """
-        CREATE TABLE inject_expectation_results(
+        CREATE TABLE IF NOT EXISTS inject_expectation_results(
             inject_expectation_result_id VARCHAR(255) PRIMARY KEY,
-            inject_expectation_result_source_id VARCHAR(255) NOT NULL,
-            inject_expectation_result_source_type VARCHAR(255) NOT NULL,
-            inject_expectation_result_source_name VARCHAR(255) NOT NULL,
+            inject_expectation_result_source_id VARCHAR(255) NULL,
+            inject_expectation_result_source_type VARCHAR(255) NULL,
+            inject_expectation_result_source_name VARCHAR(255) NULL,
             inject_expectation_result_source_asset_id VARCHAR(255) NULL,
             inject_expectation_result_source_platform VARCHAR(255) NULL,
-            inject_expectation_result_date TIMESTAMP WITH TIME ZONE NOT NULL,
-            inject_expectation_result_result VARCHAR(255) NULL,
-            inject_expectation_result_score NUMERIC NULL,
+            inject_expectation_result_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+            inject_expectation_result_result TEXT NULL, -- support provisional results
+            inject_expectation_result_score NUMERIC NULL, -- support provisional results
             inject_expectation_result_metadata JSONB,
+            inject_expectation_result_created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+            inject_expectation_result_updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
             inject_expectation_result_inject_expectation_id VARCHAR(255) NOT NULL REFERENCES injects_expectations(inject_expectation_id) ON DELETE CASCADE
         );
+        """);
+
+      statement.execute(
+          """
+        CREATE INDEX IF NOT EXISTS idx_inject_expectation_results_expectation
+          ON inject_expectation_results (inject_expectation_result_inject_expectation_id);
         """);
 
       statement.execute(
@@ -44,9 +54,9 @@ public class V6_20261017184049806__Add_expectation_results_table extends BaseJav
           res->>'sourceName',
           res->>'sourceAssetId',
           res->>'sourcePlatform',
-          DATE(res->>'date'),
+          (res->>'date')::timestamptz,
           res->>'result',
-          TO_NUMBER(res->>'score', '999D9'),
+          (res->>'score')::numeric,
           res->'metadata',
           inject_expectation_id
         FROM results;
@@ -54,8 +64,8 @@ public class V6_20261017184049806__Add_expectation_results_table extends BaseJav
 
       statement.execute(
           """
-        ALTER TABLE injects_expectations
-        DROP COLUMN inject_expectation_results;
+        ALTER TABLE IF EXISTS injects_expectations
+        DROP COLUMN IF EXISTS inject_expectation_results;
         """);
     }
   }

@@ -1473,14 +1473,15 @@ public class InjectExpectationService {
         merged.add(elected);
         continue;
       }
+      // also clones the results entities so the getResults() call below returns copies
       BaseInjectExpectation clone = elected.clone();
-      List<InjectExpectationResult> combinedResults = new ArrayList<>(elected.getResults());
+      List<InjectExpectationResult> combinedResults = new ArrayList<>(clone.getResults());
       for (BaseInjectExpectation other : sameType.subList(1, sameType.size())) {
         for (InjectExpectationResult expectationResult : other.getResults()) {
           if (!notCopiedSourceTypes.contains(expectationResult.getSourceType())
               && expectationResult.getResult() != null
               && expectationResult.getScore() != null) {
-            combinedResults.add(expectationResult);
+            combinedResults.add(expectationResult.clone());
           }
         }
       }

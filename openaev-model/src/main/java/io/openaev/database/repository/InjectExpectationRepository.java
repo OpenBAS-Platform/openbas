@@ -32,6 +32,7 @@ public interface InjectExpectationRepository
       """
       NOT EXISTS (SELECT 1 FROM inject_expectation_results ier
       WHERE ier.inject_expectation_result_result IS NOT NULL
+        AND ier.inject_expectation_result_result <> ''
         AND ier.inject_expectation_result_source_id = :sourceId
         AND ier.inject_expectation_result_inject_expectation_id = e.inject_expectation_id)
       """;
@@ -39,6 +40,7 @@ public interface InjectExpectationRepository
       """
       NOT EXISTS (SELECT 1 FROM inject_expectation_results ier
       WHERE ier.inject_expectation_result_result IS NOT NULL
+        AND ier.inject_expectation_result_result <> ''
         AND ier.inject_expectation_result_inject_expectation_id = e.inject_expectation_id)
       """;
 

@@ -241,7 +241,7 @@ public class InjectExpectationUtils {
               existingResult.ifPresent(
                   injectExpectationResult ->
                       expectation.getResults().remove(injectExpectationResult));
-              expectation.addResult(newResultToAdd);
+              expectation.addResult(newResultToAdd.clone());
             }
 
             // IF RESULT TO ADD IS EXPIRATION MANAGER => SO I EXPIRE ALL the inject expectation with
