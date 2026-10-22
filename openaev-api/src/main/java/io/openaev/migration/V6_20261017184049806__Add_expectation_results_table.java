@@ -69,6 +69,11 @@ public class V6_20261017184049806__Add_expectation_results_table extends BaseJav
         ALTER TABLE IF EXISTS injects_expectations
         DROP COLUMN IF EXISTS inject_expectation_results;
         """);
+
+      statement.execute(
+          """
+      DELETE FROM indexing_status WHERE indexing_status_type = 'expectation-inject';
+      """);
     }
   }
 }

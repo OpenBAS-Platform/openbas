@@ -626,7 +626,6 @@ public interface InjectExpectationRepository
            sa.scenario_id,
            COALESCE(spself.ids, ARRAY[]::text[]) || COALESCE(asp.security_platform_ids, ARRAY[]::text[]) AS security_platform_ids
     FROM base b
-    LEFT JOIN inject_expectation_results ier ON b.inject_expectation_id = ier.inject_expectation_result_inject_expectation_id
     LEFT JOIN ap_agg apa ON apa.injector_contract_id = b.contract_id AND apa.tenant_id = b.tenant_id
     LEFT JOIN dom_agg da ON da.injector_contract_id = b.contract_id AND da.tenant_id = b.tenant_id
     LEFT JOIN track_agg ta ON ta.inject_id = b.inject_id
