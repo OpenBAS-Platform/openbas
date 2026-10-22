@@ -44,11 +44,15 @@ public class BaseInjectExpectation implements Base, Cloneable {
   public BaseInjectExpectation clone() {
     try {
       BaseInjectExpectation clone = (BaseInjectExpectation) super.clone();
-      clone.results = this.results != null ? new ArrayList<>(this.results) : new ArrayList<>();
+      clone.results = cloneResults();
       return clone;
     } catch (CloneNotSupportedException e) {
       throw new AssertionError("Clone should be supported for Cloneable objects", e);
     }
+  }
+  private List<InjectExpectationResult> cloneResults() {
+    if (this.results == null) return new ArrayList<>();
+    return new ArrayList<>(this.results.stream().map(InjectExpectationResult::clone).toList());
   }
 
   public enum EXPECTATION_TYPE {

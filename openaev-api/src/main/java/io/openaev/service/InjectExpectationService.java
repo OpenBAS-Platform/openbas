@@ -1238,7 +1238,7 @@ public class InjectExpectationService {
                                   r.getSourceId()));
                 }
               }
-              clone.setResults(new ArrayList<>(bySource.values()));
+              clone.setResults(new ArrayList<>(bySource.values().stream().map(InjectExpectationResult::clone).toList()));
               return clone;
             })
         .toList();

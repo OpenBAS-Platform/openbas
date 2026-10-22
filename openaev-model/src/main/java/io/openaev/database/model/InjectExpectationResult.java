@@ -7,6 +7,7 @@ import io.openaev.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 import lombok.*;
 import org.hibernate.annotations.Type;
@@ -19,7 +20,7 @@ import org.hibernate.annotations.UuidGenerator;
 @AllArgsConstructor
 @Table(name = "inject_expectation_results")
 @EntityListeners(ModelBaseListener.class)
-public class InjectExpectationResult implements Base {
+public class InjectExpectationResult implements Base, Cloneable {
 
   @Id
   @NotBlank
@@ -81,4 +82,16 @@ public class InjectExpectationResult implements Base {
   @Setter
   @JsonIgnore
   private BaseInjectExpectation injectExpectation;
+
+  @Override
+  public InjectExpectationResult clone() {
+    try {
+      InjectExpectationResult clone = (InjectExpectationResult) super.clone();
+      clone.setId(null); // computed at persist time anyway, but let's avoid mistaking the clone for the original
+      clone.setMetadata(this.metadata == null ? new HashMap<>() : new HashMap<>(this.metadata));
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      throw new AssertionError(e);
+    }
+  }
 }
