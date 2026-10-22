@@ -136,5 +136,20 @@ class JsonTypeDirtyOnLoadCoverageTest {
 
       assertTrue(both.isEmpty(), "a field is both probed and recorded as latent: " + both);
     }
+
+    @Test
+    @DisplayName(
+        "given a field probed ahead of its activation, when compared, then it is still latent")
+    void given_a_field_probed_ahead_of_activation_should_still_be_latent() {
+      Set<String> notLatent =
+          new TreeSet<>(JsonTypeDirtyOnLoadProbeTest.PROBED_AHEAD_OF_ACTIVATION);
+      notLatent.removeAll(LATENT_UNTIL_THEIR_TABLE_ACTIVATES);
+
+      assertTrue(
+          notLatent.isEmpty(),
+          "a field probed ahead of its activation is no longer latent, so its table is active:"
+              + " move it from PROBED_AHEAD_OF_ACTIVATION to PROBED_FIELDS: "
+              + notLatent);
+    }
   }
 }

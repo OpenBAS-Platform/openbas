@@ -255,14 +255,7 @@ public class Exercise implements GrantableBase, TenantBase {
   @JsonProperty("exercise_scenario")
   @Queryable(filterable = true, dynamicValues = true)
   @Schema(implementation = String.class)
-  @Setter(NONE)
   private Scenario scenario;
-
-  public void setScenario(Scenario scenario) {
-    if (scenario != null) scenario.setUpdatedAt(now());
-    this.scenario = scenario;
-    this.setUpdatedAt(now());
-  }
 
   // STIX
   // Intentionally EAGER, not the usual FetchType.LAZY default: SecurityCoverageSendJobService's

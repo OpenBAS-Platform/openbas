@@ -90,8 +90,7 @@ is cancelled, or is skipped cannot leave consumers waiting until the poll cap.
 
 It deliberately does **not** `needs:` Prepare Bundled Assets. It re-runs the same
 composite action inline with `upload-artifact: false`, which removes ~1.4 min of serial
-wait from the head of the critical path. This is why the job checks out with
-`fetch-depth: 0` — the asset version comes from `git describe`.
+wait from the head of the critical path.
 
 ---
 
