@@ -6823,24 +6823,24 @@ export interface InjectExpectationOutput {
 }
 
 export interface InjectExpectationResult {
+  /** @format date-time */
+  date?: string;
   /** @minLength 1 */
   inject_expectation_id: string;
   /** @format date-time */
   inject_expectation_result_created_at?: string;
   /** @format date-time */
-  inject_expectation_result_date?: string;
-  inject_expectation_result_metadata?: Record<string, string>;
-  inject_expectation_result_result?: string;
-  /** @format double */
-  inject_expectation_result_score?: number;
-  inject_expectation_result_source_asset_id?: string;
-  inject_expectation_result_source_id?: string;
-  inject_expectation_result_source_name?: string;
-  inject_expectation_result_source_platform?: string;
-  inject_expectation_result_source_type?: string;
-  /** @format date-time */
   inject_expectation_result_updated_at?: string;
   listened?: boolean;
+  metadata?: Record<string, string>;
+  result?: string;
+  /** @format double */
+  score?: number;
+  sourceAssetId?: string;
+  sourceId?: string;
+  sourceName?: string;
+  sourcePlatform?: string;
+  sourceType?: string;
 }
 
 export interface InjectExpectationResultsByAttackPattern {

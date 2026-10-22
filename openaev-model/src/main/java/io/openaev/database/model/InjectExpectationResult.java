@@ -38,36 +38,36 @@ public class InjectExpectationResult implements Base, Cloneable {
 
   @Setter
   @Column(name = "inject_expectation_result_source_id")
-  @JsonProperty("inject_expectation_result_source_id")
+  @JsonProperty("sourceId")
   private String sourceId;
 
   @Setter
   @Column(name = "inject_expectation_result_source_type")
-  @JsonProperty("inject_expectation_result_source_type")
+  @JsonProperty("sourceType")
   private String sourceType;
 
   @Setter
   @Column(name = "inject_expectation_result_source_name")
-  @JsonProperty("inject_expectation_result_source_name")
+  @JsonProperty("sourceName")
   private String sourceName;
 
   @Setter
   @Column(name = "inject_expectation_result_source_asset_id")
-  @JsonProperty("inject_expectation_result_source_asset_id")
+  @JsonProperty("sourceAssetId")
   private String sourceAssetId;
 
   @Setter
   @Column(name = "inject_expectation_result_source_platform")
-  @JsonProperty("inject_expectation_result_source_platform")
+  @JsonProperty("sourcePlatform")
   private String sourcePlatform;
 
   @Setter
   @Column(name = "inject_expectation_result_date")
-  @JsonProperty("inject_expectation_result_date")
+  @JsonProperty("date")
   private Instant date;
 
   @Column(name = "inject_expectation_result_score")
-  @JsonProperty("inject_expectation_result_score")
+  @JsonProperty("score")
   private Double score;
 
   public void setScore(Double newScore) {
@@ -78,7 +78,7 @@ public class InjectExpectationResult implements Base, Cloneable {
   }
 
   @Column(name = "inject_expectation_result_result")
-  @JsonProperty("inject_expectation_result_result")
+  @JsonProperty("result")
   private String result;
 
   public void setResult(String newResult) {
@@ -90,7 +90,7 @@ public class InjectExpectationResult implements Base, Cloneable {
 
   @Type(JsonType.class)
   @Column(name = "inject_expectation_result_metadata")
-  @JsonProperty("inject_expectation_result_metadata")
+  @JsonProperty("metadata")
   private Map<String, String> metadata;
 
   public void setMetadata(Map<String, String> newMetadata) {
@@ -161,6 +161,7 @@ public class InjectExpectationResult implements Base, Cloneable {
       clone.setId(
           null); // computed at persist time anyway, but let's avoid mistaking the clone for the
       // original
+      clone.setInjectExpectation(null); // cloned results are orphan by default
       clone.setMetadata(this.metadata == null ? null : new HashMap<>(this.metadata));
       return clone;
     } catch (CloneNotSupportedException e) {

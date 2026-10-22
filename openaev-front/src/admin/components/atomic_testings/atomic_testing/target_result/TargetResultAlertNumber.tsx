@@ -24,10 +24,10 @@ const TargetResultAlertNumber: FunctionComponent<Props> = ({
 
   useEffect(() => {
     getAlertLinksCount(
-      injectExpectationId, expectationResult.inject_expectation_result_source_id,
-      expectationResult.inject_expectation_result_source_type)
+      injectExpectationId, expectationResult.sourceId,
+      expectationResult.sourceType)
       .then((result: { data: number }) => setAlertLinksNumber(result.data ?? 0));
-  }, [injectExpectationId, expectationResult.inject_expectation_result_source_id, expectationResult.inject_expectation_result_source_type]);
+  }, [injectExpectationId, expectationResult.sourceId, expectationResult.sourceType]);
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();

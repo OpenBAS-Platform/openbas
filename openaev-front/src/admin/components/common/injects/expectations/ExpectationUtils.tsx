@@ -30,8 +30,8 @@ export const isManualExpectation = (type: string) => {
 export const getSourceLabel = (
   expectationResult?: InjectExpectationResult | null,
 ): string => {
-  const sourceName = expectationResult?.inject_expectation_result_source_name?.trim();
-  const sourcePlatform = expectationResult?.inject_expectation_result_source_platform?.trim();
+  const sourceName = expectationResult?.sourceName?.trim();
+  const sourcePlatform = expectationResult?.sourcePlatform?.trim();
 
   if (!sourceName) {
     return '-';
