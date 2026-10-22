@@ -6826,6 +6826,8 @@ export interface InjectExpectationResult {
   /** @minLength 1 */
   inject_expectation_id: string;
   /** @format date-time */
+  inject_expectation_result_created_at?: string;
+  /** @format date-time */
   inject_expectation_result_date?: string;
   inject_expectation_result_metadata?: Record<string, string>;
   inject_expectation_result_result?: string;
@@ -6836,6 +6838,8 @@ export interface InjectExpectationResult {
   inject_expectation_result_source_name?: string;
   inject_expectation_result_source_platform?: string;
   inject_expectation_result_source_type?: string;
+  /** @format date-time */
+  inject_expectation_result_updated_at?: string;
   listened?: boolean;
 }
 
