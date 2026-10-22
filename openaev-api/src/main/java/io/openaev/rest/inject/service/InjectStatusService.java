@@ -326,17 +326,6 @@ public class InjectStatusService {
         && !ExecutionTraceUtils.hasCompleteTraceAfter(injectStatus.getTraces(), closing)) {
       ExecutionTraceUtils.appendLateReportToTimeoutTrace(closing, incoming, Instant.now());
       storeLateTrace(inject, injectStatus, incoming);
-      log.info(
-          "Late COMPLETE for inject {} (agent {}): TIMEOUT trace rewritten, inject status kept {}",
-          inject.getId(),
-          agent != null ? agent.getId() : "none",
-          injectStatus.getName());
-    } else {
-      log.info(
-          "Ignored duplicate COMPLETE for inject {} (agent {}): already closed with {}",
-          inject.getId(),
-          agent != null ? agent.getId() : "none",
-          closing.getStatus());
     }
     return true;
   }
@@ -360,11 +349,6 @@ public class InjectStatusService {
       return false;
     }
     storeLateTrace(inject, injectStatus, incoming);
-    log.info(
-        "Late COMPLETE for inject {} (agent {}): stored after the platform closed the inject, status kept {}",
-        inject.getId(),
-        incoming.getAgent().getId(),
-        status);
     return true;
   }
 
