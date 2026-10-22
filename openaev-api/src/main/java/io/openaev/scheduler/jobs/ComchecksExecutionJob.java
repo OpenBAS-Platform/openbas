@@ -61,13 +61,15 @@ public class ComchecksExecutionJob implements Job {
 
   private Inject buildComcheckEmail(Comcheck comCheck, String tenantId) {
     // injectors is v2-active: the email injector is a fail-closed association here (the raw
-    // transaction carries no tenant scope). Stamp this comcheck's tenant, then resolve the injector
-    // explicitly by (contract, tenant). The tenant-scoped query re-runs under the stamp, unlike the
-    // L1-cached findById(EMAIL_DEFAULT) whose eager injector would stay pinned to the first tenant.
+    // transaction carries no tenant scope). Stamp this comcheck's tenant, then resolve the contract
+    // and the injector explicitly by (id, tenant): every tenant holds its own copy of both under
+    // the same id.
     tenantTx.setScopeOnCurrentTransaction(TxCtx.forTenant(tenantId));
     Inject emailInject = new Inject();
     InjectorContract contract =
-        injectorContractRepository.findById(EmailContract.EMAIL_DEFAULT).orElseThrow();
+        injectorContractRepository
+            .findByContractIdAndTenant(EmailContract.EMAIL_DEFAULT, tenantId)
+            .orElseThrow();
     emailInject.setInjectorContract(contract);
     emailInject.setInjector(
         injectorRepository

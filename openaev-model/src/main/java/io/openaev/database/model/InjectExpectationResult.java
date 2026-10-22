@@ -87,7 +87,9 @@ public class InjectExpectationResult implements Base, Cloneable {
   public InjectExpectationResult clone() {
     try {
       InjectExpectationResult clone = (InjectExpectationResult) super.clone();
-      clone.setId(null); // computed at persist time anyway, but let's avoid mistaking the clone for the original
+      clone.setId(
+          null); // computed at persist time anyway, but let's avoid mistaking the clone for the
+      // original
       clone.setMetadata(this.metadata == null ? new HashMap<>() : new HashMap<>(this.metadata));
       return clone;
     } catch (CloneNotSupportedException e) {

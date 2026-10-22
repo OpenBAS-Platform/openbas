@@ -50,6 +50,7 @@ public class BaseInjectExpectation implements Base, Cloneable {
       throw new AssertionError("Clone should be supported for Cloneable objects", e);
     }
   }
+
   private List<InjectExpectationResult> cloneResults() {
     if (this.results == null) return new ArrayList<>();
     return new ArrayList<>(this.results.stream().map(InjectExpectationResult::clone).toList());

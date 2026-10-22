@@ -11,8 +11,7 @@ import io.openaev.IntegrationTest;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.InjectExpectationRepository;
 import io.openaev.execution.ExecutableInject;
-import io.openaev.rest.exercise.form.ExpectationUpdateInput;
-import io.openaev.rest.inject.form.InjectExpectationUpdateInput;
+import io.openaev.rest.inject.form.InjectExpectationUpdateFromCollectorInput;
 import io.openaev.service.InjectExpectationService;
 import io.openaev.utils.fixtures.*;
 import io.openaev.utils.fixtures.composers.*;
@@ -804,7 +803,10 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
       // Act — the injector writes its "Not vulnerable" verdict on the agentless row
       injectExpectationService.updateInjectExpectationFromSecurityPlatform(
           leaf.getId(),
-          InjectExpectationUpdateInput.builder().result("Not vulnerable").isSuccess(true).build(),
+          InjectExpectationUpdateFromCollectorInput.builder()
+              .result("Not vulnerable")
+              .isSuccess(true)
+              .build(),
           scanner);
       entityManager.flush();
       entityManager.clear();
@@ -1346,8 +1348,7 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
         entityManager.flush();
         entityManager.refresh(h.inject);
 
-        ExpectationUpdateInput input =
-            ExpectationFixture.getExpectationUpdateInput(SOURCE_ID, updateScore);
+        ExpectationVerdict input = ExpectationFixture.getExpectationVerdict(SOURCE_ID, updateScore);
 
         // Act
         injectExpectationService.updateInjectExpectationUsingBehaviors(
@@ -1417,8 +1418,7 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
         entityManager.flush();
         entityManager.refresh(h.inject);
 
-        ExpectationUpdateInput input =
-            ExpectationFixture.getExpectationUpdateInput(SOURCE_ID, updateScore);
+        ExpectationVerdict input = ExpectationFixture.getExpectationVerdict(SOURCE_ID, updateScore);
 
         // Act
         injectExpectationService.updateInjectExpectationUsingBehaviors(h.assetA.getId(), input);
@@ -1446,7 +1446,7 @@ class AbstractTechnicalBehaviorTest extends IntegrationTest {
     void given_asset_group_update_should_throw() {
       // Arrange
       Hierarchy h = createHierarchy(false);
-      ExpectationUpdateInput input = ExpectationFixture.getExpectationUpdateInput(SOURCE_ID, 100.0);
+      ExpectationVerdict input = ExpectationFixture.getExpectationVerdict(SOURCE_ID, 100.0);
 
       // Act & Assert
       assertThatThrownBy(
