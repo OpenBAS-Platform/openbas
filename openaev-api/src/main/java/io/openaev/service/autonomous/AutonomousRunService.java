@@ -49,6 +49,7 @@ import io.openaev.database.repository.autonomous.AutonomousDirectiveRepository;
 import io.openaev.database.repository.autonomous.AutonomousRunRepository;
 import io.openaev.rest.asset.endpoint.form.EndpointInput;
 import io.openaev.rest.exception.ChainingException;
+import io.openaev.rest.exception.ConflictException;
 import io.openaev.rest.exception.ElementNotFoundException;
 import io.openaev.rest.exercise.service.ExerciseService;
 import io.openaev.rest.inject.form.InjectInput;
@@ -288,8 +289,7 @@ public class AutonomousRunService {
    */
   private void assertRunAcceptsAuthoring(AutonomousRun run) {
     if (isTerminal(run.getStatus())) {
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT,
+      throw new ConflictException(
           "This autonomous run has ended ("
               + run.getStatus()
               + "); it no longer accepts"
@@ -313,8 +313,7 @@ public class AutonomousRunService {
    */
   private void assertRunNotTerminal(AutonomousRun run, String action) {
     if (isTerminal(run.getStatus())) {
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT,
+      throw new ConflictException(
           "This autonomous run has ended ("
               + run.getStatus()
               + "); it can no longer be "
@@ -690,8 +689,7 @@ public class AutonomousRunService {
           || status == AutonomousRunStatus.RUNNING
           || status == AutonomousRunStatus.PAUSED
           || status == AutonomousRunStatus.WAITING_INPUT) {
-        throw new ResponseStatusException(
-            HttpStatus.CONFLICT, "Stop the active autonomous run before refining this scenario");
+        throw new ConflictException("Stop the active autonomous run before refining this scenario");
       }
       // A settled PLAN-mode run is the AI-built case: reuse its row so its decision timeline (full
       // history) is preserved and reopened. A settled LIVE run is a different flow; supersede it
@@ -858,8 +856,7 @@ public class AutonomousRunService {
     AutonomousRun run = require(runId);
     if (run.getStatus() != AutonomousRunStatus.CREATED
         && run.getStatus() != AutonomousRunStatus.PAUSED) {
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT, "Run cannot be started from status " + run.getStatus());
+      throw new ConflictException("Run cannot be started from status " + run.getStatus());
     }
     boolean planMode = run.isPlanMode();
     run.setStatus(planMode ? AutonomousRunStatus.PLANNING : AutonomousRunStatus.RUNNING);
@@ -1564,14 +1561,12 @@ public class AutonomousRunService {
     // a locked check-then-act instead of racing a concurrent status write.
     AutonomousRun run = requireForUpdate(runId);
     if (!run.isPlanMode()) {
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT, "Only built (non-executed) logic can be launched as a live run");
+      throw new ConflictException("Only built (non-executed) logic can be launched as a live run");
     }
     if (run.getStatus() != AutonomousRunStatus.PLANNED
         && run.getStatus() != AutonomousRunStatus.FAILED
         && run.getStatus() != AutonomousRunStatus.CANCELED) {
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT, "A plan can only be launched once building has settled");
+      throw new ConflictException("A plan can only be launched once building has settled");
     }
     // Stop the planning orchestration and purge its coordination state so the live run does not
     // inherit the plan cycle's assumptions.
@@ -1656,8 +1651,7 @@ public class AutonomousRunService {
     AutonomousRun run = require(runId);
     String scenarioId = run.getScenarioId();
     if (!hasText(scenarioId)) {
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT, "This autonomous run has no scenario to convert");
+      throw new ConflictException("This autonomous run has no scenario to convert");
     }
     if (mode == ConvertToManualMode.DUPLICATE) {
       // Non-destructive: clone the scenario into a fresh manual chained scenario and leave the AI
@@ -1745,8 +1739,7 @@ public class AutonomousRunService {
         || status == AutonomousRunStatus.RUNNING
         || status == AutonomousRunStatus.PAUSED
         || status == AutonomousRunStatus.WAITING_INPUT) {
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT, "Stop the autonomous run before deleting its scenario");
+      throw new ConflictException("Stop the autonomous run before deleting its scenario");
     }
     tearDownRun(run);
   }
@@ -1845,8 +1838,7 @@ public class AutonomousRunService {
         || status == AutonomousRunStatus.PAUSED
         || status == AutonomousRunStatus.WAITING_INPUT) {
       if (refuseIfActive) {
-        throw new ResponseStatusException(
-            HttpStatus.CONFLICT,
+        throw new ConflictException(
             "Stop the active autonomous run before rebuilding or relaunching this scenario");
       }
       // A normal (operator-driven) launch must never tear down a live orchestration: leave the
@@ -2508,8 +2500,7 @@ public class AutonomousRunService {
       // author failure SHOULD surface (400) since the scenario is the primary artifact.
       if (!hasText(run.getSimulationId())) {
         if (!hasText(run.getScenarioId())) {
-          throw new ResponseStatusException(
-              HttpStatus.CONFLICT,
+          throw new ConflictException(
               "The autonomous run has neither a live simulation nor a scenario to build steps on");
         }
         // Validate a reused event id up front so a bad/foreign id is a precise 400, never a silent
@@ -2857,8 +2848,7 @@ public class AutonomousRunService {
       // scenario workflow (no simulation, no mirror twin).
       if (!hasText(run.getSimulationId())) {
         if (!hasText(run.getScenarioId())) {
-          throw new ResponseStatusException(
-              HttpStatus.CONFLICT,
+          throw new ConflictException(
               "The autonomous run has neither a live simulation nor a scenario to update steps on");
         }
         // Validate a reused event id up front so a bad/foreign id is a precise 400. In
@@ -3566,8 +3556,7 @@ public class AutonomousRunService {
     AutonomousRun run = require(runId);
     String simulationId = run.getSimulationId();
     if (!hasText(simulationId)) {
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT, "The autonomous run has no live simulation to attach a team to");
+      throw new ConflictException("The autonomous run has no live simulation to attach a team to");
     }
     List<String> requestedPlayerIds =
         playerIds == null
