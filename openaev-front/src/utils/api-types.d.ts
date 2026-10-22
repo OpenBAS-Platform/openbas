@@ -5244,7 +5244,6 @@ export interface EsInjectExpectation {
   inject_expectation_expiration_time?: number;
   inject_expectation_group?: boolean;
   inject_expectation_name?: string;
-  inject_expectation_results?: string;
   /** @format double */
   inject_expectation_score?: number;
   inject_expectation_status?: string;
