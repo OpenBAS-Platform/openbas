@@ -188,7 +188,12 @@ class CredentialConnectivityCheckJobIntegrationTest extends IntegrationTest {
     @DisplayName("A credential verified recently is skipped")
     void given_freshlyVerifiedCredential_should_leaveItAlone() throws Exception {
       // Arrange
-      Instant alreadyVerifiedAt = Instant.now().minus(1, ChronoUnit.HOURS);
+      // Non-determinism: the clock's sub-microsecond digits. PostgreSQL rounds the seeded
+      // instant to the microsecond, so a value ending in .753999xxx is stored as .754000 and
+      // its millisecond no longer matches (run 39556392256: expected .753, was .754). Seeding a
+      // millisecond-exact instant makes the stored value equal the seeded one whatever the clock.
+      Instant alreadyVerifiedAt =
+          Instant.now().minus(1, ChronoUnit.HOURS).truncatedTo(ChronoUnit.MILLIS);
       jdbc.update(
           "UPDATE secret_references SET secret_reference_last_verified_at = ?"
               + " WHERE secret_reference_id = ?",
