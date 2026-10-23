@@ -11,7 +11,7 @@ permissions:
 jobs:
   docs-check:
     name: "📖 Documentation gap check"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Detect documentation gaps
         uses: actions/github-script@v9
