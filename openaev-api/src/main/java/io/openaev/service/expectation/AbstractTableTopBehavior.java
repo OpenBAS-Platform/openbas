@@ -9,9 +9,12 @@ import io.openaev.database.repository.InjectExpectationRepository;
 import io.openaev.execution.ExecutableInject;
 import io.openaev.expectation.ExpectationPropertiesConfig;
 import io.openaev.utils.ExpectationUtils;
+import io.openaev.utils.ReferenceResolver;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -26,6 +29,8 @@ public abstract class AbstractTableTopBehavior
     implements ExpectationBehavior<TableTopInjectExpectation> {
 
   @Resource protected ExpectationPropertiesConfig expectationPropertiesConfig;
+
+  @Resource private ReferenceResolver referenceResolver;
 
   protected final InjectExpectationRepository injectExpectationRepository;
 
@@ -54,7 +59,9 @@ public abstract class AbstractTableTopBehavior
     boolean isChaining = executableInject.isChainingExecution() && inject.getExercise() != null;
 
     List<Team> teams = resolveTargetTeams(executableInject, inject, isChaining);
-    if (teams.isEmpty()) {
+    // A chaining audience made of players placed in the workflow scope has no target team
+    boolean hasDirectRecipients = isChaining && !executableInject.getUsers().isEmpty();
+    if (teams.isEmpty() && !hasDirectRecipients) {
       return;
     }
 
@@ -182,8 +189,9 @@ public abstract class AbstractTableTopBehavior
    * Builds expectations for chaining executions: the audience is not read from the simulation
    * enabled players but from the recipients the chaining step resolved (targeted teams' members,
    * minus the players denylisted in the workflow scope). A team gets an expectation only when at
-   * least one of its members is a recipient. Players placed directly in the workflow scope have no
-   * team and get none: every table-top expectation is anchored on a team.
+   * least one of its members is a recipient. A recipient covered by none of the targeted teams (a
+   * player placed directly in the workflow scope) gets a player expectation without team: it has no
+   * team expectation to derive, so it is its own leaf (see {@link #getLeaves}).
    */
   private void buildExpectationsForChaining(
       ExecutableInject executableInject,
@@ -193,8 +201,9 @@ public abstract class AbstractTableTopBehavior
     Set<String> recipientIds =
         executableInject.getUsers().stream()
             .map(context -> context.getUser().getId())
-            .collect(Collectors.toSet());
+            .collect(Collectors.toCollection(LinkedHashSet::new));
 
+    Set<String> coveredByTeamIds = new HashSet<>();
     for (Team team : teams) {
       List<TableTopInjectExpectation> playerExpectations =
           team.getUsers().stream()
@@ -204,21 +213,28 @@ public abstract class AbstractTableTopBehavior
       if (playerExpectations.isEmpty()) {
         continue;
       }
+      playerExpectations.forEach(
+          expectation -> coveredByTeamIds.add(expectation.getUser().getId()));
       allExpectations.add(buildExpectationForTarget(template, team, null));
       allExpectations.addAll(playerExpectations);
     }
+
+    recipientIds.stream()
+        .filter(userId -> !coveredByTeamIds.contains(userId))
+        .map(userId -> referenceResolver.resolve(userId, User.class))
+        .forEach(user -> allExpectations.add(buildExpectationForTarget(template, null, user)));
   }
 
   /**
    * Clones the template expectation and sets the team/user target.
    *
    * @param template the expectation template to clone
-   * @param team the target team
+   * @param team the target team, or {@code null} for a player targeted outside of any team
    * @param user the target user, or {@code null} for team-level expectations
    * @return a new expectation ready to be persisted
    */
   private static TableTopInjectExpectation buildExpectationForTarget(
-      TableTopInjectExpectation template, Team team, @Nullable User user) {
+      TableTopInjectExpectation template, @Nullable Team team, @Nullable User user) {
     TableTopInjectExpectation expectation = template.clone();
     expectation.setTeam(team);
     expectation.setUser(user);
