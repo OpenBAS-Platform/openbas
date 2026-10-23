@@ -303,6 +303,19 @@ class EngineReadScopeIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("given eq GREEN and RED in and mode, should match no inject")
+    void given_eqVisibleAndHiddenInAndMode_should_matchNothing() {
+      // An admin finds the inject targeting both; the reader sees GREEN only on it, so "targets
+      // GREEN and RED" holds for none of what it sees.
+      Filters.Filter both = targets(Filters.FilterOperator.eq, green, red);
+      both.setMode(Filters.FilterMode.and);
+
+      assertThat(injectsMatching(EngineReadScope.unrestricted(null), Map.of(), both))
+          .containsExactly(injectGreenRed);
+      assertThat(injectsMatching(both)).isEmpty();
+    }
+
+    @Test
     @DisplayName("given not_eq RED, should match every inject")
     void given_notEqHidden_should_matchEverything() {
       assertThat(injectsMatching(targets(Filters.FilterOperator.not_eq, red)))

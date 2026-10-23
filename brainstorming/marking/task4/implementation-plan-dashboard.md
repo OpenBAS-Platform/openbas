@@ -12,7 +12,7 @@
 **Status** (2026-10-23):
 - **Steps 1–6:** done on es8. **Step 7** (everything behind `MARKING`): done.
 - **Step 8 (e2e matrix):** API tests partly done.
-- **Steps 7a–7d:** done; **steps 9–21:** not started (21 optional).
+- **Steps 7a–7d:** done; **steps 7e, 7f:** in progress; **step 7g:** to decide (PR review); **steps 9–21:** not started (21 optional).
 - **es9 and OpenSearch:** they accept the scope but ignore it until steps 11–12 (today's behaviour, unfiltered).
 - **Branch `task4-poc-dashboard`:** rebased on `main` (2026-10-19) and compiles. The dashboard, engine, snapshot and coverage tests pass.
 
@@ -378,6 +378,66 @@ asset" (real markings): the expectation listed with `EDR-X` only, no `EDR-RED` b
 `EDR-RED` matches nothing, all back once `RED` is granted. `EngineReadScopeTest` (unit): both
 observation fields stripped, nothing stripped for an unrestricted reader; 5 of them fail without the
 fix. Matrix row M17 (step 8).
+
+#### Step 7e — Observations whose run is not named: fail closed (review fix) 🟡 in progress
+
+**Use case.** Bob has the snapshot observation capability, no `ACCESS_ASSESSMENT`, and a grant on
+simulation `S` only.
+- Atomic testing `T` (not granted to Bob) finds `CVE-X` on asset `A`: the vulnerability observation
+  `(A, CVE-X)` comes from `T`.
+- Simulation `S2`, not linked to a scenario, is granted to Bob; its observation `(B, CVE-Y)` is
+  exported, then `S2` is deleted.
+
+| What Bob sees | REST API | Dashboards / export before 7e | after 7e |
+|---|---|---|---|
+| the observation of `T` | the findings of `T` need the `T` grant | ✅ **visible** | ❌ |
+| the observation of `S2`, `S2` deleted | — | ✅ **visible, to every reader of observations** | ❌ |
+| an admin, or a reader with `ACCESS_ASSESSMENT` | — | ✅ | ✅ |
+
+**Why it leaked.** Grants are checked on the document's parent resource, read from its grant keys
+(7a). A document with no key at all was read as "linked to nothing grantable", hence open. An
+observation always comes from a run, but does not always name it: it keeps no atomic testing key, and
+loses its simulation key when the simulation is deleted (the observation survives it). With `MARKING`
+off, the export's `base_restrictions` filter kept the deleted-simulation case restricted.
+
+**Fix.** Registry: `parentRequired` on the two observation types. es8 `grantedQuery`: for those types,
+a document with no grant key matches no grant, so only the bypass reads it. The other grant-managed
+types always carry a key (their own id, or their inject).
+
+**Later, if product asks:** index the atomic testing (`base_inject_side`) on vulnerability observations,
+with a re-feed, so an atomic testing grant opens them.
+
+**Tests.** `CursorPagedSearchTest`, group "restrictions": a reader with no grant sees neither
+observation; a simulation grant does not open the atomic testing observation, the admin reads it; once
+its simulation is deleted (`bulkDelete`), the observation is closed to the reader granted on it and to
+a reader with no grant, and stays readable by the admin.
+
+#### Step 7f — Quick fixes from the PR review 🟡 in progress
+
+From the review of 2026-10-23 (code, security, multi-tenancy and performance reviewers).
+- **A finding's `base_dependencies` holds its hidden endpoints.** A finding on `GREEN` + `RED` is
+  returned with `RED` in `base_dependencies`. Strip hidden ids from `base_dependencies` for every type
+  (not `@JsonIgnore`: cascade delete relies on it).
+- **`eq` in `and` mode with a hidden value widens the match.** `eq [GREEN, RED]` (and) becomes "targets
+  `GREEN`"; it must match nothing.
+- **`hiddenAssetIds()` rebuilt per document** (Copilot's open comment): check `unrestricted` first,
+  compute the union once.
+- **Keep `ASSET_REFERENCE_FIELDS` and `stripHiddenAssets` in sync:** a reflection test (every field
+  exists, every model holding one gets it stripped), so a 7d-like gap fails a test.
+
+#### Step 7g — To decide from the PR review 🔴 not started
+
+- **Assets carry the ids of simulations, scenarios and findings the reader has no grant on**
+  (`EsAsset.base_simulation_side`, `base_scenario_side`, `base_findings_side`): a reader with asset read
+  only can bucket assets by simulation. Options: filter these fields by grants like the asset
+  references, or only let readers who see every simulation, scenario and finding use them.
+- **Before step 9 (otherwise the measure is mostly theirs):** pre-filter the Painless script with the
+  hidden ids (`terms`) and look them up with `binarySearch`; send the hidden ids once (not per asset
+  field and again in the no-tenant clause) and fail the same way on every widget past
+  `index.max_terms_count`.
+- **Smaller:** `sharedRules()` untested and the audit-log index has no `base_tenant_side`;
+  observation coverage for 7d through the snapshot export; `PermissionService` reads `TenantContext`;
+  grants are one union across tenants (not exploitable, contradicts the Javadoc).
 
 #### Step 8 — End-to-end tests: RBAC, grants, markings 🟡 API tests partly done
 

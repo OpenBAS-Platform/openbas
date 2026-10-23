@@ -9,10 +9,12 @@ import io.openaev.engine.model.scenario.EsScenario;
 import io.openaev.engine.model.simulation.EsSimulation;
 import io.openaev.engine.model.snapshotobservation.EsAttackObservation;
 import jakarta.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 /**
@@ -119,6 +121,9 @@ public record EngineReadScope(
    * of any hidden asset id (asset ids are unique, so the union cannot hide another tenant's asset).
    */
   public Set<String> hiddenAssetIds() {
+    if (tenantRules.size() == 1) {
+      return tenantRules.values().iterator().next().hiddenAssetIds();
+    }
     return tenantRules.values().stream()
         .flatMap(rules -> rules.hiddenAssetIds().stream())
         .collect(Collectors.toUnmodifiableSet());
@@ -151,15 +156,41 @@ public record EngineReadScope(
    * Removes hidden asset ids from a returned document. A parent (inject, scenario, simulation)
    * stays visible when it targets a hidden asset among others, a finding stays visible when one of
    * its endpoints is visible, and an expectation or observation on a visible asset stays visible
-   * when a hidden security platform reported on it; only the hidden references go. Documents about
-   * a hidden asset only never get here: the query already excluded them.
+   * when a hidden security platform reported on it; only the hidden references go, from the
+   * reference fields and from {@code base_dependencies}. Documents about a hidden asset only never
+   * get here: the query already excluded them.
    *
    * @return the same document, for use in a stream
    */
   public <T extends EsBase> T stripHiddenAssets(T document) {
+    return this.<T>assetStripper().apply(document);
+  }
+
+  /**
+   * {@link #stripHiddenAssets} for a page of documents: the hidden assets of the scope are
+   * collected once, not per document.
+   */
+  public <T extends EsBase> UnaryOperator<T> assetStripper() {
+    if (unrestricted) {
+      return UnaryOperator.identity();
+    }
     Set<String> hiddenAssetIds = hiddenAssetIds();
-    if (unrestricted || hiddenAssetIds.isEmpty() || document == null) {
-      return document;
+    if (hiddenAssetIds.isEmpty()) {
+      return UnaryOperator.identity();
+    }
+    return document -> strip(document, hiddenAssetIds);
+  }
+
+  private static <T extends EsBase> T strip(T document, Set<String> hiddenAssetIds) {
+    if (document == null) {
+      return null;
+    }
+    // A finding depends on each of its endpoints, so its dependencies name them too.
+    if (document.getBase_dependencies() != null) {
+      document.setBase_dependencies(
+          document.getBase_dependencies().stream()
+              .filter(id -> !hiddenAssetIds.contains(id))
+              .collect(Collectors.toCollection(ArrayList::new)));
     }
     switch (document) {
       case EsInject inject ->

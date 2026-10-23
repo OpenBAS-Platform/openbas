@@ -320,6 +320,8 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
       // -- ASSERT --
       assertThat(shared).isNotNull();
       assertThat(shared.getBase_endpoint_side()).containsExactly(green);
+      assertThat(shared.getBase_dependencies()).contains(green);
+      assertThat(asJsonString(shared)).doesNotContain(red);
     }
 
     @Test

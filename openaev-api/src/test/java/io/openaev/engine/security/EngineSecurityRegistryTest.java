@@ -23,7 +23,7 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 @DisplayName("Engine security registry")
 class EngineSecurityRegistryTest {
 
-  private static Map<String, Class<?>> indexedTypes() throws ClassNotFoundException {
+  static Map<String, Class<?>> indexedTypes() throws ClassNotFoundException {
     ClassPathScanningCandidateComponentProvider scanner =
         new ClassPathScanningCandidateComponentProvider(false);
     scanner.addIncludeFilter(new AnnotationTypeFilter(Indexable.class));
@@ -37,7 +37,7 @@ class EngineSecurityRegistryTest {
     return types;
   }
 
-  private static Set<String> fieldNames(Class<?> type) {
+  static Set<String> fieldNames(Class<?> type) {
     List<Field> fields = new ArrayList<>();
     for (Class<?> current = type; current != null; current = current.getSuperclass()) {
       fields.addAll(List.of(current.getDeclaredFields()));

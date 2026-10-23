@@ -47,6 +47,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -297,7 +298,9 @@ public class ElasticService implements EngineService {
    * <ul>
    *   <li>{@code eq} / {@code not_eq}: the hidden ids are removed from the values. On a
    *       multi-valued field, "a visible value equals v" and "a value equals v" only differ when v
-   *       is hidden. No value left: {@code eq} matches nothing, {@code not_eq} is dropped.
+   *       is hidden. No value left: {@code eq} matches nothing, {@code not_eq} is dropped. In
+   *       {@code and} mode, {@code eq} with a hidden value matches nothing: no visible reference
+   *       can hold it.
    *   <li>Other operators: {@link #VISIBLE_REFERENCES_SCRIPT}, over the values that are not hidden.
    * </ul>
    */
@@ -319,7 +322,9 @@ public class ElasticService implements EngineService {
         if (!hasFilteringValues) {
           break;
         }
-        if (visibleValues.isEmpty()) {
+        // In "and" mode a hidden value must be held too, which no visible reference can do.
+        if (visibleValues.isEmpty()
+            || (filterMode == Filters.FilterMode.and && visibleValues.size() < values.size())) {
           return MatchNoneQuery.of(m -> m)._toQuery();
         }
         List<Query> queries =
@@ -1254,10 +1259,10 @@ public class ElasticService implements EngineService {
             new TermsAggregation.Builder().field(elasticField).size(widgetConfig.getLimit());
         // A "by asset" breakdown of visible documents (an inject targeting a hidden asset among
         // others) must not show a bucket for the hidden asset.
-        if (!scope.unrestricted()
-            && !scope.hiddenAssetIds().isEmpty()
+        Set<String> hiddenAssetIds = scope.unrestricted() ? Set.of() : scope.hiddenAssetIds();
+        if (!hiddenAssetIds.isEmpty()
             && EngineSecurityRegistry.ASSET_REFERENCE_FIELDS.contains(field)) {
-          termsBuilder.exclude(TermsExclude.of(e -> e.terms(List.copyOf(scope.hiddenAssetIds()))));
+          termsBuilder.exclude(TermsExclude.of(e -> e.terms(List.copyOf(hiddenAssetIds))));
         }
         TermsAggregation termsAggregation = termsBuilder.build();
 
@@ -1505,10 +1510,11 @@ public class ElasticService implements EngineService {
                       .trackTotalHits(tth -> tth.enabled(true)),
               getClassForEntity(entityName));
       long total = response.hits().total() != null ? response.hits().total().value() : 0;
+      UnaryOperator<EsBase> stripHiddenAssets = scope.assetStripper();
       return new EsEntities(
           response.hits().hits().stream()
               .filter(hit -> hit.source() != null)
-              .map(hit -> scope.stripHiddenAssets((EsBase) hit.source()))
+              .map(hit -> stripHiddenAssets.apply((EsBase) hit.source()))
               .toList(),
           total,
           runtime.getPagination().getSize(),
@@ -1621,7 +1627,7 @@ public class ElasticService implements EngineService {
       return response.hits().hits().stream()
           .map(Hit::source)
           .filter(Objects::nonNull)
-          .map(scope::stripHiddenAssets)
+          .map(scope.<T>assetStripper())
           .toList();
     } catch (IOException e) {
       log.error("searchCursorPaged exception: {}", e.getMessage(), e);
