@@ -210,6 +210,10 @@ public final class ExpectationResultBuilder {
     if (existing != null) {
       existing.setResult(resultMsg);
       existing.setScore(verdict.score());
+      // A source answering again without metadata keeps the metadata of its previous answer
+      if (verdict.metadata() != null) {
+        existing.setMetadata(verdict.metadata());
+      }
     } else {
       existing =
           InjectExpectationResult.builder()
@@ -221,49 +225,16 @@ public final class ExpectationResultBuilder {
               .result(resultMsg)
               .date(now().toString())
               .score(verdict.score())
-              .build();
-      baseInjectExpectation.getResults().add(existing);
-    }
-  }
-
-  public static void addResult(
-      @NotNull final BaseInjectExpectation baseInjectExpectation,
-      @NotNull final InjectExpectationUpdateFromCollectorInput input,
-      @NotNull final Collector collector) {
-    final double score =
-        InjectExpectationUtils.computeScore(baseInjectExpectation, input.getIsSuccess());
-
-    ensureMutableResults(baseInjectExpectation);
-
-    InjectExpectationResult existing =
-        findResultBySourceId(baseInjectExpectation.getResults(), collector.getId());
-
-    if (existing != null) {
-      existing.setResult(input.getResult());
-      existing.setScore(score);
-      existing.setMetadata(input.getMetadata());
-    } else {
-      existing =
-          InjectExpectationResult.builder()
-              .sourceId(collector.getId())
-              .sourceType(COLLECTOR)
-              .sourceName(collector.getName())
-              .sourcePlatform(getSourcePlatform(collector))
-              .sourceAssetId(getSourceAssetId(collector))
-              .result(input.getResult())
-              .date(Instant.now().toString())
-              .score(score)
-              .metadata(input.getMetadata())
+              .metadata(verdict.metadata())
               .build();
       baseInjectExpectation.getResults().add(existing);
     }
   }
 
   /**
-   * Adds (or updates) the result written by a security platform source, mirroring {@link
-   * #addResult(BaseInjectExpectation, InjectExpectationUpdateFromCollectorInput, Collector)} for
-   * verdicts that are attributed to a platform entry instead of a collector (e.g. assessment
-   * injectors).
+   * Adds (or updates) the result written by a security platform source (e.g. assessment injectors),
+   * upserted on the platform ID. Collector verdicts go through the behaviors instead: see {@link
+   * #addResult(BaseInjectExpectation, ExpectationVerdict, String)}.
    */
   public static void addResult(
       @NotNull final BaseInjectExpectation baseInjectExpectation,

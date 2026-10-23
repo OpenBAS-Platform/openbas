@@ -3,7 +3,6 @@ package io.openaev.service.expectation;
 import static io.openaev.service.InjectExpectationUtils.*;
 import static io.openaev.utils.ExpectationUtils.*;
 import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.addResult;
-import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilder.computeResultsScore;
 
 import io.openaev.database.model.*;
 import io.openaev.database.repository.InjectExpectationRepository;
@@ -81,9 +80,7 @@ public abstract class AbstractTableTopBehavior
   private void recomputeScores(Inject inject, List<TableTopInjectExpectation> expectations) {
     // The parents are resolved from the inject expectations: register the new ones first
     inject.getExpectations().addAll(expectations);
-    expectations.forEach(
-        expectation ->
-            expectation.setScore(computeResultsScore(expectation.getResults(), expectation)));
+    expectations.forEach(expectation -> expectation.setScore(computeLeafScore(expectation)));
     expectations.stream()
         .filter(expectation -> !isPlayerExpectation(expectation))
         .forEach(this::recomputeParentScores);
