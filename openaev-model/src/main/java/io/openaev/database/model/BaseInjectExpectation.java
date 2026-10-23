@@ -44,11 +44,17 @@ public class BaseInjectExpectation implements Base, Cloneable {
   public BaseInjectExpectation clone() {
     try {
       BaseInjectExpectation clone = (BaseInjectExpectation) super.clone();
+      clone.setId(null);
+      clone.replaceResultsCollection();
       clone.setResults(cloneResults());
       return clone;
     } catch (CloneNotSupportedException e) {
       throw new AssertionError("Clone should be supported for Cloneable objects", e);
     }
+  }
+
+  private void replaceResultsCollection() {
+    this.results = new ArrayList<>();
   }
 
   private List<InjectExpectationResult> cloneResults() {
