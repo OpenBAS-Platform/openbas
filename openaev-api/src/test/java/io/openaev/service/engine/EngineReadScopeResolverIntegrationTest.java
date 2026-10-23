@@ -1,9 +1,14 @@
 package io.openaev.service.engine;
 
+import static io.openaev.utils.JsonTestUtils.asJsonString;
 import static io.openaev.utils.fixtures.MarkingDefinitionFixture.createMarkingDefinition;
 import static io.openaev.utils.fixtures.MarkingDefinitionFixture.uniqueDefinition;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.jayway.jsonpath.JsonPath;
 import io.openaev.IntegrationTest;
 import io.openaev.config.cache.MarkingClearanceCacheManager;
 import io.openaev.context.TxCtx;
@@ -31,6 +36,7 @@ import io.openaev.utils.TenantIsolationTestHelper;
 import io.openaev.utils.fixtures.EndpointFixture;
 import io.openaev.utils.fixtures.FindingFixture;
 import io.openaev.utils.fixtures.InjectFixture;
+import io.openaev.utils.fixtures.PaginationFixture;
 import io.openaev.utils.fixtures.TenantGroupFixture;
 import io.openaev.utils.fixtures.composers.EndpointComposer;
 import io.openaev.utils.fixtures.composers.FindingComposer;
@@ -51,7 +57,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -92,6 +100,7 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
   @Autowired private FindingComposer findingComposer;
   @Autowired private InjectComposer injectComposer;
   @Autowired private DataSource dataSource;
+  @Autowired private MockMvc mvc;
 
   private JdbcTemplate jdbc;
   private String userId;
@@ -286,9 +295,47 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
           .doesNotContain(red);
       assertThat(assets).contains(unmarked, green).doesNotContain(red, tenantBGreen);
     }
+
+    @Test
+    @DisplayName("given BYPASS in the default tenant only, should not clear tenant B's markings")
+    void given_bypassInDefaultTenantOnly_should_notClearTenantB() throws Exception {
+      // -- ARRANGE --
+      // BYPASS in the default tenant clears its markings there; tenant B is only read with
+      // ACCESS_ASSETS and no clearance, so its marked asset stays hidden.
+      tenantHelper.grantCapabilitiesInTenant(DEFAULT_TENANT, Set.of(Capability.BYPASS));
+      clearanceCache.evictForUser(userId);
+      TxCtx bothTenants = TxCtx.forTenants(List.of(DEFAULT_TENANT, tenantB));
+
+      // -- ACT --
+      EngineReadScope scope = resolver.resolve(bothTenants);
+      List<String> dashboardAssets = ids(list(bothTenants, "asset"));
+      List<String> restAssets = searchEndpointIds(DEFAULT_TENANT + "," + tenantB);
+
+      // -- ASSERT --
+      assertThat(scope.tenantRules().get(tenantB).hiddenAssetIds()).contains(tenantBGreen);
+      assertThat(dashboardAssets).contains(red, green).doesNotContain(tenantBGreen);
+      assertThat(restAssets).contains(red, green).doesNotContain(tenantBGreen);
+    }
   }
 
   // -- Helpers --
+
+  /** The unprefixed REST endpoint search over the given tenants: the SQL rewrite's clearance. */
+  private List<String> searchEndpointIds(String tenantIds) throws Exception {
+    String response =
+        mvc.perform(
+                post("/api/endpoints/search")
+                    .header("X-Tenant-Ids", tenantIds)
+                    .content(asJsonString(PaginationFixture.getDefault().size(200).build()))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(csrf()))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+    return JsonPath.read(response, "$.content[*].asset_id");
+  }
 
   private List<EsBase> list(TxCtx ctx, String entity) {
     ListConfiguration config = engineService.createListConfiguration(entity, Map.of());
