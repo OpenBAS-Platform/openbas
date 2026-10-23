@@ -16,7 +16,9 @@ import io.openaev.database.model.Capability;
 import io.openaev.database.model.Endpoint;
 import io.openaev.database.model.Filters;
 import io.openaev.database.model.Group;
+import io.openaev.database.model.InjectExpectationResult;
 import io.openaev.database.model.MarkingDefinition;
+import io.openaev.database.model.SecurityPlatform;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.model.User;
 import io.openaev.database.repository.GroupRepository;
@@ -33,6 +35,7 @@ import io.openaev.engine.api.WidgetConfigurationWithSeries;
 import io.openaev.engine.facade.EngineService;
 import io.openaev.engine.model.EsBase;
 import io.openaev.engine.model.finding.EsFinding;
+import io.openaev.engine.model.injectexpectation.EsInjectExpectation;
 import io.openaev.engine.query.EsSeries;
 import io.openaev.engine.query.EsSeriesData;
 import io.openaev.engine.security.EngineReadScope;
@@ -40,13 +43,17 @@ import io.openaev.utils.CustomDashboardTimeRange;
 import io.openaev.utils.TenantIsolationTestHelper;
 import io.openaev.utils.fixtures.EndpointFixture;
 import io.openaev.utils.fixtures.FindingFixture;
+import io.openaev.utils.fixtures.InjectExpectationFixture;
 import io.openaev.utils.fixtures.InjectFixture;
 import io.openaev.utils.fixtures.PaginationFixture;
+import io.openaev.utils.fixtures.SecurityPlatformFixture;
 import io.openaev.utils.fixtures.TenantGroupFixture;
 import io.openaev.utils.fixtures.composers.EndpointComposer;
 import io.openaev.utils.fixtures.composers.FindingComposer;
 import io.openaev.utils.fixtures.composers.InjectComposer;
+import io.openaev.utils.fixtures.composers.InjectExpectationComposer;
 import io.openaev.utils.fixtures.composers.MarkingDefinitionComposer;
+import io.openaev.utils.fixtures.composers.SecurityPlatformComposer;
 import io.openaev.utils.fixtures.composers.TenantGroupComposer;
 import io.openaev.utils.mockUser.WithMockUser;
 import io.openaev.utils.pagination.Pagination;
@@ -55,6 +62,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -73,7 +81,8 @@ import org.springframework.transaction.annotation.Transactional;
  * group's markings, with {@code MARKING} on and {@code assets} active (the test configuration). The
  * resolved scope is then applied by the engine, so the assertions cover both the hidden-assets
  * query (PostgreSQL arrays, the caller's clearance, per tenant) and what the reader gets back:
- * asset lists, derived finding lists and counts.
+ * asset lists, derived finding lists and counts, and the security platforms that reported on an
+ * expectation.
  *
  * <p>Order matters in the fixture: documents are indexed <b>before</b> the markings are written, so
  * every row is in the index and a hidden one is hidden by the reader scope, not by an indexing pass
@@ -91,6 +100,7 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
 
   private static final String DEFAULT_TENANT = Tenant.DEFAULT_TENANT_UUID;
   private static final TxCtx DEFAULT_CTX = TxCtx.forTenant(DEFAULT_TENANT);
+  private static final String EXPECTATION = "expectation-inject";
 
   @Autowired private EngineReadScopeResolver resolver;
   @Autowired private EngineService engineService;
@@ -104,6 +114,8 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
   @Autowired private EndpointComposer endpointComposer;
   @Autowired private FindingComposer findingComposer;
   @Autowired private InjectComposer injectComposer;
+  @Autowired private InjectExpectationComposer injectExpectationComposer;
+  @Autowired private SecurityPlatformComposer securityPlatformComposer;
   @Autowired private DataSource dataSource;
   @Autowired private MockMvc mvc;
 
@@ -124,6 +136,9 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
   private String findingOnRed;
   private String findingOnGreenAndRed;
   private String findingWithoutEndpoint;
+  private String unmarkedPlatform;
+  private String redPlatform;
+  private String expectationOnGreen;
 
   @BeforeEach
   void seed() throws Exception {
@@ -133,6 +148,8 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
     endpointComposer.reset();
     findingComposer.reset();
     injectComposer.reset();
+    injectExpectationComposer.reset();
+    securityPlatformComposer.reset();
     for (EsModel<?> model : engineContext.getModels()) {
       engineService.cleanUpIndex(model.getName());
     }
@@ -178,6 +195,9 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
     findingOnRed = finding(redEndpoint);
     findingOnGreenAndRed = finding(greenEndpoint, redEndpoint);
     findingWithoutEndpoint = finding();
+    unmarkedPlatform = securityPlatform("unmarked");
+    redPlatform = securityPlatform("red");
+    expectationOnGreen = expectation(greenEndpoint, unmarkedPlatform, redPlatform);
     unmarked = unmarkedEndpoint.get().getId();
     green = greenEndpoint.get().getId();
     red = redEndpoint.get().getId();
@@ -193,6 +213,7 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
 
     mark(green, tlpGreen);
     mark(red, tlpRed);
+    mark(redPlatform, tlpRed);
     mark(tenantBGreen, tenantBTlpGreen);
     grant(tlpGreen);
   }
@@ -399,6 +420,62 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
     }
   }
 
+  @Nested
+  @DisplayName("Security platforms reporting on a visible asset: only the hidden platform goes")
+  class SecurityPlatformsOnAVisibleAsset {
+
+    private EsInjectExpectation expectationDocument() {
+      return list(DEFAULT_CTX, EXPECTATION).stream()
+          .filter(document -> expectationOnGreen.equals(document.getBase_id()))
+          .map(EsInjectExpectation.class::cast)
+          .findFirst()
+          .orElse(null);
+    }
+
+    @Test
+    @DisplayName("given a RED platform reporting on GREEN, should list it without the RED platform")
+    void given_redPlatformOnGreen_should_listTheExpectationWithoutIt() {
+      // -- ACT --
+      EsInjectExpectation expectation = expectationDocument();
+
+      // -- ASSERT --
+      assertThat(expectation).isNotNull();
+      assertThat(expectation.getBase_security_platforms_side()).containsExactly(unmarkedPlatform);
+    }
+
+    @Test
+    @DisplayName("given expectations by security platform, should give the RED platform no bucket")
+    void given_expectationsBySecurityPlatform_should_haveNoRedBucket() {
+      // -- ACT --
+      List<String> buckets = expectationsBySecurityPlatform(DEFAULT_CTX);
+
+      // -- ASSERT --
+      assertThat(buckets).contains(unmarkedPlatform).doesNotContain(redPlatform);
+    }
+
+    @Test
+    @DisplayName("given a filter on the RED platform, should match no expectation")
+    void given_filterOnRedPlatform_should_matchNothing() {
+      // -- ACT & ASSERT --
+      assertThat(expectationsReportedBy(redPlatform)).isEmpty();
+      assertThat(expectationsReportedBy(unmarkedPlatform)).containsExactly(expectationOnGreen);
+    }
+
+    @Test
+    @DisplayName("given the clearance raised to TLP:RED, should show the RED platform again")
+    void given_clearanceRaisedToRed_should_showTheRedPlatform() {
+      // -- ARRANGE --
+      grant(tlpRed);
+
+      // -- ACT & ASSERT --
+      assertThat(expectationDocument().getBase_security_platforms_side())
+          .containsExactlyInAnyOrder(unmarkedPlatform, redPlatform);
+      assertThat(expectationsBySecurityPlatform(DEFAULT_CTX))
+          .contains(unmarkedPlatform, redPlatform);
+      assertThat(expectationsReportedBy(redPlatform)).containsExactly(expectationOnGreen);
+    }
+  }
+
   // -- Helpers --
 
   /** The unprefixed REST endpoint search over the given tenants: the SQL rewrite's clearance. */
@@ -423,6 +500,50 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
     config.setTimeRange(CustomDashboardTimeRange.ALL_TIME);
     ListRuntime runtime = new ListRuntime(config, Map.of(), Map.of(), new Pagination(0, 100));
     return engineService.entities(ctx, resolver.resolve(ctx), runtime).getEsDatas();
+  }
+
+  /** The fixture's expectation if a security platform filter on {@code platformId} matches it. */
+  private List<String> expectationsReportedBy(String platformId) {
+    ListConfiguration config =
+        engineService.createListConfiguration(
+            EXPECTATION, Map.of("base_id", List.of(expectationOnGreen)));
+    config.setTimeRange(CustomDashboardTimeRange.ALL_TIME);
+    Filters.Filter reportedBy = new Filters.Filter();
+    reportedBy.setKey("base_security_platforms_side");
+    reportedBy.setMode(Filters.FilterMode.or);
+    reportedBy.setOperator(Filters.FilterOperator.eq);
+    reportedBy.setValues(List.of(platformId));
+    List<Filters.Filter> filters =
+        new ArrayList<>(config.getPerspective().getFilter().getFilters());
+    filters.add(reportedBy);
+    config.getPerspective().getFilter().setFilters(filters);
+    ListRuntime runtime = new ListRuntime(config, Map.of(), Map.of(), new Pagination(0, 100));
+    return ids(
+        engineService.entities(DEFAULT_CTX, resolver.resolve(DEFAULT_CTX), runtime).getEsDatas());
+  }
+
+  /**
+   * The platform buckets of this fixture's expectation, as an "expectations by platform" widget.
+   */
+  private List<String> expectationsBySecurityPlatform(TxCtx ctx) {
+    Filters.FilterGroup filter = Filters.FilterGroup.defaultFilterGroup();
+    filter.setFilters(
+        List.of(
+            Filters.Filter.getNewDefaultEqualFilter("base_entity", List.of(EXPECTATION)),
+            Filters.Filter.getNewDefaultEqualFilter("base_id", List.of(expectationOnGreen))));
+    WidgetConfigurationWithSeries.Series series = new WidgetConfigurationWithSeries.Series();
+    series.setName("expectations");
+    series.setFilter(filter);
+    StructuralHistogramWidget widget = new StructuralHistogramWidget();
+    widget.setField("base_security_platforms_side");
+    widget.setDateAttribute("base_created_at");
+    widget.setTimeRange(CustomDashboardTimeRange.ALL_TIME);
+    widget.setLimit(100);
+    widget.setSeries(List.of(series));
+    List<EsSeries> result =
+        engineService.multiTermHistogram(
+            ctx, resolver.resolve(ctx), new StructuralHistogramRuntime(widget, Map.of(), Map.of()));
+    return result.getFirst().getData().stream().map(EsSeriesData::getKey).toList();
   }
 
   /** The endpoint buckets of this fixture's findings, as a "findings by endpoint" widget. */
@@ -496,6 +617,45 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
     }
     injectComposer.forInject(InjectFixture.getDefaultInject()).withFinding(finding).persist();
     return finding.get().getId();
+  }
+
+  /** A security platform of the default tenant; security platforms are assets, so markable. */
+  private String securityPlatform(String name) {
+    SecurityPlatform platform =
+        SecurityPlatformFixture.createDefault(
+            "engine-scope-" + name + "-" + uniqueDefinition(), "EDR");
+    platform.setTenant(new Tenant(DEFAULT_TENANT));
+    return securityPlatformComposer.forSecurityPlatform(platform).persist().get().getId();
+  }
+
+  /**
+   * A detection expectation on {@code endpoint}, through a bare (atomic testing) inject, with one
+   * result reported by each of {@code platformIds}.
+   */
+  private String expectation(EndpointComposer.Composer endpoint, String... platformIds) {
+    InjectExpectationComposer.Composer expectation =
+        injectExpectationComposer
+            .forExpectation(InjectExpectationFixture.createDefaultDetectionInjectExpectation())
+            .withEndpoint(endpoint);
+    expectation
+        .get()
+        .setResults(
+            Arrays.stream(platformIds)
+                .map(
+                    platformId ->
+                        InjectExpectationResult.builder()
+                            .sourceId(platformId)
+                            .sourceType("security-platform")
+                            .sourceName(platformId)
+                            .result("detected")
+                            .score(100.0)
+                            .build())
+                .collect(Collectors.toCollection(ArrayList::new)));
+    injectComposer
+        .forInject(InjectFixture.getDefaultInject())
+        .withExpectation(expectation)
+        .persist();
+    return expectation.get().getId();
   }
 
   /** Grants markings to the reader's group, and drops the cached clearance. */

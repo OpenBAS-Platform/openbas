@@ -84,11 +84,19 @@ public final class EngineSecurityRegistry {
   }
 
   /**
-   * Fields holding asset ids. Aggregations on them drop hidden assets, and returned documents have
-   * hidden ids removed from them.
+   * Fields holding asset ids. Aggregations on them drop hidden assets, filters on them only see the
+   * visible ones, and returned documents have hidden ids removed from them. Security platforms are
+   * assets: an expectation or observation keeps the ids of the platforms that reported on it (and,
+   * for an observation, of those that succeeded), and a hidden platform must not show there.
    */
   public static final Set<String> ASSET_REFERENCE_FIELDS =
-      Set.of("base_assets_side", "base_asset_side", "base_endpoint_side", "vulnerable_endpoint_id");
+      Set.of(
+          "base_assets_side",
+          "base_asset_side",
+          "base_endpoint_side",
+          "vulnerable_endpoint_id",
+          "base_security_platforms_side",
+          "attack_observation_platforms_succeeded");
 
   private static final ResourceAccess ASSESSMENT = access(ResourceType.SIMULATION, Action.READ);
 

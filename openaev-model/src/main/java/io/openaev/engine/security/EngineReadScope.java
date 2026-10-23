@@ -4,8 +4,10 @@ import io.openaev.database.raw.RawUserAuth;
 import io.openaev.engine.model.EsBase;
 import io.openaev.engine.model.finding.EsFinding;
 import io.openaev.engine.model.inject.EsInject;
+import io.openaev.engine.model.injectexpectation.EsInjectExpectation;
 import io.openaev.engine.model.scenario.EsScenario;
 import io.openaev.engine.model.simulation.EsSimulation;
+import io.openaev.engine.model.snapshotobservation.EsAttackObservation;
 import jakarta.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
@@ -147,9 +149,10 @@ public record EngineReadScope(
 
   /**
    * Removes hidden asset ids from a returned document. A parent (inject, scenario, simulation)
-   * stays visible when it targets a hidden asset among others, and a finding stays visible when one
-   * of its endpoints is visible; only the hidden references go. Documents about a hidden asset only
-   * never get here: the query already excluded them.
+   * stays visible when it targets a hidden asset among others, a finding stays visible when one of
+   * its endpoints is visible, and an expectation or observation on a visible asset stays visible
+   * when a hidden security platform reported on it; only the hidden references go. Documents about
+   * a hidden asset only never get here: the query already excluded them.
    *
    * @return the same document, for use in a stream
    */
@@ -167,6 +170,15 @@ public record EngineReadScope(
           simulation.setBase_assets_side(visible(simulation.getBase_assets_side(), hiddenAssetIds));
       case EsFinding finding ->
           finding.setBase_endpoint_side(visible(finding.getBase_endpoint_side(), hiddenAssetIds));
+      case EsInjectExpectation expectation ->
+          expectation.setBase_security_platforms_side(
+              visible(expectation.getBase_security_platforms_side(), hiddenAssetIds));
+      case EsAttackObservation observation -> {
+        observation.setBase_security_platforms_side(
+            visible(observation.getBase_security_platforms_side(), hiddenAssetIds));
+        observation.setAttack_observation_platforms_succeeded(
+            visible(observation.getAttack_observation_platforms_succeeded(), hiddenAssetIds));
+      }
       default -> {
         // no asset reference to strip
       }

@@ -9,10 +9,10 @@
 **Depends on**: Task 2 (`MarkingClearanceCacheManager`), Task 3 / Task 4 (asset markings,
 `is_marking_set_allowed`), the tenant filter of the engine (`tenantFilter(TxCtx)`, #8162).
 
-**Status** (2026-10-20):
+**Status** (2026-10-23):
 - **Steps 1–6:** done on es8. **Step 7** (everything behind `MARKING`): done.
 - **Step 8 (e2e matrix):** API tests partly done.
-- **Steps 7a, 7b:** done; **step 7c:** in progress; **steps 9–21:** not started (21 optional).
+- **Steps 7a–7d:** done; **steps 9–21:** not started (21 optional).
 - **es9 and OpenSearch:** they accept the scope but ignore it until steps 11–12 (today's behaviour, unfiltered).
 - **Branch `task4-poc-dashboard`:** rebased on `main` (2026-10-19) and compiles. The dashboard, engine, snapshot and coverage tests pass.
 
@@ -312,7 +312,7 @@ inject targets, the same field and rule as scenarios (`eq`, `not_eq`, `empty`, `
 `contains` on part of an id, ranges, a parameter, an unrestricted reader); 7 of them fail without
 the fix. Matrix rows M14–M16 (step 8).
 
-#### Step 7c — Findings on several endpoints: one visible endpoint is enough (review fix) 🟡 in progress
+#### Step 7c — Findings on several endpoints: one visible endpoint is enough (review fix) ✅ done (2026-10-23)
 
 **Use case.** Asset `RED` is `TLP:RED`, asset `GREEN` is `TLP:GREEN`. A scan produced finding `F1` on
 `GREEN` and `RED`, finding `F2` on `RED` only, finding `F3` on no endpoint. A `TLP:GREEN` reader opens
@@ -342,7 +342,42 @@ with **one** visible asset (`MarkingDerivedTables.FROM_ASSETS`, `MarkingLinkedTa
 
 **Tests.** `EngineReadScopeResolverIntegrationTest`, group "Findings linked to several endpoints"
 (real markings): `F1` listed with `GREEN` only, count 2, no `RED` bucket, both endpoints once `RED` is
-granted, `F1` hidden once `GREEN` is re-marked `RED`. Matrix rows M6, M10 (step 8).
+granted, `F1` hidden once `GREEN` is re-marked `RED`. Matrix rows M6, M10 (step 8). Regression run
+(engine, dashboards, findings, 551 tests): green, apart from `FindingRefeedEndToEndTest`, brought by
+the `main` merge, which read the index with no scope; it now passes an unrestricted one.
+
+#### Step 7d — Security platforms on a visible asset: a hidden platform is not shown (review fix) ✅ done (2026-10-23)
+
+**Use case.** Asset `GREEN` is `TLP:GREEN`. Security platform `EDR-RED` is `TLP:RED` (a security
+platform is an asset, so it can be marked), `EDR-X` is unmarked. Both report a detection on an
+expectation of `GREEN`. A `TLP:GREEN` reader opens a dashboard with the expectations, an "expectations
+by security platform" widget and a widget filtered on `EDR-RED`.
+
+| What the `TLP:GREEN` reader sees | REST API | Dashboards before 7d | Dashboards after 7d |
+|---|---|---|---|
+| the expectation on `GREEN` | ✅ | ✅ | ✅ |
+| its security platforms | `EDR-RED` not in the security platforms list | `EDR-X`, **`EDR-RED`** | `EDR-X` |
+| "expectations by security platform" | — | `EDR-X`, **`EDR-RED`** | `EDR-X` |
+| expectations reported by `EDR-RED` | — | **1** | none |
+| an observation's platforms (reporting, succeeded) | — | with **`EDR-RED`** | without |
+
+**Why it leaked.** Expectations and attack observations keep the ids of the platforms that reported
+(`base_security_platforms_side`) and, for an observation, of those that succeeded
+(`attack_observation_platforms_succeeded`). These fields were not in the asset reference fields, so a
+hidden platform kept its bucket, matched filters and stayed in the returned documents.
+
+**Fix.**
+- Registry: both fields join `ASSET_REFERENCE_FIELDS`, so they get the bucket `exclude` and the 7b
+  filter handling (visible values only).
+- Returned expectations and observations: hidden platform ids stripped (`stripHiddenAssets`).
+- The document itself is kept: it is about its asset (`base_asset_side`); the platforms are sources,
+  like the targets of a scenario.
+
+**Tests.** `EngineReadScopeResolverIntegrationTest`, group "Security platforms reporting on a visible
+asset" (real markings): the expectation listed with `EDR-X` only, no `EDR-RED` bucket, a filter on
+`EDR-RED` matches nothing, all back once `RED` is granted. `EngineReadScopeTest` (unit): both
+observation fields stripped, nothing stripped for an unrestricted reader; 5 of them fail without the
+fix. Matrix row M17 (step 8).
 
 #### Step 8 — End-to-end tests: RBAC, grants, markings 🟡 API tests partly done
 
@@ -678,6 +713,7 @@ another on both `A-GREEN` and `A-AMBER`.
 | M14 | `full-green` | admin-authored widget: count of scenarios filtered on `base_assets_side = A-RED` | 0, while the admin sees the real count |
 | M15 | `full-green` | scenarios widget filtered `base_assets_side` empty / not empty, a scenario targeting `A-RED` only | counted as empty, like its visible (stripped) targets |
 | M16 | `full-green` | widget filtered on `base_assets_side` through a dashboard parameter set to `A-RED` | nothing |
+| M17 | `full-green` | expectation on `A-GREEN` reported by a `TLP:RED` security platform: list, "by security platform" widget, filter on that platform | expectation listed without the platform, no bucket, the filter matches nothing |
 
 **Across the three**
 

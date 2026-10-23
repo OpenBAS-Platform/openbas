@@ -569,14 +569,24 @@ sequenceDiagram
 > | Finding of a RED asset only | hidden (link rows) | hidden (`base_endpoint_side`) |
 > | Finding on a GREEN **and** a RED asset | **visible**: at least one visible asset (`MarkingDimension.linkRowsPredicate`) | **visible**, with `GREEN` only: excluded only when all its endpoints are hidden, RED stripped from `base_endpoint_side` |
 > | Inject / scenario / simulation targeting RED | visible, RED not listed | visible, RED stripped from `base_assets_side` and from "by asset" buckets |
+> | Expectation / observation on GREEN reported by a RED security platform | visible; the RED platform is not in the security platforms list | visible, RED stripped from `base_security_platforms_side` (and an observation's `attack_observation_platforms_succeeded`) and from "by security platform" buckets |
 >
 > **Findings.** A finding can be on several endpoints (`base_endpoint_side` is a set). "At least one
 > visible endpoint" cannot be expressed with a `terms` query, so es8 uses a small script (the one of
 > the filters on targeted assets), only for readers with hidden assets. If it costs too much on a
 > large findings index (§4.7), the alternative is an indexed endpoint count and a `terms_set` query,
-> with no security data in the index. Not covered: an asset-group expectation
-> (`base_asset_group_side`, no asset) rolls up every member, RED included; and
-> `base_security_platforms_side` is not in the asset fields, in case a security platform is marked.
+> with no security data in the index.
+>
+> **Security platforms.** A security platform is an asset, so it can be marked. Expectations and
+> observations keep the platforms that reported on them as references, like the targets of a
+> scenario: the document stays with its asset, the hidden platform is dropped from the returned
+> document, its buckets and the filters on these fields.
+>
+> **Same as the REST API, tracked in Task 4** ([`implementation-plan.md`](./implementation-plan.md)):
+> - An asset-group expectation (`base_asset_group_side`, no asset) rolls up every member, RED
+>   included: Chunk 3b.
+> - An expectation's results (`inject_expectation_results`) still name a hidden security platform,
+>   and an observation's platform types (`EDR`, `SIEM`) count its contribution: Chunk 15.
 
 ## 4.4 The grant dimension in detail: generic, not scenario-only
 

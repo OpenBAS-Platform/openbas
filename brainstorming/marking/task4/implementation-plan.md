@@ -641,3 +641,42 @@ UI-driven assertions, not clicking through every setup step):
   `ScenarioApiHelpers`, `TeamApiHelpers`, `DocumentApiHelpers`, `TenantApiHelpers` exist today.
 
 **DoD**: spec green in CI under the existing `test:e2e` job, no new pipeline required.
+
+## Chunk 15 — Marked security platforms as result sources 🔴 not started
+
+Size: S–M, to settle with the PO (like Chunks 10–12).
+
+A security platform is an asset, so it can be marked. The expectation row stays visible (its asset is
+`GREEN`), but the platforms that reported on it live inside that row's results JSON
+(`injects_expectations.inject_expectation_results`). The read filter hides rows (`MarkingDerivedTables`),
+not the content of a visible row, so a hidden platform is still named there.
+
+**Use case.** Security platforms `EDR-RED` (`TLP:RED`) and `EDR-X` (unmarked) both report a detection on an
+expectation of `GREEN`. A `TLP:GREEN` user opens the atomic testing / simulation results:
+
+| What the `TLP:GREEN` user sees | Today | Expected |
+|---|---|---|
+| the expectation on `GREEN` | ✅ | ✅ |
+| its results | `EDR-X` and **`EDR-RED`** (`sourceId`, `sourceName`, `sourcePlatform`) | `EDR-X` only |
+| the security platforms list | `EDR-X` only | `EDR-X` only |
+| an attack observation's platform types (`EDR`, `SIEM`) | count `EDR-RED`'s contribution | to decide |
+
+Dashboards already drop `EDR-RED` from the platform id fields (`base_security_platforms_side`,
+`attack_observation_platforms_succeeded`, dashboard step 7d), but the indexed results JSON has the same gap
+as the REST API.
+
+Questions to settle first:
+- **Identity or outcome?** Hide only the platform's identity, or also its result (score, verdict, types)?
+  Same question as Chunk 3b.
+- **Strip or anonymise?** Remove the hidden sources from the results at read time, or show them as "a
+  security platform".
+- **Where:** every reader of the results JSON (expectation outputs, the results UI, the indexed
+  `inject_expectation_results`), and whether `sourceAssetId` can also name a hidden asset.
+
+### Steps
+
+- **15.1** Failing tests first: the use case above through the REST API (expectation results) and a
+  dashboard list of expectations.
+- **15.2** Inventory of the results JSON readers and the fields naming a source.
+- **15.3** Implement the chosen option, REST and index alike.
+- **15.4** Check the admin still sees every source and the true verdict.
