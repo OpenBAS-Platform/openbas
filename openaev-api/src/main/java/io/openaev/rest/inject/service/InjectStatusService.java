@@ -299,26 +299,26 @@ public class InjectStatusService {
 
   /**
    * Records a trace received after the inject is finished, without recomputing its status. The
-   * trace is always saved; the COMPLETE report of an agent that already timed out is also appended
-   * to its TIMEOUT trace.
+   * COMPLETE report of an agent that already timed out is appended to its TIMEOUT trace; any other
+   * late trace is saved as is.
    */
   private void recordLateTrace(
       Inject inject, InjectStatus injectStatus, ExecutionTrace lateTrace, @Nullable Agent agent) {
-    if (ExecutionTraceAction.COMPLETE.equals(lateTrace.getAction())) {
-      findAgentTimeoutTrace(injectStatus, agent)
-          .ifPresent(
-              timeout ->
-                  timeout.setMessage(
-                      "%s It finally reported %s after the timeout: %s"
-                          .formatted(
-                              timeout.getMessage(),
-                              lateTrace.getStatus(),
-                              lateTrace.getMessage())));
+    Optional<ExecutionTrace> timeoutTrace =
+        ExecutionTraceAction.COMPLETE.equals(lateTrace.getAction())
+            ? findAgentTimeoutTrace(injectStatus, agent)
+            : Optional.empty();
+    if (timeoutTrace.isPresent()) {
+      ExecutionTrace timeout = timeoutTrace.get();
+      timeout.setMessage(
+          "%s It finally reported %s after the timeout: %s"
+              .formatted(timeout.getMessage(), lateTrace.getStatus(), lateTrace.getMessage()));
+    } else {
+      injectStatus.addTrace(lateTrace);
+      lateTrace.setId(executionTraceRepositoryHelper.saveExecutionTrace(lateTrace));
+      logAgentTraceStep(injectStatus, lateTrace);
     }
-    injectStatus.addTrace(lateTrace);
-    lateTrace.setId(executionTraceRepositoryHelper.saveExecutionTrace(lateTrace));
     entityManager.merge(injectStatus);
-    logAgentTraceStep(injectStatus, lateTrace);
     publishInjectStatusUpdate(inject);
   }
 
