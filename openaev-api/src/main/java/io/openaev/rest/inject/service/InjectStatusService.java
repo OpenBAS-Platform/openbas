@@ -260,6 +260,11 @@ public class InjectStatusService {
         createExecutionTrace(injectStatus, input, agent, structuredOutput);
     // Resolve the placeholder status of the COMPLETE trace
     resolveCompleteTraceStatus(injectStatus, executionTrace, agent);
+    // Once an inject is finished its status never changes: a late trace is only recorded
+    if (previousStatus != null && previousStatus.isClosed()) {
+      recordLateTrace(inject, injectStatus, executionTrace, agent);
+      return;
+    }
     injectStatus.addTrace(executionTrace);
     // Save the trace using a low level call to the database
     String executionTraceId = executionTraceRepositoryHelper.saveExecutionTrace(executionTrace);
@@ -293,9 +298,47 @@ public class InjectStatusService {
   }
 
   /**
+   * Records a trace received after the inject is finished, without recomputing its status. The
+   * COMPLETE report of an agent that already timed out is appended to its TIMEOUT trace; any other
+   * late trace is saved as is.
+   */
+  private void recordLateTrace(
+      Inject inject, InjectStatus injectStatus, ExecutionTrace lateTrace, @Nullable Agent agent) {
+    Optional<ExecutionTrace> timeoutTrace =
+        ExecutionTraceAction.COMPLETE.equals(lateTrace.getAction())
+            ? findAgentTimeoutTrace(injectStatus, agent)
+            : Optional.empty();
+    if (timeoutTrace.isPresent()) {
+      ExecutionTrace timeout = timeoutTrace.get();
+      timeout.setMessage(
+          "%s It finally reported %s after the timeout: %s"
+              .formatted(timeout.getMessage(), lateTrace.getStatus(), lateTrace.getMessage()));
+    } else {
+      injectStatus.addTrace(lateTrace);
+      lateTrace.setId(executionTraceRepositoryHelper.saveExecutionTrace(lateTrace));
+      logAgentTraceStep(injectStatus, lateTrace);
+    }
+    entityManager.merge(injectStatus);
+    publishInjectStatusUpdate(inject);
+  }
+
+  private Optional<ExecutionTrace> findAgentTimeoutTrace(
+      InjectStatus injectStatus, @Nullable Agent agent) {
+    if (agent == null) {
+      return Optional.empty();
+    }
+    return injectStatus.getTraces().stream()
+        .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
+        .filter(t -> ExecutionTraceStatus.TIMEOUT.equals(t.getStatus()))
+        .filter(t -> t.getAgent() != null && agent.getId().equals(t.getAgent().getId()))
+        .findFirst();
+  }
+
+  /**
    * Resolves the status of a COMPLETE trace when the implant sent the default INFO placeholder. The
-   * real status is computed from the agent's previous traces (prerequisite, execution, cleanup). If
-   * the implant sent an explicit status (not INFO), it is kept as-is.
+   * real status is computed from the agent's previous traces (prerequisite, execution, cleanup),
+   * ignoring COMPLETE traces so that a late report is not turned into the TIMEOUT that closed the
+   * agent. If the implant sent an explicit status (not INFO), it is kept as-is.
    */
   protected void resolveCompleteTraceStatus(
       InjectStatus injectStatus, ExecutionTrace executionTrace, Agent agent) {
@@ -309,6 +352,7 @@ public class InjectStatusService {
     ExecutionTraceStatus computedStatus =
         ExecutionTraceUtils.computeAgentTraceStatus(
             injectStatus.getTraces().stream()
+                .filter(t -> !ExecutionTraceAction.COMPLETE.equals(t.getAction()))
                 .filter(t -> t.getAgent() != null)
                 .filter(t -> t.getAgent().getId().equals(agent.getId()))
                 .toList());
