@@ -6899,7 +6899,11 @@ export interface InjectExpectationUpdateFromCollectorInput {
   collector_id: string;
   is_success: boolean;
   metadata?: Record<string, string>;
-  result: string;
+  /**
+   * Ignored for collectors: the result label is derived from is_success and the expectation type
+   * @deprecated
+   */
+  result?: string;
 }
 
 export interface InjectExpectationUpdateFromUIInput {

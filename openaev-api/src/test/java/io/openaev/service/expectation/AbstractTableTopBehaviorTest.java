@@ -506,8 +506,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
           ExpectationFixture.getExpectationVerdict(MEDIA_PRESSURE_SOURCE_ID, 80.0);
 
       // Act
-      injectExpectationService.updateInjectExpectationUsingBehaviors(
-          playerExpectation.getId(), input);
+      injectExpectationService.updateInjectExpectation(playerExpectation.getId(), input);
       entityManager.flush();
       entityManager.clear();
 
@@ -603,8 +602,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
           ExpectationFixture.getExpectationVerdict(MEDIA_PRESSURE_SOURCE_ID, 70.0);
 
       // Act
-      injectExpectationService.updateInjectExpectationUsingBehaviors(
-          teamExpectation.getId(), input);
+      injectExpectationService.updateInjectExpectation(teamExpectation.getId(), input);
       entityManager.flush();
       entityManager.clear();
 
@@ -738,7 +736,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
       ExpectationVerdict input = ExpectationVerdict.fromUI(uiInput);
 
       // Act — update player3
-      injectExpectationService.updateInjectExpectationUsingBehaviors(p3Expectation.getId(), input);
+      injectExpectationService.updateInjectExpectation(p3Expectation.getId(), input);
       entityManager.flush();
       entityManager.clear();
 
@@ -803,7 +801,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
       persistExpectations(inject, List.of(playerExpectation, teamExpectation));
 
       // Act
-      injectExpectationService.updateInjectExpectationUsingBehaviors(
+      injectExpectationService.updateInjectExpectation(
           playerExpectation.getId(), ExpectationFixture.getExpectationVerdict(UI_SOURCE_ID, 100.0));
       entityManager.flush();
       entityManager.clear();
@@ -835,7 +833,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
       persistExpectations(inject, expectations);
 
       // Act
-      injectExpectationService.updateInjectExpectationUsingBehaviors(
+      injectExpectationService.updateInjectExpectation(
           teamExpectation.getId(), ExpectationFixture.getExpectationVerdict(UI_SOURCE_ID, 100.0));
       entityManager.flush();
       entityManager.clear();
@@ -866,7 +864,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
       persistExpectations(inject, List.of(playerExpectation, teamExpectation));
 
       // Act
-      injectExpectationService.updateInjectExpectationUsingBehaviors(
+      injectExpectationService.updateInjectExpectation(
           playerExpectation.getId(), ExpectationFixture.getExpectationVerdict(UI_SOURCE_ID, 0.0));
       entityManager.flush();
       entityManager.clear();
@@ -889,7 +887,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
       persistExpectations(inject, List.of(teamExpectation));
 
       // Act
-      injectExpectationService.updateInjectExpectationUsingBehaviors(
+      injectExpectationService.updateInjectExpectation(
           teamExpectation.getId(), ExpectationFixture.getExpectationVerdict(UI_SOURCE_ID, 100.0));
       entityManager.flush();
       entityManager.clear();
@@ -916,7 +914,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
       ManualInjectExpectation teamExpectation =
           InjectExpectationFixture.createManualInjectExpectation(team, inject);
       persistExpectations(inject, List.of(playerExpectation, teamExpectation));
-      injectExpectationService.updateInjectExpectationUsingBehaviors(
+      injectExpectationService.updateInjectExpectation(
           playerExpectation.getId(), ExpectationFixture.getExpectationVerdict(UI_SOURCE_ID, 100.0));
 
       // Act
@@ -950,7 +948,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
           InjectExpectationFixture.createManualInjectExpectation(team, inject);
       expectations.add(teamExpectation);
       persistExpectations(inject, expectations);
-      injectExpectationService.updateInjectExpectationUsingBehaviors(
+      injectExpectationService.updateInjectExpectation(
           teamExpectation.getId(), ExpectationFixture.getExpectationVerdict(UI_SOURCE_ID, 100.0));
 
       // Act
@@ -1021,7 +1019,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
       ManualInjectExpectation teamExpectation =
           InjectExpectationFixture.createManualInjectExpectation(team, inject);
       persistExpectations(inject, List.of(teamExpectation));
-      injectExpectationService.updateInjectExpectationUsingBehaviors(
+      injectExpectationService.updateInjectExpectation(
           teamExpectation.getId(), ExpectationFixture.getExpectationVerdict(UI_SOURCE_ID, 100.0));
 
       // Act
@@ -1046,7 +1044,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
       ManualInjectExpectation teamExpectation =
           InjectExpectationFixture.createManualInjectExpectation(team, inject);
       persistExpectations(inject, List.of(playerExpectation, teamExpectation));
-      injectExpectationService.updateInjectExpectationUsingBehaviors(
+      injectExpectationService.updateInjectExpectation(
           playerExpectation.getId(), ExpectationFixture.getExpectationVerdict(UI_SOURCE_ID, 100.0));
 
       // Act
@@ -1120,7 +1118,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
       ArticleInjectExpectation reader = findPlayerExpectations(article1).getFirst();
 
       // Act
-      injectExpectationService.updateInjectExpectationUsingBehaviors(
+      injectExpectationService.updateInjectExpectation(
           reader.getId(),
           ExpectationFixture.getExpectationVerdict(MEDIA_PRESSURE_SOURCE_ID, 100.0));
       entityManager.flush();
@@ -1141,7 +1139,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
       ArticleInjectExpectation teamExpectation = findTeamExpectation(article1);
 
       // Act
-      injectExpectationService.updateInjectExpectationUsingBehaviors(
+      injectExpectationService.updateInjectExpectation(
           teamExpectation.getId(), ExpectationFixture.getExpectationVerdict(UI_SOURCE_ID, 100.0));
       entityManager.flush();
       entityManager.clear();
@@ -1296,7 +1294,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
           .filter(expectation -> expectation.getUser() != null)
           .forEach(
               player ->
-                  injectExpectationService.updateInjectExpectationUsingBehaviors(
+                  injectExpectationService.updateInjectExpectation(
                       player.getId(),
                       ExpectationFixture.getExpectationVerdict(UI_SOURCE_ID, 100.0)));
       entityManager.flush();
@@ -1533,7 +1531,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
       ManualInjectExpectation teamExpectation =
           InjectExpectationFixture.createManualInjectExpectation(team, inject);
       persistExpectations(inject, List.of(playerExpectation, teamExpectation));
-      injectExpectationService.updateInjectExpectationUsingBehaviors(
+      injectExpectationService.updateInjectExpectation(
           playerExpectation.getId(), ExpectationFixture.getExpectationVerdict(UI_SOURCE_ID, 100.0));
       entityManager.flush();
       entityManager.clear();
