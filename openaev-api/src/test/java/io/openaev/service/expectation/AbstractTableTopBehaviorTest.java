@@ -598,7 +598,7 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
               .orElseThrow();
 
       // Act
-      injectExpectationService.updateInjectExpectationUsingBehaviors(
+      injectExpectationService.updateInjectExpectation(
           teamless.getId(), ExpectationFixture.getExpectationVerdict(UI_SOURCE_ID, 0.0));
       entityManager.flush();
       entityManager.clear();
