@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.openaev</groupId>
         <artifactId>openaev-platform</artifactId>
-        <version>3.261016.0</version>
+        <version>3.261023.0</version>
     </parent>
 
     <artifactId>openaev-api</artifactId>
@@ -28,7 +28,7 @@
         <!-- Not managed by the Spring Boot BOM; pinned here. Apache-2.0. -->
         <datasource-proxy.version>1.11.1</datasource-proxy.version>
         <!-- Server-side report rendering (headless Chromium). Apache-2.0. -->
-        <playwright.version>1.63.0</playwright.version>
+        <playwright.version>1.64.0</playwright.version>
         <!-- Azure credential status validation. Aligned with openaev-model's azure-core-management. MIT. -->
         <azure-identity.version>1.18.7</azure-identity.version>
         <!-- GCP credential status validation: signs the service account RS256 JWT and exchanges
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>io.openaev</groupId>
             <artifactId>openaev-framework</artifactId>
-            <version>3.261016.0</version>
+            <version>3.261023.0</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>

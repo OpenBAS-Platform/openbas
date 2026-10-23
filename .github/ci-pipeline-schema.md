@@ -90,8 +90,7 @@ is cancelled, or is skipped cannot leave consumers waiting until the poll cap.
 
 It deliberately does **not** `needs:` Prepare Bundled Assets. It re-runs the same
 composite action inline with `upload-artifact: false`, which removes ~1.4 min of serial
-wait from the head of the critical path. This is why the job checks out with
-`fetch-depth: 0` — the asset version comes from `git describe`.
+wait from the head of the critical path.
 
 ---
 
@@ -108,7 +107,7 @@ The minutes column is each job's `timeout-minutes` ceiling, not its runtime.
 | 🎨 **Frontend Build** | 15 min | Yarn build of `openaev-front` |
 | 📦 **Prepare Bundled Assets** | 10 min | Agent/implant binaries from JFrog, patches `catalog-integrators.json`, uploads `release-assets` |
 | 🔍 **Spotless Check** | 10 min | Java formatting |
-| 🧪 **Frontend Quality & Unit Tests** | 20 min | ESLint + Vitest + coverage |
+| 🧪 **Frontend Quality & Unit Tests** | 20 min | ESLint + dependency-cruiser + knip + Vitest + coverage |
 | 🐳 **Docker Build** ×4 | 25 min | `standard`/`ubi9` × `amd64`/`arm64`, native runners, no QEMU. `fail-fast: false` |
 | 🐳 **Merge Platforms** ×2 | 45 min | Multi-arch OCI index per variant, with artifact fallback when the registry is unavailable |
 | 🔒 **Container Vulnerability Scan** | 25 min | CVE scan of both amd64 images, threshold `high` |
