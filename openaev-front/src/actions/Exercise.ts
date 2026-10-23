@@ -141,16 +141,16 @@ export const fetchPlayerExercise = (exerciseId: string, userId: string | null) =
 
 // -- HEALTHCHECKS --
 
-export const searchExerciseHealthchecks = (exerciseId: Exercise['exercise_id']) => {
+export const searchExerciseHealthchecks = (exerciseId: Exercise['exercise_id'], notifyOnError = true) => {
   const uri = `/api/exercises/${exerciseId}/healthchecks`;
-  return simpleCall(uri);
+  return simpleCall(uri, undefined, notifyOnError);
 };
 
 // -- EXPECTATIONS DRIFT --
 
-export const fetchExerciseExpectationsDrift = (exerciseId: Exercise['exercise_id']) => {
+export const fetchExerciseExpectationsDrift = (exerciseId: Exercise['exercise_id'], notifyOnError = true) => {
   const uri = `/api/exercises/${exerciseId}/expectations-drift`;
-  return simpleCall(uri);
+  return simpleCall(uri, undefined, notifyOnError);
 };
 
 export const realignExerciseExpectations = (exerciseId: Exercise['exercise_id']) => {

@@ -1,14 +1,13 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { useParams } from 'react-router';
 
-import type { WorkflowConfigurationHelper } from '../../../../../actions/chaining/workflow-helper';
-import { searchScenarioHealthcheks } from '../../../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import { useHelper } from '../../../../../store';
-import { type HealthCheck, type Scenario } from '../../../../../utils/api-types';
+import { type Scenario } from '../../../../../utils/api-types';
 import ScopeDefinition from '../../../chaining/ScopeDefinition';
 import { PermissionsContext } from '../../../common/Context';
 import Healthchecks from '../../../common/healthchecks/Healthchecks';
+import { useReadinessContext } from '../../../common/healthchecks/readiness';
 
 interface Props {
   /** Read-only inspection mode: the scope belongs to an autonomous (AI-driven) run. */
@@ -21,21 +20,10 @@ const ScenarioScope = ({ readOnly = false, autonomousTimeoutSeconds }: Props) =>
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
   const { scenario } = useHelper((helper: ScenariosHelper) => ({ scenario: helper.getScenario(scenarioId) }));
-  const { workflowConfiguration } = useHelper(
-    (helper: WorkflowConfigurationHelper) => ({
-      workflowConfiguration: scenario?.scenario_workflow_id
-        ? helper.getWorkflowConfiguration(scenario.scenario_workflow_id)
-        : undefined,
-    }),
-  );
 
   const { permissions } = useContext(PermissionsContext);
 
-  const [healthchecks, setHealthchecks] = useState<HealthCheck[]>([]);
-
-  useEffect(() => {
-    searchScenarioHealthcheks(scenarioId).then((result: { data: HealthCheck[] }) => setHealthchecks(result.data));
-  }, [scenarioId, scenario, workflowConfiguration]);
+  const { healthchecks } = useReadinessContext();
 
   if (!scenario?.scenario_workflow_id) return null;
 
