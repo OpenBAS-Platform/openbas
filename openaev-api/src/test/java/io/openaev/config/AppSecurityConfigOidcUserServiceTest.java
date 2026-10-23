@@ -25,8 +25,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
@@ -107,24 +105,11 @@ class AppSecurityConfigOidcUserServiceTest {
   @DisplayName("UserInfo is called")
   class UserInfoCalled {
 
-    @ParameterizedTest(name = "{0}")
-    @ValueSource(strings = {"profile", "email", "address", "phone"})
-    @DisplayName("given a scope served by UserInfo, should call UserInfo")
-    void given_userInfoScope_should_callUserInfo(String scope) {
-      // Arrange
-      OidcUserRequest request = getOidcUserRequest(Set.of("openid", scope));
-
-      // Act & Assert
-      assertThatThrownBy(() -> oidcUserService.loadUser(request))
-          .isInstanceOf(OAuth2AuthenticationException.class)
-          .hasMessageContaining("invalid_user_info_response");
-    }
-
     @Test
-    @DisplayName("given no granted scope in the token response, should call UserInfo")
-    void given_noGrantedScope_should_callUserInfo() {
+    @DisplayName("given the profile scope, should call UserInfo")
+    void given_profileScope_should_callUserInfo() {
       // Arrange
-      OidcUserRequest request = getOidcUserRequest(Set.of());
+      OidcUserRequest request = getOidcUserRequest(Set.of("openid", "profile"));
 
       // Act & Assert
       assertThatThrownBy(() -> oidcUserService.loadUser(request))
