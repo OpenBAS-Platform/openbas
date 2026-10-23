@@ -687,7 +687,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
         assertThatJson(response)
             .when(Option.IGNORING_ARRAY_ORDER)
             .whenIgnoringPaths(
-                "[*].inject_expectation_results[*].inject_expectation_result_date",
+                "[*].inject_expectation_results[*].date",
                 "[*].inject_expectation_results[*].inject_expectation_result_created_at",
                 "[*].inject_expectation_results[*].inject_expectation_result_updated_at",
                 "[*].inject_expectation_results[*].inject_expectation_id")
@@ -938,7 +938,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
         assertThatJson(mapper.writeValueAsString(detectionResultsByType.getFirst()))
             .when(Option.IGNORING_ARRAY_ORDER)
             .whenIgnoringPaths(
-                "[*].inject_expectation_result_date",
+                "[*].date",
                 "[*].inject_expectation_result_created_at",
                 "[*].inject_expectation_result_updated_at",
                 "[*].inject_expectation_id")
@@ -959,7 +959,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
         assertThatJson(mapper.writeValueAsString(preventionResultsByType.getFirst()))
             .when(Option.IGNORING_ARRAY_ORDER)
             .whenIgnoringPaths(
-                "[*].inject_expectation_result_date",
+                "[*].date",
                 "[*].inject_expectation_result_created_at",
                 "[*].inject_expectation_result_updated_at",
                 "[*].inject_expectation_id")
@@ -1095,7 +1095,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
         assertThatJson(responseDetection)
             .when(Option.IGNORING_ARRAY_ORDER)
             .whenIgnoringPaths(
-                "[*].inject_expectation_results[*].inject_expectation_result_date",
+                "[*].inject_expectation_results[*].date",
                 "[*].inject_expectation_results[*].inject_expectation_result_created_at",
                 "[*].inject_expectation_results[*].inject_expectation_result_updated_at",
                 "[*].inject_expectation_results[*].inject_expectation_id")
@@ -1146,7 +1146,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
         assertThatJson(responsePrevention)
             .when(Option.IGNORING_ARRAY_ORDER)
             .whenIgnoringPaths(
-                "[*].inject_expectation_results[*].inject_expectation_result_date",
+                "[*].inject_expectation_results[*].date",
                 "[*].inject_expectation_results[*].inject_expectation_result_created_at",
                 "[*].inject_expectation_results[*].inject_expectation_result_updated_at",
                 "[*].inject_expectation_results[*].inject_expectation_id")
