@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.openaev.database.model.ContractOutputType;
 import io.openaev.database.model.PrimitiveType;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -340,6 +343,70 @@ class SensitiveValueMaskingUtilsTest {
               SensitiveValueMaskingUtils.isMaskedRepresentationOfCurrentValue(
                   PrimitiveType.Password, "TopSecret", null))
           .isFalse();
+    }
+  }
+
+  @Nested
+  @DisplayName("When the masking rule changes")
+  class WhenTheMaskingRuleChanges {
+
+    /** A composed value and a value too short to keep a visible fragment. */
+    private static final List<String> SAMPLES = List.of("admin:Sup3rS3cret", "abc");
+
+    private static final String UNKNOWN_TYPE = "<unknown type>";
+
+    /**
+     * Every sample the rule changes, for every finding type, under {@code MASKING_VERSION} 1; every
+     * other one is handed out unchanged. The search index stores this form, so it may only change
+     * together with a version bump.
+     */
+    private static final Map<String, String> MASKED_SAMPLES_V1 =
+        // Literals, not MASK: a change to the mask itself is a rule change too
+        Map.of(
+            "Credentials | abc",
+            "******",
+            "Credentials | admin:Sup3rS3cret",
+            "admin:Su******",
+            UNKNOWN_TYPE + " | abc",
+            "******",
+            UNKNOWN_TYPE + " | admin:Sup3rS3cret",
+            "ad******:Su******");
+
+    @Test
+    @DisplayName("Should keep the masked output pinned to its masking version")
+    void given_theCurrentRule_should_produceTheOutputPinnedForItsVersion() {
+      // -------- Arrange --------
+      Map<String, String> masked = new TreeMap<>();
+      for (String sample : SAMPLES) {
+        for (ContractOutputType type : ContractOutputType.values()) {
+          putIfChanged(
+              masked,
+              type.name() + " | " + sample,
+              sample,
+              SensitiveValueMaskingUtils.maskIfNeeded(type, sample));
+        }
+        putIfChanged(
+            masked, UNKNOWN_TYPE + " | " + sample, sample, SensitiveValueMaskingUtils.mask(sample));
+      }
+
+      // -------- Act & Assert --------
+      assertThat(SensitiveValueMaskingUtils.MASKING_VERSION)
+          .as("pin the outputs of the new version below, under its own name")
+          .isEqualTo(1L);
+      assertThat(masked)
+          .as(
+              "The masked output changed, but the finding documents of the search index still"
+                  + " hold the previous one. Bump SensitiveValueMaskingUtils.MASKING_VERSION, add"
+                  + " a migration requesting a re-feed of the finding model (see the class"
+                  + " Javadoc), then pin the new outputs here")
+          .isEqualTo(MASKED_SAMPLES_V1);
+    }
+
+    private static void putIfChanged(
+        Map<String, String> masked, String key, String sample, String output) {
+      if (!sample.equals(output)) {
+        masked.put(key, output);
+      }
     }
   }
 }

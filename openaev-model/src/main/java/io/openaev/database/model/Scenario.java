@@ -478,7 +478,6 @@ public class Scenario extends ModelBehaviour implements GrantableBase, TenantBas
       }
     }
     this.exercises = exercises == null ? null : new HashSet<>(exercises);
-    this.setUpdatedAt(now());
   }
 
   @Getter
