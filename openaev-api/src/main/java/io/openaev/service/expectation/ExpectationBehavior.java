@@ -72,7 +72,7 @@ public abstract class ExpectationBehavior<T extends BaseInjectExpectation> {
       BaseInjectExpectation expectation);
 
   /**
-   * Validates that the given expectation can be updated directly; throws otherwise.
+   * Validates that the given expectation can be answered directly by a user; throws otherwise.
    *
    * @param expectation the expectation to validate
    * @throws IllegalArgumentException if direct update is not allowed
@@ -91,13 +91,24 @@ public abstract class ExpectationBehavior<T extends BaseInjectExpectation> {
     if (verdict.score() == null) {
       throw new IllegalArgumentException("Expectation score cannot be null");
     }
-    throwIfCannotUpdateThisExpectation(expectation);
     List<? extends BaseInjectExpectation> leaves = getLeaves(expectation);
     for (BaseInjectExpectation leaf : leaves) {
       addResultToLeaf(leaf, verdict, resolveResultLabel(leaf, verdict.score()));
-      leaf.setScore(computeResultsScore(leaf.getResults(), leaf));
+      leaf.setScore(computeLeafScore(leaf));
     }
     return leaves;
+  }
+
+  /**
+   * Computes the score of a leaf expectation from its results. Defaults to the highest score once
+   * every source answered (see {@link
+   * io.openaev.utils.inject_expectation_result.ExpectationResultBuilder#computeResultsScore}).
+   *
+   * @param leaf the leaf expectation whose score is computed
+   * @return the score of the leaf, or {@code null} while it is still pending
+   */
+  public Double computeLeafScore(BaseInjectExpectation leaf) {
+    return computeResultsScore(leaf.getResults(), leaf);
   }
 
   /**
@@ -129,7 +140,7 @@ public abstract class ExpectationBehavior<T extends BaseInjectExpectation> {
       if (!removed.isEmpty()) {
         injectExpectationResultRepository.deleteAll(removed);
       }
-      leaf.setScore(computeResultsScore(leaf.getResults(), leaf));
+      leaf.setScore(computeLeafScore(leaf));
     }
     // The expectation is a leaf itself: the loop above already cleaned it
     if (leaves.contains(expectation)) {
@@ -187,7 +198,7 @@ public abstract class ExpectationBehavior<T extends BaseInjectExpectation> {
       // The per-source rows still pending (e.g. one per security platform) get the verdict too
       expireEmptyResults(leaf.getResults(), verdict.score(), EXPIRED);
       addResultToLeaf(leaf, verdict, resolveResultLabel(leaf, verdict.score()));
-      leaf.setScore(computeResultsScore(leaf.getResults(), leaf));
+      leaf.setScore(computeLeafScore(leaf));
     }
     return leaves;
   }

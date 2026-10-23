@@ -1045,13 +1045,13 @@ class TenantStatementInspectorTest {
   void findingIndexingQueryGroupsOnEveryProjectedColumn() throws Exception {
     String sql =
         io.openaev.database.repository.FindingRepository.class
-            .getMethod("findForIndexing", java.time.Instant.class, int.class)
+            .getMethod("findForIndexing", java.time.Instant.class, String.class, int.class)
             .getAnnotation(org.springframework.data.jpa.repository.Query.class)
             .value();
     // Cut at ORDER BY: the substring used to run to the end of the query, which ends
-    // "ORDER BY f.finding_updated_at LIMIT :limit". contains("f.finding_updated_at") was then
-    // satisfied by the ORDER BY occurrence, so deleting that column from the real GROUP BY - the
-    // exact edit this test exists to catch - left it green.
+    // "ORDER BY f.finding_updated_at, f.finding_id LIMIT :limit". contains("f.finding_updated_at")
+    // was then satisfied by the ORDER BY occurrence, so deleting that column from the real GROUP
+    // BY - the exact edit this test exists to catch - left it green.
     String tail = sql.substring(sql.indexOf("GROUP BY"));
     int orderBy = tail.indexOf("ORDER BY");
     String groupBy = (orderBy < 0 ? tail : tail.substring(0, orderBy)).toLowerCase();

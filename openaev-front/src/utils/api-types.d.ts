@@ -5169,6 +5169,8 @@ export interface EsFinding {
   /** @format date-time */
   base_updated_at?: string;
   finding_field?: string;
+  /** @format int64 */
+  finding_masking_version?: number;
   finding_type?: string;
   finding_value?: string;
 }
@@ -6270,7 +6272,7 @@ export interface FullTextSearchResult {
   /** @minLength 1 */
   name: string;
   /** @uniqueItems true */
-  tags?: Tag[];
+  tags?: string[];
 }
 
 export type GcpOAuth2 = Value & {
@@ -6903,7 +6905,11 @@ export interface InjectExpectationUpdateFromCollectorInput {
   collector_id: string;
   is_success: boolean;
   metadata?: Record<string, string>;
-  result: string;
+  /**
+   * Ignored for collectors: the result label is derived from is_success and the expectation type
+   * @deprecated
+   */
+  result?: string;
 }
 
 export interface InjectExpectationUpdateFromUIInput {

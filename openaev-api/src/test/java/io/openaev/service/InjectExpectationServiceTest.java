@@ -412,6 +412,13 @@ class InjectExpectationServiceTest {
       return captor.getValue();
     }
 
+    // Without a security platform, the group score is derived from its assets by the behaviors
+    private void assertGroupNotAnsweredDirectly() {
+      verify(injectExpectationService, never())
+          .updateInjectExpectation(
+              eq("exp-group"), any(InjectExpectationUpdateFromCollectorInput.class));
+    }
+
     @Test
     @DisplayName("Only the asset carrying the CVE is marked vulnerable, siblings stay clean")
     void shouldMarkOnlyAttributedAssetVulnerable() {
@@ -425,9 +432,7 @@ class InjectExpectationServiceTest {
 
       assertEquals(Boolean.FALSE, capturedVerdict("exp-asset-1").getIsSuccess());
       assertEquals(Boolean.TRUE, capturedVerdict("exp-asset-2").getIsSuccess());
-      // Default group semantics: one vulnerable asset makes the group vulnerable, and the group
-      // verdict is written with its own attributed source result.
-      assertEquals(Boolean.FALSE, capturedVerdict("exp-group").getIsSuccess());
+      assertGroupNotAnsweredDirectly();
     }
 
     @Test
@@ -443,7 +448,7 @@ class InjectExpectationServiceTest {
 
       assertEquals(Boolean.TRUE, capturedVerdict("exp-asset-1").getIsSuccess());
       assertEquals(Boolean.TRUE, capturedVerdict("exp-asset-2").getIsSuccess());
-      assertEquals(Boolean.TRUE, capturedVerdict("exp-group").getIsSuccess());
+      assertGroupNotAnsweredDirectly();
     }
 
     @Test
@@ -466,7 +471,7 @@ class InjectExpectationServiceTest {
 
       assertEquals(Boolean.FALSE, capturedVerdict("exp-asset-1").getIsSuccess());
       assertEquals(Boolean.TRUE, capturedVerdict("exp-asset-2").getIsSuccess());
-      assertEquals(Boolean.FALSE, capturedVerdict("exp-group").getIsSuccess());
+      assertGroupNotAnsweredDirectly();
     }
 
     @Test
@@ -486,7 +491,7 @@ class InjectExpectationServiceTest {
 
       assertEquals(Boolean.FALSE, capturedVerdict("exp-asset-1").getIsSuccess());
       assertEquals(Boolean.FALSE, capturedVerdict("exp-asset-2").getIsSuccess());
-      assertEquals(Boolean.FALSE, capturedVerdict("exp-group").getIsSuccess());
+      assertGroupNotAnsweredDirectly();
     }
 
     @Test
@@ -570,26 +575,7 @@ class InjectExpectationServiceTest {
       // dropping it, every asset falls back to the legacy blanket verdict.
       assertEquals(Boolean.FALSE, capturedVerdict("exp-asset-1").getIsSuccess());
       assertEquals(Boolean.FALSE, capturedVerdict("exp-asset-2").getIsSuccess());
-      assertEquals(Boolean.FALSE, capturedVerdict("exp-group").getIsSuccess());
-    }
-
-    @Test
-    @DisplayName(
-        "Expectation-group semantics keep the group clean while at least one asset is clean")
-    void shouldKeepExpectationGroupCleanWhenOneAssetIsClean() {
-      expectationGroup.setExpectationGroup(true);
-
-      ArrayNode structuredOutput = mapper.createArrayNode();
-      ObjectNode cve = structuredOutput.addObject();
-      cve.put("id", "CVE-2025-0005").put("host", "https://vulnerable-host").put("severity", "7.5");
-      cve.putArray("asset_id").add("asset-1");
-
-      injectExpectationService.matchesVulnerabilityExpectations(
-          injectorContext(structuredOutput), structuredOutput);
-
-      assertEquals(Boolean.FALSE, capturedVerdict("exp-asset-1").getIsSuccess());
-      assertEquals(Boolean.TRUE, capturedVerdict("exp-asset-2").getIsSuccess());
-      assertEquals(Boolean.TRUE, capturedVerdict("exp-group").getIsSuccess());
+      assertGroupNotAnsweredDirectly();
     }
   }
 

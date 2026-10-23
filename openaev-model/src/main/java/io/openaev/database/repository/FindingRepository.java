@@ -137,7 +137,12 @@ public interface FindingRepository
               + "LEFT JOIN injects i ON i.inject_id = f.finding_inject_id "
               + "LEFT JOIN scenarios_exercises se ON i.inject_exercise = se.exercise_id "
               + "LEFT JOIN findings_assets fa ON f.finding_id = fa.finding_id "
-              + "WHERE f.finding_updated_at > :from "
+              // Keyset resume on (updated_at, id): a batch whose LIMIT falls inside a group of
+              // findings sharing one timestamp - an upsert stamps a whole transaction with now() -
+              // resumes after its last id instead of skipping the rest of the group. A null id
+              // (first round, grace-window cap) re-serves the boundary group, idempotently.
+              + "WHERE (f.finding_updated_at > :from OR (f.finding_updated_at = :from"
+              + " AND (CAST(:fromId AS text) IS NULL OR f.finding_id > CAST(:fromId AS text)))) "
               // Every non-aggregated projected column, not just the id. Grouping on the id
               // alone relies on PostgreSQL's functional-dependency rule, which only applies to
               // BASE TABLES. Once findings is v2-active the tenant statement inspector rewrites
@@ -147,9 +152,10 @@ public interface FindingRepository
               + "GROUP BY f.finding_id, f.finding_value, f.finding_type, f.finding_field,"
               + " f.finding_inject_id, i.inject_exercise, f.finding_created_at,"
               + " f.finding_updated_at, f.tenant_id "
-              + "ORDER BY f.finding_updated_at LIMIT :limit;",
+              + "ORDER BY f.finding_updated_at, f.finding_id LIMIT :limit;",
       nativeQuery = true)
-  List<RawFindingIndexing> findForIndexing(@Param("from") Instant from, @Param("limit") int limit);
+  List<RawFindingIndexing> findForIndexing(
+      @Param("from") Instant from, @Param("fromId") String fromId, @Param("limit") int limit);
 
   // The finding upsert, its asset link and its tag links used to be one modifying CTE
   // (WITH ... INSERT ... RETURNING), which JSQLParser cannot parse, so the tenant inspector would
