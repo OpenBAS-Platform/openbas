@@ -78,7 +78,8 @@ public class ExecutionExecutorService {
     // Manage overloaded agents
     saveOverloadedAgentsTraces(overloadedAgents, injectStatus);
     // Manage assets not cleared
-    saveAssetClearanceRestrictTraces(agentsWithoutClearance, injectStatus);
+    saveAgentWithoutClearanceTraces(agentsWithoutClearance, injectStatus);
+    saveAssetsWithoutClearanceTraces(agentsAndAssetsAgentless.assetsWithoutClearance(), injectStatus);
 
     // Group remaining agents by their executor entity for per-instance routing.
     // Each executor entity maps to exactly one ConnectorInstance (and therefore one Integration
@@ -309,8 +310,7 @@ public class ExecutionExecutorService {
     }
   }
 
-  @VisibleForTesting
-  public void saveAssetClearanceRestrictTraces(
+  public void saveAgentWithoutClearanceTraces(
       Set<Agent> agentsWithoutClearance, InjectStatus injectStatus) {
     if (!agentsWithoutClearance.isEmpty()) {
       executionTraceRepository.saveAll(
@@ -324,6 +324,30 @@ public class ExecutionExecutorService {
                           "Asset not targeted",
                           ExecutionTraceAction.COMPLETE,
                           agent,
+                          null))
+              .toList());
+    }
+  }
+
+  /**
+   * Asset-level counterpart of {@link #saveAgentWithoutClearanceTraces}, for restricted targets
+   * with no agent to attribute the trace to: endpoints without agent, non-endpoint assets, and
+   * every target of an injector that does not go through agents.
+   */
+  public void saveAssetsWithoutClearanceTraces(
+      Set<Asset> assetsWithoutClearance, InjectStatus injectStatus) {
+    if (!assetsWithoutClearance.isEmpty()) {
+      executionTraceRepository.saveAll(
+          assetsWithoutClearance.stream()
+              .map(
+                  asset ->
+                      new ExecutionTrace(
+                          injectStatus,
+                          ExecutionTraceStatus.ASSET_CLEARANCE_RESTRICTED,
+                          List.of(asset.getId()),
+                          "Asset " + asset.getName() + " not targeted",
+                          ExecutionTraceAction.COMPLETE,
+                          null,
                           null))
               .toList());
     }

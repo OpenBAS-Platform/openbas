@@ -465,6 +465,23 @@ public class InjectService {
 
   // -- ASSETS --
   public List<AssetToExecute> resolveAllAssetsToExecute(@NotNull final Inject inject) {
+    return filterByMarkingClearance(inject, resolveAllTargetedAssets(inject));
+  }
+
+  /**
+   * Returns the targets that {@link #resolveAllAssetsToExecute} drops because the launcher's
+   * clearance does not cover their markings, so the dispatch can trace them as not targeted instead
+   * of skipping them silently.
+   */
+  public Set<Asset> resolveAssetsWithoutClearance(@NotNull final Inject inject) {
+    MarkingCtx clearance = resolveLaunchedByClearance(inject);
+    return resolveAllTargetedAssets(inject).stream()
+        .map(AssetToExecute::asset)
+        .filter(asset -> !isVisibleUnderClearance(asset, clearance))
+        .collect(Collectors.toSet());
+  }
+
+  private List<AssetToExecute> resolveAllTargetedAssets(Inject inject) {
     List<AssetToExecute> assetToExecutes = new ArrayList<>();
 
     inject.getAssets().forEach(asset -> assetToExecutes.add(new AssetToExecute(asset)));
@@ -512,7 +529,7 @@ public class InjectService {
               }
             });
 
-    return filterByMarkingClearance(inject, assetToExecutes);
+    return assetToExecutes;
   }
 
   /**
@@ -1195,6 +1212,7 @@ public class InjectService {
     Set<Agent> agents = new HashSet<>();
     Set<Agent> agentsWithoutClearance = new HashSet<>();
     Set<Asset> assetsAgentless = new HashSet<>();
+    Set<Asset> assetsWithoutClearance = new HashSet<>();
     MarkingCtx clearance = resolveLaunchedByClearance(inject);
 
     List<Asset> targetedAssets =
@@ -1209,12 +1227,16 @@ public class InjectService {
     for (Asset asset : targetedAssets) {
       if (isVisibleUnderClearance(asset, clearance)) {
         extractAgentsAndAssetsAgentless(agents, assetsAgentless, asset);
+      } else if (Hibernate.unproxy(asset) instanceof Endpoint) {
+        extractAgentsAndAssetsAgentless(agentsWithoutClearance, assetsWithoutClearance, asset);
       } else {
-        extractAgentsAndAssetsAgentless(agentsWithoutClearance, assetsAgentless, asset);
+        // No agent to attribute the trace to: a restricted non-endpoint is traced at asset level
+        assetsWithoutClearance.add(asset);
       }
     }
 
-    return new AgentsAndAssetsAgentless(agents, assetsAgentless, agentsWithoutClearance);
+    return new AgentsAndAssetsAgentless(
+        agents, assetsAgentless, agentsWithoutClearance, assetsWithoutClearance);
   }
 
   private void extractAgentsAndAssetsAgentless(

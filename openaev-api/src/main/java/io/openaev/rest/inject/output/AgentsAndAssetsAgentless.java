@@ -8,4 +8,5 @@ import java.util.Set;
 public record AgentsAndAssetsAgentless(
     @NotNull Set<Agent> agents,
     @NotNull Set<Asset> assetsAgentless,
-    Set<Agent> agentsWithoutClearance) {}
+    @NotNull Set<Agent> agentsWithoutClearance,
+    @NotNull Set<Asset> assetsWithoutClearance) {}
