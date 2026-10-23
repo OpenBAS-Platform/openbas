@@ -1088,9 +1088,9 @@ class ExpectationApiTest extends IntegrationTest {
     }
 
     /**
-     * Regression test: a collector writing a failed result DIRECTLY on an asset-level parent
-     * expectation (asset with agent children) must not clobber the score derived from the agents.
-     * The green verdict rolled up from the agents stays, the direct result is only recorded.
+     * Regression test: a collector answering an asset-level parent expectation (asset with agent
+     * children) with a failure must not clobber the score derived from the agents. The result is
+     * written on the agents, where the green verdict of another source still settles them.
      */
     @Test
     @DisplayName("Direct collector failure cannot clobber a parent whose agents are green")
@@ -1128,12 +1128,15 @@ class ExpectationApiTest extends IntegrationTest {
               savedSIEMCollector.getId(), DETECTION.failureLabel, false));
 
       // -- ASSERT --
-      // The direct result is recorded on the parent row...
+      // The result is written on the agents (the leaves), never on the parent row...
+      agentExpectations =
+          injectExpectationRepository.findAllByInjectAndAgent(
+              savedInject.getId(), savedAgent1.getId());
+      assertEquals(0.0, getResultScoreForCollector(agentExpectations, savedSIEMCollector).get());
+      // ...where the green EDR result still settles the agent, hence the parent
       assetExpectations =
           injectExpectationRepository.findAllByInjectAndAsset(
               savedInject.getId(), savedEndpoint.getId());
-      assertEquals(0.0, getResultScoreForCollector(assetExpectations, savedSIEMCollector).get());
-      // ...but the children-derived verdict is untouched
       assertEquals(detectionExpectation.getScore(), getScore(assetExpectations));
       List<BaseInjectExpectation> assetGroupExpectations =
           injectExpectationRepository.findAllByInjectAndAssetGroup(
