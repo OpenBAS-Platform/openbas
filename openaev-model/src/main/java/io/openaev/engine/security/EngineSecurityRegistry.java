@@ -61,13 +61,19 @@ public final class EngineSecurityRegistry {
    *     hidden only when every one of them is hidden, and stays visible without the hidden ones
    *     otherwise (like link rows in {@code MarkingDerivedTables}: a finding needs one visible
    *     asset)
+   * @param parentRequired whether a document with none of its grant keys set is only readable
+   *     through the bypass. Otherwise it is linked to nothing grantable and not grant-filtered. A
+   *     type sets it when its documents always have a parent resource but do not always name it: an
+   *     observation keeps no atomic testing key, and loses its simulation key when the simulation
+   *     is deleted (the observation survives it)
    */
   public record EntitySecurity(
       List<ResourceAccess> requiredAccess,
       @Nullable ResourceAccess grantBypass,
       List<GrantKeyField> grantKeys,
       List<String> assetFields,
-      List<String> linkedAssetFields) {
+      List<String> linkedAssetFields,
+      boolean parentRequired) {
 
     /** A type with no field linking it to several assets. */
     public EntitySecurity(
@@ -75,7 +81,17 @@ public final class EngineSecurityRegistry {
         @Nullable ResourceAccess grantBypass,
         List<GrantKeyField> grantKeys,
         List<String> assetFields) {
-      this(requiredAccess, grantBypass, grantKeys, assetFields, List.of());
+      this(requiredAccess, grantBypass, grantKeys, assetFields, List.of(), false);
+    }
+
+    /** A type whose documents without a grant key are linked to nothing grantable. */
+    public EntitySecurity(
+        List<ResourceAccess> requiredAccess,
+        @Nullable ResourceAccess grantBypass,
+        List<GrantKeyField> grantKeys,
+        List<String> assetFields,
+        List<String> linkedAssetFields) {
+      this(requiredAccess, grantBypass, grantKeys, assetFields, linkedAssetFields, false);
     }
 
     public boolean grantManaged() {
@@ -198,13 +214,17 @@ public final class EngineSecurityRegistry {
             ASSESSMENT,
             ASSESSMENT_KEYS,
             List.of("vulnerable_endpoint_id")));
-    // Snapshot export (dev feature BULK_SNAPSHOT_EXPORT); its capability is SEARCH-only.
+    // Snapshot export (dev feature BULK_SNAPSHOT_EXPORT); its capability is SEARCH-only. An
+    // observation without a simulation or scenario still comes from one (deleted since) or from an
+    // atomic testing: only the bypass reads it.
     EntitySecurity observation =
         new EntitySecurity(
             List.of(access(ResourceType.SNAPSHOT_OBSERVATION, Action.SEARCH)),
             ASSESSMENT,
             ASSESSMENT_KEYS,
-            List.of("base_asset_side"));
+            List.of("base_asset_side"),
+            List.of(),
+            true);
     entities.put(index(EsAttackObservation.class), observation);
     entities.put(index(EsVulnerabilityObservation.class), observation);
     return Map.copyOf(entities);

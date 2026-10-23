@@ -573,7 +573,8 @@ public class ElasticService implements EngineService {
               ._toQuery());
       List<EngineReadScope.GrantKey> grantKeys = rules.grantFilters().get(entity);
       if (grantKeys != null) {
-        conditions.add(grantedQuery(grantKeys));
+        conditions.add(
+            grantedQuery(grantKeys, EngineSecurityRegistry.get(entity).parentRequired()));
       }
       readableEntities.add(BoolQuery.of(b -> b.filter(conditions))._toQuery());
     }
@@ -586,14 +587,16 @@ public class ElasticService implements EngineService {
   /**
    * The document's most specific owner is a resource the reader is granted on, or the document
    * links to no grant-managed resource at all (none of the grant-key fields is set): like a row
-   * with no parent in SQL, a document attached to nothing grantable has no grant to check.
+   * with no parent in SQL, a document attached to nothing grantable has no grant to check. When
+   * {@code parentRequired}, a document without any key has a parent it does not name (an atomic
+   * testing, a deleted simulation): no grant can be checked, so it is not readable here.
    *
    * <p>The keys come in precedence order ({@link EngineSecurityRegistry.EntitySecurity#grantKeys}):
    * the first one set on the document names its owner, and only that owner's grant counts. A
    * simulation's documents are therefore checked on the simulation, never on its scenario, as in
    * the REST API.
    */
-  private Query grantedQuery(List<EngineReadScope.GrantKey> grantKeys) {
+  private Query grantedQuery(List<EngineReadScope.GrantKey> grantKeys, boolean parentRequired) {
     List<Query> granted = new ArrayList<>();
     List<Query> morePreciseKeysUnset = new ArrayList<>();
     for (EngineReadScope.GrantKey key : grantKeys) {
@@ -605,8 +608,13 @@ public class ElasticService implements EngineService {
       }
       morePreciseKeysUnset.add(keySet);
     }
-    List<Query> noKeySet = List.copyOf(morePreciseKeysUnset);
-    granted.add(BoolQuery.of(b -> b.mustNot(noKeySet))._toQuery());
+    if (!parentRequired) {
+      List<Query> noKeySet = List.copyOf(morePreciseKeysUnset);
+      granted.add(BoolQuery.of(b -> b.mustNot(noKeySet))._toQuery());
+    }
+    if (granted.isEmpty()) {
+      return MatchNoneQuery.of(m -> m)._toQuery();
+    }
     return BoolQuery.of(b -> b.should(granted).minimumShouldMatch("1"))._toQuery();
   }
 

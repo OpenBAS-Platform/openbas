@@ -221,6 +221,26 @@ class CursorPagedSearchTest extends IntegrationTest {
     return new Grain(endpointWrapper.get().getId(), findingWrapper.get().getId(), simulationId);
   }
 
+  /** Persists an endpoint + CVE finding through an inject of a simulation with no scenario. */
+  private Grain newSimulationGrain() {
+    EndpointComposer.Composer endpointWrapper =
+        endpointComposer.forEndpoint(EndpointFixture.createEndpoint("ep-" + UUID.randomUUID()));
+    FindingComposer.Composer findingWrapper =
+        findingComposer
+            .forFinding(FindingFixture.createDefaultCveFindingWithRandomTitle())
+            .withEndpoint(endpointWrapper);
+    InjectComposer.Composer injectWrapper =
+        injectComposer.forInject(InjectFixture.getDefaultInject()).withFinding(findingWrapper);
+    String simulationId =
+        exerciseComposer
+            .forExercise(ExerciseFixture.createDefaultIncidentResponseExercise(Instant.now()))
+            .withInject(injectWrapper)
+            .persist()
+            .get()
+            .getId();
+    return new Grain(endpointWrapper.get().getId(), findingWrapper.get().getId(), simulationId);
+  }
+
   private Scenario persistScenario() {
     return scenarioComposer
         .forScenario(ScenarioFixture.createDefaultIncidentResponseScenario())
@@ -712,17 +732,60 @@ class CursorPagedSearchTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("a non-admin user with no grant only sees unrestricted documents")
-    void given_noGrant_should_onlySeeUnrestrictedDocuments() {
+    @DisplayName("a non-admin user with no grant sees no document")
+    void given_noGrant_should_seeNoDocument() {
       Scenario scenario = persistScenario();
-      Grain restricted = newScenarioLinkedGrain(scenario);
-      Grain unrestricted = newGrain();
+      Grain ofSimulation = newScenarioLinkedGrain(scenario);
+      Grain ofAtomicTesting = newGrain();
       indexAll();
 
       List<EsVulnerabilityObservation> results = page(nonAdminScope(Set.of(), Set.of()), null, 100);
 
-      assertThat(containsAsset(results, restricted.assetId())).isFalse();
-      assertThat(containsAsset(results, unrestricted.assetId())).isTrue();
+      assertThat(containsAsset(results, ofSimulation.assetId())).isFalse();
+      assertThat(containsAsset(results, ofAtomicTesting.assetId())).isFalse();
+    }
+
+    @Test
+    @DisplayName("an observation from an atomic testing is not revealed by a simulation grant")
+    void given_observationOfAtomicTesting_should_onlyBeReadThroughTheBypass() {
+      // It names no simulation or scenario, and keeps no atomic testing key: no grant can be
+      // checked, so only the bypass (the admin here) reads it.
+      Grain ofAtomicTesting = newGrain();
+      Grain ofSimulation = newSimulationGrain();
+      indexAll();
+
+      List<EsVulnerabilityObservation> granted =
+          page(nonAdminScope(Set.of(ofSimulation.simulationId()), Set.of()), null, 100);
+
+      assertThat(containsAsset(granted, ofSimulation.assetId())).isTrue();
+      assertThat(containsAsset(granted, ofAtomicTesting.assetId())).isFalse();
+      assertThat(containsAsset(page(ADMIN_SCOPE, null, 100), ofAtomicTesting.assetId())).isTrue();
+    }
+
+    @Test
+    @DisplayName("deleting its simulation does not open the observation to everyone")
+    void given_simulationDeleted_should_keepTheObservationClosed() {
+      // The observation survives its simulation (not a dependency) but loses its simulation key.
+      Grain ofSimulation = newSimulationGrain();
+      indexAll();
+      assertThat(
+              containsAsset(
+                  page(nonAdminScope(Set.of(ofSimulation.simulationId()), Set.of()), null, 100),
+                  ofSimulation.assetId()))
+          .isTrue();
+
+      engineService.bulkDelete(List.of(ofSimulation.simulationId()));
+
+      assertThat(containsAsset(page(ADMIN_SCOPE, null, 100), ofSimulation.assetId())).isTrue();
+      assertThat(
+              containsAsset(
+                  page(nonAdminScope(Set.of(ofSimulation.simulationId()), Set.of()), null, 100),
+                  ofSimulation.assetId()))
+          .isFalse();
+      assertThat(
+              containsAsset(
+                  page(nonAdminScope(Set.of(), Set.of()), null, 100), ofSimulation.assetId()))
+          .isFalse();
     }
 
     @Test

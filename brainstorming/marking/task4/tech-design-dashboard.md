@@ -664,6 +664,7 @@ it belongs to, as the REST API's parent permission (`Inject.getParentResourceId(
 | scenario, and the injects of a scenario | the scenario | `base_id` / `base_scenario_side` → SCENARIO grant |
 | atomic testing and its documents | the atomic testing | `base_id` / `base_inject_side` → ATOMIC_TESTING grant |
 | linked to nothing grant-managed | — | not grant-filtered |
+| observation (snapshot) with no simulation or scenario | an atomic testing, or a deleted simulation | not readable without the bypass (`ACCESS_ASSESSMENT`) |
 
 The registry declares a type's grant keys in that order, and es8's `grantedQuery` uses the **first
 one set** on the document:
@@ -673,8 +674,15 @@ should (minimum_should_match = 1):
   - base_simulation_side ∈ granted simulations
   - NOT exists base_simulation_side AND base_scenario_side ∈ granted scenarios
   - neither set AND base_inject_side (or base_id) ∈ granted atomic testings
-  - none of these fields set
+  - none of these fields set (not for observations: see below)
 ```
+
+An observation always comes from a run, but does not always name it: it keeps no atomic testing key,
+and it loses its simulation key when the simulation is deleted (the observation survives it, by
+design). "None of these fields set" would then open it to every reader of observations, so for these
+two types (`parentRequired` in the registry) a document without a key is only readable through the
+bypass. With `MARKING` off, the export's `base_restrictions` filter gives the same result for a
+deleted simulation.
 
 With `MARKING` off, nothing changes: the OpenGRC export keeps `main`'s `base_restrictions` filter.
 
