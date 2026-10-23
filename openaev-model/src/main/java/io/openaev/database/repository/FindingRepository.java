@@ -167,6 +167,18 @@ public interface FindingRepository
   // cursor (findForIndexing), so a re-detected finding (same natural key, possibly a new asset
   // link added right after by insertFindingAsset) would otherwise never be re-indexed and its
   // ES document would keep a stale asset list forever.
+  //
+  // Being native, the upsert skips ModelBaseListener: FindingWriter publishes the lifecycle event
+  // itself, which notification triggers and the stream depend on. "inserted" tells it which one:
+  // xmax is 0 only on a row version this statement inserted, the conflict branch stamps it with
+  // its own transaction id.
+
+  /** Projection for {@link #upsertFinding}. */
+  interface UpsertedFinding {
+    String getId();
+
+    boolean getInserted();
+  }
 
   @Query(
       value =
@@ -179,10 +191,10 @@ public interface FindingRepository
            :findingLabels, :findingInjectId, :findingName, :tenantId)
         ON CONFLICT (finding_inject_id, finding_field, finding_type, finding_value)
         DO UPDATE SET finding_name = EXCLUDED.finding_name, finding_updated_at = now()
-        RETURNING finding_id
+        RETURNING finding_id AS id, (xmax = 0) AS inserted
         """,
       nativeQuery = true)
-  String upsertFinding(
+  UpsertedFinding upsertFinding(
       @Param("findingField") String findingField,
       @Param("findingType") String findingType,
       @Param("findingValue") String findingValue,
@@ -190,6 +202,27 @@ public interface FindingRepository
       @Param("findingInjectId") String injectId,
       @Param("findingName") String name,
       @Param("tenantId") String tenantId);
+
+  // Native to match the upsert's natural key as the raw strings it is written with. FOR UPDATE
+  // serializes the agents of one inject re-detecting the same finding: the second one waits for
+  // the first to commit, re-evaluates the predicate on the bumped finding_updated_at, and no
+  // longer matches. Read-only: no listener side effect is lost.
+  @Query(
+      value =
+          """
+        SELECT finding_id FROM findings
+        WHERE finding_inject_id = :findingInjectId AND finding_field = :findingField
+          AND finding_type = :findingType AND finding_value = :findingValue
+          AND finding_updated_at < :executionStartedAt
+        FOR UPDATE
+        """,
+      nativeQuery = true)
+  Optional<String> lockFindingLastUpdatedBefore(
+      @Param("findingField") String findingField,
+      @Param("findingType") String findingType,
+      @Param("findingValue") String findingValue,
+      @Param("findingInjectId") String injectId,
+      @Param("executionStartedAt") Instant executionStartedAt);
 
   @Modifying
   @Query(

@@ -1,8 +1,17 @@
 package io.openaev.rest.finding;
 
+import static io.openaev.database.audit.ModelBaseListener.DATA_PERSIST;
+import static io.openaev.database.audit.ModelBaseListener.DATA_UPDATE;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openaev.context.TxCtx;
+import io.openaev.database.audit.BaseEvent;
 import io.openaev.database.repository.FindingRepository;
+import io.openaev.database.repository.FindingRepository.UpsertedFinding;
+import jakarta.annotation.Nullable;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,13 +30,29 @@ import org.springframework.transaction.annotation.Transactional;
  * included, so a re-detected finding could never be updated. The scope is set by the tenant aspect
  * from that parameter, which is how the HTTP path carries a scope; the background primitive must
  * not be reachable from here.
+ *
+ * <p>The writes are native, so {@code ModelBaseListener} never sees them: this writer publishes the
+ * lifecycle event itself, without which notification triggers on findings never fire (#8649).
  */
 @Component
 @RequiredArgsConstructor
 public class FindingWriter {
 
   private final FindingRepository findingRepository;
+  private final ApplicationEventPublisher eventPublisher;
+  private final ObjectMapper mapper;
 
+  /**
+   * Upserts the finding, links it to the asset and tags, and publishes its lifecycle event.
+   *
+   * <p>Every agent of an inject reports its own copy of a finding, so one execution re-detects it
+   * once per agent. Publishing an update for each would notify once per agent: an update is only
+   * published for the first re-detection of an execution, the one that finds the row last written
+   * before {@code executionStartedAt}. Without an execution start, no update is published.
+   *
+   * @param executionStartedAt when the current execution of the inject started, or {@code null} if
+   *     unknown
+   */
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void saveCompleteFinding(
       TxCtx ctx,
@@ -38,7 +63,8 @@ public class FindingWriter {
       String injectId,
       String name,
       String assetId,
-      String[] tagIds) {
+      String[] tagIds,
+      @Nullable Instant executionStartedAt) {
     // The transaction's scope and the row's tenant are one value. Taking both from the caller let
     // them disagree: the transaction scoped to one tenant while the row carried another's id, so
     // the upsert's conflict branch could never match. A scope naming anything but exactly one
@@ -55,12 +81,19 @@ public class FindingWriter {
                       + " would be unattributed. The caller must resolve the tenant from the"
                       + " inject.");
         };
-    String findingId =
+    // Must run before the upsert, which bumps finding_updated_at past the execution start.
+    boolean firstRedetectionOfExecution =
+        executionStartedAt != null
+            && findingRepository
+                .lockFindingLastUpdatedBefore(
+                    findingField, findingType, findingValue, injectId, executionStartedAt)
+                .isPresent();
+    UpsertedFinding upserted =
         findingRepository.upsertFinding(
             findingField, findingType, findingValue, findingLabels, injectId, name, tenantId);
-    if (findingId == null) {
+    if (upserted == null) {
       // The tenant statement inspector rewrites the upsert's conflict branch to
-      // "DO UPDATE SET ... WHERE can_access_tenant(findings.tenant_id) RETURNING finding_id".
+      // "DO UPDATE SET ... WHERE can_access_tenant(findings.tenant_id) RETURNING ...".
       // On a conflict with no scope, or with a row owned by another tenant, that predicate is
       // false: nothing is updated, RETURNING yields nothing, and this comes back null. Refusing
       // here names the cause; without it the next line inserts a null finding_id into
@@ -74,7 +107,23 @@ public class FindingWriter {
               + " this transaction. A background caller must open one (TenantScopedTransaction);"
               + " an HTTP caller must carry a TxCtx.");
     }
+    String findingId = upserted.getId();
     findingRepository.insertFindingAsset(findingId, assetId);
     findingRepository.insertFindingTags(findingId, tagIds);
+
+    if (upserted.getInserted()) {
+      publishLifecycleEvent(DATA_PERSIST, findingId);
+    } else if (firstRedetectionOfExecution) {
+      publishLifecycleEvent(DATA_UPDATE, findingId);
+    }
+  }
+
+  // Loaded after the links are written: the event carries the serialized finding to the stream,
+  // so it must hold its full asset and tag lists. Listeners consume it after this commit.
+  private void publishLifecycleEvent(String eventType, String findingId) {
+    findingRepository
+        .findById(findingId)
+        .ifPresent(
+            finding -> eventPublisher.publishEvent(new BaseEvent(eventType, finding, mapper)));
   }
 }
