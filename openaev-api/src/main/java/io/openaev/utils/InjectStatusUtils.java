@@ -19,6 +19,7 @@ public class InjectStatusUtils {
         traces.stream()
             .filter(t -> !ExecutionTraceStatus.AGENT_INACTIVE.equals(t.getStatus()))
             .filter(t -> !ExecutionTraceStatus.AGENT_OVERLOADED.equals(t.getStatus()))
+            .filter(t -> !ExecutionTraceStatus.ASSET_CLEARANCE_RESTRICTED.equals(t.getStatus()))
             .filter(t -> !ExecutionTraceStatus.ASSET_AGENTLESS.equals(t.getStatus()))
             .filter(t -> !ExecutionTraceStatus.INFO.equals(t.getStatus()))
             .toList();

@@ -47,10 +47,12 @@ public class ExecutionExecutorService {
   public void launchExecutorContext(Inject inject) {
     InjectStatus injectStatus =
         inject.getStatus().orElseThrow(() -> new IllegalArgumentException("Status should exist"));
-    // First, get the agents and the assets agentless of this inject
+    // First, get the agents and the assets agentless of this inject restricted by the launch by
+    // clearance
     AgentsAndAssetsAgentless agentsAndAssetsAgentless =
         this.injectService.getAgentsAndAgentlessAssetsByInject(inject);
     Set<Agent> agents = agentsAndAssetsAgentless.agents();
+    Set<Agent> agentsWithoutClearance = agentsAndAssetsAgentless.agentsWithoutClearance();
     Set<Asset> assetsAgentless = agentsAndAssetsAgentless.assetsAgentless();
     // Persist the number of agents resolved at launch so the COMPLETE callback path can decide
     // completion without re-resolving the full asset/agent graph on every callback
@@ -75,6 +77,9 @@ public class ExecutionExecutorService {
     saveWithoutExecutorAgentsTraces(agentsWithoutExecutor, injectStatus);
     // Manage overloaded agents
     saveOverloadedAgentsTraces(overloadedAgents, injectStatus);
+    // Manage assets not cleared
+    saveAgentWithoutClearanceTraces(agentsWithoutClearance, injectStatus);
+    saveAssetsWithoutClearanceTraces(agentsAndAssetsAgentless.assetsWithoutClearance(), injectStatus);
 
     // Group remaining agents by their executor entity for per-instance routing.
     // Each executor entity maps to exactly one ConnectorInstance (and therefore one Integration
@@ -298,6 +303,49 @@ public class ExecutionExecutorService {
                           ExecutionTraceStatus.ASSET_AGENTLESS,
                           List.of(asset.getId()),
                           "Asset " + asset.getName() + " has no agent, unable to launch the inject",
+                          ExecutionTraceAction.COMPLETE,
+                          null,
+                          null))
+              .toList());
+    }
+  }
+
+  public void saveAgentWithoutClearanceTraces(
+      Set<Agent> agentsWithoutClearance, InjectStatus injectStatus) {
+    if (!agentsWithoutClearance.isEmpty()) {
+      executionTraceRepository.saveAll(
+          agentsWithoutClearance.stream()
+              .map(
+                  agent ->
+                      new ExecutionTrace(
+                          injectStatus,
+                          ExecutionTraceStatus.ASSET_CLEARANCE_RESTRICTED,
+                          List.of(),
+                          "Asset not targeted",
+                          ExecutionTraceAction.COMPLETE,
+                          agent,
+                          null))
+              .toList());
+    }
+  }
+
+  /**
+   * Asset-level counterpart of {@link #saveAgentWithoutClearanceTraces}, for restricted targets
+   * with no agent to attribute the trace to: endpoints without agent, non-endpoint assets, and
+   * every target of an injector that does not go through agents.
+   */
+  public void saveAssetsWithoutClearanceTraces(
+      Set<Asset> assetsWithoutClearance, InjectStatus injectStatus) {
+    if (!assetsWithoutClearance.isEmpty()) {
+      executionTraceRepository.saveAll(
+          assetsWithoutClearance.stream()
+              .map(
+                  asset ->
+                      new ExecutionTrace(
+                          injectStatus,
+                          ExecutionTraceStatus.ASSET_CLEARANCE_RESTRICTED,
+                          List.of(asset.getId()),
+                          "Asset " + asset.getName() + " not targeted",
                           ExecutionTraceAction.COMPLETE,
                           null,
                           null))

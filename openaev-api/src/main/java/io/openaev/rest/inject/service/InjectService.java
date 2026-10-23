@@ -465,6 +465,23 @@ public class InjectService {
 
   // -- ASSETS --
   public List<AssetToExecute> resolveAllAssetsToExecute(@NotNull final Inject inject) {
+    return filterByMarkingClearance(inject, resolveAllTargetedAssets(inject));
+  }
+
+  /**
+   * Returns the targets that {@link #resolveAllAssetsToExecute} drops because the launcher's
+   * clearance does not cover their markings, so the dispatch can trace them as not targeted instead
+   * of skipping them silently.
+   */
+  public Set<Asset> resolveAssetsWithoutClearance(@NotNull final Inject inject) {
+    MarkingCtx clearance = resolveLaunchedByClearance(inject);
+    return resolveAllTargetedAssets(inject).stream()
+        .map(AssetToExecute::asset)
+        .filter(asset -> !isVisibleUnderClearance(asset, clearance))
+        .collect(Collectors.toSet());
+  }
+
+  private List<AssetToExecute> resolveAllTargetedAssets(Inject inject) {
     List<AssetToExecute> assetToExecutes = new ArrayList<>();
 
     inject.getAssets().forEach(asset -> assetToExecutes.add(new AssetToExecute(asset)));
@@ -512,7 +529,7 @@ public class InjectService {
               }
             });
 
-    return filterByMarkingClearance(inject, assetToExecutes);
+    return assetToExecutes;
   }
 
   /**
@@ -1193,24 +1210,33 @@ public class InjectService {
    */
   public AgentsAndAssetsAgentless getAgentsAndAgentlessAssetsByInject(Inject inject) {
     Set<Agent> agents = new HashSet<>();
+    Set<Agent> agentsWithoutClearance = new HashSet<>();
     Set<Asset> assetsAgentless = new HashSet<>();
+    Set<Asset> assetsWithoutClearance = new HashSet<>();
     MarkingCtx clearance = resolveLaunchedByClearance(inject);
 
-    for (Asset asset : inject.getAssets()) {
+    List<Asset> targetedAssets =
+        Stream.concat(
+                Optional.ofNullable(inject.getAssets()).orElse(Collections.emptyList()).stream(),
+                inject.getAssetGroups().stream()
+                    .flatMap(
+                        assetGroup ->
+                            assetGroupService.assetsFromAssetGroup(assetGroup.getId()).stream()))
+            .toList();
+
+    for (Asset asset : targetedAssets) {
       if (isVisibleUnderClearance(asset, clearance)) {
         extractAgentsAndAssetsAgentless(agents, assetsAgentless, asset);
+      } else if (Hibernate.unproxy(asset) instanceof Endpoint) {
+        extractAgentsAndAssetsAgentless(agentsWithoutClearance, assetsWithoutClearance, asset);
+      } else {
+        // No agent to attribute the trace to: a restricted non-endpoint is traced at asset level
+        assetsWithoutClearance.add(asset);
       }
     }
 
-    for (AssetGroup assetGroup : inject.getAssetGroups()) {
-      for (Asset asset : assetGroupService.assetsFromAssetGroup(assetGroup.getId())) {
-        if (isVisibleUnderClearance(asset, clearance)) {
-          extractAgentsAndAssetsAgentless(agents, assetsAgentless, asset);
-        }
-      }
-    }
-
-    return new AgentsAndAssetsAgentless(agents, assetsAgentless);
+    return new AgentsAndAssetsAgentless(
+        agents, assetsAgentless, agentsWithoutClearance, assetsWithoutClearance);
   }
 
   private void extractAgentsAndAssetsAgentless(

@@ -21,6 +21,7 @@ public enum ExecutionTraceStatus {
 
   // -- Not counted (ignored in status computation) --
   ASSET_AGENTLESS,
+  ASSET_CLEARANCE_RESTRICTED,
   AGENT_INACTIVE,
   AGENT_OVERLOADED,
   INFO,
