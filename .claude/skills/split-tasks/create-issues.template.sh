@@ -17,9 +17,22 @@
 # Prerequisites:
 #   - gh CLI, authenticated with the project scope: gh auth refresh -s project
 #   - jq
+#
+# Runs in bash on macOS, Linux and Windows (Git Bash or WSL; from PowerShell,
+# prefix it with bash).
 # =============================================================================
 
+# POSIX syntax on purpose: sh (dash on Ubuntu) and zsh reach this line before failing on bash syntax.
+if [ -z "${BASH_VERSION:-}" ]; then
+  echo "Run this script with bash: ./create-issues.sh or bash create-issues.sh" >&2
+  exit 1
+fi
+
 set -euo pipefail
+
+# A native jq.exe called from Git Bash on Windows ends its lines with CRLF: drop the CR, or every
+# id read through jq carries it into the next gh call.
+jq() { command jq "$@" | tr -d '\r'; }
 
 OWNER="OpenAEV-Platform"
 REPO_NAME="openaev"
@@ -82,8 +95,8 @@ if [[ "${1:-}" == "--execute" ]]; then
   bash "$0" >/dev/null
 fi
 
-TMPDIR="$(mktemp -d)"
-trap 'rm -rf "$TMPDIR"' EXIT
+WORK_DIR="$(mktemp -d)"
+trap 'rm -rf "$WORK_DIR"' EXIT
 CREATED=0
 UPDATED=0
 
@@ -206,25 +219,33 @@ add_to_project() {
   fi
 }
 
-# Makes the issue a sub-issue of the epic, unless it already has a parent.
-link_to_epic() {
-  local child_node_id="$1" parent
+# Makes the issue a sub-issue of the given parent (the epic for a story, the story for a task).
+# A task still directly under the epic, as earlier runs left them, is moved under its story; an
+# issue someone put under any other parent is left where it is.
+link_to_parent() {
+  local child_node_id="$1" parent_node_id="$2" parent_label="$3" current replace=false
   if $DRY_RUN; then
-    echo "SUB-ISSUE OF: epic #${EPIC_NUMBER}"
+    echo "SUB-ISSUE OF: ${parent_label}"
     return
   fi
-  parent="$(gh api graphql -f issueId="$child_node_id" -q '.data.node.parent.id // empty' -f query='
+  current="$(gh api graphql -f issueId="$child_node_id" -q '.data.node.parent.id // empty' -f query='
     query($issueId: ID!) { node(id: $issueId) { ... on Issue { parent { id } } } }')"
-  if [[ "$parent" == "$EPIC_NODE_ID" ]]; then
+  if [[ "$current" == "$parent_node_id" ]]; then
     return
   fi
-  if [[ -n "$parent" ]]; then
-    echo "  ⚠ #${ISSUE_NUMBER} already has another parent issue, not moved under the epic" >&2
-    return
+  if [[ -n "$current" ]]; then
+    if [[ "$current" != "$EPIC_NODE_ID" ]]; then
+      echo "  ⚠ #${ISSUE_NUMBER} already has another parent issue, not moved under ${parent_label}" >&2
+      return
+    fi
+    replace=true
   fi
-  gh api graphql -f parentIssueId="$EPIC_NODE_ID" -f subIssueId="$child_node_id" -f query='
-    mutation($parentIssueId: ID!, $subIssueId: ID!) {
-      addSubIssue(input: { issueId: $parentIssueId, subIssueId: $subIssueId }) { issue { id } }
+  gh api graphql -f parentIssueId="$parent_node_id" -f subIssueId="$child_node_id" \
+    -F replaceParent="$replace" -f query='
+    mutation($parentIssueId: ID!, $subIssueId: ID!, $replaceParent: Boolean) {
+      addSubIssue(input: {
+        issueId: $parentIssueId, subIssueId: $subIssueId, replaceParent: $replaceParent
+      }) { issue { id } }
     }' >/dev/null
 }
 
@@ -276,7 +297,7 @@ upsert_issue() {
 # Prints the file path.
 write_body() {
   local extra_line="${1:-}" body_file
-  body_file="$(mktemp "$TMPDIR/body.XXXXXX")"
+  body_file="$(mktemp "$WORK_DIR/body.XXXXXX")"
   {
     echo "$TECH_DESIGN_LINE"
     if [[ -n "$extra_line" ]]; then
@@ -299,10 +320,25 @@ epic() {
   EPIC_NODE_ID="$ISSUE_NODE_ID"
 }
 
-# Usage: task "US1.1 <title>" <<'BODY' ... BODY
-task() {
+# Usage: story "US1 <title>" <<'BODY' ... BODY
+# A sub-issue of the epic. The tasks that follow it go under it, so it shows their progress.
+story() {
   upsert_issue "feat(${TOPIC}): $1" "$TASK_LABELS" "$(write_body)"
-  link_to_epic "$ISSUE_NODE_ID"
+  link_to_parent "$ISSUE_NODE_ID" "$EPIC_NODE_ID" "epic #${EPIC_NUMBER}"
+  STORY_ID="${1%% *}"
+  STORY_NUMBER="$ISSUE_NUMBER"
+  STORY_NODE_ID="$ISSUE_NODE_ID"
+}
+
+# Usage: task "US1.1 <title>" <<'BODY' ... BODY
+# A sub-issue of the story declared just before it (US1.1 goes under US1).
+task() {
+  if [[ -z "${STORY_ID:-}" || "${1%% *}" != "${STORY_ID}".* ]]; then
+    echo "Task '$1' must come right after its story: story \"${1%%.*} …\"" >&2
+    exit 1
+  fi
+  upsert_issue "feat(${TOPIC}): $1" "$TASK_LABELS" "$(write_body)"
+  link_to_parent "$ISSUE_NODE_ID" "$STORY_NODE_ID" "${STORY_ID} #${STORY_NUMBER}"
 }
 
 # Read-only: the dry run also checks that the project, status and vertical exist.
@@ -328,7 +364,7 @@ BODY
 
 # --- US1 ---------------------------------------------------------------------
 
-task "US1 <story title>" <<'BODY'
+story "US1 <story title>" <<'BODY'
 ## User story
 
 As a <persona>, I want <goal> so that <benefit>.

@@ -15,7 +15,8 @@ description: >-
 - A feature folder `brainstorming/<feature>/` holding `tech-design.md`, merged on `main` (the issues
   link to it there)
 - The user stories: `user-stories.md` **or** a Notion link to the page listing them
-- `gh` authenticated with the project scope (`gh auth refresh -s project`) and `jq`, to run the script
+- `gh` authenticated with the project scope (`gh auth refresh -s project`) and `jq`, to run the script in
+  bash: macOS, Linux, or on Windows Git Bash or WSL (from PowerShell, prefix it with `bash`)
 
 ## Step 1 — Gather the inputs
 
@@ -76,8 +77,19 @@ Then read the code and `docs/` areas the tech design refers to, to know how the 
   | User story | `feat(<topic>): US1 <story title>` |
   | Sub-task | `feat(<topic>): US1.1 <task title>` |
 
-  The sub-task number always starts with its user story (`US1.x`), so the epic reads as a list grouped by
-  story.
+  The sub-task number always starts with its user story (`US1.x`).
+
+- The issues nest in three levels: the stories are sub-issues of the epic, and each sub-task is a sub-issue
+  of its story. A story then shows its tasks' progress, so the PO knows when it is ready to test.
+
+  ```
+  Epic
+  ├── US1
+  │   ├── US1.1
+  │   └── US1.2
+  └── US2
+      └── US2.1
+  ```
 
 ## Step 3 — Split each user story
 
@@ -152,9 +164,12 @@ and make it executable. Then:
    is not on `main` yet: the tech design must be merged before the issues are created.
    The script refuses to run while any of these settings, or any issue title, still holds a template `<…>`
    value. `--execute` checks every issue with a silent dry run before writing anything.
-2. Replace the example issues at the bottom with one `epic` call, then for each user story one `task "USn …"`
-   call followed by its `task "USn.m …"` calls.
+2. Replace the example issues at the bottom with one `epic` call, then for each user story one `story "USn …"`
+   call followed by its `task "USn.m …"` calls. A task goes under the story declared just before it, and the
+   script stops when a task does not follow its own story.
 3. Keep the bodies in quoted heredocs (`<<'BODY'`): backticks, `$` and Mermaid arrows stay verbatim.
+4. Save the script with LF line endings, also on Windows: bash cannot run a CRLF copy, and the repository's
+   `eol=lf` rule only applies once the file is committed.
 
 Do not touch the helpers: they hold the project, issue type and field settings, and the idempotency.
 
@@ -206,7 +221,8 @@ When the user stories, tech design or plan change, update `task-splitting.md` an
 `create-issues.sh`, then dry run again. The script matches issues by **exact title**:
 
 - changed body → the issue is updated
-- new task → a new issue, added under the epic and to the project
+- new task → a new issue, added under its story and to the project
+- task still directly under the epic (created before tasks were nested) → moved under its story
 - renamed task → a **new** issue; rename the existing one on GitHub first so the script finds it
 - removed task → nothing happens; close the issue by hand
 
