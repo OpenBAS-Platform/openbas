@@ -527,27 +527,19 @@ class InjectStatusServiceTest {
       return input;
     }
 
-    // A late trace only moves the end date: the status name written back is the one already kept
-    private void verifyStatusNotRecomputed(ExecutionStatus keptStatus) {
-      verify(executionTraceRepositoryHelper, never())
-          .updateInjectStatus(any(), argThat(name -> !keptStatus.name().equals(name)), any());
-      verify(injectRepository, never()).updateUpdatedAt(any(), any());
-    }
-
-    private void verifyNothingSaved() {
-      verify(executionTraceRepositoryHelper, never()).saveExecutionTrace(any());
+    // A finished inject keeps its status: nothing is recomputed nor written back
+    private void verifyStatusNotRecomputed() {
       verify(executionTraceRepositoryHelper, never()).updateInjectStatus(any(), any(), any());
       verify(injectRepository, never()).updateUpdatedAt(any(), any());
     }
 
     @Test
-    @DisplayName("given_lateSuccessAfterTimeout_should_keepErrorRewriteTimeoutMessageAndAddTrace")
-    void given_lateSuccessAfterTimeout_should_keepErrorRewriteTimeoutMessageAndAddTrace() {
+    @DisplayName("given_lateSuccessAfterTimeout_should_keepErrorAndAppendReportToTimeoutTrace")
+    void given_lateSuccessAfterTimeout_should_keepErrorAndAppendReportToTimeoutTrace() {
       // Arrange
       Agent agent = agent("agent-1");
       InjectStatus injectStatus = closedStatus(ExecutionStatus.ERROR, 1);
       completeTrace(injectStatus, agent, ExecutionTraceStatus.TIMEOUT, "Agent did not respond.");
-      when(executionTraceRepositoryHelper.saveExecutionTrace(any())).thenReturn("trace-late");
 
       // Act
       injectStatusService.updateInjectStatus(
@@ -555,22 +547,16 @@ class InjectStatusServiceTest {
 
       // Assert
       assertThat(injectStatus.getName()).isEqualTo(ExecutionStatus.ERROR);
-      assertThat(injectStatus.getTraces()).hasSize(2);
+      assertThat(injectStatus.getTraces()).hasSize(1);
       ExecutionTrace timeout = injectStatus.getTraces().getFirst();
       assertThat(timeout.getStatus()).isEqualTo(ExecutionTraceStatus.TIMEOUT);
       assertThat(timeout.getMessage())
           .contains("Agent did not respond.")
           .contains("It finally reported EXECUTED")
-          .contains("after the timeout")
           .contains("late report");
-      ExecutionTrace implantTrace = injectStatus.getTraces().getLast();
-      assertThat(implantTrace.getStatus()).isEqualTo(ExecutionTraceStatus.EXECUTED);
-      assertThat(implantTrace.getMessage()).isEqualTo("late report");
-      verify(executionTraceRepositoryHelper).saveExecutionTrace(implantTrace);
-      assertThat(injectStatus.getTrackingEndDate()).isEqualTo(implantTrace.getTime());
-      verify(executionTraceRepositoryHelper)
-          .updateInjectStatus("status-late", "ERROR", implantTrace.getTime());
-      verifyStatusNotRecomputed(ExecutionStatus.ERROR);
+      verify(entityManager).merge(injectStatus);
+      verify(executionTraceRepositoryHelper, never()).saveExecutionTrace(any());
+      verifyStatusNotRecomputed();
     }
 
     @Test
@@ -582,7 +568,6 @@ class InjectStatusServiceTest {
       InjectStatus injectStatus = closedStatus(ExecutionStatus.PARTIAL, 2);
       completeTrace(injectStatus, agentA, ExecutionTraceStatus.EXECUTED, "done");
       completeTrace(injectStatus, agentB, ExecutionTraceStatus.TIMEOUT, "Agent B timed out.");
-      when(executionTraceRepositoryHelper.saveExecutionTrace(any())).thenReturn("trace-late");
 
       // Act
       injectStatusService.updateInjectStatus(
@@ -592,20 +577,45 @@ class InjectStatusServiceTest {
       assertThat(injectStatus.getName()).isEqualTo(ExecutionStatus.PARTIAL);
       assertThat(injectStatus.getTraces())
           .extracting(ExecutionTrace::getStatus)
-          .containsExactly(
-              ExecutionTraceStatus.EXECUTED,
-              ExecutionTraceStatus.TIMEOUT,
-              ExecutionTraceStatus.EXECUTED);
-      verifyStatusNotRecomputed(ExecutionStatus.PARTIAL);
+          .containsExactly(ExecutionTraceStatus.EXECUTED, ExecutionTraceStatus.TIMEOUT);
+      assertThat(injectStatus.getTraces().getLast().getMessage())
+          .contains("Agent B timed out.")
+          .contains("late report");
+      verifyStatusNotRecomputed();
     }
 
     @Test
-    @DisplayName("given_duplicateCompleteForClosedAgent_should_beIgnored")
-    void given_duplicateCompleteForClosedAgent_should_beIgnored() {
+    @DisplayName("given_lateInfoCompleteAfterTimeout_should_notBecomeTimeout")
+    void given_lateInfoCompleteAfterTimeout_should_notBecomeTimeout() {
+      // Arrange
+      Agent agent = agent("agent-1");
+      InjectStatus injectStatus = closedStatus(ExecutionStatus.ERROR, 1);
+      completeTrace(injectStatus, agent, ExecutionTraceStatus.TIMEOUT, "Agent did not respond.");
+      ExecutionTrace lateTrace =
+          new ExecutionTrace(
+              injectStatus,
+              ExecutionTraceStatus.INFO,
+              null,
+              "late report",
+              ExecutionTraceAction.COMPLETE,
+              agent,
+              Instant.now());
+
+      // Act
+      injectStatusService.resolveCompleteTraceStatus(injectStatus, lateTrace, agent);
+
+      // Assert
+      assertThat(lateTrace.getStatus()).isEqualTo(ExecutionTraceStatus.INFO);
+    }
+
+    @Test
+    @DisplayName("given_lateCompleteWithoutTimeoutTrace_should_saveItAndKeepStatus")
+    void given_lateCompleteWithoutTimeoutTrace_should_saveItAndKeepStatus() {
       // Arrange
       Agent agent = agent("agent-1");
       InjectStatus injectStatus = closedStatus(ExecutionStatus.EXECUTED, 1);
       completeTrace(injectStatus, agent, ExecutionTraceStatus.EXECUTED, "done");
+      when(executionTraceRepositoryHelper.saveExecutionTrace(any())).thenReturn("trace-late");
 
       // Act
       injectStatusService.updateInjectStatus(
@@ -613,76 +623,16 @@ class InjectStatusServiceTest {
 
       // Assert
       assertThat(injectStatus.getName()).isEqualTo(ExecutionStatus.EXECUTED);
-      assertThat(injectStatus.getTraces()).hasSize(1);
+      assertThat(injectStatus.getTraces()).hasSize(2);
       assertThat(injectStatus.getTraces().getFirst().getStatus())
           .isEqualTo(ExecutionTraceStatus.EXECUTED);
-      verifyNothingSaved();
+      assertThat(injectStatus.getTraces().getLast().getId()).isEqualTo("trace-late");
+      verifyStatusNotRecomputed();
     }
 
     @Test
-    @DisplayName("given_secondLateCompleteAfterRewrittenTimeout_should_beIgnored")
-    void given_secondLateCompleteAfterRewrittenTimeout_should_beIgnored() {
-      // Arrange
-      Agent agent = agent("agent-1");
-      InjectStatus injectStatus = closedStatus(ExecutionStatus.ERROR, 1);
-      completeTrace(injectStatus, agent, ExecutionTraceStatus.TIMEOUT, "Timed out, reported late.");
-      completeTrace(injectStatus, agent, ExecutionTraceStatus.EXECUTED, "first late report");
-
-      // Act
-      injectStatusService.updateInjectStatus(
-          injectStatus.getInject(), agent, input(InjectExecutionAction.complete, "SUCCESS"), null);
-
-      // Assert
-      assertThat(injectStatus.getTraces()).hasSize(2);
-      assertThat(injectStatus.getTraces().getFirst().getMessage())
-          .isEqualTo("Timed out, reported late.");
-      verifyNothingSaved();
-    }
-
-    @Test
-    @DisplayName(
-        "given_lateCompleteAfterAgentlessTimeout_should_keepErrorRewriteTimeoutAndAddTrace")
-    void given_lateCompleteAfterAgentlessTimeout_should_keepErrorRewriteTimeoutAndAddTrace() {
-      // Arrange
-      InjectStatus injectStatus = closedStatus(ExecutionStatus.ERROR, 0);
-      completeTrace(injectStatus, null, ExecutionTraceStatus.TIMEOUT, "Inject timed out.");
-      when(executionTraceRepositoryHelper.saveExecutionTrace(any())).thenReturn("trace-late");
-
-      // Act
-      injectStatusService.updateInjectStatus(
-          injectStatus.getInject(), null, input(InjectExecutionAction.complete, "SUCCESS"), null);
-
-      // Assert
-      assertThat(injectStatus.getName()).isEqualTo(ExecutionStatus.ERROR);
-      assertThat(injectStatus.getTraces()).hasSize(2);
-      ExecutionTrace timeout = injectStatus.getTraces().getFirst();
-      assertThat(timeout.getStatus()).isEqualTo(ExecutionTraceStatus.TIMEOUT);
-      assertThat(timeout.getMessage()).contains("Inject timed out.").contains("late report");
-      assertThat(injectStatus.getTraces().getLast().getStatus())
-          .isEqualTo(ExecutionTraceStatus.EXECUTED);
-      verifyStatusNotRecomputed(ExecutionStatus.ERROR);
-    }
-
-    @Test
-    @DisplayName("given_secondAgentlessCompleteWithoutTimeout_should_stillBeProcessed")
-    void given_secondAgentlessCompleteWithoutTimeout_should_stillBeProcessed() {
-      // Arrange — injectors may legitimately send several agent-less COMPLETE traces
-      InjectStatus injectStatus = closedStatus(ExecutionStatus.PENDING, 0);
-      completeTrace(injectStatus, null, ExecutionTraceStatus.EXECUTED, "first target done");
-      when(executionTraceRepositoryHelper.saveExecutionTrace(any())).thenReturn("trace-2");
-
-      // Act
-      injectStatusService.updateInjectStatus(
-          injectStatus.getInject(), null, input(InjectExecutionAction.complete, "SUCCESS"), null);
-
-      // Assert
-      assertThat(injectStatus.getTraces()).hasSize(2);
-      verify(executionTraceRepositoryHelper).saveExecutionTrace(any());
-    }
-
-    @Test
-    @DisplayName("given_lateNonCompleteTrace_should_appendItWithoutTouchingTheTimeoutTrace")
-    void given_lateNonCompleteTrace_should_appendItWithoutTouchingTheTimeoutTrace() {
+    @DisplayName("given_lateNonCompleteTrace_should_saveItWithoutTouchingTheTimeoutTrace")
+    void given_lateNonCompleteTrace_should_saveItWithoutTouchingTheTimeoutTrace() {
       // Arrange
       Agent agent = agent("agent-1");
       InjectStatus injectStatus = closedStatus(ExecutionStatus.ERROR, 1);
@@ -699,47 +649,15 @@ class InjectStatusServiceTest {
       // Assert
       assertThat(injectStatus.getName()).isEqualTo(ExecutionStatus.ERROR);
       assertThat(injectStatus.getTraces()).hasSize(2);
-      assertThat(injectStatus.getTraces().getFirst().getStatus())
-          .isEqualTo(ExecutionTraceStatus.TIMEOUT);
-      Instant lastTraceTime = injectStatus.getTraces().getLast().getTime();
-      assertThat(injectStatus.getTrackingEndDate()).isEqualTo(lastTraceTime);
-      verify(executionTraceRepositoryHelper)
-          .updateInjectStatus("status-late", "ERROR", lastTraceTime);
+      assertThat(injectStatus.getTraces().getFirst().getMessage())
+          .isEqualTo("Agent did not respond.");
+      verify(executionTraceRepositoryHelper).saveExecutionTrace(injectStatus.getTraces().getLast());
+      verifyStatusNotRecomputed();
     }
 
     @Test
-    @DisplayName("given_agentReportAfterSimulationInterruption_should_storeItAndKeepError")
-    void given_agentReportAfterSimulationInterruption_should_storeItAndKeepError() {
-      // Arrange
-      Agent agent = agent("agent-1");
-      InjectStatus injectStatus = closedStatus(ExecutionStatus.ERROR, 1);
-      completeTrace(
-          injectStatus,
-          null,
-          ExecutionTraceStatus.INTERRUPTED,
-          "Inject stopped due to simulation interruption.");
-      when(executionTraceRepositoryHelper.saveExecutionTrace(any())).thenReturn("trace-late");
-
-      // Act
-      injectStatusService.updateInjectStatus(
-          injectStatus.getInject(), agent, input(InjectExecutionAction.complete, "SUCCESS"), null);
-
-      // Assert
-      assertThat(injectStatus.getName()).isEqualTo(ExecutionStatus.ERROR);
-      assertThat(injectStatus.getTraces()).hasSize(2);
-      assertThat(injectStatus.getTraces().getFirst().getStatus())
-          .isEqualTo(ExecutionTraceStatus.INTERRUPTED);
-      ExecutionTrace implantTrace = injectStatus.getTraces().getLast();
-      assertThat(implantTrace.getStatus()).isEqualTo(ExecutionTraceStatus.EXECUTED);
-      assertThat(implantTrace.getAgent()).isSameAs(agent);
-      assertThat(implantTrace.getMessage()).isEqualTo("late report");
-      verify(executionTraceRepositoryHelper).saveExecutionTrace(implantTrace);
-      verifyStatusNotRecomputed(ExecutionStatus.ERROR);
-    }
-
-    @Test
-    @DisplayName("given_agentReportAfterSimulationTimeout_should_storeItAndKeepError")
-    void given_agentReportAfterSimulationTimeout_should_storeItAndKeepError() {
+    @DisplayName("given_agentReportAfterSimulationTimeout_should_saveItAndKeepError")
+    void given_agentReportAfterSimulationTimeout_should_saveItAndKeepError() {
       // Arrange
       Agent agent = agent("agent-1");
       InjectStatus injectStatus = closedStatus(ExecutionStatus.ERROR, 1);
@@ -757,57 +675,20 @@ class InjectStatusServiceTest {
       // Assert
       assertThat(injectStatus.getName()).isEqualTo(ExecutionStatus.ERROR);
       assertThat(injectStatus.getTraces()).hasSize(2);
+      assertThat(injectStatus.getTraces().getFirst().getMessage())
+          .isEqualTo("Inject stopped due to simulation timeout.");
       assertThat(injectStatus.getTraces().getLast().getStatus())
           .isEqualTo(ExecutionTraceStatus.EXECUTED);
-      verifyStatusNotRecomputed(ExecutionStatus.ERROR);
-    }
-
-    @Test
-    @DisplayName("given_secondReportOfAnAgentAlreadyStoredAfterPlatformClose_should_beIgnored")
-    void given_secondReportOfAnAgentAlreadyStoredAfterPlatformClose_should_beIgnored() {
-      // Arrange
-      Agent agent = agent("agent-1");
-      InjectStatus injectStatus = closedStatus(ExecutionStatus.ERROR, 1);
-      completeTrace(injectStatus, null, ExecutionTraceStatus.INTERRUPTED, "Interrupted.");
-      completeTrace(injectStatus, agent, ExecutionTraceStatus.EXECUTED, "first late report");
-
-      // Act
-      injectStatusService.updateInjectStatus(
-          injectStatus.getInject(), agent, input(InjectExecutionAction.complete, "SUCCESS"), null);
-
-      // Assert
-      assertThat(injectStatus.getTraces()).hasSize(2);
-      verifyNothingSaved();
-    }
-
-    @Test
-    @DisplayName("given_agentlessCompleteAfterSimulationInterruption_should_beIgnored")
-    void given_agentlessCompleteAfterSimulationInterruption_should_beIgnored() {
-      // Arrange
-      InjectStatus injectStatus = closedStatus(ExecutionStatus.ERROR, 0);
-      completeTrace(injectStatus, null, ExecutionTraceStatus.INTERRUPTED, "Interrupted.");
-
-      // Act
-      injectStatusService.updateInjectStatus(
-          injectStatus.getInject(), null, input(InjectExecutionAction.complete, "SUCCESS"), null);
-
-      // Assert
-      assertThat(injectStatus.getName()).isEqualTo(ExecutionStatus.ERROR);
-      assertThat(injectStatus.getTraces()).hasSize(1);
-      assertThat(injectStatus.getTraces().getFirst().getStatus())
-          .isEqualTo(ExecutionTraceStatus.INTERRUPTED);
-      verifyNothingSaved();
+      verifyStatusNotRecomputed();
     }
 
     @Test
     @DisplayName("given_agentReportWhileInjectStillInProgress_should_beProcessedNormally")
     void given_agentReportWhileInjectStillInProgress_should_beProcessedNormally() {
-      // Arrange — an agent-less closing-looking trace on a still running inject must not
-      // swallow the agent's legitimate report
+      // Arrange
       Agent agent = agent("agent-1");
       InjectStatus injectStatus = closedStatus(ExecutionStatus.PENDING, 1);
-      completeTrace(injectStatus, null, ExecutionTraceStatus.TIMEOUT, "Some agent-less trace.");
-      when(executionTraceRepositoryHelper.saveExecutionTrace(any())).thenReturn("trace-2");
+      when(executionTraceRepositoryHelper.saveExecutionTrace(any())).thenReturn("trace-1");
       when(injectRepository.updateUpdatedAt(any(), any())).thenReturn(1);
 
       // Act
@@ -815,42 +696,8 @@ class InjectStatusServiceTest {
           injectStatus.getInject(), agent, input(InjectExecutionAction.complete, "SUCCESS"), null);
 
       // Assert
-      assertThat(injectStatus.getTraces().getLast().getStatus())
-          .isEqualTo(ExecutionTraceStatus.EXECUTED);
-      verify(executionTraceRepositoryHelper).updateInjectStatus(any(), any(), any());
-    }
-
-    @Test
-    @DisplayName("given_duplicateCompleteTracesOfOneAgent_should_computeStatusFromTheFirstOnly")
-    void given_duplicateCompleteTracesOfOneAgent_should_computeStatusFromTheFirstOnly() {
-      // Arrange — a duplicate that slipped past the guard (race with the finalization job)
-      Agent agent = agent("agent-1");
-      InjectStatus injectStatus = closedStatus(ExecutionStatus.PENDING, 1);
-      completeTrace(injectStatus, agent, ExecutionTraceStatus.TIMEOUT, "Agent did not respond.");
-      completeTrace(injectStatus, agent, ExecutionTraceStatus.EXECUTED, "done");
-
-      // Act
-      injectStatusService.updateFinalInjectStatus(injectStatus);
-
-      // Assert
-      assertThat(injectStatus.getName()).isEqualTo(ExecutionStatus.ERROR);
-    }
-
-    @Test
-    @DisplayName("given_lateReportAddedAfterTimeout_should_countAsErrorWhenStatusIsRecomputed")
-    void given_lateReportAddedAfterTimeout_should_countAsErrorWhenStatusIsRecomputed() {
-      // Arrange
-      Agent agentB = agent("agent-b");
-      InjectStatus injectStatus = closedStatus(ExecutionStatus.PENDING, 2);
-      completeTrace(injectStatus, agent("agent-a"), ExecutionTraceStatus.EXECUTED, "done");
-      completeTrace(injectStatus, agentB, ExecutionTraceStatus.TIMEOUT, "Agent B timed out.");
-      completeTrace(injectStatus, agentB, ExecutionTraceStatus.EXECUTED, "late");
-
-      // Act
-      injectStatusService.updateFinalInjectStatus(injectStatus);
-
-      // Assert
-      assertThat(injectStatus.getName()).isEqualTo(ExecutionStatus.PARTIAL);
+      assertThat(injectStatus.getName()).isEqualTo(ExecutionStatus.EXECUTED);
+      verify(executionTraceRepositoryHelper).updateInjectStatus(any(), eq("EXECUTED"), any());
     }
   }
 }
