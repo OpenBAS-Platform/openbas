@@ -110,7 +110,7 @@ The OpenAEV implant started on the endpoint is also stopped after this delay.
 An Agent can report back after its `TIMEOUT` trace was written, for example when the endpoint was slow or offline.
 Once an Inject is finished, its status never changes: OpenAEV keeps the status it already computed and does not
 recompute it. The `TIMEOUT` trace keeps its status and its message is completed with the status and the message the
-Agent reported. The other traces sent by the implant are added to the execution details.
+Agent reported. The traces sent by the implant, including its final one, are added to the execution details.
 
 ### `TIMEOUT` on an Asset shown as active
 
