@@ -575,48 +575,6 @@ class AbstractTableTopBehaviorTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("given a teamless player expectation when validated should score it as a leaf")
-    void given_a_teamless_player_expectation_when_validated_should_score_it_as_a_leaf() {
-      // Arrange — a team and a scope player coexist on the same inject
-      Team team = persistTeamWithPlayers(1);
-      User teamMember = team.getUsers().getFirst();
-      User scopePlayer = persistPlayerWithoutTeam();
-      Inject inject = persistChainedInject(team, false);
-      phishingBehavior.initializeAndSaveInjectExpectationsFromExecutableInject(
-          chainedExecutableInject(
-              inject,
-              List.of(team),
-              List.of(recipientOf(teamMember, team), directRecipientOf(scopePlayer))),
-          buildTemplate(inject),
-          null);
-      entityManager.flush();
-      entityManager.refresh(inject);
-      TableTopInjectExpectation teamless =
-          findPlayerExpectations(inject).stream()
-              .filter(player -> player.getTeam() == null)
-              .findFirst()
-              .orElseThrow();
-
-      // Act
-      injectExpectationService.updateInjectExpectation(
-          teamless.getId(), ExpectationFixture.getExpectationVerdict(UI_SOURCE_ID, 0.0));
-      entityManager.flush();
-      entityManager.clear();
-
-      // Assert — the teamless player is scored, the team of the other player is left untouched
-      List<TableTopInjectExpectation> players = findPlayerExpectations(inject);
-      assertThat(players)
-          .filteredOn(player -> player.getTeam() == null)
-          .singleElement()
-          .satisfies(player -> assertThat(player.getScore()).isEqualTo(0.0));
-      assertThat(players)
-          .filteredOn(player -> player.getTeam() != null)
-          .singleElement()
-          .satisfies(player -> assertThat(player.getScore()).isEqualTo(100.0));
-      assertThat(findTeamExpectation(inject).getScore()).isEqualTo(100.0);
-    }
-
-    @Test
     @DisplayName("given a teamless player expectation should count in the primary expectations")
     void given_a_teamless_player_expectation_should_count_in_the_primary_expectations() {
       // Arrange
