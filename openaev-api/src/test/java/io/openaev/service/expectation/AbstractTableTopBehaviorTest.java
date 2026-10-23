@@ -17,7 +17,6 @@ import io.openaev.database.model.*;
 import io.openaev.database.repository.InjectExpectationRepository;
 import io.openaev.execution.ExecutableInject;
 import io.openaev.execution.ExecutionContext;
-import io.openaev.rest.exercise.form.ExpectationUpdateInput;
 import io.openaev.rest.exercise.form.InjectExpectationUpdateFromUIInput;
 import io.openaev.service.InjectExpectationService;
 import io.openaev.utils.fixtures.*;
