@@ -326,7 +326,7 @@ How each dimension is resolved, reusing what exists:
 |---|---|---|
 | **Tenancy** | the tenants of the request's `TxCtx` (already checked against the user's memberships); in each of them, the user's rights through `PermissionService.hasCapabilityPermissionInTenant` (the user's groups in that tenant plus platform groups), never the ambient `TenantContext` | each tenant's rules are bound to `base_tenant_side = T`; a document without a tenant only gets what every tenant of the request allows |
 | **Capability** | for each index, its `ResourceType` (asset → `ASSET`, finding → `FINDING`, security-platform → `SECURITY_PLATFORM`…), checked with `PermissionService` / `Capability` READ | `terms(base_entity, readable types)` |
-| **Grant** | generic, per indexed type (§4.4): for a type managed by grants, `PermissionService` first checks the capability that makes grants irrelevant (e.g. `ACCESS_ASSESSMENT` for scenarios and simulations); without it, the user's grants of the matching `GRANT_RESOURCE_TYPE` (from `RawUserAuth`, already loaded) | on the fields the registry declares as grant keys for that type (today `base_scenario_side`, `base_simulation_side`, `base_id`, `base_inject_side`), within the granted ids, **checked on the document's most specific owner only** (simulation, else scenario, else atomic testing, §4.4), as the REST API does; a document with none of these fields set is not grant-filtered. Types not managed by grants (assets, tags, teams…) are only filtered by capability: OpenAEV has no grant on an asset today. Supporting one later is a registry entry, not new code |
+| **Grant** | generic, per indexed type (§4.4): for a type managed by grants, `PermissionService` first checks the capability that makes grants irrelevant (e.g. `ACCESS_ASSESSMENT` for scenarios and simulations); without it, the user's grants of the matching `GRANT_RESOURCE_TYPE` (from `RawUserAuth`, already loaded) | on the fields the registry declares as grant keys for that type (today `base_scenario_side`, `base_simulation_side`, `base_id`, `base_inject_side`), within the granted ids, **checked on the document's parent resource only** (its simulation, else its scenario, else its atomic testing, §4.4), as the REST API does; a document with none of these fields set is not grant-filtered. Types not managed by grants (assets, tags, teams…) are only filtered by capability: OpenAEV has no grant on an asset today. Supporting one later is a registry entry, not new code |
 | **Marking** | `SELECT asset_id FROM assets WHERE marking_ids <> '{}' AND NOT is_marking_set_allowed(marking_ids)` under the user's clearance, over the tenants of the request, grouped per tenant (`SELECT asset_id, tenant_id`): **the same SQL function** as the REST API, so no copy of the rule | inside each tenant's clause, `must_not terms` on the asset reference of each type (asset: `base_id`; expectation, observations: `base_asset_side`; finding: `base_endpoint_side`; vulnerable-endpoint: `vulnerable_endpoint_id`). Aggregations on `base_assets_side` get `exclude: <hidden ids>` (see below), and the same ids are stripped from the `base_assets_side` of returned documents |
 
 ### One request, several tenants
@@ -488,31 +488,33 @@ So `exclude` only matters for a multi-valued dependency field of documents that 
 |---|---|---|---|
 | `base_assets_side` | inject, scenario, simulation (their targets) | **yes**: the parent stays visible | **yes**, otherwise RED gets a bar |
 | `base_asset_side` | expectation, observations | no: dropped by `must_not` | no, redundant |
-| `base_endpoint_side` | finding | no: dropped as soon as one endpoint is hidden (strict) | no today; **yes** if findings become permissive |
+| `base_endpoint_side` | finding | **yes** when one endpoint is still visible (a finding needs one visible endpoint, as in SQL) | **yes**, otherwise the hidden endpoint gets a bar |
 | `vulnerable_endpoint_id`, `base_id` | vulnerable endpoint, asset | no: dropped | no, redundant |
 
 The `exclude` uses the union of every tenant's hidden assets, since one aggregation spans the tenants
 of the request.
 
-**Filters on dependency fields** (found in review). `must_not`, `exclude` and stripping clean what is
-**returned**, but a widget's own filter is evaluated by Elasticsearch on the stored document, hidden
-references included. A readable scenario targeting GREEN and RED matches `base_assets_side = RED`, so
-a count reveals the hidden association. Realistic paths need no guessing: a widget authored by an
-admin on RED and opened by a GREEN viewer, `empty` / `not_empty` (no id needed), or `starts_with`
-probing an id prefix. The REST API does not have the issue: the SQL rewrite narrows `injects_assets`.
+**Filters on targeted assets: only visible assets count.**
 
-The rule: a filter on a dependency field is evaluated on the **visible** references only, after the
-dashboard parameters are resolved (`$asset`-style values included).
+*Use case.* Asset `RED` is `TLP:RED`, asset `GREEN` is `TLP:GREEN`. Scenario `S1` targets `GREEN`
+and `RED`; scenario `S3` targets `RED` only. A `TLP:GREEN` reader opens a dashboard whose widget
+counts "scenarios targeting `RED`" (built by an admin, or through a dashboard parameter).
 
-| Operator on a dependency field | Evaluation for a reader with hidden assets |
+| What the `TLP:GREEN` reader sees | REST API and dashboards |
 |---|---|
-| `eq` | the hidden ids are removed from the values; no value left → matches nothing |
-| `not_eq` | the hidden ids are removed from the values; no value left → the filter is dropped |
-| `contains`, `starts_with`, `empty`, `not_empty`, their negations, ranges | a Painless script query over the field's values, skipping the hidden ids (`params.hidden`): e.g. `not_empty` ≡ "one value is not hidden", `starts_with x` ≡ "one visible value starts with x" |
+| `S1` in a list | ✅, targets: `GREEN` only |
+| scenarios targeting `RED` | none |
+| scenarios with no target | `S3` (its only target is hidden) |
 
-The script runs only for those operators, on a dependency field, for a reader who has hidden assets:
-every other query is unchanged. Removing values is exact for `eq` / `not_eq` because, on a
-multi-valued field, "a visible value equals v" and "a value equals v" differ only when v is hidden.
+*Why a rule is needed.* Stripping and `exclude` clean what is **returned**, but Elasticsearch
+evaluates a widget's filter on the stored document, which still holds `RED`: counting "scenarios
+targeting `RED`" would return 2 and reveal `RED` and who targets it.
+
+*How it is implemented.* A filter on a dependency field only looks at the visible values, after
+dashboard parameters are resolved. `eq` / `not_eq`: the hidden ids are removed from the filter's values (no value left:
+`eq` matches nothing, `not_eq` is dropped). `empty`, `not_empty`, `contains`, ranges: a small Painless
+script checks the field's values and skips the hidden ids. A reader without hidden assets gets the
+same query as before.
 
 An admin gets `EngineReadScope.unrestricted(…)`: no per-user filter at all. A user holding every
 capability, with no hidden asset, gets the same.
@@ -556,21 +558,23 @@ sequenceDiagram
 > In SQL, Task 4 declares in `MarkingDerivedTables` how each child table reaches `assets` (a parent
 > link such as `injects_expectations.asset_id`, or link rows such as `findings_assets`), and
 > `MarkingDimension` filters the child through its asset. The index has no join, so the registry
-> declares, per indexed type, the field that holds the asset id (`assetFields`). The reader filter
-> then adds `must_not terms(<field>, hiddenAssetIds)`: a document goes with its asset.
+> declares, per indexed type, the fields that hold asset ids: `assetFields` for a document about one
+> asset (like a parent link: the document goes with its asset), `linkedAssetFields` for a document
+> linked to several assets (like link rows: hidden only when all of them are hidden).
 >
 > | | SQL (REST API) | Index (dashboards) |
 > |---|---|---|
-> | Where the dependency is declared | `MarkingDerivedTables` | `EngineSecurityRegistry.assetFields` |
+> | Where the dependency is declared | `MarkingDerivedTables` | `EngineSecurityRegistry.assetFields` / `linkedAssetFields` |
 > | Expectation of a RED asset | hidden (parent link) | hidden (`base_asset_side`) |
 > | Finding of a RED asset only | hidden (link rows) | hidden (`base_endpoint_side`) |
-> | Finding on a GREEN **and** a RED asset | **visible**: at least one visible asset (`MarkingDimension.linkRowsPredicate`, permissive) | **hidden**: one hidden asset is enough (strict) |
+> | Finding on a GREEN **and** a RED asset | **visible**: at least one visible asset (`MarkingDimension.linkRowsPredicate`) | **visible**, with `GREEN` only: excluded only when all its endpoints are hidden, RED stripped from `base_endpoint_side` |
 > | Inject / scenario / simulation targeting RED | visible, RED not listed | visible, RED stripped from `base_assets_side` and from "by asset" buckets |
 >
-> **Edge case: findings.** A finding can be on several assets (`base_endpoint_side` is a set), and
-> `must_not terms` excludes it as soon as **one** of them is hidden. Making dashboards permissive,
-> like SQL, needs "at least one value outside the list", which a `terms` query cannot express (a
-> script, or a count field at indexing). Not covered either: an asset-group expectation
+> **Findings.** A finding can be on several endpoints (`base_endpoint_side` is a set). "At least one
+> visible endpoint" cannot be expressed with a `terms` query, so es8 uses a small script (the one of
+> the filters on targeted assets), only for readers with hidden assets. If it costs too much on a
+> large findings index (§4.7), the alternative is an indexed endpoint count and a `terms_set` query,
+> with no security data in the index. Not covered: an asset-group expectation
 > (`base_asset_group_side`, no asset) rolls up every member, RED included; and
 > `base_security_platforms_side` is not in the asset fields, in case a security platform is marked.
 
@@ -607,7 +611,7 @@ At query time, per index, `PermissionService`'s own rule decides, instead of a c
 
 1. the user has the capability for that type (admin, BYPASS, `ACCESS_ASSESSMENT`, and any future
    capability) → no grant filter;
-2. else, the type is grant-managed → the document's **most specific owner** must be granted: `owner
+2. else, the type is grant-managed → the document's **parent resource** must be granted: `parent
    field ∈ ids of the user's grants of that resource type` (see below);
 3. else → the index is excluded for this user.
 
@@ -616,53 +620,53 @@ Reads run on the `openaev_*` wildcard, so the per-index conditions combine as
 marking filter. A new grantable resource is then one registry entry, and `base_restrictions` can be
 retired instead of fixed handler by handler.
 
-### The most specific owner decides (no inheritance)
+### A simulation is read through its own grant (no inheritance)
 
-**The rule in the REST API.** Access to a simulation is a grant **on that simulation**:
-`grantService.hasGrant(simulationId, …)`, and for lists `ExerciseSpecification.findGrantedFor` and
-`ExerciseRepository.rawAllGranted`, which join the simulation's own grants. A scenario's grants only
-reach a simulation by being **copied at its creation** (`ScenarioToExerciseService.java:106`). The
-children of a simulation (injects, expectations, findings…) follow the simulation's permission.
+*Use case.* Group `Analysts` (no `ACCESS_ASSESSMENT`) is granted on scenario `S1`.
 
-**The first version of the POC broke it** (found in review): the registry gave a simulation two grant
-keys OR-ed together, `base_id` → SIMULATION and `base_scenario_side` → SCENARIO, and the children of a
-simulation the same two (`ASSESSMENT_KEYS`). A grant on the scenario then matched every simulation of
-that scenario, and their expectations, findings, vulnerable endpoints and observations
-(`InjectExpectationHandler` and `FindingHandler` set `base_scenario_side` from the simulation's
-scenario):
+1. `S1` runs every day: each new simulation gets a **copy** of `S1`'s grants
+   (`ScenarioToExerciseService.java:106`), so `Analysts` can read them.
+2. The admin removes `Analysts`' grant from `S1`. Simulations created **afterwards** are not granted
+   to `Analysts`; the **earlier** ones keep their copied grant.
+3. The admin also revokes `Analysts`' grant on one earlier simulation `X`.
 
-| Case | REST API | Dashboards, first POC | Dashboards, fixed |
-|---|---|---|---|
-| Simulation X created from S1, **then** a grant on S1 | X hidden | X **visible** | X hidden |
-| X's grant revoked, S1's grant kept | X hidden | X **visible** | X hidden |
-| X created after the grant on S1 (grant copied) | X visible | X visible | X visible |
-| A grant on X only | X visible, S1 hidden | same | same |
+| What `Analysts` sees | REST API and dashboards |
+|---|---|
+| simulations created while `S1` was granted | ✅ (copied grant) |
+| simulations created after the grant was removed | ❌ (no grant) |
+| a simulation of `S1` created **before** `S1` was granted | ❌ |
+| simulation `X`, its own grant revoked, `S1` still granted | ❌ |
+| their injects, expectations, findings | same as their simulation |
 
-**The fix: grant keys in precedence order.** A document is checked against the grant of the
-resource it belongs to, the most specific one present:
+*Why a rule is needed.* A simulation's documents also carry its scenario's id
+(`base_scenario_side`). Accepting a document when **any** of its grant fields matches would let a
+grant on `S1` open every simulation of `S1`, which the REST API never does: it reads a simulation
+through its own grant only (`grantService.hasGrant`, `ExerciseSpecification.findGrantedFor`,
+`ExerciseRepository.rawAllGranted`).
 
-| Document | Its owner | Checked on |
+*How it is implemented.* A document is checked on the grant of its **parent resource**, the resource
+it belongs to, as the REST API's parent permission (`Inject.getParentResourceId()`):
+
+| Document | Parent resource | Checked on |
 |---|---|---|
-| simulation | itself | `base_id` → SIMULATION grant only (the scenario key is removed) |
-| belongs to a simulation (`base_simulation_side` set): inject, expectation, finding, vulnerable endpoint, observation | the simulation | `base_simulation_side` → SIMULATION grant |
-| belongs to a scenario only (scenario injects, their expectations) | the scenario | `base_scenario_side` → SCENARIO grant |
-| belongs to an atomic testing | the atomic testing | `base_id` / `base_inject_side` → ATOMIC_TESTING grant |
-| linked to nothing grant-managed | — | not grant-filtered, as today |
+| simulation | itself | `base_id` → SIMULATION grant only |
+| inject, expectation, finding, vulnerable endpoint, observation of a simulation | the simulation | `base_simulation_side` → SIMULATION grant |
+| scenario, and the injects of a scenario | the scenario | `base_id` / `base_scenario_side` → SCENARIO grant |
+| atomic testing and its documents | the atomic testing | `base_id` / `base_inject_side` → ATOMIC_TESTING grant |
+| linked to nothing grant-managed | — | not grant-filtered |
 
-In Elasticsearch, the grant filter of a type becomes ordered instead of a plain OR of every key:
+The registry declares a type's grant keys in that order, and es8's `grantedQuery` uses the **first
+one set** on the document:
 
 ```text
 should (minimum_should_match = 1):
   - base_simulation_side ∈ granted simulations
   - NOT exists base_simulation_side AND base_scenario_side ∈ granted scenarios
-  - NOT exists base_simulation_side AND NOT exists base_scenario_side
-      AND base_inject_side (or base_id) ∈ granted atomic testings
+  - neither set AND base_inject_side (or base_id) ∈ granted atomic testings
   - none of these fields set
 ```
 
-In the registry, the grant keys of a type are declared in precedence order and the first one set on
-the document decides; the resolver is unchanged. With `MARKING` off, nothing changes: the OpenGRC
-export keeps `main`'s `base_restrictions` filter, inheritance included.
+With `MARKING` off, nothing changes: the OpenGRC export keeps `main`'s `base_restrictions` filter.
 
 ## 4.5 Embedded dashboards: assets shown in a breakdown
 

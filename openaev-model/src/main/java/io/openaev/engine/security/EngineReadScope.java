@@ -2,6 +2,7 @@ package io.openaev.engine.security;
 
 import io.openaev.database.raw.RawUserAuth;
 import io.openaev.engine.model.EsBase;
+import io.openaev.engine.model.finding.EsFinding;
 import io.openaev.engine.model.inject.EsInject;
 import io.openaev.engine.model.scenario.EsScenario;
 import io.openaev.engine.model.simulation.EsSimulation;
@@ -146,8 +147,9 @@ public record EngineReadScope(
 
   /**
    * Removes hidden asset ids from a returned document. A parent (inject, scenario, simulation)
-   * stays visible when it targets a hidden asset among others; only the reference goes. Documents
-   * about a hidden asset never get here: the query already excluded them.
+   * stays visible when it targets a hidden asset among others, and a finding stays visible when one
+   * of its endpoints is visible; only the hidden references go. Documents about a hidden asset only
+   * never get here: the query already excluded them.
    *
    * @return the same document, for use in a stream
    */
@@ -163,6 +165,8 @@ public record EngineReadScope(
           scenario.setBase_assets_side(visible(scenario.getBase_assets_side(), hiddenAssetIds));
       case EsSimulation simulation ->
           simulation.setBase_assets_side(visible(simulation.getBase_assets_side(), hiddenAssetIds));
+      case EsFinding finding ->
+          finding.setBase_endpoint_side(visible(finding.getBase_endpoint_side(), hiddenAssetIds));
       default -> {
         // no asset reference to strip
       }

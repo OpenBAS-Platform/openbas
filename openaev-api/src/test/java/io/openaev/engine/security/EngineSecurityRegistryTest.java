@@ -68,6 +68,9 @@ class EngineSecurityRegistryTest {
               Set<String> fields = fieldNames(types.get(entity));
               assertThat(fields).as(entity + " asset fields").containsAll(security.assetFields());
               assertThat(fields)
+                  .as(entity + " linked asset fields")
+                  .containsAll(security.linkedAssetFields());
+              assertThat(fields)
                   .as(entity + " grant keys")
                   .containsAll(
                       security.grantKeys().stream()

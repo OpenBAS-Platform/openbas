@@ -528,15 +528,33 @@ public class ElasticService implements EngineService {
     return BoolQuery.of(b -> b.should(perTenant).minimumShouldMatch("1"))._toQuery();
   }
 
-  /** The documents of one tenant ({@code tenantMatch}) that its {@code rules} let through. */
+  /**
+   * The documents of one tenant ({@code tenantMatch}) that its {@code rules} let through. A
+   * document about one hidden asset ({@link EngineSecurityRegistry#ASSET_FIELDS}) is excluded; a
+   * document linked to several assets ({@link EngineSecurityRegistry#LINKED_ASSET_FIELDS}, a
+   * finding's endpoints) is excluded only when all of them are hidden, as in SQL.
+   */
   private Query tenantClause(Query tenantMatch, EngineReadScope.TenantRules rules) {
     BoolQuery.Builder clause = new BoolQuery.Builder().filter(tenantMatch, rulesQuery(rules));
     if (!rules.hiddenAssetIds().isEmpty()) {
       for (String assetField : EngineSecurityRegistry.ASSET_FIELDS) {
         clause.mustNot(keywordTerms(assetField, rules.hiddenAssetIds()));
       }
+      for (String linkedField : EngineSecurityRegistry.LINKED_ASSET_FIELDS) {
+        clause.mustNot(onlyHiddenAssets(linkedField + ".keyword", rules.hiddenAssetIds()));
+      }
     }
     return clause.build()._toQuery();
+  }
+
+  /** The field holds asset ids, and none of them is visible. */
+  private Query onlyHiddenAssets(String elasticField, Set<String> hiddenAssetIds) {
+    return BoolQuery.of(
+            b ->
+                b.filter(
+                    ExistsQuery.of(e -> e.field(elasticField))._toQuery(),
+                    visibleReferencesScript(elasticField, "exists", "", true, hiddenAssetIds)))
+        ._toQuery();
   }
 
   /** What one tenant's rules let through: every readable type, each with its grant filter. */

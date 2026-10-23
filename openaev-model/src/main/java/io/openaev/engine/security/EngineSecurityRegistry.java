@@ -52,16 +52,31 @@ public final class EngineSecurityRegistry {
    *     ACCESS_ASSESSMENT} through SIMULATION READ); {@code null} when the type is not
    *     grant-managed
    * @param grantKeys the fields linking a document to a granted resource, in precedence order: the
-   *     first one set on a document names its most specific owner, and only that owner's grant
+   *     first one set on a document names its parent resource, and only that resource's grant
    *     counts (a simulation's documents follow the simulation, never its scenario, as in the REST
    *     API); empty when the type is not grant-managed
-   * @param assetFields the fields holding the id of the asset(s) the document is about
+   * @param assetFields the fields holding the id of the one asset the document is about: the
+   *     document is hidden with that asset (like a parent link in {@code MarkingDerivedTables})
+   * @param linkedAssetFields the fields linking the document to several assets: the document is
+   *     hidden only when every one of them is hidden, and stays visible without the hidden ones
+   *     otherwise (like link rows in {@code MarkingDerivedTables}: a finding needs one visible
+   *     asset)
    */
   public record EntitySecurity(
       List<ResourceAccess> requiredAccess,
       @Nullable ResourceAccess grantBypass,
       List<GrantKeyField> grantKeys,
-      List<String> assetFields) {
+      List<String> assetFields,
+      List<String> linkedAssetFields) {
+
+    /** A type with no field linking it to several assets. */
+    public EntitySecurity(
+        List<ResourceAccess> requiredAccess,
+        @Nullable ResourceAccess grantBypass,
+        List<GrantKeyField> grantKeys,
+        List<String> assetFields) {
+      this(requiredAccess, grantBypass, grantKeys, assetFields, List.of());
+    }
 
     public boolean grantManaged() {
       return grantBypass != null;
@@ -78,9 +93,9 @@ public final class EngineSecurityRegistry {
   private static final ResourceAccess ASSESSMENT = access(ResourceType.SIMULATION, Action.READ);
 
   /**
-   * The owner of an assessment document, most specific first: its simulation, else its scenario. A
-   * scenario grant never opens a simulation: the REST API only reads a simulation through a grant
-   * on that simulation (copied from the scenario at creation, not inherited).
+   * The parent resource of an assessment document: its simulation, else its scenario. A scenario
+   * grant never opens a simulation: the REST API only reads a simulation through a grant on that
+   * simulation (copied from the scenario at creation, not inherited).
    */
   private static final List<GrantKeyField> ASSESSMENT_KEYS =
       List.of(
@@ -90,12 +105,22 @@ public final class EngineSecurityRegistry {
   private static final Map<String, EntitySecurity> ENTITIES = buildEntities();
 
   /**
-   * Every field in which an indexed type holds the id of the asset it is about: where the hidden
-   * assets are excluded. Asset ids are unique, so the exclusion can apply to every document.
+   * Every field in which an indexed type holds the id of the one asset it is about: a document
+   * holding a hidden asset there is excluded. Asset ids are unique, so the exclusion can apply to
+   * every document.
    */
   public static final Set<String> ASSET_FIELDS =
       ENTITIES.values().stream()
           .flatMap(security -> security.assetFields().stream())
+          .collect(Collectors.toUnmodifiableSet());
+
+  /**
+   * Every field linking an indexed type to several assets: a document is excluded only when all the
+   * assets it holds there are hidden.
+   */
+  public static final Set<String> LINKED_ASSET_FIELDS =
+      ENTITIES.values().stream()
+          .flatMap(security -> security.linkedAssetFields().stream())
           .collect(Collectors.toUnmodifiableSet());
 
   private EngineSecurityRegistry() {}
@@ -154,6 +179,8 @@ public final class EngineSecurityRegistry {
             ASSESSMENT,
             withAtomicTesting(
                 new GrantKeyField("base_inject_side", GRANT_RESOURCE_TYPE.ATOMIC_TESTING)),
+            // A finding can be on several endpoints: visible with one visible endpoint, as in SQL.
+            List.of(),
             List.of("base_endpoint_side")));
     entities.put(
         index(EsVulnerableEndpoint.class),

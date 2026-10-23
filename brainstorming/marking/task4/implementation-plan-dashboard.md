@@ -12,7 +12,7 @@
 **Status** (2026-10-20):
 - **Steps 1–6:** done on es8. **Step 7** (everything behind `MARKING`): done.
 - **Step 8 (e2e matrix):** API tests partly done.
-- **Steps 7a, 7b:** done; **steps 9–21:** not started (21 optional).
+- **Steps 7a, 7b:** done; **step 7c:** in progress; **steps 9–21:** not started (21 optional).
 - **es9 and OpenSearch:** they accept the scope but ignore it until steps 11–12 (today's behaviour, unfiltered).
 - **Branch `task4-poc-dashboard`:** rebased on `main` (2026-10-19) and compiles. The dashboard, engine, snapshot and coverage tests pass.
 
@@ -256,76 +256,93 @@ context (a minute or two of CI).
 - with the flag **on** (the test default, `openaev.enabled-dev-features=MARKING`), the §4 matrix and
   the POC tests pass.
 
-#### Step 7a — Grants: the most specific owner decides (review fix) ✅ done (2026-10-21)
+#### Step 7a — Grants: a simulation is read through its own grant ✅ done (2026-10-21)
 
-**Issue** (review, blocking): a grant on a scenario reveals, in dashboards, the simulations of that
-scenario whose own grant is absent or revoked, and their children. The REST API denies them: a
-simulation is only readable through a grant **on that simulation** (`grantService.hasGrant`,
-`ExerciseSpecification.findGrantedFor`, `ExerciseRepository.rawAllGranted`); a scenario's grants
-only reach it by being copied at creation (`ScenarioToExerciseService.java:106`). The POC registry
-OR-ed `base_scenario_side` → SCENARIO with the simulation keys, i.e. inheritance. Design: §4.4, "The
-most specific owner decides".
+**Use case.** Group `Analysts` (no `ACCESS_ASSESSMENT`) is granted on scenario `S1`.
 
-- `EngineSecurityRegistry`: grant keys declared **in precedence order**; the `simulation` entry loses
-  its `base_scenario_side` key; `ASSESSMENT_KEYS` and `withAtomicTesting` put `base_simulation_side`
-  first, then `base_scenario_side`, then the atomic testing key.
-- es8 `grantedQuery`: the first key **set on the document** decides, instead of any key matching:
-  `simulation ∈ granted` OR (no simulation AND scenario ∈ granted) OR (neither AND atomic testing ∈
-  granted) OR (none of the fields set).
-- `EngineReadScopeResolver`: unchanged (it already lists the granted ids per resource type).
-- With `MARKING` off: unchanged (the OpenGRC export keeps `main`'s `base_restrictions` filter).
+1. `S1` runs every day: each new simulation gets a **copy** of `S1`'s grants, so `Analysts` can read
+   them.
+2. The admin removes `Analysts`' grant from `S1`. Simulations created **afterwards** are not granted
+   to `Analysts`; the **earlier** ones keep their copied grant.
+3. The admin also revokes `Analysts`' grant on one earlier simulation `X`.
 
-**Tests** (engine integration and API), reader without `ACCESS_ASSESSMENT`:
-- grant on `S1`, simulation `X` of `S1` created **before** the grant: `X` and its injects,
-  expectations and findings hidden; `S1`'s own documents visible;
-- `X` created after the grant (grant copied): visible;
-- `X`'s grant revoked, `S1`'s kept: `X` and its children hidden on the next request;
-- grant on `X` only: `X` and its children visible, `S1` hidden;
-- an atomic testing inject (no scenario, no simulation): only through its own grant.
+| What `Analysts` sees | REST API | Dashboards before 7a | Dashboards after 7a |
+|---|---|---|---|
+| simulations created while `S1` was granted | ✅ (copied grant) | ✅ | ✅ |
+| simulations created after the grant was removed | ❌ (no grant) | ❌ | ❌ |
+| a simulation of `S1` created **before** `S1` was granted | ❌ | ✅ **leak** | ❌ |
+| simulation `X`, its own grant revoked, `S1` still granted | ❌ | ✅ **leak** | ❌ |
+| their injects, expectations, findings | same as their simulation | leaked with it | same as their simulation |
 
-**Built**: registry keys in precedence order (simulation, scenario, atomic testing; the `simulation`
-entry has no scenario key), es8 `grantedQuery` decides on the first key set on the document.
-`EngineReadScopeGrantIntegrationTest` (real grant rows, reader without `ACCESS_ASSESSMENT`): scenario
-grant only, simulation grant, simulation grant revoked with the scenario grant kept, atomic testing.
-`CursorPagedSearchTest` flag-on group: a simulation grant reveals its observation, a scenario grant
-alone does not. 334 engine, dashboard, snapshot and attack-pattern tests green.
+**Why it leaked.** Dashboards accepted a document if *any* of its grant fields matched, so a grant
+on `S1` opened every simulation of `S1`. The REST API never does that: a simulation is read through
+its own grant only, and a scenario grant reaches it only by being copied at creation.
 
-**DoD**: these tests green on es8; matrix rows G2, G6, G8–G11 green (step 8).
+**Fix.** A document is checked on the grant of its **parent resource**: its simulation, else its
+scenario, else its atomic testing (registry keys in that order; es8 `grantedQuery` uses the first one
+set on the document). With `MARKING` off, nothing changes.
 
-#### Step 7b — Filters on dependency fields: visible references only (review fix) ✅ done (2026-10-21)
+**Tests.** `EngineReadScopeGrantIntegrationTest` (real grant rows): scenario grant only, simulation
+grant, simulation grant revoked, atomic testing. `CursorPagedSearchTest`: a simulation grant reveals
+its observation, a scenario grant alone does not. Matrix rows G2, G6, G8–G11 (step 8).
 
-**Issue** (review, blocking): with `MARKING` on, a readable scenario targeting GREEN and a hidden RED
-matches a user-supplied filter `base_entity = scenario AND base_assets_side = RED`: the count reveals
-the hidden association. Stripping returned targets and excluding buckets cannot prevent it, since
-the filter runs on the stored document. Design: §4.3, "Filters on dependency fields".
+#### Step 7b — Filters on targeted assets: only visible assets count ✅ done (2026-10-21)
 
-- es8: pass the reader's hidden asset ids (`scope.hiddenAssetIds()`) down to the filter builder
-  (`buildQuery` → `queryFromFilter` → `queryFromBaseFilter`).
-- For a key in `EngineSecurityRegistry.ASSET_REFERENCE_FIELDS`, **after** parameter resolution:
-  - `eq`: remove the hidden ids from the values; no value left → match nothing;
-  - `not_eq`: remove the hidden ids from the values; no value left → drop the filter;
-  - `contains`, `not_contains`, `starts_with`, `not_starts_with`, `empty`, `not_empty`, ranges:
-    **option (a)**, a Painless script query over the field's values that skips the hidden ids
-    (`params.hidden`, `params.value`).
-- Only when the reader has hidden assets: every other query is built as today.
+**Use case.** Asset `RED` is `TLP:RED`, asset `GREEN` is `TLP:GREEN`. Scenario `S1` targets
+`GREEN` and `RED`; scenario `S3` targets `RED` only. A `TLP:GREEN` reader opens a dashboard whose
+widget counts "scenarios targeting `RED`" (built by an admin, or through a dashboard parameter).
 
-**Tests** (engine integration and API), GREEN reader, scenario `SG` targeting GREEN + RED, scenario
-`SR` targeting RED only:
-- count and list `base_assets_side eq RED` → nothing;
-- `eq GREEN` → `SG`; `not_eq RED` → `SG` and `SR`; `not_eq GREEN` → `SR`;
-- `empty` → `SR`; `not_empty` → `SG` only;
-- `starts_with <first characters of RED's id>` → nothing;
-- a widget whose filter value is a dashboard parameter set to RED → nothing;
-- the same on inject documents; an admin (unrestricted) gets every match, unchanged.
+| What the `TLP:GREEN` reader sees | REST API | Dashboards before 7b | Dashboards after 7b |
+|---|---|---|---|
+| `S1` in a list | ✅, targets: `GREEN` | ✅, targets: `GREEN` | ✅, targets: `GREEN` |
+| scenarios targeting `RED` | none | **2** (reveals `RED` and who targets it) | none |
+| scenarios with no target | `S3` (its only target is hidden) | not `S3` | `S3` |
+| scenarios targeting `GREEN` | `S1` | `S1` | `S1` |
 
-**Built**: es8 passes `scope.hiddenAssetIds()` to the filter builder; on a dependency field, `eq` /
-`not_eq` drop the hidden values, the other operators run `VISIBLE_REFERENCES_SCRIPT` (Painless, values
-not hidden). `starts_with` is not supported by es8 at all (it throws for every field), so it needs no
-case. `EngineReadScopeIntegrationTest`, group "Filters on dependency fields": 10 tests (7 fail with the
-fix disabled). 379 engine, dashboard, snapshot and attack-pattern tests green.
+**Why it leaked.** The returned targets were already cleaned, but a widget's filter was evaluated on
+the stored document, hidden targets included.
 
-**DoD**: these tests green on es8; the queries of a reader without hidden assets are unchanged
-(existing dashboard tests green); matrix rows M14–M16 green (step 8).
+**Fix.** A filter on a target field only looks at the visible targets: hidden ids are removed from
+`eq` / `not_eq` values (after dashboard parameters are resolved), and the other operators (`empty`,
+`not_empty`, `contains`, ranges) run a small script that skips hidden ids. Readers with no hidden
+asset get the same query as before.
+
+**Tests.** `EngineReadScopeIntegrationTest`, group "Filters on dependency fields": 10 cases on
+inject targets, the same field and rule as scenarios (`eq`, `not_eq`, `empty`, `not_empty`,
+`contains` on part of an id, ranges, a parameter, an unrestricted reader); 7 of them fail without
+the fix. Matrix rows M14–M16 (step 8).
+
+#### Step 7c — Findings on several endpoints: one visible endpoint is enough (review fix) 🟡 in progress
+
+**Use case.** Asset `RED` is `TLP:RED`, asset `GREEN` is `TLP:GREEN`. A scan produced finding `F1` on
+`GREEN` and `RED`, finding `F2` on `RED` only, finding `F3` on no endpoint. A `TLP:GREEN` reader opens
+the findings list and a "findings by endpoint" widget.
+
+| What the `TLP:GREEN` reader sees | REST API | Dashboards before 7c | Dashboards after 7c |
+|---|---|---|---|
+| `F1` (GREEN + RED) | ✅, endpoint: `GREEN` | ❌ **missing** | ✅, endpoint: `GREEN` |
+| `F2` (RED only) | ❌ | ❌ | ❌ |
+| `F3` (no endpoint) | ✅ | ✅ | ✅ |
+| findings count | 2 | 1 | 2 |
+| "findings by endpoint" | `GREEN` only | `GREEN` only | `GREEN` only |
+
+**Why it differed.** A finding's endpoints are one multi-valued field (`base_endpoint_side`), and
+dashboards dropped the document as soon as **one** value was hidden. The REST API keeps a finding
+with **one** visible asset (`MarkingDerivedTables.FROM_ASSETS`, `MarkingLinkedTablesRowsTest`).
+
+**Fix.**
+- Registry: `linkedAssetFields` next to `assetFields`, like link rows vs a parent link in
+  `MarkingDerivedTables`. Findings declare `base_endpoint_side` there.
+- es8: a document is excluded through a linked field only when it has values there and none is
+  visible (option 1: the visible-references script of 7b, `exists` negated, only for readers with
+  hidden assets).
+- Returned findings: hidden endpoint ids stripped (`stripHiddenAssets`).
+- If the script costs too much on a large findings index (step 9), option 2: an indexed endpoint
+  count and a `terms_set` query, no security data in the index.
+
+**Tests.** `EngineReadScopeResolverIntegrationTest`, group "Findings linked to several endpoints"
+(real markings): `F1` listed with `GREEN` only, count 2, no `RED` bucket, both endpoints once `RED` is
+granted, `F1` hidden once `GREEN` is re-marked `RED`. Matrix rows M6, M10 (step 8).
 
 #### Step 8 — End-to-end tests: RBAC, grants, markings 🟡 API tests partly done
 
@@ -650,11 +667,11 @@ another on both `A-GREEN` and `A-AMBER`.
 | M3 | `full-green` | inject and scenario documents targeting the three assets | the inject is visible; `A-AMBER` and `A-RED` are stripped from its targets |
 | M4 | `full-green` | after the admin marks `A-GREEN` as `TLP:RED` | `A-GREEN` and its history gone on the next refresh |
 | M5 | `full-green` | after the admin gives the user's group `TLP:RED` | `A-RED` appears on the next refresh |
-| M6 | `full-green` | the finding on `A-GREEN` and `A-RED` | hidden: the POC is strict, a finding with one hidden asset is excluded (the REST API is permissive) |
+| M6 | `full-green` | the finding on `A-GREEN` and `A-RED` | visible with `A-GREEN` only, as in the REST API (step 7c) |
 | M7 | `full-green` | OpenGRC snapshot export (`BULK_SNAPSHOT_EXPORT`) | no observation of `A-AMBER` or `A-RED`; only granted scenarios for a caller without `ACCESS_ASSESSMENT` |
 | M8 | `full-green` | findings list widget, finding on `A-GREEN` only | visible |
 | M9 | `full-green` | findings list widget, finding on `A-RED` only | hidden |
-| M10 | `full-green` | findings count widget on `S1` | counts only the findings whose assets are all `TLP:GREEN`: not the `A-AMBER` or `A-RED` ones, nor the two multi-asset findings (strict) |
+| M10 | `full-green` | findings count widget on `S1` | counts the findings with at least one `TLP:GREEN` endpoint: the two multi-asset findings included, not the `A-AMBER`-only or `A-RED`-only ones |
 | M11 | `full-green` | the `A-GREEN` + `A-RED` finding: REST findings tab of `S1` vs dashboard | REST shows it (permissive), the dashboard hides it (strict): record the difference until the strict/permissive question is settled (§4.3 note of the design) |
 | M12 | `amber` | the `A-GREEN` + `A-AMBER` finding | visible: both assets are within `TLP:AMBER` |
 | M13 | `full-green` | vulnerable endpoints widget on `S1` | `A-GREEN` only: the vulnerable endpoint of `A-RED` is hidden with its copied hostname and platform |

@@ -27,9 +27,14 @@ import io.openaev.engine.api.CountRuntime;
 import io.openaev.engine.api.FlatConfiguration;
 import io.openaev.engine.api.ListConfiguration;
 import io.openaev.engine.api.ListRuntime;
+import io.openaev.engine.api.StructuralHistogramRuntime;
+import io.openaev.engine.api.StructuralHistogramWidget;
 import io.openaev.engine.api.WidgetConfigurationWithSeries;
 import io.openaev.engine.facade.EngineService;
 import io.openaev.engine.model.EsBase;
+import io.openaev.engine.model.finding.EsFinding;
+import io.openaev.engine.query.EsSeries;
+import io.openaev.engine.query.EsSeriesData;
 import io.openaev.engine.security.EngineReadScope;
 import io.openaev.utils.CustomDashboardTimeRange;
 import io.openaev.utils.TenantIsolationTestHelper;
@@ -117,6 +122,8 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
   private String tenantBGreen;
   private String findingOnGreen;
   private String findingOnRed;
+  private String findingOnGreenAndRed;
+  private String findingWithoutEndpoint;
 
   @BeforeEach
   void seed() throws Exception {
@@ -169,6 +176,8 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
     EndpointComposer.Composer redEndpoint = endpoint(DEFAULT_TENANT, "red");
     findingOnGreen = finding(greenEndpoint);
     findingOnRed = finding(redEndpoint);
+    findingOnGreenAndRed = finding(greenEndpoint, redEndpoint);
+    findingWithoutEndpoint = finding();
     unmarked = unmarkedEndpoint.get().getId();
     green = greenEndpoint.get().getId();
     red = redEndpoint.get().getId();
@@ -222,7 +231,7 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
     void given_greenClearance_should_hideDerivedFindingOfRed() {
       // -- ACT --
       List<String> findings = ids(list(DEFAULT_CTX, "finding"));
-      long count = countFindings(DEFAULT_CTX);
+      long count = countFindings(DEFAULT_CTX, findingOnGreen, findingOnRed);
 
       // -- ASSERT --
       assertThat(findings).contains(findingOnGreen).doesNotContain(findingOnRed);
@@ -248,7 +257,7 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
       // -- ASSERT --
       assertThat(scope.hiddenAssetIds()).doesNotContain(red);
       assertThat(assets).contains(red, green, unmarked);
-      assertThat(countFindings(DEFAULT_CTX)).isEqualTo(2);
+      assertThat(countFindings(DEFAULT_CTX, findingOnGreen, findingOnRed)).isEqualTo(2);
     }
 
     @Test
@@ -265,7 +274,79 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
       assertThat(scope.tenantRules().get(DEFAULT_TENANT).hiddenAssetIds()).contains(green, red);
       assertThat(ids(list(DEFAULT_CTX, "asset"))).doesNotContain(green, red).contains(unmarked);
       assertThat(ids(list(DEFAULT_CTX, "finding"))).doesNotContain(findingOnGreen);
-      assertThat(countFindings(DEFAULT_CTX)).isZero();
+      assertThat(countFindings(DEFAULT_CTX, findingOnGreen, findingOnRed)).isZero();
+    }
+  }
+
+  @Nested
+  @DisplayName("Findings linked to several endpoints: one visible endpoint is enough, as in SQL")
+  class FindingsOnSeveralEndpoints {
+
+    private EsFinding findingDocument(String findingId) {
+      return list(DEFAULT_CTX, "finding").stream()
+          .filter(document -> findingId.equals(document.getBase_id()))
+          .map(EsFinding.class::cast)
+          .findFirst()
+          .orElse(null);
+    }
+
+    @Test
+    @DisplayName("given a finding on GREEN and RED, should list it with its GREEN endpoint only")
+    void given_findingOnGreenAndRed_should_listItWithGreenOnly() {
+      // -- ACT --
+      EsFinding shared = findingDocument(findingOnGreenAndRed);
+
+      // -- ASSERT --
+      assertThat(shared).isNotNull();
+      assertThat(shared.getBase_endpoint_side()).containsExactly(green);
+    }
+
+    @Test
+    @DisplayName("given findings on GREEN + RED, RED only and no endpoint, should count two")
+    void given_mixedFindings_should_countTheVisibleOnes() {
+      // -- ACT --
+      long count =
+          countFindings(DEFAULT_CTX, findingOnGreenAndRed, findingOnRed, findingWithoutEndpoint);
+
+      // -- ASSERT --
+      assertThat(count).isEqualTo(2);
+      assertThat(ids(list(DEFAULT_CTX, "finding")))
+          .contains(findingOnGreenAndRed, findingWithoutEndpoint)
+          .doesNotContain(findingOnRed);
+    }
+
+    @Test
+    @DisplayName("given findings by endpoint, should give GREEN a bucket and RED none")
+    void given_findingsByEndpoint_should_haveNoRedBucket() {
+      // -- ACT --
+      List<String> buckets = findingsByEndpoint(DEFAULT_CTX);
+
+      // -- ASSERT --
+      assertThat(buckets).contains(green).doesNotContain(red);
+    }
+
+    @Test
+    @DisplayName("given the clearance raised to TLP:RED, should show both endpoints")
+    void given_clearanceRaisedToRed_should_showBothEndpoints() {
+      // -- ARRANGE --
+      grant(tlpRed);
+
+      // -- ACT --
+      EsFinding shared = findingDocument(findingOnGreenAndRed);
+
+      // -- ASSERT --
+      assertThat(shared.getBase_endpoint_side()).containsExactlyInAnyOrder(green, red);
+    }
+
+    @Test
+    @DisplayName("given GREEN re-marked TLP:RED, should hide the finding: no endpoint left visible")
+    void given_everyEndpointHidden_should_hideTheFinding() {
+      // -- ARRANGE --
+      mark(green, tlpRed);
+
+      // -- ACT & ASSERT --
+      assertThat(ids(list(DEFAULT_CTX, "finding"))).doesNotContain(findingOnGreenAndRed);
+      assertThat(countFindings(DEFAULT_CTX, findingOnGreenAndRed)).isZero();
     }
   }
 
@@ -344,14 +425,36 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
     return engineService.entities(ctx, resolver.resolve(ctx), runtime).getEsDatas();
   }
 
-  /** Counts this fixture's two findings, as a count widget would, with the reader's scope. */
-  private long countFindings(TxCtx ctx) {
+  /** The endpoint buckets of this fixture's findings, as a "findings by endpoint" widget. */
+  private List<String> findingsByEndpoint(TxCtx ctx) {
     Filters.FilterGroup filter = Filters.FilterGroup.defaultFilterGroup();
     filter.setFilters(
         List.of(
             Filters.Filter.getNewDefaultEqualFilter("base_entity", List.of("finding")),
             Filters.Filter.getNewDefaultEqualFilter(
-                "base_id", List.of(findingOnGreen, findingOnRed))));
+                "base_id", List.of(findingOnGreen, findingOnRed, findingOnGreenAndRed))));
+    WidgetConfigurationWithSeries.Series series = new WidgetConfigurationWithSeries.Series();
+    series.setName("findings");
+    series.setFilter(filter);
+    StructuralHistogramWidget widget = new StructuralHistogramWidget();
+    widget.setField("base_endpoint_side");
+    widget.setDateAttribute("base_created_at");
+    widget.setTimeRange(CustomDashboardTimeRange.ALL_TIME);
+    widget.setLimit(100);
+    widget.setSeries(List.of(series));
+    List<EsSeries> result =
+        engineService.multiTermHistogram(
+            ctx, resolver.resolve(ctx), new StructuralHistogramRuntime(widget, Map.of(), Map.of()));
+    return result.getFirst().getData().stream().map(EsSeriesData::getKey).toList();
+  }
+
+  /** Counts the given findings, as a count widget would, with the reader's scope. */
+  private long countFindings(TxCtx ctx, String... findingIds) {
+    Filters.FilterGroup filter = Filters.FilterGroup.defaultFilterGroup();
+    filter.setFilters(
+        List.of(
+            Filters.Filter.getNewDefaultEqualFilter("base_entity", List.of("finding")),
+            Filters.Filter.getNewDefaultEqualFilter("base_id", List.of(findingIds))));
     WidgetConfigurationWithSeries.Series series = new WidgetConfigurationWithSeries.Series();
     series.setName("findings");
     series.setFilter(filter);
@@ -385,11 +488,12 @@ class EngineReadScopeResolverIntegrationTest extends IntegrationTest {
   }
 
   /** A finding on {@code endpoint}, through a bare (atomic testing) inject. */
-  private String finding(EndpointComposer.Composer endpoint) {
+  private String finding(EndpointComposer.Composer... endpoints) {
     FindingComposer.Composer finding =
-        findingComposer
-            .forFinding(FindingFixture.createDefaultCveFindingWithRandomTitle())
-            .withEndpoint(endpoint);
+        findingComposer.forFinding(FindingFixture.createDefaultCveFindingWithRandomTitle());
+    for (EndpointComposer.Composer endpoint : endpoints) {
+      finding.withEndpoint(endpoint);
+    }
     injectComposer.forInject(InjectFixture.getDefaultInject()).withFinding(finding).persist();
     return finding.get().getId();
   }
