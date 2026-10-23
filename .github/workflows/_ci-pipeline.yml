@@ -122,10 +122,6 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
-        with:
-          # git describe needs the commit graph, not historical file contents
-          fetch-depth: 0
-          filter: blob:none
       - uses: ./.github/actions/prepare-bundled-assets
 
   # ════════════════════════════════════════════════════════════════════
@@ -611,7 +607,6 @@ jobs:
   # ════════════════════════════════════════════════════════════════════
 
   # Docker builds fetch bundled assets inline, avoiding a serial dependency.
-  # fetch-depth 0 is required because the asset version comes from `git describe`.
   docker-build:
     name: "🐳 Docker Build (${{ matrix.variant }} ${{ matrix.arch }})"
     if: ${{ !cancelled() }}
@@ -659,10 +654,6 @@ jobs:
             tags: openaev-ubi9:ci-${{ github.run_id }}
     steps:
       - uses: actions/checkout@v7
-        with:
-          # git describe needs the commit graph, not historical file contents
-          fetch-depth: 0
-          filter: blob:none
       - uses: ./.github/actions/docker-build
         with:
           dockerfile: ${{ matrix.dockerfile }}

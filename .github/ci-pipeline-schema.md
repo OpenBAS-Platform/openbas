@@ -91,8 +91,7 @@ is cancelled, or is skipped cannot leave consumers waiting until the poll cap.
 
 It deliberately does **not** `needs:` Prepare Bundled Assets. It re-runs the same
 composite action inline with `upload-artifact: false`, which removes ~1.4 min of serial
-wait from the head of the critical path. This is why the job checks out with
-`fetch-depth: 0` — the asset version comes from `git describe`.
+wait from the head of the critical path.
 
 ---
 
@@ -112,7 +111,7 @@ The minutes column is each job's `timeout-minutes` ceiling, not its runtime.
 | 📦 **Prepare Bundled Assets** | 10 min | Agent/implant binaries from JFrog, patches `catalog-integrators.json`, uploads `release-assets` |
 | 🔍 **Spotless Check** | 10 min | Java formatting |
 | 🔎 **BOM Override Guard** | 15 min | Spring Boot BOM overrides tracked by Renovate and still effective. Advisory in the Gate |
-| 🧪 **Frontend Quality & Unit Tests** | 20 min | ESLint + Vitest + coverage |
+| 🧪 **Frontend Quality & Unit Tests** | 20 min | ESLint + dependency-cruiser + knip + Vitest + coverage |
 | 🎨 **FDS Conformity** | 5 min | Design-system token bridge and migrated zones stay conformant |
 | 🎨 **FDS MUI Regression** | 5 min | Pull requests only: no MUI component re-enters where the design system replaces it |
 | 🔎 **Docs Links Check** | 5 min | Every in-app `docs.openaev.io` link resolves to a page and anchor of the built MkDocs site |
