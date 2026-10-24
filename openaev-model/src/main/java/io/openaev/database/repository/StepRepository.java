@@ -274,6 +274,19 @@ public interface StepRepository extends JpaRepository<Step, String> {
   boolean existsByStepTemplateIdAndWorkflowId(String stepTemplateId, String workflowRunId);
 
   /**
+   * Checks whether the given step template has a run step in one of the given statuses within the
+   * given workflow run: a {@code DEPEND_ON} condition waits while its prerequisite has one that is
+   * still {@code READY} or {@code RUN}.
+   *
+   * @param stepTemplateId the ID of the step template to check
+   * @param workflowRunId the ID of the workflow run to scope the check
+   * @param statuses the statuses to look for
+   * @return {@code true} if a matching step exists
+   */
+  boolean existsByStepTemplateIdAndWorkflowIdAndStatusIn(
+      String stepTemplateId, String workflowRunId, Collection<StepStatus> statuses);
+
+  /**
    * Returns {@code true} if the given step template has already spawned at least one run step
    * (READY/RUN/END) in any workflow run - i.e. it has been evaluated at least once. The idempotent
    * author guard uses this to tell a duplicate author of a still-pending template (collapse it)
