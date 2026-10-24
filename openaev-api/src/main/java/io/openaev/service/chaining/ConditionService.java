@@ -10,6 +10,7 @@ import io.openaev.api.chaining.dto.EventOutput;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.ConditionRepository;
 import io.openaev.database.repository.StepConditionRow;
+import io.openaev.database.repository.StepDelayQueueRepository;
 import io.openaev.database.repository.StepRepository;
 import io.openaev.database.repository.WorkflowRepository;
 import io.openaev.rest.exception.BadRequestException;
@@ -43,6 +44,7 @@ public class ConditionService {
 
   private final ConditionRepository conditionRepository;
   private final StepRepository stepRepository;
+  private final StepDelayQueueRepository stepDelayQueueRepository;
   private final WorkflowRepository workflowRepository;
 
   // -- CONDITION TREE CREATE --
@@ -700,8 +702,9 @@ public class ConditionService {
    * <p>Each DEPEND_ON condition references a step template ID in its value. The condition is
    * satisfied if and only if that step template has run in the given workflow run and every one of
    * its run steps has ended ({@link StepStatus#END}), in success or in error: none is still {@code
-   * READY} or {@code RUN}. A step that depends on another therefore starts once the other has
-   * finished on every target, not as soon as it was launched.
+   * READY} or {@code RUN}, and no target of it waits in the delay queue (held back by the rate
+   * limit). A step that depends on another therefore starts once the other has finished on every
+   * target, not as soon as it was launched.
    *
    * <p>All DEPEND_ON conditions must be satisfied
    *
@@ -735,7 +738,9 @@ public class ConditionService {
           stepRepository.existsByStepTemplateIdAndWorkflowIdAndStatusIn(
               dependentStepTemplateId, workflowRun.getId(), UNFINISHED);
 
-      if (stillRunning) {
+      if (stillRunning
+          || stepDelayQueueRepository.existsByStepTemplateIdAndWorkflowRunId(
+              dependentStepTemplateId, workflowRun.getId())) {
         log.debug(
             "[Chaining] DEPEND_ON not satisfied: step template {} has not ended in workflow run {}",
             dependentStepTemplateId,

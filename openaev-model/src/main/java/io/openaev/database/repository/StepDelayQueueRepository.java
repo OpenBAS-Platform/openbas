@@ -38,6 +38,9 @@ public interface StepDelayQueueRepository extends JpaRepository<StepDelayQueue, 
 
   List<StepDelayQueue> findAllByWorkflowRun(Workflow workflowRun);
 
+  /** Whether a target of this step template still waits in the delay queue of this workflow run. */
+  boolean existsByStepTemplateIdAndWorkflowRunId(String stepTemplateId, String workflowRunId);
+
   int deleteAllByWorkflowRun(Workflow workflowRun);
 
   @Modifying

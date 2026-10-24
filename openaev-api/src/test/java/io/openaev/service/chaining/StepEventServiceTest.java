@@ -31,7 +31,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -755,6 +754,8 @@ class StepEventServiceTest {
       when(updated.getWorkflow()).thenReturn(workflowRun);
       when(localActionStep.update(stepRun)).thenReturn(Optional.of(updated));
 
+      when(workflowService.evaluateWorkflowProgress(workflowRun)).thenReturn(workflowRun);
+
       // Act
       stepEventService.handleExternalUpdateEvent(event);
 
@@ -765,103 +766,23 @@ class StepEventServiceTest {
     }
   }
 
-  // -- A FAILED STEP RELEASES THE STEPS THAT DEPEND ON IT --
+  // -- THE WORKFLOW RUN IS EVALUATED ONCE THE STEP IS COMMITTED --
 
   @Nested
-  class FailedStepEvaluatesProgress {
+  class EvaluationAfterCommit {
 
-    private Step stepOf(Workflow workflowRun, StepStatus status) {
-      Step step = new Step();
-      step.setStepAction(StepActionClass.INJECT_EXECUTION);
-      step.setStatus(status);
-      step.setWorkflow(workflowRun);
-      return step;
-    }
+    private final AtomicInteger transactions = new AtomicInteger();
+    private final AtomicInteger savedIn = new AtomicInteger();
+    private final AtomicInteger evaluatedIn = new AtomicInteger();
 
-    @Test
-    void given_runFails_should_endStepAndEvaluateWorkflowProgress() throws ChainingException {
-      // Arrange
-      Workflow workflowRun = new Workflow();
-      Step stepReady = stepOf(workflowRun, StepStatus.READY);
-      when(stepService.factoryAction(any(), any())).thenReturn(actionStep);
-      when(actionStep.run(stepReady)).thenReturn(Optional.empty());
-
-      // Act
-      stepEventService.run(stepReady);
-
-      // Assert: a step that depends on it can start now that it has ended
-      assertEquals(StepStatus.END, stepReady.getStatus());
-      InOrder order = inOrder(stepService, workflowService);
-      order.verify(stepService).saveStep(stepReady);
-      order.verify(workflowService).evaluateWorkflowProgress(workflowRun);
-      order.verify(workflowService).saveWorkflowRun(workflowRun);
-    }
-
-    @Test
-    void given_updateFails_should_endStepAndEvaluateWorkflowProgress() throws ChainingException {
-      // Arrange
-      Workflow workflowRun = new Workflow();
-      Step stepRun = stepOf(workflowRun, StepStatus.RUN);
-      ExternalUpdateEvent event = mock(ExternalUpdateEvent.class);
-      when(event.getStepId()).thenReturn("step-run");
-      when(stepService.findById("step-run")).thenReturn(stepRun);
-      when(stepService.factoryAction(any(), any()))
-          .thenThrow(new ChainingException("update failed"));
-
-      // Act
-      stepEventService.handleExternalUpdateEvent(event);
-
-      // Assert
-      assertEquals(StepStatus.END, stepRun.getStatus());
-      InOrder order = inOrder(stepService, workflowService);
-      order.verify(stepService).saveStep(stepRun);
-      order.verify(workflowService).evaluateWorkflowProgress(workflowRun);
-      order.verify(workflowService).saveWorkflowRun(workflowRun);
-    }
-
-    @Test
-    void given_readyEventDropped_should_endStepAndEvaluateWorkflowProgress()
-        throws ChainingException {
-      // Arrange: the event transaction fails for good, the transaction ending the step succeeds
-      Workflow workflowRun = new Workflow();
-      Step step = stepOf(workflowRun, StepStatus.READY);
-      StepEvent event = StepEvent.builder().stepId(UUID.randomUUID().toString()).build();
-      event.setRetryCount(chainingConfig.getMaxRetryCount());
-      when(stepRepository.findForUpdateById(event.getStepId())).thenReturn(Optional.of(step));
-      doThrow(new RuntimeException("DB error"))
-          .doAnswer(
+    /** Counts the transactions; the first ones given fail, as the event transaction may. */
+    private void transactionsCounted(int failing) {
+      AtomicInteger calls = new AtomicInteger();
+      doAnswer(
               invocation -> {
-                Runnable work = invocation.getArgument(1);
-                work.run();
-                return null;
-              })
-          .when(tenantTx)
-          .execute(any(TxCtx.class), any(Runnable.class));
-
-      // Act
-      stepEventService.handleReadyStepEvent(event);
-
-      // Assert
-      assertEquals(StepStatus.END, step.getStatus());
-      InOrder order = inOrder(stepService, workflowService);
-      order.verify(stepService).saveStep(step);
-      order.verify(workflowService).evaluateWorkflowProgress(workflowRun);
-      order.verify(workflowService).saveWorkflowRun(workflowRun);
-    }
-
-    @Test
-    void given_readyEventDropped_should_evaluateInATransactionOfItsOwn() throws ChainingException {
-      // Arrange: a failed evaluation rolls its transaction back, never the one that ended the step
-      Workflow workflowRun = new Workflow();
-      Step step = stepOf(workflowRun, StepStatus.READY);
-      StepEvent event = StepEvent.builder().stepId(UUID.randomUUID().toString()).build();
-      event.setRetryCount(chainingConfig.getMaxRetryCount());
-      when(stepRepository.findForUpdateById(event.getStepId())).thenReturn(Optional.of(step));
-      AtomicInteger transactions = new AtomicInteger();
-      AtomicReference<StepStatus> endedIn = new AtomicReference<>();
-      doThrow(new RuntimeException("DB error"))
-          .doAnswer(
-              invocation -> {
+                if (calls.incrementAndGet() <= failing) {
+                  throw new RuntimeException("DB error");
+                }
                 transactions.incrementAndGet();
                 Runnable work = invocation.getArgument(1);
                 work.run();
@@ -869,55 +790,214 @@ class StepEventServiceTest {
               })
           .when(tenantTx)
           .execute(any(TxCtx.class), any(Runnable.class));
-      AtomicInteger evaluatedIn = new AtomicInteger();
+      lenient()
+          .when(stepService.saveStep(any()))
+          .thenAnswer(
+              invocation -> {
+                savedIn.set(transactions.get());
+                return invocation.getArgument(0);
+              });
+    }
+
+    private void evaluationRecorded(Workflow workflowRun, boolean fails) throws ChainingException {
+      evaluationRecorded(workflowRun, fails ? Integer.MAX_VALUE : 0);
+    }
+
+    /** The evaluation fails its first {@code failing} times, then succeeds. */
+    private void evaluationRecorded(Workflow workflowRun, int failing) throws ChainingException {
+      AtomicInteger attempts = new AtomicInteger();
       when(workflowService.evaluateWorkflowProgress(workflowRun))
           .thenAnswer(
               invocation -> {
                 evaluatedIn.set(transactions.get());
-                endedIn.set(step.getStatus());
-                throw new ChainingException("evaluation failed");
+                if (attempts.incrementAndGet() <= failing) {
+                  throw new ChainingException("evaluation failed");
+                }
+                return workflowRun;
               });
+    }
 
-      // Act
-      assertDoesNotThrow(() -> stepEventService.handleReadyStepEvent(event));
+    private Step stepOf(Workflow workflowRun, StepStatus status) {
+      Step step = new Step();
+      step.setId(UUID.randomUUID().toString());
+      step.setStepAction(StepActionClass.INJECT_EXECUTION);
+      step.setStatus(status);
+      step.setWorkflow(workflowRun);
+      return step;
+    }
 
-      // Assert: the step was ended in the first transaction, evaluated in the second
-      assertEquals(2, evaluatedIn.get());
-      assertEquals(StepStatus.END, endedIn.get());
-      verify(stepService).saveStep(step);
+    private ExternalUpdateEvent updateOf(Step stepRun) {
+      ExternalUpdateEvent event = mock(ExternalUpdateEvent.class);
+      when(event.getStepId()).thenReturn(stepRun.getId());
+      when(stepService.findById(stepRun.getId())).thenReturn(stepRun);
+      return event;
     }
 
     @Test
-    void given_evaluationFails_should_keepTheStepEnded() throws ChainingException {
+    void given_runFails_should_endStepThenEvaluateInATransactionOfItsOwn()
+        throws ChainingException {
       // Arrange
+      transactionsCounted(0);
       Workflow workflowRun = new Workflow();
       Step stepReady = stepOf(workflowRun, StepStatus.READY);
+      when(stepRepository.findForUpdateById(stepReady.getId())).thenReturn(Optional.of(stepReady));
       when(stepService.factoryAction(any(), any())).thenReturn(actionStep);
       when(actionStep.run(stepReady)).thenReturn(Optional.empty());
-      when(workflowService.evaluateWorkflowProgress(workflowRun))
-          .thenThrow(new ChainingException("evaluation failed"));
+      evaluationRecorded(workflowRun, false);
 
       // Act
-      assertDoesNotThrow(() -> stepEventService.run(stepReady));
+      stepEventService.handleReadyStepEvent(StepEvent.builder().stepId(stepReady.getId()).build());
+
+      // Assert: a step that depends on it can start now that it has ended
+      assertEquals(StepStatus.END, stepReady.getStatus());
+      assertEquals(1, savedIn.get());
+      assertEquals(2, evaluatedIn.get());
+      verify(workflowService).saveWorkflowRun(workflowRun);
+    }
+
+    @Test
+    void given_runSucceeds_should_notEvaluate() throws ChainingException {
+      // Arrange
+      transactionsCounted(0);
+      Workflow workflowRun = new Workflow();
+      Step stepReady = stepOf(workflowRun, StepStatus.READY);
+      when(stepRepository.findForUpdateById(stepReady.getId())).thenReturn(Optional.of(stepReady));
+      when(stepService.factoryAction(any(), any())).thenReturn(actionStep);
+      when(actionStep.run(stepReady)).thenReturn(Optional.of(stepReady));
+
+      // Act
+      stepEventService.handleReadyStepEvent(StepEvent.builder().stepId(stepReady.getId()).build());
+
+      // Assert: a running step is evaluated once it is updated, as before
+      assertEquals(StepStatus.RUN, stepReady.getStatus());
+      verify(workflowService, never()).evaluateWorkflowProgress(any());
+    }
+
+    @Test
+    void given_updateFails_should_endStepThenEvaluateInATransactionOfItsOwn()
+        throws ChainingException {
+      // Arrange
+      transactionsCounted(0);
+      Workflow workflowRun = new Workflow();
+      Step stepRun = stepOf(workflowRun, StepStatus.RUN);
+      ExternalUpdateEvent event = updateOf(stepRun);
+      when(stepService.factoryAction(any(), any()))
+          .thenThrow(new ChainingException("update failed"));
+      evaluationRecorded(workflowRun, false);
+
+      // Act
+      stepEventService.handleExternalUpdateEvent(event);
 
       // Assert
-      assertEquals(StepStatus.END, stepReady.getStatus());
-      verify(stepService).saveStep(stepReady);
+      assertEquals(StepStatus.END, stepRun.getStatus());
+      assertEquals(1, savedIn.get());
+      assertEquals(2, evaluatedIn.get());
+      verify(workflowService).saveWorkflowRun(workflowRun);
+    }
+
+    @Test
+    void given_updateSucceeds_should_saveThenEvaluateInATransactionOfItsOwn()
+        throws ChainingException {
+      // Arrange: two steps ending at once each evaluate after their own commit, so the last to
+      // commit sees the other ended
+      transactionsCounted(0);
+      Workflow workflowRun = new Workflow();
+      Step stepRun = stepOf(workflowRun, StepStatus.RUN);
+      ExternalUpdateEvent event = updateOf(stepRun);
+      when(stepService.factoryAction(any(), any())).thenReturn(actionStep);
+      when(actionStep.update(stepRun)).thenReturn(Optional.of(stepRun));
+      evaluationRecorded(workflowRun, false);
+
+      // Act
+      stepEventService.handleExternalUpdateEvent(event);
+
+      // Assert
+      assertEquals(1, savedIn.get());
+      assertEquals(2, evaluatedIn.get());
+      verify(workflowService).saveWorkflowRun(workflowRun);
+    }
+
+    @Test
+    void given_readyEventDropped_should_endStepThenEvaluateInATransactionOfItsOwn()
+        throws ChainingException {
+      // Arrange: the event transaction fails for good, the transaction ending the step succeeds
+      transactionsCounted(1);
+      Workflow workflowRun = new Workflow();
+      Step step = stepOf(workflowRun, StepStatus.READY);
+      StepEvent event = StepEvent.builder().stepId(step.getId()).build();
+      event.setRetryCount(chainingConfig.getMaxRetryCount());
+      when(stepRepository.findForUpdateById(step.getId())).thenReturn(Optional.of(step));
+      evaluationRecorded(workflowRun, false);
+
+      // Act
+      stepEventService.handleReadyStepEvent(event);
+
+      // Assert
+      assertEquals(StepStatus.END, step.getStatus());
+      assertEquals(1, savedIn.get());
+      assertEquals(2, evaluatedIn.get());
+    }
+
+    @Test
+    void given_evaluationFails_should_keepTheCommittedStepAndNotThrow() throws ChainingException {
+      // Arrange
+      transactionsCounted(0);
+      Workflow workflowRun = new Workflow();
+      Step stepRun = stepOf(workflowRun, StepStatus.RUN);
+      ExternalUpdateEvent event = updateOf(stepRun);
+      when(stepService.factoryAction(any(), any()))
+          .thenThrow(new ChainingException("update failed"));
+      evaluationRecorded(workflowRun, true);
+
+      // Act
+      assertDoesNotThrow(() -> stepEventService.handleExternalUpdateEvent(event));
+
+      // Assert: the step was saved in a transaction the evaluation never joined, and the
+      // evaluation was tried again a bounded number of times, each in a transaction of its own
+      assertEquals(StepStatus.END, stepRun.getStatus());
+      assertEquals(1, savedIn.get());
+      assertEquals(1 + chainingConfig.getMaxRetryCount(), evaluatedIn.get() - 1);
+      verify(workflowService, times(1 + chainingConfig.getMaxRetryCount()))
+          .evaluateWorkflowProgress(workflowRun);
       verify(workflowService, never()).saveWorkflowRun(any());
+    }
+
+    @Test
+    void given_evaluationFailsOnce_should_evaluateAgainAndSave() throws ChainingException {
+      // Arrange: a transient failure (a deadlock, say) would otherwise leave a dependent step
+      // blocked until the workflow's timeout, no later event evaluating the run
+      transactionsCounted(0);
+      Workflow workflowRun = new Workflow();
+      Step stepRun = stepOf(workflowRun, StepStatus.RUN);
+      ExternalUpdateEvent event = updateOf(stepRun);
+      when(stepService.factoryAction(any(), any())).thenReturn(actionStep);
+      when(actionStep.update(stepRun)).thenReturn(Optional.of(stepRun));
+      evaluationRecorded(workflowRun, 1);
+
+      // Act
+      stepEventService.handleExternalUpdateEvent(event);
+
+      // Assert
+      verify(workflowService, times(2)).evaluateWorkflowProgress(workflowRun);
+      verify(workflowService).saveWorkflowRun(workflowRun);
+      assertEquals(3, evaluatedIn.get());
     }
 
     @Test
     void given_stepWithoutWorkflow_should_endStepWithoutEvaluating() throws ChainingException {
       // Arrange
+      transactionsCounted(0);
       Step stepReady = stepOf(null, StepStatus.READY);
+      when(stepRepository.findForUpdateById(stepReady.getId())).thenReturn(Optional.of(stepReady));
       when(stepService.factoryAction(any(), any())).thenReturn(actionStep);
       when(actionStep.run(stepReady)).thenReturn(Optional.empty());
 
       // Act
-      stepEventService.run(stepReady);
+      stepEventService.handleReadyStepEvent(StepEvent.builder().stepId(stepReady.getId()).build());
 
       // Assert
       assertEquals(StepStatus.END, stepReady.getStatus());
+      assertEquals(1, transactions.get());
       verify(workflowService, never()).evaluateWorkflowProgress(any());
     }
   }

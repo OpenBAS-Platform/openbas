@@ -87,17 +87,19 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
         stepEvent.getTenantId() != null ? stepEvent.getTenantId() : DEFAULT_TENANT_UUID;
     TenantContext.setCurrentTenant(tenantId);
     try {
+      AtomicReference<Workflow> toEvaluate = new AtomicReference<>();
       tenantTx.execute(
           TxCtx.forTenant(tenantId),
           () ->
               stepRepository
                   .findForUpdateById(stepEvent.getStepId())
                   .ifPresentOrElse(
-                      this::run,
+                      step -> run(step).ifPresent(toEvaluate::set),
                       () ->
                           log.error(
                               "[Chaining] Ready consume: Step not found for StepEvent ID: {}",
                               stepEvent.getStepId())));
+      evaluateAfterCommit(toEvaluate.get(), tenantId, stepEvent.getStepId());
     } catch (Exception e) {
       if (stepEvent.getRetryCount() < chainingConfig.getMaxRetryCount()) {
         stepEvent.setRetryCount(stepEvent.getRetryCount() + 1);
@@ -135,11 +137,10 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
    * Ends a READY step whose event is dropped, so it no longer counts as active and the workflow can
    * end. Runs in a new transaction (the failed one was rolled back), under a row lock, and only if
    * the step is still READY: a step another event moved on is left untouched. If this fails too,
-   * the step stays READY. Its workflow run is then evaluated in a transaction of its own, so that a
-   * failed evaluation never puts the step back to READY.
+   * the step stays READY. Its workflow run is then evaluated once this transaction is committed.
    */
   private void endReadyStepWithoutEvent(StepEvent stepEvent, String tenantId) {
-    AtomicReference<Step> ended = new AtomicReference<>();
+    AtomicReference<Workflow> toEvaluate = new AtomicReference<>();
     try {
       tenantTx.execute(
           TxCtx.forTenant(tenantId),
@@ -147,11 +148,7 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
               stepRepository
                   .findForUpdateById(stepEvent.getStepId())
                   .filter(step -> step.getStatus() == StepStatus.READY)
-                  .ifPresent(
-                      step -> {
-                        endStep(step);
-                        ended.set(step);
-                      }));
+                  .ifPresent(step -> toEvaluate.set(endStep(step))));
     } catch (Exception e) {
       log.error(
           "[Chaining] Could not end step {} after its event was dropped, it stays READY.",
@@ -159,49 +156,57 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
           e);
       return;
     }
-    if (ended.get() != null) {
-      try {
-        tenantTx.execute(TxCtx.forTenant(tenantId), () -> evaluateProgressAfter(ended.get()));
-      } catch (Exception e) {
-        log.error(
-            "[Chaining] Could not evaluate the workflow run of step {} after its event was dropped.",
-            stepEvent.getStepId(),
-            e);
-      }
-    }
+    evaluateAfterCommit(toEvaluate.get(), tenantId, stepEvent.getStepId());
+  }
+
+  /** Ends a step and gives its workflow run, which is evaluated once this is committed. */
+  private Workflow endStep(Step step) {
+    step.setStatus(StepStatus.END);
+    stepService.saveStep(step);
+    return step.getWorkflow();
   }
 
   /**
-   * Ends a step that failed, then evaluates its workflow run again, as the end of a step that ran
-   * does: a step that depends on it (DEPEND_ON) waits for it to end, whatever the outcome, and the
-   * run ends once nothing is left to do.
+   * Evaluates a workflow run once the transaction that ended or updated one of its steps is
+   * committed, in a transaction of its own. A step that depends on another (DEPEND_ON) waits until
+   * none of the other's run steps is READY or RUN: evaluated after its own commit, the last of two
+   * steps ending at the same time sees the other ended, and a failed evaluation never puts a step
+   * back to READY or RUN. A failed evaluation is tried again, each time in a new transaction, up to
+   * the retry count of the chaining configuration: no later event may come to evaluate the run. A
+   * failure left is logged; nothing is thrown. The caller has set the tenant on the thread.
+   *
+   * @param workflowRun the workflow run to evaluate, or {@code null} for none
+   * @param tenantId the tenant of the run
+   * @param cause the step, or delayed entry, whose change is evaluated, for the logs
    */
-  private void endFailedStep(Step step) {
-    endStep(step);
-    evaluateProgressAfter(step);
-  }
-
-  private void endStep(Step step) {
-    step.setStatus(StepStatus.END);
-    stepService.saveStep(step);
-  }
-
-  /** Evaluates the workflow run of a step that ended on a failure; a failure is logged. */
-  private void evaluateProgressAfter(Step step) {
-    Workflow workflowRun = step.getWorkflow();
+  public void evaluateAfterCommit(Workflow workflowRun, String tenantId, String cause) {
     if (workflowRun == null) {
       return;
     }
-    try {
-      workflowService.evaluateWorkflowProgress(workflowRun);
-      workflowService.saveWorkflowRun(workflowRun);
-    } catch (ChainingException e) {
-      log.error(
-          "[Chaining] Evaluation of WORKFLOW Progress has failed after STEP ended on a failure. Workflow ID: {}, Step ID: {}. {}",
-          workflowRun.getId(),
-          step.getId(),
-          e.getMessage(),
-          e);
+    int attempts = 1 + chainingConfig.getMaxRetryCount();
+    for (int attempt = 1; attempt <= attempts; attempt++) {
+      try {
+        tenantTx.execute(
+            TxCtx.forTenant(tenantId),
+            () -> {
+              try {
+                workflowService.saveWorkflowRun(
+                    workflowService.evaluateWorkflowProgress(workflowRun));
+              } catch (ChainingException e) {
+                throw new IllegalStateException(e.getMessage(), e);
+              }
+            });
+        return;
+      } catch (Exception e) {
+        log.error(
+            "[Chaining] Evaluation of WORKFLOW Progress has failed after a STEP update (attempt {}/{}). Workflow ID: {}, cause: {}. {}",
+            attempt,
+            attempts,
+            workflowRun.getId(),
+            cause,
+            e.getMessage(),
+            e);
+      }
     }
   }
 
@@ -209,8 +214,10 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
    * Run step that is ready.
    *
    * @param stepReady step ready to run
+   * @return the workflow run to evaluate once this is committed: the step's, when it ended on a
+   *     failure
    */
-  void run(Step stepReady) {
+  Optional<Workflow> run(Step stepReady) {
     // Guard: ignore if workflow run is not runnable (END or STOP).
     // Reads fresh status from DB to catch concurrent timeout/pause completion.
     Workflow workflowRun = stepReady.getWorkflow();
@@ -221,7 +228,7 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
           "[Chaining] Ignoring run request for step {} because workflow run {} is not runnable (END/STOP).",
           stepReady.getId(),
           workflowRun.getId());
-      return;
+      return Optional.empty();
     }
 
     Step stepRun;
@@ -236,7 +243,7 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
         log.warn(
             "[Chaining] Ready consume: step {} already ran, duplicate READY request dropped.",
             stepReady.getId());
-        return;
+        return Optional.empty();
       }
       stepRun =
           actionStep
@@ -249,12 +256,12 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
           stepReady.getId(),
           e.getMessage(),
           e);
-      endFailedStep(stepReady);
-      return;
+      return Optional.ofNullable(endStep(stepReady));
     }
 
     stepRun.setStatus(StepStatus.RUN);
     stepService.saveStep(stepRun);
+    return Optional.empty();
   }
 
   // -- EXTERNAL UPDATE EVENTS --
@@ -294,13 +301,23 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
         stepEvent.getTenantId() != null ? stepEvent.getTenantId() : DEFAULT_TENANT_UUID;
     TenantContext.setCurrentTenant(tenantId);
     try {
-      tenantTx.execute(TxCtx.forTenant(tenantId), () -> processExternalUpdateEvent(stepEvent));
+      AtomicReference<Workflow> toEvaluate = new AtomicReference<>();
+      tenantTx.execute(
+          TxCtx.forTenant(tenantId),
+          () -> processExternalUpdateEvent(stepEvent).ifPresent(toEvaluate::set));
+      evaluateAfterCommit(toEvaluate.get(), tenantId, stepEvent.getStepId());
     } finally {
       TenantContext.clearCurrentTenant();
     }
   }
 
-  private void processExternalUpdateEvent(ExternalUpdateEvent stepEvent) {
+  /**
+   * Updates a step from an external event.
+   *
+   * @return the workflow run to evaluate once this is committed: the step's, once it was updated or
+   *     ended on a failure
+   */
+  private Optional<Workflow> processExternalUpdateEvent(ExternalUpdateEvent stepEvent) {
     Step stepRun;
     try {
       stepRun = stepService.findById(stepEvent.getStepId());
@@ -308,13 +325,13 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
         log.info(
             "[Chaining] Update consume: Step already in END state. Step ID: {}",
             stepEvent.getStepId());
-        return;
+        return Optional.empty();
       } else if (stepRun.getStatus() != StepStatus.RUN) {
         log.error(
             "[Chaining] Update consume: Step not in RUN or END state. Step ID: {}, Current Status: {}",
             stepEvent.getStepId(),
             stepRun.getStatus());
-        return;
+        return Optional.empty();
       }
     } catch (ElementNotFoundException e) {
       // Todo: system notif queue fail + system log for step + status FAIL
@@ -323,7 +340,7 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
           stepEvent.getStepId(),
           e.getMessage(),
           e);
-      return;
+      return Optional.empty();
     }
 
     // Guard: ignore if workflow run has already ended (e.g. timeout).
@@ -334,7 +351,7 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
           "[Chaining] Ignoring external update event for step {} because workflow run {} has ended.",
           stepRun.getId(),
           workflowRun.getId());
-      return;
+      return Optional.empty();
     }
 
     Optional<Step> stepUpdatedOpt;
@@ -350,8 +367,7 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
           stepRun.getId(),
           e.getMessage(),
           e);
-      endFailedStep(stepRun);
-      return;
+      return Optional.ofNullable(endStep(stepRun));
     }
 
     if (stepUpdatedOpt.isPresent()) {
@@ -370,18 +386,9 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
       }
 
       stepService.saveStep(stepUpdated);
-      try {
-        workflowService.evaluateWorkflowProgress(stepUpdated.getWorkflow());
-        workflowService.saveWorkflowRun(stepUpdated.getWorkflow());
-      } catch (ChainingException e) {
-        log.error(
-            "[Chaining] Update consume: Evaluation of WORKFLOW Progress has failed with STEP (RUN) update. Workflow ID: {}, Step ID: {}. {}",
-            stepUpdated.getWorkflow().getId(),
-            stepUpdated.getId(),
-            e.getMessage(),
-            e);
-      }
+      return Optional.ofNullable(stepUpdated.getWorkflow());
     }
+    return Optional.empty();
   }
 
   /**
