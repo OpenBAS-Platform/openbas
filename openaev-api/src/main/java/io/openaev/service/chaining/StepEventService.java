@@ -15,6 +15,7 @@ import io.openaev.rest.exception.ElementNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -134,9 +135,11 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
    * Ends a READY step whose event is dropped, so it no longer counts as active and the workflow can
    * end. Runs in a new transaction (the failed one was rolled back), under a row lock, and only if
    * the step is still READY: a step another event moved on is left untouched. If this fails too,
-   * the step stays READY.
+   * the step stays READY. Its workflow run is then evaluated in a transaction of its own, so that a
+   * failed evaluation never puts the step back to READY.
    */
   private void endReadyStepWithoutEvent(StepEvent stepEvent, String tenantId) {
+    AtomicReference<Step> ended = new AtomicReference<>();
     try {
       tenantTx.execute(
           TxCtx.forTenant(tenantId),
@@ -146,13 +149,58 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
                   .filter(step -> step.getStatus() == StepStatus.READY)
                   .ifPresent(
                       step -> {
-                        step.setStatus(StepStatus.END);
-                        stepService.saveStep(step);
+                        endStep(step);
+                        ended.set(step);
                       }));
     } catch (Exception e) {
       log.error(
           "[Chaining] Could not end step {} after its event was dropped, it stays READY.",
           stepEvent.getStepId(),
+          e);
+      return;
+    }
+    if (ended.get() != null) {
+      try {
+        tenantTx.execute(TxCtx.forTenant(tenantId), () -> evaluateProgressAfter(ended.get()));
+      } catch (Exception e) {
+        log.error(
+            "[Chaining] Could not evaluate the workflow run of step {} after its event was dropped.",
+            stepEvent.getStepId(),
+            e);
+      }
+    }
+  }
+
+  /**
+   * Ends a step that failed, then evaluates its workflow run again, as the end of a step that ran
+   * does: a step that depends on it (DEPEND_ON) waits for it to end, whatever the outcome, and the
+   * run ends once nothing is left to do.
+   */
+  private void endFailedStep(Step step) {
+    endStep(step);
+    evaluateProgressAfter(step);
+  }
+
+  private void endStep(Step step) {
+    step.setStatus(StepStatus.END);
+    stepService.saveStep(step);
+  }
+
+  /** Evaluates the workflow run of a step that ended on a failure; a failure is logged. */
+  private void evaluateProgressAfter(Step step) {
+    Workflow workflowRun = step.getWorkflow();
+    if (workflowRun == null) {
+      return;
+    }
+    try {
+      workflowService.evaluateWorkflowProgress(workflowRun);
+      workflowService.saveWorkflowRun(workflowRun);
+    } catch (ChainingException e) {
+      log.error(
+          "[Chaining] Evaluation of WORKFLOW Progress has failed after STEP ended on a failure. Workflow ID: {}, Step ID: {}. {}",
+          workflowRun.getId(),
+          step.getId(),
+          e.getMessage(),
           e);
     }
   }
@@ -201,17 +249,8 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
           stepReady.getId(),
           e.getMessage(),
           e);
-      stepReady.setStatus(StepStatus.END);
-      stepService.saveStep(stepReady);
+      endFailedStep(stepReady);
       return;
-      // todo Check all executed steps, if all ended, end workflow run
-      /* int runningStep = stepRepository.countRunningStep(stepReady.getWorkflow().getId());
-      if (runningStep == 0) {
-        // TODO manage steptemplate with time delay
-        Workflow run = stepReady.getWorkflow();
-        run.setStatus(WorkflowStatus.END);
-        workflowService.saveWorkflowRun(run);
-      }*/
     }
 
     stepRun.setStatus(StepStatus.RUN);
@@ -311,8 +350,7 @@ public class StepEventService implements StepEventHandler, ExternalUpdateEventHa
           stepRun.getId(),
           e.getMessage(),
           e);
-      stepRun.setStatus(StepStatus.END);
-      stepService.saveStep(stepRun);
+      endFailedStep(stepRun);
       return;
     }
 
