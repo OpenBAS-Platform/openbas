@@ -10,7 +10,6 @@ import io.openaev.api.chaining.dto.EventOutput;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.ConditionRepository;
 import io.openaev.database.repository.StepConditionRow;
-import io.openaev.database.repository.StepDelayQueueRepository;
 import io.openaev.database.repository.StepRepository;
 import io.openaev.database.repository.WorkflowRepository;
 import io.openaev.rest.exception.BadRequestException;
@@ -44,7 +43,6 @@ public class ConditionService {
 
   private final ConditionRepository conditionRepository;
   private final StepRepository stepRepository;
-  private final StepDelayQueueRepository stepDelayQueueRepository;
   private final WorkflowRepository workflowRepository;
 
   // -- CONDITION TREE CREATE --
@@ -693,9 +691,6 @@ public class ConditionService {
     return prepareInputsForStepExecution(nextStepTemplateToExecute, workflowRun, mapperConditions);
   }
 
-  /** The statuses of a run step that has been launched and has not ended. */
-  private static final Set<StepStatus> UNFINISHED = Set.of(StepStatus.READY, StepStatus.RUN);
-
   /**
    * Evaluates all DEPEND_ON conditions for a step.
    *
@@ -734,13 +729,8 @@ public class ConditionService {
         return false;
       }
 
-      boolean stillRunning =
-          stepRepository.existsByStepTemplateIdAndWorkflowIdAndStatusIn(
-              dependentStepTemplateId, workflowRun.getId(), UNFINISHED);
-
-      if (stillRunning
-          || stepDelayQueueRepository.existsByStepTemplateIdAndWorkflowRunId(
-              dependentStepTemplateId, workflowRun.getId())) {
+      if (stepRepository.existsUnfinishedByStepTemplateIdAndWorkflowRunId(
+          dependentStepTemplateId, workflowRun.getId())) {
         log.debug(
             "[Chaining] DEPEND_ON not satisfied: step template {} has not ended in workflow run {}",
             dependentStepTemplateId,

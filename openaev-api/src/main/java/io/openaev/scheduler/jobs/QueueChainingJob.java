@@ -135,6 +135,11 @@ public class QueueChainingJob implements Job {
               }
             } catch (ChainingException e) {
               log.error("[Chaining] Delay consume failed : {}", e.getMessage(), e);
+              // A ready step that could not be published was ended: nothing else will wake the
+              // steps that depend on its template.
+              if (tenantId != null) {
+                toEvaluate.add(Map.entry(stepDelayQueue.getWorkflowRun(), tenantId));
+              }
             }
           }
         });

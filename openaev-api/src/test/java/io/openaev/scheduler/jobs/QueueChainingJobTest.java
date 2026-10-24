@@ -28,6 +28,7 @@ import io.openaev.database.repository.StepDelayQueueRepository;
 import io.openaev.database.repository.StepRepository;
 import io.openaev.database.repository.TenantRepository;
 import io.openaev.database.repository.WorkflowRepository;
+import io.openaev.rest.exception.ChainingException;
 import io.openaev.service.chaining.StepService;
 import io.openaev.service.chaining.WorkflowService;
 import io.openaev.utils.fixtures.ScenarioFixture;
@@ -176,9 +177,7 @@ class QueueChainingJobTest extends IntegrationTest {
     AtomicBoolean entryGoneWhenEvaluated = new AtomicBoolean();
     doAnswer(
             invocation -> {
-              entryGoneWhenEvaluated.set(
-                  !stepDelayQueueRepository.existsByStepTemplateIdAndWorkflowRunId(
-                      dueEntry.getStepTemplate().getId(), runId));
+              entryGoneWhenEvaluated.set(!stepDelayQueueRepository.existsById(dueEntry.getId()));
               return invocation.getArgument(0);
             })
         .when(workflowService)
@@ -190,6 +189,26 @@ class QueueChainingJobTest extends IntegrationTest {
     // Assert
     verify(workflowService).evaluateWorkflowProgress(argThat(run -> runId.equals(run.getId())));
     assertThat(entryGoneWhenEvaluated).isTrue();
+  }
+
+  @Test
+  @DisplayName("an entry whose ready step cannot be published evaluates its run after commit")
+  void given_readyStepNotPublished_should_evaluateItsRunAfterCommit() throws Exception {
+    // Arrange: publishing ends the step and throws; no READY event follows to wake its dependents
+    Workflow scenarioBackedRun = WorkflowFixture.getDefaultWorkflowExecution(WorkflowStatus.RUN);
+    StepDelayQueue dueEntry = persistDueDelayQueueEntry(scenarioBackedRun);
+    String runId = dueEntry.getWorkflowRun().getId();
+    doReturn(List.of(new Step())).when(stepService).createReadySteps(any(), any(), any(), anyInt());
+    doThrow(new ChainingException("broker down")).when(stepService).enqueueReadySteps(any(), any());
+    doAnswer(invocation -> invocation.getArgument(0))
+        .when(workflowService)
+        .evaluateWorkflowProgress(any());
+
+    // Act
+    job.execute(null);
+
+    // Assert
+    verify(workflowService).evaluateWorkflowProgress(argThat(run -> runId.equals(run.getId())));
   }
 
   @Test

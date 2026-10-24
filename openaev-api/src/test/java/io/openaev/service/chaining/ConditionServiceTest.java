@@ -11,7 +11,6 @@ import io.openaev.api.chaining.dto.EventInput;
 import io.openaev.api.chaining.dto.EventOutput;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.ConditionRepository;
-import io.openaev.database.repository.StepDelayQueueRepository;
 import io.openaev.database.repository.StepRepository;
 import io.openaev.database.repository.WorkflowRepository;
 import io.openaev.rest.exception.BadRequestException;
@@ -48,7 +47,6 @@ public class ConditionServiceTest {
   @Captor private ArgumentCaptor<List<Condition>> conditionsCaptor;
   @Mock private ConditionRepository conditionRepository;
   @Mock private StepRepository stepRepository;
-  @Mock private StepDelayQueueRepository stepDelayQueueRepository;
   @Mock private WorkflowRepository workflowRepository;
   @Mock private WorkflowStateService workflowStateService;
   @Spy private ConditionUtils conditionUtils;
@@ -1131,8 +1129,8 @@ public class ConditionServiceTest {
       doReturn(List.of(dependOnCondition)).when(conditionService).findAllConditionsByStepId(stepId);
       when(stepRepository.existsByStepTemplateIdAndWorkflowId(dependentStepTemplateId, workflowId))
           .thenReturn(true);
-      when(stepRepository.existsByStepTemplateIdAndWorkflowIdAndStatusIn(
-              dependentStepTemplateId, workflowId, Set.of(StepStatus.READY, StepStatus.RUN)))
+      when(stepRepository.existsUnfinishedByStepTemplateIdAndWorkflowRunId(
+              dependentStepTemplateId, workflowId))
           .thenReturn(true);
 
       // -------- Act --------
@@ -1148,7 +1146,8 @@ public class ConditionServiceTest {
     void given_dependOnParentTargetStillDelayed_should_returnEmptyList() throws ChainingException {
       // -------- Arrange --------
       // Every run step of the parent has ended, but a target held back by the rate limit waits in
-      // the delay queue: the parent has not ended on every target.
+      // the delay queue: the parent has not ended on every target. The query reads both in one
+      // statement (see StepUnfinishedQueryIntegrationTest).
       Step stepTemplate = mock(Step.class);
       Workflow workflowRun = mock(Workflow.class);
 
@@ -1166,7 +1165,7 @@ public class ConditionServiceTest {
       doReturn(List.of(dependOnCondition)).when(conditionService).findAllConditionsByStepId(stepId);
       when(stepRepository.existsByStepTemplateIdAndWorkflowId(dependentStepTemplateId, workflowId))
           .thenReturn(true);
-      when(stepDelayQueueRepository.existsByStepTemplateIdAndWorkflowRunId(
+      when(stepRepository.existsUnfinishedByStepTemplateIdAndWorkflowRunId(
               dependentStepTemplateId, workflowId))
           .thenReturn(true);
 

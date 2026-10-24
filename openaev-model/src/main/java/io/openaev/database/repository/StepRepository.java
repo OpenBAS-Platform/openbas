@@ -274,17 +274,31 @@ public interface StepRepository extends JpaRepository<Step, String> {
   boolean existsByStepTemplateIdAndWorkflowId(String stepTemplateId, String workflowRunId);
 
   /**
-   * Checks whether the given step template has a run step in one of the given statuses within the
-   * given workflow run: a {@code DEPEND_ON} condition waits while its prerequisite has one that is
-   * still {@code READY} or {@code RUN}.
+   * Whether a step template has not ended in a workflow run: one of its run steps is READY or RUN,
+   * or one of its targets waits in the delay queue (held back by the rate limit). Both are read in
+   * one statement: a delayed target the queue turns into a READY step between two reads would
+   * otherwise be in neither.
    *
-   * @param stepTemplateId the ID of the step template to check
-   * @param workflowRunId the ID of the workflow run to scope the check
-   * @param statuses the statuses to look for
-   * @return {@code true} if a matching step exists
+   * @param stepTemplateId the ID of the step template
+   * @param workflowRunId the ID of the workflow run
+   * @return {@code true} if the template has not ended in the run
    */
-  boolean existsByStepTemplateIdAndWorkflowIdAndStatusIn(
-      String stepTemplateId, String workflowRunId, Collection<StepStatus> statuses);
+  @Query(
+      value =
+          """
+      SELECT EXISTS (
+               SELECT 1 FROM steps
+               WHERE step_template_id = :stepTemplateId
+                 AND step_workflow_id = :workflowRunId
+                 AND step_status IN ('READY', 'RUN'))
+          OR EXISTS (
+               SELECT 1 FROM steps_delay_queue
+               WHERE steps_delay_queue_step_template_id = :stepTemplateId
+                 AND steps_delay_queue_workflow_run_id = :workflowRunId)
+      """,
+      nativeQuery = true)
+  boolean existsUnfinishedByStepTemplateIdAndWorkflowRunId(
+      @Param("stepTemplateId") String stepTemplateId, @Param("workflowRunId") String workflowRunId);
 
   /**
    * Returns {@code true} if the given step template has already spawned at least one run step
